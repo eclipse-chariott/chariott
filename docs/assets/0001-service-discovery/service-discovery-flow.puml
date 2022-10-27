@@ -1,0 +1,23 @@
+@startuml
+
+collections "Provider/App"  as Provider
+
+loop every x seconds
+    Provider -> Middleware: Send discovery message
+    Middleware -> Middleware: "Store provider name and port"
+
+    alt IF (new provider) OR IF (middleware restart)
+
+        Middleware --> Provider: "Response message with capability request"
+        Provider -> Middleware: "Send capabilities"
+        Middleware -> Middleware: "Store capabilities in-memory"
+        Middleware --> Provider: "Acknowledgement"
+
+    else IF (known provider)
+
+        Middleware --> Provider: "Acknowledgement"
+
+    end
+end
+
+@enduml

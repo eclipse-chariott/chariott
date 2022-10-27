@@ -1,0 +1,21 @@
+[package]
+name = "chariott-common"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[dependencies]
+prost = { workspace = true }
+prost-types = { workspace = true }
+regex = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+tokio = { workspace = true, features = ["signal"] }
+tokio-util = { workspace = true }
+tonic = { workspace = true }
+tracing = { workspace = true }
+
+[build-dependencies]
+tonic-build = { workspace = true }
+
+[dev-dependencies]
+tempfile = { version = "3.3.0" }

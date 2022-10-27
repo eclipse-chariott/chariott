@@ -1,0 +1,58 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT license.
+
+ARG RUST_VERSION=1.64
+FROM rust:${RUST_VERSION} AS builder
+
+# Dockerfile for building SDV Chariott container
+#
+# This Dockerfile utilizes a two step build process. It builds Chariott with
+# statically linked dependencies (using musl vs. glibc to accomplish this) for a
+# specific architecture such that we can utilize a scratch container without
+# further dependencies for our final container, minimizing container size.
+
+# Examples user id
+ARG SAMPLE_UID=10001
+
+# User name
+ARG USER_NAME=sample
+
+RUN apt update && apt upgrade -y
+RUN apt install -y cmake protobuf-compiler musl-tools
+
+WORKDIR /sdv
+
+COPY ./ .
+
+RUN rustup target add x86_64-unknown-linux-musl
+
+RUN cargo build --release --target=x86_64-unknown-linux-musl --package lt-provider-app
+
+# unprivileged identity to run Chariott as
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${SAMPLE_UID}" \
+    ${USER_NAME}
+
+#####################################################################################################
+## Final image
+####################################################################################################
+FROM alpine:latest
+ARG APP_NAME
+ARG USER_NAME
+# Import Chariott user and group from builder.
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
+
+WORKDIR /sdv
+
+# Copy our build
+COPY --from=builder /sdv/target/x86_64-unknown-linux-musl/release/lt-provider-app /sdv/lt-provider-app
+
+# Use the unprivileged chariott user during execution.
+USER ${USER_NAME}:${USER_NAME}
+CMD ["sh", "-c", "./lt-provider-app"]

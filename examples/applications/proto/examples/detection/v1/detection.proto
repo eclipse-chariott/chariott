@@ -1,0 +1,21 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
+syntax = "proto3";
+
+package examples.detection.v1;
+
+import "chariott/common/v1/common.proto";
+
+message DetectRequest {
+    chariott.common.v1.Blob blob = 1;
+}
+
+message DetectResponse {
+    repeated DetectEntry entries = 1;
+}
+
+message DetectEntry {
+    string object = 1;
+    double confidence = 2;
+}

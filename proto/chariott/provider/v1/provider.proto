@@ -1,0 +1,33 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
+/**
+* Provider definition
+*
+* This proto file defines the contract between chariott and an intent provider.
+*/
+
+
+syntax = "proto3";
+
+package chariott.provider.v1;
+
+import "chariott/common/v1/common.proto";
+
+/**
+* The provider service definition.
+*
+* This service is used by chariott to communicate with the provider. Each service application
+* that wants to be a provider must implement this service.
+*/
+service ProviderService  {
+    rpc Fulfill(FulfillRequest) returns (FulfillResponse) {}
+}
+
+message FulfillRequest {
+    chariott.common.v1.Intent intent = 1;
+}
+
+message FulfillResponse {
+    chariott.common.v1.Fulfillment fulfillment = 1;
+}

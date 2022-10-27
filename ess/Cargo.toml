@@ -1,0 +1,21 @@
+[package]
+name = "ess"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[dependencies]
+tokio = { workspace = true, features = ["macros", "sync"] }
+tokio-stream = { workspace = true }
+tokio-util = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+chariott-common = { path = "../common/" }
+criterion = { version = "0.4.0", features = ["async_tokio"] }
+futures = { workspace = true }
+tokio = { workspace = true, features = ["macros", "sync", "rt-multi-thread"] }
+
+[[bench]]
+name = "load_bench"
+harness = false

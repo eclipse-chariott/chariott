@@ -1,0 +1,66 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.231.5/containers/rust
+{
+  "name": "Rust",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      // Use the VARIANT arg to pick a Debian OS version: bullseye (buster breaks rust-analyzer extension #508)
+      // Use bullseye when on local on arm64/Apple Silicon.
+      "DOTNET_VERSION": "6.0.301",
+      "VARIANT": "bullseye"
+    },
+    "context": ".."
+  },
+  "runArgs": [
+    "--cap-add=SYS_PTRACE",
+    "--security-opt",
+    "seccomp=unconfined"
+  ],
+  // Set *default* container specific settings.json values on container create.
+  "settings": {
+    "lldb.executable": "/usr/bin/lldb",
+    // VS Code don't watch files under ./target
+    "files.watcherExclude": {
+      "**/target/**": true
+    },
+    "rust-analyzer.checkOnSave.command": "clippy",
+    "rust-analyzer.checkOnSave.allFeatures": true,
+    "rust-analyzer.checkOnSave.allTargets": true,
+    "rust-analyzer.checkOnSave.extraArgs": [
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "editor.formatOnSave": true, // General VSCode setting to allow a formatter, in this case rustfmt, to format text on save
+    "[rust]": { // Tells VSCode to defer to rust-analyzer's formatter (rustfmt) for rust code
+      "editor.defaultFormatter": "rust-lang.rust-analyzer"
+    },
+    "css.format.enable": false,
+    "html.format.enable": false
+  },
+  // Add the IDs of extensions you want installed when the container is created.
+  "extensions": [
+    "vadimcn.vscode-lldb",
+    "mutantdino.resourcemonitor",
+    "rust-lang.rust-analyzer",
+    "tamasfe.even-better-toml",
+    "serayuzgur.crates",
+    "editorconfig.editorconfig",
+    "DavidAnson.vscode-markdownlint",
+    "stkb.rewrap",
+    "zxh404.vscode-proto3",
+    "ryanluker.vscode-coverage-gutters",
+    "ms-dotnettools.csharp"
+  ],
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // "forwardPorts": [],
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // "postCreateCommand": "rustc --version",
+  // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+  "remoteUser": "vscode",
+  "remoteEnv": {
+    "PATH": "${containerEnv:PATH}:/home/vscode/.dotnet"
+  },
+  "postStartCommand": "git lfs install && git lfs pull"
+}

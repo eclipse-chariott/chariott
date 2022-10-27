@@ -1,0 +1,126 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
+/**
+* Chariott Runtime
+*
+* The prototype definitions for Chariott.
+*/
+
+syntax = "proto3";
+
+package chariott.runtime.v1;
+
+import "chariott/common/v1/common.proto";
+
+/**
+* The service entry point to Chariott. All functionality is provided through
+* this service.
+*
+* **Announce** a service to Chariott.
+*
+* The Announce method is used to announce a service to Chariott.
+* If an application calls this method with a not already registered service
+* it will get back that the service is in `ANNOUNCED` state. If the service
+* is already registered it will return `NOT_CHANGED`. Each service needs to
+* periodically call within 5 seconds this method in order to keep the service
+* active with Chariott.
+* More details in the [ADR-0012](docs/adr/ctp-2/0012-intent-registration.md)
+*
+* **Register** a service to Chariott.
+*
+* The Register method is used to register a service to Chariott,
+* together with the locality where the service is supposed to run. It also
+* takes a list of intents that the service can handle. It prunes all old
+* registrations for the same service, where a service is identified by the
+* same name and version. It is allowed to run two services with the same name
+* and a different version at the same time.
+*
+* **Fulfill** an intent.
+*
+* The Fulfill method is used to fulfill an intent. Chariott will
+* lookup the registered services that can handle the intent. This is
+* opaque to the caller. It will call the Fulfill method on the selected
+* service that is Chariott selected to be able to handle the intent.
+* More details on intents can be found in the following ADRs:
+* [ADR-0014](docs/adr/ctp-2/0014-intent-discover.md)
+* [ADR-0015](docs/adr/ctp-2/0015-inspection.md)
+* [ADR-0017](docs/adr/ctp-2/0016-intent-invoke.md)
+*/
+service ChariottService {
+    rpc Announce(AnnounceRequest) returns (AnnounceResponse);
+    rpc Register(RegisterRequest) returns (RegisterResponse);
+    rpc Fulfill(FulfillRequest) returns (FulfillResponse);
+}
+
+/**
+* This is used as input to the `Announce` and `Register` method.
+*/
+message IntentServiceRegistration {
+    string name = 1;
+    string version = 2;
+    string url = 3;
+    ExecutionLocality locality = 4;
+
+    /**
+    * A side note about the `ExecutionLocality`. When `CLOUD` is selected this doesn't
+    * mean that the service will be invoked directly in the cloud through Chariott,
+    * but that the service will be invoked in the cloud through a local installed provider
+    * that acts as a proxy to the cloud service. This allows abstraction of the cloud
+    * service interface and protocol.
+    */
+    enum ExecutionLocality {
+        EXECUTION_LOCALITY_LOCAL = 0;
+        EXECUTION_LOCALITY_CLOUD = 1;
+    }
+}
+
+/**
+* This is used as input to the `Announce` method.
+*
+* Message to check if a service is already registered and also to announce a
+* service's health to Chariott.
+*/
+message AnnounceRequest {
+    IntentServiceRegistration service = 1;
+}
+
+message AnnounceResponse {
+    RegistrationState registration_state = 1;
+}
+
+message RegisterRequest {
+    IntentServiceRegistration service = 1;
+    repeated IntentRegistration intents = 2;
+}
+
+message RegisterResponse {
+}
+
+message IntentRegistration {
+    string namespace = 1;
+    Intent intent = 2;
+
+    enum Intent {
+        INTENT_DISCOVER = 0;
+        INTENT_INSPECT = 1;
+        INTENT_READ = 2;
+        INTENT_WRITE = 3;
+        INTENT_INVOKE = 4;
+        INTENT_SUBSCRIBE = 5;
+    }
+}
+
+enum RegistrationState {
+    REGISTRATION_STATE_ANNOUNCED = 0; // service is not registered for Chariott, upon this result the service should call the `Register` method.
+    REGISTRATION_STATE_NOT_CHANGED = 1; // service is registered and successfully announced to Chariott.
+}
+
+message FulfillRequest {
+    string namespace = 1;
+    chariott.common.v1.Intent intent = 2;
+}
+
+message FulfillResponse {
+    chariott.common.v1.Fulfillment fulfillment = 1;
+}

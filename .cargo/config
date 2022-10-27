@@ -1,0 +1,9 @@
+[env]
+DEFAULT_CHARIOTT_URL = "http://0.0.0.0:4243"
+
+[target.'cfg(all())']
+rustflags = ["-D", "warnings"]
+
+[target.aarch64-unknown-linux-musl]
+linker = "aarch64-linux-gnu-gcc"
+rustflags = [ "-C", "target-feature=+crt-static", "-C", "link-arg=-lgcc" ]

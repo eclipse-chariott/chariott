@@ -1,0 +1,378 @@
+#!/usr/bin/env bash
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT license.
+
+set -e
+
+THIS_FILE_PATH="$(readlink -f "$0")"
+THIS_FILE_NAME="$(basename "$THIS_FILE_PATH")"
+cd "$(dirname "$THIS_FILE_PATH")"
+
+if [[ -z "$CHAR_HOME" ]]; then
+    CHAR_HOME="$HOME/.charc"
+fi
+
+if [[ ! -d "$CHAR_HOME" ]]; then
+    mkdir -p "$CHAR_HOME"
+fi
+
+MUX_EVENTS_FILE_PATH="$CHAR_HOME/events"
+GRPC_LOG_DIR_PATH="$CHAR_HOME/log/grpc"
+
+fulfill() {
+    local INTENT; INTENT="$(</dev/stdin)"
+    local REQ; REQ="$(jq <<EOF
+        {
+            "namespace": "$NAMESPACE",
+            "intent": {
+                "$1": $INTENT
+            }
+        }
+EOF
+)"
+    if [[ ! -d "$GRPC_LOG_DIR_PATH" ]]; then
+        mkdir -p "$GRPC_LOG_DIR_PATH"
+    fi
+    local ID; ID="$(date -u +%s.%N)"
+    echo "$REQ" > "$GRPC_LOG_DIR_PATH/req-$ID"
+    grpcurl -plaintext -import-path ../proto -proto ../proto/chariott/runtime/v1/runtime.proto \
+        -d @ "${CHARIOTT_ADDRESS:-0.0.0.0:4243}" \
+        chariott.runtime.v1.ChariottService/Fulfill <<< "$REQ" \
+        | tee "$GRPC_LOG_DIR_PATH/rsp-$ID"
+    if [[ "${PIPESTATUS[*]}" != '0 0' ]]; then return 1; fi
+}
+
+must_be_listening() {
+    if [[ ! -f "$CHANNEL_ID_FILE_PATH" ]]; then
+        echo>&2 'Listening channel not established. Run "listen" sub-command, first.'
+        return 1
+    fi
+}
+
+parse_events() {
+    local JSON LINE
+    while IFS= read -r LINE; do
+        if [[ "$LINE" == '{' ]]; then
+            JSON="$LINE"
+        elif [[ -n "$JSON" ]]; then
+            JSON="$JSON$LINE"
+            if [[ "$LINE" == '}' ]]; then
+                echo "$JSON"
+                unset JSON
+            fi
+        fi
+    done
+}
+
+parse_grpcurl_stream() {
+    [[ -n "$1" ]] || return 2
+    local CHANNEL_ID LINE
+    while IFS= read -r LINE; do
+        if [[ "${LINE::22}" == 'x-chariott-channel-id:' ]]; then
+            CHANNEL_ID=${LINE:22}
+            CHANNEL_ID=${CHANNEL_ID// }
+            break
+        fi
+    done
+    if [[ -z "$CHANNEL_ID" ]]; then
+        echo>&2 'Channel identifier not found.'
+        return 1
+    fi
+    echo "$CHANNEL_ID" > "$1"
+    parse_events
+}
+
+cmd_read() {
+    if [[ -z "$1" ]]; then
+        echo>&2 'Missing key.'
+        return 1
+    fi
+    local KEY; KEY="$(echo -n "$1" | jq -Rsa .)"
+    (fulfill read <<EOF
+        { "key" : $KEY }
+EOF
+    ) | jq -M .fulfillment.read.value
+    if [[ "${PIPESTATUS[*]}" != '0 0' ]]; then return 1; fi
+}
+
+cmd_write() {
+    if [[ -z "$1" ]]; then
+        echo>&2 'Missing key.'
+        return 1
+    fi
+    local KEY; KEY="$(echo -n "$1" | jq -Rsa .)"
+    shift
+    if [ -z "$1" ]; then
+        echo>&2 'Missing value.'
+        return 1
+    fi
+    local VALUE; VALUE="$(echo -n "$1" | jq -Rsa .)"
+    fulfill write >/dev/null <<EOF
+        {
+            "key": $KEY,
+            "value": {
+                "string": $VALUE
+            }
+        }
+EOF
+}
+
+cmd_discover() {
+    fulfill discover <<< '{}' | jq -M .fulfillment.discover.services
+    if [[ "${PIPESTATUS[*]}" != '0 0' ]]; then return 1; fi
+}
+
+cmd_invoke() {
+    if [ -z "$1" ]; then
+        echo>&2 'Missing command.'
+        return 1
+    fi
+    local JSON; JSON="{
+        \"command\": $(echo -n "$1" | jq -Rsa .),
+        \"args\": ["
+    shift
+    local COUNT; COUNT=0
+    while [[ -n "$1" ]]; do
+        if [[ -z "$2" ]]; then
+            echo>&2 'Missing argument.'
+            return 1
+        fi
+        [[ $COUNT -gt 0 ]] && JSON="$JSON, "
+        case "$1" in
+            -s|--string)
+                JSON="$JSON { \"string\": $(jq -Rsa . <<< "$2") }"
+                ;;
+            -b|--bool)
+                JSON="$JSON { \"bool\": $2 }"
+                ;;
+            -n|--int32)
+                JSON="$JSON { \"int32\": $2 }"
+                ;;
+            *)
+                echo>&2 "Invalid argument type: $1"
+                return 1
+                ;;
+        esac
+        shift 2
+        COUNT=$((COUNT + 1))
+    done
+    printf "%s ]\n}\n" "$JSON" | fulfill invoke | jq -M .fulfillment.invoke.return
+    if [[ "${PIPESTATUS[*]}" != '0 0 0' ]]; then return 1; fi
+}
+
+cmd_inspect() {
+    if [ -z "$1" ]; then
+        echo>&2 'Missing query.'
+        return 1
+    fi
+    local QUERY; QUERY="$(echo -n "$1" | jq -Rsa .)"
+    (fulfill inspect <<EOF
+        { "query" : $QUERY }
+EOF
+    ) | jq -M .fulfillment.inspect.entries
+    if [[ "${PIPESTATUS[*]}" != '0 0' ]]; then return 1; fi
+}
+
+cmd_subscribe() {
+    must_be_listening
+    local CHANNEL_ID; CHANNEL_ID="$(<"$CHANNEL_ID_FILE_PATH")"
+    local SOURCES; SOURCES="$(printf '%s\n' "$@" | jq -Ra . | jq -s .)"
+    fulfill subscribe >/dev/null <<EOF
+        {
+            "channel_id": "$CHANNEL_ID",
+            "sources": $SOURCES
+        }
+EOF
+}
+
+cmd_listen() {
+    if must_be_listening 2>/dev/null; then
+        echo>&2 'Looks like event listening is already set up.'
+        return 1
+    fi
+    local ADDRESS; ADDRESS="$(
+        cmd_discover \
+            | jq -r '.[] | select(.schemaReference == "chariott.streaming.v1" and .schemaKind == "grpc+proto") | .url' \
+            | tr -d / | sed -E "s/^http://"
+    )"
+    if [ -z "$ADDRESS" ]; then
+        echo>&2 'Failed to determine streaming end-point.'
+        return 1
+    fi
+    local FILE_PATH DIR_PATH
+    for FILE_PATH in "$EVENTS_FILE_PATH" "$LISTENER_PID_FILE_PATH" "$CHANNEL_ID_FILE_PATH"; do
+        DIR_PATH="$(dirname "$FILE_PATH")"
+        if [[ ! -d "$DIR_PATH" ]]; then
+            mkdir -p "$DIR_PATH"
+        fi
+    done
+    if [[ ! -p "$EVENT_STREAM_FIFO" ]]; then
+        mkfifo "$EVENT_STREAM_FIFO"
+    fi
+    grpcurl -v -plaintext -import-path ../proto -proto \
+        ../proto/chariott/streaming/v1/streaming.proto "$ADDRESS" \
+        chariott.streaming.v1.ChannelService/Open > "$EVENT_STREAM_FIFO" &
+    echo>"$LISTENER_PID_FILE_PATH" $!
+    touch "$EVENTS_FILE_PATH" "$MUX_EVENTS_FILE_PATH"
+    local LINE
+    parse_grpcurl_stream "$CHANNEL_ID_FILE_PATH" < "$EVENT_STREAM_FIFO" \
+        | jq -c --unbuffered \
+        | while IFS= read -r LINE; do
+            echo "$LINE" >> "$EVENTS_FILE_PATH"
+            flock "$MUX_EVENTS_FILE_PATH.lock" cat <<< "$LINE" >> "$MUX_EVENTS_FILE_PATH"
+        done &
+    local CHANNEL_ID
+    while [[ ! -f "$CHANNEL_ID_FILE_PATH" ]]; do
+        sleep 0.2
+    done
+    cat "$CHANNEL_ID_FILE_PATH"
+}
+
+cmd_channel() {
+    must_be_listening
+    cat "$CHANNEL_ID_FILE_PATH"
+}
+
+cmd_events() {
+    local FOLLOW; FOLLOW=0
+    local NAMESPACE
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -f) FOLLOW=1 ;;
+            *)
+                if [[ -z "$NAMESPACE" ]]; then
+                    NAMESPACE="$1"
+                    init_channel_context "$1"
+                else
+                    echo>&2 "Invalid argument: $1"
+                    exit 1
+                fi
+                ;;
+        esac
+        shift
+    done
+    if [[ -z "$NAMESPACE" ]]; then
+        if [[ ! -f "$MUX_EVENTS_FILE_PATH" ]]; then
+            echo>&2 'Listening channel not established. Run "listen" sub-command, first.'
+            return 1
+        fi
+        tail --pid=$$ -f "$MUX_EVENTS_FILE_PATH"
+    else
+        if [[ $FOLLOW -ne 0 ]]; then
+            must_be_listening
+            tail --pid=$$ -f "$EVENTS_FILE_PATH"
+        else
+            must_be_listening
+            cat "$EVENTS_FILE_PATH"
+        fi
+    fi
+}
+
+cmd_end() {
+    if [ -d "$CHAR_HOME" ]; then
+        local PID
+        find "$CHAR_HOME" -name pid -print0 -o -name "*.pid" -print0 \
+        | while IFS= read -r -d '' p; do
+            PID="$(<"$p")"
+            kill "$PID" && echo>&2 "$PID killed" || true
+        done
+        rm -rf "$CHAR_HOME"
+    fi
+}
+
+cmd_show() {
+    if [ -z "$1" ]; then
+        echo>&2 'Show what? `request` or `response`?'
+        exit 1
+    fi
+    local TYPE
+    case "$1" in
+        req|request)
+            TYPE=req
+            ;;
+        rsp|response)
+            TYPE=rsp
+            ;;
+        *)
+            echo "Invalid for show: $1"
+            exit 1
+            ;;
+    esac
+    local LOG_FILE_PATH; LOG_FILE_PATH="$(
+        find "$GRPC_LOG_DIR_PATH" -name "$TYPE-*" -printf '%T@\t%p\n' 2>/dev/null \
+        | sort -nr | cut -f 2- | head -1)"
+    if [ -z "$LOG_FILE_PATH" ]; then
+        echo>&2 'Sorry, nothing to show!'
+        exit 1
+    fi
+    cat "$LOG_FILE_PATH"
+}
+
+init_channel_context() {
+    [[ -n "$1" ]] || return 2
+    local NAMESPACE; NAMESPACE="$1"
+    CHANNEL_ID_FILE_PATH="$CHAR_HOME/channel/$NAMESPACE/id"
+    LISTENER_PID_FILE_PATH="$CHAR_HOME/channel/$NAMESPACE/pid"
+    EVENT_STREAM_FIFO="$CHAR_HOME/channel/$NAMESPACE/stream.fifo"
+    EVENTS_FILE_PATH="$CHAR_HOME/channel/$NAMESPACE/events"
+}
+
+chariott_cmd() {
+    if [ -z "$2" ]; then
+        echo>&2 'Missing namespace argument.'
+        return 1
+    fi
+    local COMMAND; COMMAND="${1//-/_}"; shift
+    local NAMESPACE; NAMESPACE="$1"; shift
+    init_channel_context "$NAMESPACE"
+    "cmd_$COMMAND" "$@"
+}
+
+if [ -z "$1" ]; then
+    echo>&2 'Missing command.'
+    exit 1
+fi
+case "$1" in
+    read|\
+    write|\
+    invoke|\
+    discover|\
+    subscribe|\
+    listen|\
+    channel|\
+    inspect)
+        chariott_cmd "$@"
+        ;;
+    events)
+        shift
+        cmd_events "$@"
+        ;;
+    end)
+        cmd_end "$@"
+        ;;
+    show)
+        shift
+        cmd_show "$@"
+        ;;
+    h|help)
+        echo -n "Usage:
+
+    $THIS_FILE_NAME inspect <namespace> <query>
+    $THIS_FILE_NAME discover <namespace>
+    $THIS_FILE_NAME read <namespace> <key>
+    $THIS_FILE_NAME write <namespace> <key> <value>
+    $THIS_FILE_NAME invoke <namespace> <command> [(<type> <arg>)...]
+    $THIS_FILE_NAME listen <namespace>
+    $THIS_FILE_NAME subscribe <namespace> <source>
+    $THIS_FILE_NAME events [<namespace>] [-f]
+    $THIS_FILE_NAME channel <namespace>
+    $THIS_FILE_NAME show (req|request|rsp|response)
+    $THIS_FILE_NAME end
+"
+        ;;
+    *)
+        echo "Unknown command: $1"
+        exit 1
+        ;;
+esac
+exit $?

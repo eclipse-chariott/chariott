@@ -1,0 +1,64 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT license.
+
+ARG RUST_VERSION=1.64
+FROM rust:${RUST_VERSION} AS builder
+
+# Dockerfile for building Chariott base image
+#
+# This Dockerfile builds the packages from chariott workspace with
+# statically linked dependencies (using musl) for x86_64 architecture
+
+# Examples user id
+ARG SAMPLE_UID=10001
+
+# User name
+ENV USER_NAME=sample
+
+RUN apt update && apt upgrade -y
+RUN apt install -y cmake protobuf-compiler musl-tools
+
+# compile openssl for musl
+# from https://qiita.com/liubin/items/6c94f0b61f746c08b74c,
+# but keeping references in case above side goes down
+# https://github.com/sfackler/rust-openssl/issues/183
+# https://github.com/getsentry/rust-musl-cross
+# https://github.com/rust-lang/cargo/issues/713#issuecomment-59597433
+# https://github.com/getsentry/rust-musl-cross/blob/master/Dockerfile
+
+RUN ln -s /usr/include/x86_64-linux-gnu/asm /usr/include/x86_64-linux-musl/asm \
+    && ln -s /usr/include/asm-generic /usr/include/x86_64-linux-musl/asm-generic \
+    && ln -s /usr/include/linux /usr/include/x86_64-linux-musl/linux
+
+WORKDIR /musl
+RUN wget https://www.openssl.org/source/openssl-1.1.1l.tar.gz \
+    && tar -xzf openssl-1.1.1l.tar.gz \
+    && cd openssl-1.1.1l \
+    && CC="musl-gcc -fPIE -pie" ./Configure no-shared no-async linux-x86_64 --prefix=/musl --openssldir=/musl/ssl \
+    && make depend \
+    && make \
+    && make install
+
+ENV PKG_CONFIG_ALLOW_CROSS 1
+ENV OPENSSL_STATIC true
+ENV OPENSSL_DIR /musl
+
+WORKDIR /sdv
+
+COPY ./rust-toolchain .
+
+RUN rustup target add x86_64-unknown-linux-musl
+
+COPY ./ .
+
+RUN cargo build --release --target=x86_64-unknown-linux-musl --workspace
+
+# unprivileged identity to run Chariott as
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${SAMPLE_UID}" \
+    ${USER_NAME}

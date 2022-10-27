@@ -1,0 +1,21 @@
+name: Security Audit
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "**/Cargo.toml"
+      - "**/Cargo.lock"
+      - ".github/workflows/security-audit.yaml"
+  schedule:
+    - cron: "0 0 * * *" # once a day at midnight UTC
+    # NB: that cron trigger on GH actions runs only on the default branch
+jobs:
+  security_audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: |
+          # ignores error due to the unmaintained crate ansi_term from
+          # tracing-subscriber, TODO remove the ignores with #538
+          cargo audit --ignore RUSTSEC-2021-0139

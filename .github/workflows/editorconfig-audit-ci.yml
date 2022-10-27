@@ -1,0 +1,23 @@
+name: EditorConfig audit
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  editorconfig-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - run: npm install eclint
+      - run: |
+          # Unfortunately, if the "".editorconfig" is present then "eclint"
+          # checks for full conformance either irrespective or on top of the
+          # check options you given the command-line. By removing the file, only
+          # the given options are checked.
+          git ls-files | grep -iF .editorconfig | xargs -t -n 1 rm
+          env node_modules/.bin/eclint check --insert_final_newline --trim_trailing_whitespace $(git ls-files | grep -viF .editorconfig | grep -viE "\.pb$" | grep -viE "NOTICE$")

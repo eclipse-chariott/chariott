@@ -1,0 +1,26 @@
+name: Notice generation
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 0" # once a week, on sundays at midnight UTC
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  notice_generation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+      - name: Cache Dependencies
+        uses: Swatinem/rust-cache@v1
+      - run: |
+          git config --global user.email "sdv-ivm@example.com"
+          git config --global user.name "Automated Notice Generation Pipeline"
+          ./tools/notice_generation.sh
+        shell: bash
+        env:
+          GITHUB_PAT_TOKEN: ${{ secrets.GITHUB_TOKEN }}

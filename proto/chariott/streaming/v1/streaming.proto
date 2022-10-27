@@ -1,0 +1,49 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
+/**
+* The streaming contract between applications
+*
+* This contract is used to stream data from a service application registered as provider and
+* a service application that is a consumer. This interface will be discovered using the
+* `Discover` intent through the chariott runtime. The communication is done after discovery
+* peer to peer without chariott being involved. Only the subscription of sources will be
+* handled by chariott again, but data flows peer to peer without chariott in between.
+* More details found here:
+* [ADR-0016](docs/adr/ctp-2/0016-streaming-support.md)
+*/
+syntax = "proto3";
+
+package chariott.streaming.v1;
+
+import "chariott/common/v1/common.proto";
+import "google/protobuf/timestamp.proto";
+
+/**
+* The streaming service definition.
+*/
+service ChannelService {
+    /**
+    * Open a new channel to the provider.
+    */
+    rpc Open (OpenRequest) returns (stream Event) {}
+}
+
+message OpenRequest {}
+
+/**
+* The event that is sent over the channel.
+*
+* The first response is sending the metadata containing the channel id that was created to be used
+* for subscribing to sources. The metadata field is called `x-chariott-channel-id`. The channel id
+* has to be used to subscribe to sources as defined in the `chariott.runtime.v1.proto` file.
+*
+* Each subscribed source will be sending an event through this response stream once subscribed to
+* and if an event occurs.
+*/
+message Event {
+    string source = 1; // The source id of the event
+    chariott.common.v1.Value value = 2; // The value of the event
+    uint64 seq = 3; // The sequence number of the event
+    google.protobuf.Timestamp timestamp = 4; // The timestamp at which the event was generated
+}

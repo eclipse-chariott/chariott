@@ -1,0 +1,7 @@
+# ignore default GitHub files
+
+README.md
+SECURITY.md
+LICENSE
+SUPPORT.md
+CODE_Of_CONDUCT.md

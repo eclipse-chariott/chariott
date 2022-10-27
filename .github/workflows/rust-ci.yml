@@ -1,0 +1,91 @@
+name: Rust CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'common/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'proto/**'
+      - 'ess/**'
+      - 'keyvalue/**'
+      - 'examples/**'
+      - '.github/workflows/rust-ci.yml'
+      - 'Cargo.lock'
+      - 'Cargo.toml'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  static_code_analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install protobuf-compiler
+        run: sudo apt-get install -y protobuf-compiler
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          components: clippy, rustfmt
+      - name: Cache Dependencies
+        uses: Swatinem/rust-cache@v1
+      - run: cargo check --workspace --locked
+      - run: cargo clippy --all-targets --all-features --workspace --no-deps -- -D warnings
+      - run: cargo fmt --all -- --check
+      - name: Run doctest only
+        # we run doctests here as cargo tarpaulin (our test runner)
+        # requires nightly toolchain to do so
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --workspace --doc
+      - name: Run cargo doc
+        # This step is required to detect possible errors in docs that are not doctests.
+        uses: actions-rs/cargo@v1
+        with:
+          command: doc
+          args: --workspace --no-deps # Warnings are treated as errors due to our .cargo/config file.
+
+
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install protobuf-compiler
+        run: sudo apt-get install -y protobuf-compiler
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+      - name: Cache Dependencies
+        uses: Swatinem/rust-cache@v1
+      - name: Run cargo-tarpaulin
+        uses: actions-rs/tarpaulin@v0.1
+        with:
+          version: '0.21.0'
+          args: '--workspace --ignore-tests --skip-clean --exclude-files spikes/* --exclude-files examples/* --exclude-files tests/*'
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v1
+        with:
+          name: code-coverage-report
+          path: cobertura.xml
+      - uses: 5monkeys/cobertura-action@master
+        if: ${{ github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
+        with:
+          path: cobertura.xml
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          minimum_coverage: 80
+          only_changed_files: true
+
+  buf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          version: '1.8.0'
+      - uses: bufbuild/buf-lint-action@v1

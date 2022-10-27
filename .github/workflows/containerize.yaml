@@ -1,0 +1,70 @@
+name: Containerize and Push to Container Registry
+
+# Containerizes and pushes a build of the Chariott to a container registry.
+#
+# To use this in your own clone of this repo, you need to configure three Github Action secrets:
+# 1. CONTAINER_REGISTRY_ENDPOINT: The DNS endpoint of your container registry (eg. sdv.azurecr.io)
+# 2. CONTAINER_REGISTRY_USERNAME: A user for your container registry that has push permissions.
+# 3. CONTAINER_REGISTRY_PASSWORD: The auth password for your container registry user
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "proto/**"
+      - "Dockerfile"
+      - ".github/workflows/containerize.yaml"
+
+env:
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Find Rust version
+        id: rust_version
+        run: echo "::set-output name=RUST_VERSION::$(cat rust-toolchain)"
+
+      - name: Set up Docker buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          install: true
+
+      - name: Login to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}
+          username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
+          password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
+
+      - name: Extract metadata and create {branch}-{sha} tag
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: RUST_VERSION=${{ steps.rust_version.outputs.RUST_VERSION }}

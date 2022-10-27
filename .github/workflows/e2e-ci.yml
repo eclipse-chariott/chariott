@@ -1,0 +1,92 @@
+name: E2E CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "common/**"
+      - "ess/**"
+      - "examples/**"
+      - "keyvalue/**"
+      - "proto/**"
+      - "src/**"
+      - "tests/**"
+      - ".github/workflows/e2e.yaml"
+      - 'Cargo.lock'
+      - 'Cargo.toml'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install protobuf compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install cmake protobuf-compiler libprotobuf-dev
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+
+      - name: Cache Dependencies
+        uses: Swatinem/rust-cache@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Chariott Container
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          load: true
+          tags: chariott:1
+
+      - name: Build KV-App Container
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./examples/applications/Dockerfile.kv-app.ci
+          build-args: APP_NAME=kv-app
+          load: true
+          tags: kv-app:1
+
+      - name: Start Chariott
+        run: |
+          docker run -d --name chariott --network host -e RUST_LOG=debug chariott:1
+
+      - name: Start KV-App
+        run: |
+          docker run -d --name kv-app --network host -e RUST_LOG=debug kv-app:1
+
+      - name: Run E2E tests
+        run: |
+          cargo test --test "*e2e"
+
+      - name: Print Chariott log output
+        if: ${{ always() }}
+        run: |
+          docker logs chariott > chariott.log
+          docker logs chariott
+
+      - name: Archive Chariott log output
+        uses: actions/upload-artifact@v1
+        with:
+          name: Chariott E2E log
+          path: chariott.log
+
+      - name: Print KV App log output
+        if: ${{ always() }}
+        run: |
+          docker logs kv-app > kv-app.log
+          docker logs kv-app
+
+      - name: Archive KV App log output
+        uses: actions/upload-artifact@v1
+        with:
+          name: KV App E2E log
+          path: kv-app.log

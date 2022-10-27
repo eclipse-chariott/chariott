@@ -1,0 +1,171 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
+/**
+* Common Messages for the Chariott runtime.
+*
+* The protobuf definitions for messages common to the other definitions.
+*/
+
+
+syntax = "proto3";
+
+package chariott.common.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+
+message Intent {
+    oneof intent {
+        DiscoverIntent discover = 1;
+        InvokeIntent invoke = 2;
+        ReadIntent read = 3;
+        WriteIntent write = 4;
+        InspectIntent inspect = 5;
+        SubscribeIntent subscribe = 6;
+    }
+}
+
+message ReadIntent {
+    string key = 1;
+}
+
+message ReadFulfillment {
+    Value value = 1;
+}
+
+message WriteIntent {
+    string key = 1;
+    Value value = 2;
+}
+
+message WriteFulfillment {
+}
+
+/** Subscribe to a source on the application. This requires an already open streaming channel.
+* The `channel_id` is used to identify the channel to use for subscription. This is provided
+* by the provider as a gRPC metadata header when establishing a channel through the streaming
+* interface call. See [chariott.streaming.v1.proto](chariott.streaming.v1.proto) for more details.
+*/
+message SubscribeIntent {
+    string channel_id = 1;
+    repeated string sources = 2;
+}
+
+message SubscribeFulfillment {
+}
+
+message Fulfillment {
+    oneof fulfillment {
+        DiscoverFulfillment discover = 1;
+        InspectFulfillment inspect = 2;
+        ReadFulfillment read = 3;
+        WriteFulfillment write = 4;
+        InvokeFulfillment invoke = 5;
+        SubscribeFulfillment subscribe = 6;
+    }
+}
+
+message DiscoverIntent {}
+
+/**
+* Discover Fulfillment
+*
+* Returns a list of services that are provided by the application with their corresponding url endpoint, schema type and reference.
+* The `schema_kind` is defining the contract depending of the `schema_reference`.
+* For instance, if the `schema_kind` is `grpc+proto` the `schema_reference` is the protobuf definition of the service.
+*/
+message DiscoverFulfillment {
+    message Service {
+        string url = 1;
+        string schema_kind = 2;
+        string schema_reference = 3;
+        map<string, Value> metadata = 4;
+    }
+
+    repeated Service services = 1; // The list of services provided by the application
+}
+
+/**
+* Inspect Intent
+*
+* The inspection query is a simple wildcard query language expecting dot notations as namespace separators.
+* For more details see the ADR `docs/adr/ctp2-/0015-inspection.md`
+*/
+message InspectIntent {
+    string query = 1;
+}
+
+/**
+* Inspect Fulfillment
+*
+* Returns a list of entries containing methods, properties and events that match the query.
+*/
+message InspectFulfillment {
+    message Entry {
+        string path = 1;
+        map<string, Value> items = 2;
+    }
+    repeated Entry entries = 1;
+}
+
+/**
+* Invoke Intent
+*
+* The invoke intent is used to invoke a method on the application through the chariott runtime.
+*/
+message InvokeIntent {
+    string command = 1;
+    repeated Value args = 2;
+}
+
+message InvokeFulfillment {
+    Value return = 1;
+}
+
+/**
+* Value
+*
+* The value is a wrapper around multiple value types. In case you don't
+* find the type you need, you can use the `any` field to pass a custom
+* value type.
+*/
+message Value {
+    oneof value {
+        NullValue null = 1;
+        google.protobuf.Any any = 2;
+        bool bool = 3;
+        sint32 int32 = 4;
+        sint64 int64 = 5;
+        float float32 = 6;
+        double float64 = 7;
+        string string = 8;
+        google.protobuf.Timestamp timestamp = 9;
+        List list = 10;
+        Map map = 11;
+        Blob blob = 12;
+    }
+}
+
+/**
+* Blob
+*
+* The blob message is primarily used to pass around binary data that can be
+* described by a mime type.
+*/
+message Blob {
+    string media_type = 1;
+    bytes bytes = 2;
+}
+
+message List {
+    repeated Value value = 1;
+}
+
+message Map {
+    map<string, Value> map = 1;
+}
+
+enum NullValue {
+    NULL_VALUE_UNSPECIFIED = 0;
+}

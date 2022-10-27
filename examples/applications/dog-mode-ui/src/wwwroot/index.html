@@ -1,0 +1,114 @@
+<!--
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the MIT license.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Dog Mode Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="index.css" />
+    <script defer src="fa/js/solid.min.js"></script>
+    <script defer src="fa/js/fontawesome.min.js"></script>
+    <script>
+        const eventSource = new EventSource('events');
+        let connected = false;
+        let isDogModeEnabled = false;
+
+        window.addEventListener('DOMContentLoaded', event => {
+
+            const dog = document.getElementById('dog');
+            const status = document.getElementById('status');
+            const tempValue = document.getElementById('temp-value');
+            const aircon = document.getElementById('aircon');
+            const batteryLevel = document.getElementById('battery-level');
+            const log = document.getElementById('log');
+
+            dog.onclick = event => {
+                fetch('dog-mode', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `on=${isDogModeEnabled ? 'off' : 'on'}`
+                })
+                    .then(console.log)
+                    .catch(console.error);
+            };
+
+            eventSource.onerror = err => {
+                connected = false;
+                updateClasses(status, '!link', '!up');
+                console.error(err);
+            };
+
+            eventSource.onmessage = event => {
+                if (log) {
+                    log.appendChild(document.createTextNode(event.data + '\n'));
+                }
+                switch (event.data) {
+                    case 'disconnected':
+                        connected = false;
+                        updateClasses(status, '!up', 'link');
+                        break;
+                    case 'connected':
+                        connected = true;
+                        updateClasses(status, 'up', '!link');
+                        break;
+                    default:
+                    {
+                        connected = true;
+                        updateClasses(status, 'up', '!link');
+                        const { id, data } = JSON.parse(event.data);
+                        switch (id) {
+                            case 'Vehicle.Cabin.HVAC.AmbientAirTemperature':
+                                tempValue.innerText = data;
+                                updateClasses(tempValue, data >= 25 && isDogModeEnabled ? 'warm' : '!warm');
+                                break;
+                            case 'Vehicle.OBD.HybridBatteryRemaining':
+                                batteryLevel.innerText = data;
+                                break;
+                            case 'Vehicle.Cabin.HVAC.IsAirConditioningActive':
+                                updateClasses(aircon, data ? 'on' : '!on');
+                                break;
+                            case 'Feature.DogMode.Status':
+                                isDogModeEnabled = data;
+                                updateClasses(dog, isDogModeEnabled ? 'on' : '!on');
+                                break;
+                        }
+                        break;
+                    }
+                }
+            };
+        });
+
+        function updateClasses(element, ...classNames) {
+            const classList = element.classList;
+            for (const className of classNames) {
+                if (className.length > 1 && className[0] === '!') {
+                    classList.remove(className.slice(1));
+                } else {
+                    classList.add(className);
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="status"><i class="fa fa-signal"></i></div>
+    <div id="panel">
+        <div id="dog"><i class="fa fa-dog"></i></div>
+        <div id="temp">
+            <span id="temp-value">0</span><span id="deg-c"><sup>&deg;C</sup></span>
+            <i class="fa fa-temperature-half"></i>
+        </div>
+        <div id="aircon">
+            <i class="fa fa-wind"></i>
+        </div>
+        <div id="battery">
+            <div><i class="fa fa-battery-half"></i></div>
+            <div><span id="battery-level">100</span>%</div>
+        </div>
+    </div>
+</body>
+</html>

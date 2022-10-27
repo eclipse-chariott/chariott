@@ -1,0 +1,69 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT license.
+
+ARG RUST_VERSION=1.64
+FROM rust:${RUST_VERSION} AS builder
+
+# Dockerfile for building SDV Chariott container
+#
+# This Dockerfile utilizes a two step build process. It builds Chariott with
+# statically linked dependencies (using musl vs. glibc to accomplish this) for a
+# specific architecture such that we can utilize a scratch container without
+# further dependencies for our final container, minimizing container size.
+
+# Chariott user id
+ARG CHARIOTT_UID=10001
+
+RUN apt update && apt upgrade -y
+RUN apt install -y cmake protobuf-compiler wget
+
+# unprivileged identity to run Chariott as
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${CHARIOTT_UID}" \
+    chariott
+
+WORKDIR /sdv
+
+COPY ./ .
+
+RUN cargo build --release
+
+#############################################################x#######################################
+## Final image
+####################################################################################################
+
+# **NOTE**
+# This image is based on debian and is not using musl. This is because
+# valgrind seems to have problems running with musl on Alpine. See this stackoverflow
+# post for more details:
+# https://stackoverflow.com/questions/61774643/valgrind-on-alpine-linux
+
+FROM debian:bullseye-slim
+
+# Install valgrind
+RUN apt update && apt install -y valgrind
+
+# Create output dir to mount
+RUN mkdir /output && chmod 777 /output
+
+# Import Chariott user and group from builder.
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
+
+WORKDIR /sdv
+
+# Copy our build
+COPY --from=builder /sdv/target/release/chariott /sdv/chariott
+
+# Give chariott user ownership of the /sdv directory
+RUN chown -R chariott:chariott /sdv
+
+# Use the unprivileged chariott user during execution.
+USER chariott::chariott
+
+CMD ["valgrind", "--tool=memcheck", "--xml=yes", "--xml-file=/output/out.xml", "./chariott"]

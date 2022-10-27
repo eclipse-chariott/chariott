@@ -1,0 +1,24 @@
+name: .NET CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'examples/applications/dog-mode-ui/**'
+      - '.github/workflows/dotnet-ci.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-dotnet@v2
+        with:
+          global-json-file: examples/applications/dog-mode-ui/global.json
+
+      - run: dotnet build examples/applications/dog-mode-ui

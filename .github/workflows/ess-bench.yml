@@ -1,0 +1,51 @@
+name: ESS Benchmark
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'common/**'
+      - 'ess/**'
+      - '.github/workflows/ess-bench.yml'
+
+permissions:
+  contents: write
+  deployments: write
+
+env:
+  # Push the results to gh-pages only on merge to main.
+  AUTO_PUSH: ${{ github.event_name == 'push' }}
+  # Comment the performance numbers of the load tests only on PRs.
+  COMMENT_ALWAYS: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  benchmark:
+    name: Execute load tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+
+      - name: Install protobuf-compiler
+        run: sudo apt-get install -y protobuf-compiler
+
+      - name: Run benchmark
+        run: cargo bench --manifest-path ess/Cargo.toml --bench load_bench -- --output-format bencher | tee output.txt
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        with:
+          name: ESS Benchmark
+          tool: 'cargo'
+          output-file-path: output.txt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: ${{ env.AUTO_PUSH }}
+          comment-always: ${{ env.COMMENT_ALWAYS }}
+          benchmark-data-dir-path: "ess/bench"

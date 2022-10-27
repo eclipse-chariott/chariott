@@ -1,0 +1,24 @@
+[package]
+name = "examples-common"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[dependencies]
+async-trait = { workspace = true }
+bytes = "1.2"
+chariott-common = { path = "../../common/" }
+ess = { path = "../../ess/" }
+keyvalue = { path = "../../keyvalue" }
+futures = { workspace = true }
+prost = { workspace = true }
+prost-types = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tokio-stream = { workspace = true }
+tonic = { workspace = true }
+tracing = { workspace = true }
+url = { workspace = true }
+uuid = { workspace = true }
+
+[build-dependencies]
+tonic-build = { workspace = true }
