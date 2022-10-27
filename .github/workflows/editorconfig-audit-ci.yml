@@ -20,4 +20,4 @@ jobs:
           # check options you given the command-line. By removing the file, only
           # the given options are checked.
           git ls-files | grep -iF .editorconfig | xargs -t -n 1 rm
-          env node_modules/.bin/eclint check --insert_final_newline --trim_trailing_whitespace $(git ls-files | grep -viF .editorconfig | grep -viE "\.pb$" | grep -viE "NOTICE$")
+          env node_modules/.bin/eclint check --insert_final_newline --trim_trailing_whitespace $(git ls-files | grep -viF .editorconfig | grep -viE "\.pb$")
