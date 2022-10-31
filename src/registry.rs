@@ -7,8 +7,56 @@ use std::collections::{HashMap, HashSet};
 use chariott_common::error::Error;
 use url::Url;
 
+use crate::registry::update::TransactionalRegistryUpdate;
+
 const SYSTEM_NAMESPACE: &str = "system";
 const SYSTEM_NAMESPACE_PREFIX: &str = "system.";
+
+mod update {
+    use std::collections::{HashMap, HashSet};
+
+    use super::{IntentConfiguration, Registry, RegistryChange, RegistryObserver};
+
+    enum ChangeKind {
+        Modify,
+        Add,
+    }
+
+    pub struct TransactionalRegistryUpdate(HashMap<IntentConfiguration, ChangeKind>);
+
+    impl TransactionalRegistryUpdate {
+        pub fn new() -> Self {
+            Self(HashMap::new())
+        }
+
+        pub fn track_modify(&mut self, intent: IntentConfiguration) {
+            self.0.entry(intent).or_insert(ChangeKind::Modify);
+        }
+
+        pub fn track_add(&mut self, intent: IntentConfiguration) {
+            self.0.entry(intent).or_insert(ChangeKind::Add);
+        }
+
+        pub fn observe<T: RegistryObserver>(&self, observer: &T, registry: &Registry<T>) {
+            let empty_set = HashSet::new();
+
+            let services = self.0.iter().map(|(intent, kind)| {
+                (
+                    kind,
+                    registry.external_services_by_intent.get(intent).unwrap_or(&empty_set),
+                    intent,
+                )
+            });
+
+            observer.on_intent_config_change(services.into_iter().map(
+                |(kind, services, intent)| match kind {
+                    ChangeKind::Add => RegistryChange::Add(intent, services),
+                    ChangeKind::Modify => RegistryChange::Modify(intent, services),
+                },
+            ));
+        }
+    }
+}
 
 pub enum RegistryChange<'a> {
     Add(&'a IntentConfiguration, &'a HashSet<ServiceConfiguration>),
@@ -65,13 +113,7 @@ impl<T: RegistryObserver> Registry<T> {
 
         // Track the changes to the registry for the current registry operation
 
-        #[derive(Eq, PartialEq, Hash)]
-        enum ChangeKind {
-            Add,
-            Modify,
-        }
-
-        let mut registry_changes = HashMap::new();
+        let mut registry_changes = TransactionalRegistryUpdate::new();
 
         // Upserting a registration should not happen frequently and has worse
         // performance than service resolution.
@@ -84,8 +126,8 @@ impl<T: RegistryObserver> Registry<T> {
             services.retain(|service| service.id != service_configuration.id);
 
             if service_count != services.len() {
-                // If we changed the services, we need to refresh the broker.
-                registry_changes.insert(intent_configuration.clone(), ChangeKind::Modify);
+                // Track changes to registry in case of changed services.
+                registry_changes.track_modify(intent_configuration.clone());
             }
 
             !services.is_empty()
@@ -101,12 +143,10 @@ impl<T: RegistryObserver> Registry<T> {
         for intent_configuration in intent_configurations {
             // Update the list of registry changes.
 
-            registry_changes.entry(intent_configuration.clone()).or_insert(
-                match self.external_services_by_intent.contains_key(&intent_configuration) {
-                    true => ChangeKind::Modify,
-                    false => ChangeKind::Add,
-                },
-            );
+            match self.external_services_by_intent.contains_key(&intent_configuration) {
+                true => registry_changes.track_modify(intent_configuration.clone()),
+                false => registry_changes.track_add(intent_configuration.clone()),
+            };
 
             // Update the service registry for a given intent.
 
@@ -122,18 +162,7 @@ impl<T: RegistryObserver> Registry<T> {
 
         // Notify the observer
 
-        let empty_set = HashSet::new();
-
-        let services = registry_changes.iter().map(|(intent, kind)| {
-            (kind, self.external_services_by_intent.get(intent).unwrap_or(&empty_set), intent)
-        });
-
-        self.observer.on_intent_config_change(services.into_iter().map(
-            |(kind, services, intent)| match kind {
-                ChangeKind::Add => RegistryChange::Add(intent, services),
-                ChangeKind::Modify => RegistryChange::Modify(intent, services),
-            },
-        ));
+        registry_changes.observe(&self.observer, self);
 
         Ok(())
     }
