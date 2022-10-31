@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1667209093363,
+  "lastUpdate": 1667224352785,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -179,6 +179,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 260155162,
             "range": "± 2789548",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "code@raboof.com",
+            "name": "Atif Aziz",
+            "username": "atifaziz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "113ee4457fba295351da647b8708ec9bcf5a2af4",
+          "message": "Fix notice generation script to quote PR title (#11)",
+          "timestamp": "2022-10-31T14:47:46+01:00",
+          "tree_id": "4df68469588a8e4bf8003982fea7950c35783a60",
+          "url": "https://github.com/eclipse/chariott/commit/113ee4457fba295351da647b8708ec9bcf5a2af4"
+        },
+        "date": 1667224352268,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 432990,
+            "range": "± 16298",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2641612,
+            "range": "± 12161",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 24930303,
+            "range": "± 389933",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 3847469,
+            "range": "± 60575",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 26018523,
+            "range": "± 131825",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 248502442,
+            "range": "± 2088378",
             "unit": "ns/iter"
           }
         ]
