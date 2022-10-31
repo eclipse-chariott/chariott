@@ -22,8 +22,14 @@ mod chariott {
             tonic::include_proto!("chariott.runtime.v1");
         }
     }
+    pub mod streaming {
+        pub mod v1 {
+            tonic::include_proto!("chariott.streaming.v1");
+        }
+    }
 }
 
 pub use chariott::common::v1 as common;
 pub use chariott::provider::v1 as provider;
 pub use chariott::runtime::v1 as runtime;
+pub use chariott::streaming::v1 as streaming;
