@@ -172,7 +172,7 @@ fn map_locality_value(locality: i32) -> Result<ExecutionLocality, Status> {
 #[cfg(test)]
 mod tests {
     use crate::execution::RuntimeBinding;
-    use crate::registry::{Registry, RegistryObserver};
+    use crate::registry::{Registry, RegistryChange, RegistryObserver};
     use crate::{connection_provider::GrpcProvider, execution::tests::TestBinding};
     use chariott_common::proto::{
         common, runtime as runtime_api,
@@ -422,11 +422,7 @@ mod tests {
     }
 
     impl RegistryObserver for MockBroker {
-        fn on_intent_config_change<'a>(
-            &self,
-            _: IntentConfiguration,
-            _: impl IntoIterator<Item = &'a ServiceConfiguration>,
-        ) {
+        fn on_intent_config_change<'a>(&self, _: impl IntoIterator<Item = RegistryChange<'a>>) {
             todo!()
         }
     }

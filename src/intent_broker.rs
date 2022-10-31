@@ -10,7 +10,7 @@ use crate::{
     connection_provider::{ConnectionProvider, GrpcProvider, ReusableProvider},
     execution::RuntimeBinding,
     registry::{
-        ExecutionLocality, IntentConfiguration, IntentKind, RegistryObserver, ServiceConfiguration,
+        ExecutionLocality, IntentConfiguration, IntentKind, RegistryChange, RegistryObserver,
     },
 };
 
@@ -62,48 +62,55 @@ impl IntentBinder {
             .map(|binding| binding_into_runtime_binding(self, binding))
     }
 
-    fn refresh<'a>(
-        &mut self,
-        intent_configuration: IntentConfiguration,
-        service_configurations: impl IntoIterator<Item = &'a ServiceConfiguration>,
-    ) {
-        let mut cloud_service = None;
-        let mut local_service = None;
+    fn refresh<'a>(&mut self, changes: impl IntoIterator<Item = RegistryChange<'a>>) {
+        for change in changes {
+            let (intent_configuration, service_configurations) = match change {
+                RegistryChange::Add(intent, services) => (intent, services),
+                RegistryChange::Modify(intent, services) => (intent, services),
+            };
 
-        for candidate in service_configurations {
-            match (candidate.locality(), &local_service, &cloud_service) {
-                // Stop on the first cloud/local provider that is
-                // found. This could be evolved in the future by
-                // always comparing all candidates using a priority
-                // as a tie-breaker (which does not yet exist).
-                (_, Some(_), Some(_)) => {
-                    break;
+            let mut cloud_service = None;
+            let mut local_service = None;
+
+            for candidate in service_configurations {
+                match (candidate.locality(), &local_service, &cloud_service) {
+                    // Stop on the first cloud/local provider that is
+                    // found. This could be evolved in the future by
+                    // always comparing all candidates using a priority
+                    // as a tie-breaker (which does not yet exist).
+                    (_, Some(_), Some(_)) => {
+                        break;
+                    }
+                    (ExecutionLocality::Local, None, _) => {
+                        local_service = Some(candidate);
+                    }
+                    (ExecutionLocality::Cloud, _, None) => {
+                        cloud_service = Some(candidate);
+                    }
+                    (ExecutionLocality::Local, Some(_), None) => {}
+                    (ExecutionLocality::Cloud, None, Some(_)) => {}
                 }
-                (ExecutionLocality::Local, None, _) => {
-                    local_service = Some(candidate);
-                }
-                (ExecutionLocality::Cloud, _, None) => {
-                    cloud_service = Some(candidate);
-                }
-                (ExecutionLocality::Local, Some(_), None) => {}
-                (ExecutionLocality::Cloud, None, Some(_)) => {}
             }
-        }
 
-        let binding = match (local_service, cloud_service) {
-            (Some(local_service), Some(cloud_service)) => Some(Binding::Fallback(
-                Box::new(Binding::Remote(Provider::new(cloud_service.url().to_owned()))),
-                Box::new(Binding::Remote(Provider::new(local_service.url().to_owned()))),
-            )),
-            (Some(service), None) => Some(Binding::Remote(Provider::new(service.url().to_owned()))),
-            (None, Some(service)) => Some(Binding::Remote(Provider::new(service.url().to_owned()))),
-            (None, None) => None,
-        };
+            let binding = match (local_service, cloud_service) {
+                (Some(local_service), Some(cloud_service)) => Some(Binding::Fallback(
+                    Box::new(Binding::Remote(Provider::new(cloud_service.url().to_owned()))),
+                    Box::new(Binding::Remote(Provider::new(local_service.url().to_owned()))),
+                )),
+                (Some(service), None) => {
+                    Some(Binding::Remote(Provider::new(service.url().to_owned())))
+                }
+                (None, Some(service)) => {
+                    Some(Binding::Remote(Provider::new(service.url().to_owned())))
+                }
+                (None, None) => None,
+            };
 
-        if let Some(binding) = binding {
-            self.bindings_by_intent.insert(intent_configuration, binding);
-        } else {
-            self.bindings_by_intent.remove(&intent_configuration);
+            if let Some(binding) = binding {
+                self.bindings_by_intent.insert(intent_configuration.clone(), binding);
+            } else {
+                self.bindings_by_intent.remove(intent_configuration);
+            }
         }
     }
 }
@@ -124,18 +131,17 @@ impl IntentBroker {
 }
 
 impl RegistryObserver for IntentBroker {
-    fn on_intent_config_change<'a>(
-        &self,
-        intent_configuration: IntentConfiguration,
-        service_configurations: impl IntoIterator<Item = &'a ServiceConfiguration>,
-    ) {
-        self.0.write().unwrap().refresh(intent_configuration, service_configurations)
+    fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = RegistryChange<'a>>) {
+        self.0.write().unwrap().refresh(changes)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use std::{collections::HashMap, sync::Arc};
+    use std::{
+        collections::{HashMap, HashSet},
+        sync::Arc,
+    };
 
     use url::Url;
 
@@ -145,7 +151,8 @@ mod tests {
         intent_broker::{IntentBroker, RegistryObserver as _},
         registry::{
             tests::{IntentConfigurationBuilder, ServiceConfigurationBuilder},
-            ExecutionLocality, IntentConfiguration, IntentKind, ServiceConfiguration,
+            ExecutionLocality, IntentConfiguration, IntentKind, RegistryChange,
+            ServiceConfiguration,
         },
     };
 
@@ -174,7 +181,8 @@ mod tests {
         let subject = setup.clone().build();
 
         // act
-        subject.on_intent_config_change(setup.intent.clone(), vec![]);
+        subject
+            .on_intent_config_change(vec![RegistryChange::Modify(&setup.intent, HashSet::new())]);
 
         // assert
         assert!(subject.resolve(&setup.intent).is_none());
@@ -287,7 +295,10 @@ mod tests {
         let subject = setup.clone().build();
 
         // act
-        subject.on_intent_config_change(setup.intent.clone(), vec![&service_b]);
+        subject.on_intent_config_change([RegistryChange::Modify(
+            &setup.intent,
+            HashSet::from([&service_b]),
+        )]);
 
         // assert
         let result = subject.resolve(&setup.intent).unwrap();
@@ -345,7 +356,10 @@ mod tests {
 
         fn build(self) -> IntentBroker {
             let broker = IntentBroker::new();
-            broker.on_intent_config_change(self.intent.clone(), vec![&self.service.build()]);
+            broker.on_intent_config_change([RegistryChange::Add(
+                &self.intent,
+                HashSet::from([&self.service.build()]),
+            )]);
             broker
         }
 
@@ -370,7 +384,11 @@ mod tests {
             for (intent, services) in services_by_intent {
                 let services: Vec<ServiceConfiguration> =
                     services.clone().into_iter().map(|s| s.build()).collect();
-                broker.on_intent_config_change(intent, services.iter());
+
+                broker.on_intent_config_change([RegistryChange::Add(
+                    &intent,
+                    services.iter().collect(),
+                )]);
             }
 
             broker

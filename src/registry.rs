@@ -10,14 +10,15 @@ use url::Url;
 const SYSTEM_NAMESPACE: &str = "system";
 const SYSTEM_NAMESPACE_PREFIX: &str = "system.";
 
+pub enum RegistryChange<'a> {
+    Add(&'a IntentConfiguration, HashSet<&'a ServiceConfiguration>),
+    Modify(&'a IntentConfiguration, HashSet<&'a ServiceConfiguration>),
+}
+
 /// Represents a type which can observe changes to the registry.
 pub trait RegistryObserver {
     /// Handles observation on changed registry state.
-    fn on_intent_config_change<'a>(
-        &self,
-        intent_configuration: IntentConfiguration,
-        service_configurations: impl IntoIterator<Item = &'a ServiceConfiguration>,
-    );
+    fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = RegistryChange<'a>>);
 }
 
 #[derive(Clone, Debug)]
@@ -62,6 +63,16 @@ impl<T: RegistryObserver> Registry<T> {
             ));
         }
 
+        // Track the changes to the registry for the current registry operation
+
+        #[derive(Eq, PartialEq, Hash)]
+        enum ChangeKind {
+            Add,
+            Modify,
+        }
+
+        let mut registry_changes = HashMap::new();
+
         // Upserting a registration should not happen frequently and has worse
         // performance than service resolution.
 
@@ -74,8 +85,7 @@ impl<T: RegistryObserver> Registry<T> {
 
             if service_count != services.len() {
                 // If we changed the services, we need to refresh the broker.
-                self.observer
-                    .on_intent_config_change(intent_configuration.clone(), services.iter());
+                registry_changes.insert(intent_configuration.clone(), ChangeKind::Modify);
             }
 
             !services.is_empty()
@@ -89,24 +99,42 @@ impl<T: RegistryObserver> Registry<T> {
         // used for each intent.
 
         for intent_configuration in intent_configurations {
+            // Update the list of registry changes.
+
+            registry_changes.entry(intent_configuration.clone()).or_insert(
+                match self.external_services_by_intent.contains_key(&intent_configuration) {
+                    true => ChangeKind::Modify,
+                    false => ChangeKind::Add,
+                },
+            );
+
             // Update the service registry for a given intent.
 
-            let service_configurations = self
-                .external_services_by_intent
-                .entry(intent_configuration.clone())
-                .or_insert_with(HashSet::new);
-
-            service_configurations.insert(service_configuration.clone());
-
-            // Refresh the broker with the updated service configurations.
-
-            self.observer
-                .on_intent_config_change(intent_configuration, service_configurations.iter());
+            self.external_services_by_intent
+                .entry(intent_configuration)
+                .or_insert_with(HashSet::new)
+                .insert(service_configuration.clone());
         }
 
         // Add the service to the lookup for known services.
 
         self.known_services.insert(service_configuration);
+
+        // Notify the observer
+
+        let empty_set = HashSet::new();
+
+        let services = registry_changes.iter().map(|(intent, kind)| {
+            (kind, self.external_services_by_intent.get(intent).unwrap_or(&empty_set), intent)
+        });
+
+        self.observer.on_intent_config_change(services.into_iter().map(
+            |(kind, services, intent)| match kind {
+                ChangeKind::Add => RegistryChange::Add(intent, services.iter().collect()),
+                ChangeKind::Modify => RegistryChange::Modify(intent, services.iter().collect()),
+            },
+        ));
+
         Ok(())
     }
 
@@ -213,7 +241,9 @@ pub(crate) mod tests {
 
     use crate::registry::{ExecutionLocality, IntentKind, ServiceId};
 
-    use super::{IntentConfiguration, Registry, RegistryObserver, ServiceConfiguration};
+    use super::{
+        IntentConfiguration, Registry, RegistryChange, RegistryObserver, ServiceConfiguration,
+    };
 
     #[test]
     fn when_registry_does_not_contain_service_has_service_returns_false() {
@@ -286,12 +316,11 @@ pub(crate) mod tests {
         assert!(registry.has_service(&updated_service));
         assert!(!registry.has_service(&service));
 
-        // broker was refreshed twice, the first time to prune the old services,
-        // then to update with the new services.
+        // broker was refreshed only once, as changes are observed
+        // "transactionally".
         let refresh_calls = registry.observer.refresh_calls.lock().unwrap();
-        assert_eq!(2, refresh_calls.len());
-        assert!(refresh_calls[0].1.is_empty());
-        assert_eq!([updated_service], refresh_calls[1].1.as_slice());
+        assert_eq!(1, refresh_calls.len());
+        assert_eq!([updated_service], refresh_calls[0].1.as_slice());
     }
 
     #[test]
@@ -492,13 +521,21 @@ pub(crate) mod tests {
     impl RegistryObserver for MockBroker {
         fn on_intent_config_change<'a>(
             &self,
-            intent_configuration: IntentConfiguration,
-            service_configurations: impl IntoIterator<Item = &'a ServiceConfiguration>,
+            changes: impl IntoIterator<Item = RegistryChange<'a>>,
         ) {
-            self.refresh_calls
-                .lock()
-                .unwrap()
-                .push((intent_configuration, service_configurations.into_iter().cloned().collect()))
+            for change in changes {
+                let (intent_configuration, service_configurations) = match change {
+                    RegistryChange::Add(i, s) => (i, s),
+                    RegistryChange::Modify(i, s) => (i, s),
+                };
+
+                println!("{:?}", service_configurations);
+
+                self.refresh_calls.lock().unwrap().push((
+                    intent_configuration.clone(),
+                    service_configurations.into_iter().cloned().collect(),
+                ))
+            }
         }
     }
 
