@@ -152,7 +152,6 @@ mod tests {
         registry::{
             tests::{IntentConfigurationBuilder, ServiceConfigurationBuilder},
             ExecutionLocality, IntentConfiguration, IntentKind, RegistryChange,
-            ServiceConfiguration,
         },
     };
 
@@ -182,7 +181,7 @@ mod tests {
 
         // act
         subject
-            .on_intent_config_change(vec![RegistryChange::Modify(&setup.intent, HashSet::new())]);
+            .on_intent_config_change(vec![RegistryChange::Modify(&setup.intent, &HashSet::new())]);
 
         // assert
         assert!(subject.resolve(&setup.intent).is_none());
@@ -297,7 +296,7 @@ mod tests {
         // act
         subject.on_intent_config_change([RegistryChange::Modify(
             &setup.intent,
-            HashSet::from([&service_b]),
+            &HashSet::from([service_b]),
         )]);
 
         // assert
@@ -358,7 +357,7 @@ mod tests {
             let broker = IntentBroker::new();
             broker.on_intent_config_change([RegistryChange::Add(
                 &self.intent,
-                HashSet::from([&self.service.build()]),
+                &HashSet::from([self.service.build()]),
             )]);
             broker
         }
@@ -382,12 +381,9 @@ mod tests {
             });
 
             for (intent, services) in services_by_intent {
-                let services: Vec<ServiceConfiguration> =
-                    services.clone().into_iter().map(|s| s.build()).collect();
-
                 broker.on_intent_config_change([RegistryChange::Add(
                     &intent,
-                    services.iter().collect(),
+                    &services.clone().into_iter().map(|s| s.build()).collect(),
                 )]);
             }
 

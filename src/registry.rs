@@ -11,8 +11,8 @@ const SYSTEM_NAMESPACE: &str = "system";
 const SYSTEM_NAMESPACE_PREFIX: &str = "system.";
 
 pub enum RegistryChange<'a> {
-    Add(&'a IntentConfiguration, HashSet<&'a ServiceConfiguration>),
-    Modify(&'a IntentConfiguration, HashSet<&'a ServiceConfiguration>),
+    Add(&'a IntentConfiguration, &'a HashSet<ServiceConfiguration>),
+    Modify(&'a IntentConfiguration, &'a HashSet<ServiceConfiguration>),
 }
 
 /// Represents a type which can observe changes to the registry.
@@ -130,8 +130,8 @@ impl<T: RegistryObserver> Registry<T> {
 
         self.observer.on_intent_config_change(services.into_iter().map(
             |(kind, services, intent)| match kind {
-                ChangeKind::Add => RegistryChange::Add(intent, services.iter().collect()),
-                ChangeKind::Modify => RegistryChange::Modify(intent, services.iter().collect()),
+                ChangeKind::Add => RegistryChange::Add(intent, services),
+                ChangeKind::Modify => RegistryChange::Modify(intent, services),
             },
         ));
 
@@ -533,7 +533,7 @@ pub(crate) mod tests {
 
                 self.refresh_calls.lock().unwrap().push((
                     intent_configuration.clone(),
-                    service_configurations.into_iter().cloned().collect(),
+                    service_configurations.iter().cloned().collect(),
                 ))
             }
         }
