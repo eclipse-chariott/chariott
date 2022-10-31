@@ -6,37 +6,52 @@ use std::{
     sync::{Arc, RwLock},
 };
 
+use url::Url;
+
 use crate::{
     connection_provider::{ConnectionProvider, GrpcProvider, ReusableProvider},
     execution::RuntimeBinding,
     registry::{
-        ExecutionLocality, IntentConfiguration, IntentKind, RegistryChange, RegistryObserver,
+        ExecutionLocality, IntentConfiguration, IntentKind, RegistryChange, RegistryChangeEvents,
+        RegistryObserver,
     },
 };
 
 type Provider = ReusableProvider<GrpcProvider>;
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 enum Binding {
     Remote(Provider),
     Fallback(Box<Binding>, Box<Binding>),
-    System,
+    SystemInspect,
+    SystemDiscover(Url),
+    SystemSubscribe(RegistryChangeEvents),
 }
 
-#[derive(Debug, Default)]
+#[derive(Default)]
 struct IntentBinder {
     bindings_by_intent: HashMap<IntentConfiguration, Binding>,
 }
 
 impl IntentBinder {
-    pub fn new() -> Self {
-        let system_intents = [IntentConfiguration::new("system.registry", IntentKind::Inspect)];
+    pub fn new(streaming_url: Url, registry_change_events: RegistryChangeEvents) -> Self {
+        const SYSTEM_REGISTRY_NAMESPACE: &str = "system.registry";
 
         Self {
-            bindings_by_intent: system_intents
-                .into_iter()
-                .map(|intent_configuration| (intent_configuration, Binding::System))
-                .collect(),
+            bindings_by_intent: HashMap::from([
+                (
+                    IntentConfiguration::new(SYSTEM_REGISTRY_NAMESPACE, IntentKind::Inspect),
+                    Binding::SystemInspect,
+                ),
+                (
+                    IntentConfiguration::new(SYSTEM_REGISTRY_NAMESPACE, IntentKind::Discover),
+                    Binding::SystemDiscover(streaming_url),
+                ),
+                (
+                    IntentConfiguration::new(SYSTEM_REGISTRY_NAMESPACE, IntentKind::Subscribe),
+                    Binding::SystemSubscribe(registry_change_events),
+                ),
+            ]),
         }
     }
 
@@ -46,14 +61,18 @@ impl IntentBinder {
             binding: &Binding,
         ) -> RuntimeBinding<Provider> {
             match binding {
-                Binding::System => {
-                    RuntimeBinding::System(broker.bindings_by_intent.keys().cloned().collect())
-                }
+                Binding::SystemInspect => RuntimeBinding::SystemInspect(
+                    broker.bindings_by_intent.keys().cloned().collect(),
+                ),
                 Binding::Remote(provider) => RuntimeBinding::Remote(provider.clone()),
                 Binding::Fallback(primary, secondary) => RuntimeBinding::Fallback(
                     Box::new(binding_into_runtime_binding(broker, primary)),
                     Box::new(binding_into_runtime_binding(broker, secondary)),
                 ),
+                Binding::SystemDiscover(url) => RuntimeBinding::SystemDiscover(url.clone()),
+                Binding::SystemSubscribe(registry_changed) => {
+                    RuntimeBinding::SystemSubscribe(registry_changed.clone())
+                }
             }
         }
 
@@ -117,12 +136,12 @@ impl IntentBinder {
 
 /// Brokers intents based on internal state. Cloning is cheap and only increases
 /// a reference count to shared mutable state.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct IntentBroker(Arc<RwLock<IntentBinder>>);
 
 impl IntentBroker {
-    pub fn new() -> Self {
-        Self(Arc::new(RwLock::new(IntentBinder::new())))
+    pub fn new(streaming_url: Url, registry_changed: RegistryChangeEvents) -> Self {
+        Self(Arc::new(RwLock::new(IntentBinder::new(streaming_url, registry_changed))))
     }
 
     pub fn resolve(&self, intent: &IntentConfiguration) -> Option<RuntimeBinding<Provider>> {
@@ -152,13 +171,17 @@ mod tests {
         registry::{
             tests::{IntentConfigurationBuilder, ServiceConfigurationBuilder},
             ExecutionLocality, IntentConfiguration, IntentKind, RegistryChange,
+            RegistryChangeEvents,
         },
     };
 
     #[test]
     fn when_empty_does_not_resolve() {
         // arrange
-        let subject = IntentBroker::new();
+        let subject = IntentBroker::new(
+            "https://localhost:4243".parse().unwrap(),
+            RegistryChangeEvents::new(),
+        );
 
         // act + assert
         assert!(subject.resolve(&IntentConfigurationBuilder::new().build()).is_none());
@@ -277,7 +300,7 @@ mod tests {
         let result = subject.resolve(&intent).unwrap();
 
         // assert
-        if let RuntimeBinding::System(context) = result {
+        if let RuntimeBinding::SystemInspect(context) = result {
             assert!(context.contains(&Arc::new(intent)));
             assert!(context.contains(&Arc::new(setup.intent)));
         } else {
@@ -354,7 +377,10 @@ mod tests {
         }
 
         fn build(self) -> IntentBroker {
-            let broker = IntentBroker::new();
+            let broker = IntentBroker::new(
+                "https://localhost:4243".parse().unwrap(),
+                RegistryChangeEvents::new(),
+            );
             broker.on_intent_config_change([RegistryChange::Add(
                 &self.intent,
                 &HashSet::from([self.service.build()]),
@@ -373,7 +399,10 @@ mod tests {
         }
 
         fn combine(setups: impl IntoIterator<Item = Setup>) -> IntentBroker {
-            let broker = IntentBroker::new();
+            let broker = IntentBroker::new(
+                "https://localhost:4243".parse().unwrap(),
+                RegistryChangeEvents::new(),
+            );
 
             let services_by_intent = setups.into_iter().fold(HashMap::new(), |mut acc, s| {
                 acc.entry(s.intent.clone()).or_insert_with(Vec::new).push(s.service);

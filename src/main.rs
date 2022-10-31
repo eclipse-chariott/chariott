@@ -7,7 +7,6 @@ use chariott::IntentBroker;
 use chariott_common::proto::runtime::chariott_service_server::ChariottServiceServer;
 use chariott_common::proto::streaming::channel_service_server::ChannelServiceServer;
 use chariott_common::shutdown::RouterExt as _;
-use std::sync::Arc;
 use tonic::transport::Server;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
@@ -30,8 +29,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     collector.init();
 
-    let broker = IntentBroker::new();
-    let ess = Arc::new(RegistryChangeEvents::new());
+    let ess = RegistryChangeEvents::new();
+    let broker = IntentBroker::new("http://localhost:4243".parse().unwrap(), ess.clone());
     let registry = Registry::new(CompositeRegistryObserver::new(broker.clone(), ess.clone()));
 
     #[cfg(build = "debug")]
@@ -45,7 +44,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let router = Server::builder()
         .add_service(ChariottServiceServer::new(ChariottServer::new(registry, broker)))
-        .add_service(ChannelServiceServer::from_arc(ess));
+        .add_service(ChannelServiceServer::new(ess));
 
     #[cfg(build = "debug")]
     let router = router.add_service(reflection_service);

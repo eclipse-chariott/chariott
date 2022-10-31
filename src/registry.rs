@@ -62,8 +62,11 @@ mod update {
 
 mod events {
     use std::{
-        ops::Deref,
-        sync::atomic::{AtomicU64, Ordering},
+        sync::{
+            atomic::{AtomicU64, Ordering},
+            Arc,
+        },
+        time::SystemTime,
     };
 
     use async_trait::async_trait;
@@ -71,19 +74,49 @@ mod events {
         channel_service_server::ChannelService, Event, OpenRequest,
     };
     use ess::EventSubSystem;
+    use tokio::spawn;
     use tokio_stream::wrappers::ReceiverStream;
     use tonic::{Response, Status};
 
     use super::{RegistryChange, RegistryObserver};
 
+    type Ess = EventSubSystem<Box<str>, Box<str>, u64, Result<Event, Status>>;
+
+    #[derive(Clone)]
     pub struct RegistryChangeEvents {
-        sequence: AtomicU64,
-        ess: EventSubSystem<Box<str>, Box<str>, u64, Result<Event, Status>>,
+        sequence: Arc<AtomicU64>,
+        ess: Arc<Ess>,
     }
 
     impl RegistryChangeEvents {
         pub fn new() -> Self {
-            Self { sequence: AtomicU64::new(0), ess: EventSubSystem::new() }
+            Self { sequence: Arc::new(AtomicU64::new(0)), ess: Arc::new(EventSubSystem::new()) }
+        }
+
+        pub fn serve_subscriptions(
+            &self,
+            client_id: impl Into<Box<str>>,
+            requested_subscriptions: impl IntoIterator<Item = Box<str>>,
+        ) -> Result<(), Status> {
+            let subscriptions = self
+                .ess
+                .register_subscriptions(client_id.into(), requested_subscriptions)
+                .map_err(|_| Status::failed_precondition("Specified client does not exist."))?;
+
+            for subscription in subscriptions {
+                let source = subscription.event_id().to_string();
+
+                spawn(subscription.serve(move |_, seq| {
+                    Ok(Event {
+                        source: source.clone(),
+                        value: None,
+                        seq,
+                        timestamp: Some(SystemTime::now().into()),
+                    })
+                }));
+            }
+
+            Ok(())
         }
     }
 
@@ -93,10 +126,7 @@ mod events {
         }
     }
 
-    impl<T> RegistryObserver for T
-    where
-        T: Deref<Target = RegistryChangeEvents>,
-    {
+    impl RegistryObserver for RegistryChangeEvents {
         fn on_intent_config_change<'a>(
             &self,
             changes: impl IntoIterator<Item = RegistryChange<'a>>,

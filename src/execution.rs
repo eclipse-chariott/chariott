@@ -4,11 +4,21 @@
 use std::collections::HashMap;
 
 use crate::connection_provider::{ConnectedProvider, ConnectionProvider};
-use crate::registry::IntentConfiguration;
+use crate::registry::{IntentConfiguration, RegistryChangeEvents};
 use async_recursion::async_recursion;
-use chariott_common::proto::{common, provider as provider_api};
+use chariott_common::proto::common::discover_fulfillment::Service;
+use chariott_common::proto::common::SubscribeFulfillment;
+use chariott_common::proto::{
+    common::{
+        fulfillment::Fulfillment as FulfillmentEnum, inspect_fulfillment::Entry,
+        intent::Intent as IntentEnum, value::Value as ValueEnum, DiscoverFulfillment, Fulfillment,
+        InspectFulfillment, Intent as IntentMessage, List, Value as ValueMessage,
+    },
+    provider::{FulfillRequest, FulfillResponse},
+};
 use chariott_common::query::regex_from_query;
 use tonic::Status;
+use url::Url;
 
 const REGISTERED_INTENTS_KEY: &str = "registered_intents";
 
@@ -30,11 +40,13 @@ where
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone)]
 pub enum RuntimeBinding<T: ConnectionProvider> {
     Remote(T),
     Fallback(Box<RuntimeBinding<T>>, Box<RuntimeBinding<T>>),
-    System(Vec<IntentConfiguration>),
+    SystemInspect(Vec<IntentConfiguration>),
+    SystemDiscover(Url),
+    SystemSubscribe(RegistryChangeEvents),
     #[cfg(test)]
     Test(tests::TestBinding),
 }
@@ -45,16 +57,13 @@ where
     T: ConnectionProvider + Send + 'static,
 {
     #[async_recursion]
-    pub async fn execute(
-        self,
-        arg: common::Intent,
-    ) -> Result<provider_api::FulfillResponse, Status> {
+    pub async fn execute(self, arg: IntentMessage) -> Result<FulfillResponse, Status> {
         match self {
             RuntimeBinding::Remote(mut provider) => provider
                 .connect()
                 .await
                 .map_err(|e| Status::unknown(format!("Failed to connect to provider: {}.", e)))?
-                .fulfill(provider_api::FulfillRequest { intent: Some(arg) })
+                .fulfill(FulfillRequest { intent: Some(arg) })
                 .await
                 .map_err(|e| Status::unknown(format!("Error when invoking provider: '{}'.", e))),
             RuntimeBinding::Fallback(primary, secondary) => {
@@ -63,48 +72,85 @@ where
                     Err(_) => secondary.execute(arg).await,
                 }
             }
-            RuntimeBinding::System(intents) => match arg.intent {
-                Some(common::intent::Intent::Inspect(inspect_intent)) => {
-                    let regex = regex_from_query(&inspect_intent.query);
+            RuntimeBinding::SystemInspect(intents) => {
+                let fulfillment = match arg.intent {
+                    Some(IntentEnum::Inspect(inspect_intent)) => {
+                        let regex = regex_from_query(&inspect_intent.query);
 
-                    let intents = intents
-                        .into_iter()
-                        .filter(|e| regex.is_match(e.namespace_as_str()))
-                        .map(|ic| ic.into_namespaced_intent())
-                        .group();
+                        let intents = intents
+                            .into_iter()
+                            .filter(|e| regex.is_match(e.namespace_as_str()))
+                            .map(|ic| ic.into_namespaced_intent())
+                            .group();
 
-                    Ok(provider_api::FulfillResponse {
-                        fulfillment: Some(common::Fulfillment {
-                            fulfillment: Some(common::fulfillment::Fulfillment::Inspect(
-                                common::InspectFulfillment {
-                                    entries: intents
-                                        .into_iter()
-                                        .map(|(path, intent_kinds)| common::inspect_fulfillment::Entry {
-                                            path,
-                                            items: HashMap::from([(
-                                                REGISTERED_INTENTS_KEY.to_owned(),
-                                                common::Value {
-                                                    value: Some(common::value::Value::List(common::List {
-                                                        value: intent_kinds
-                                                            .into_iter()
-                                                            .map(|intent_kind| common::Value {
-                                                                value: Some(common::value::Value::String(
-                                                                    intent_kind.to_string(),
-                                                                )),
-                                                            })
-                                                            .collect(),
-                                                    })),
-                                                },
-                                            )]),
-                                        })
-                                        .collect(),
-                                },
-                            )),
-                        }),
-                    })
-                }
-                _ => Err(Status::invalid_argument("System does not support the specified intent.")),
-            },
+                        Ok(FulfillmentEnum::Inspect(InspectFulfillment {
+                            entries: intents
+                                .into_iter()
+                                .map(|(path, intent_kinds)| Entry {
+                                    path,
+                                    items: HashMap::from([(
+                                        REGISTERED_INTENTS_KEY.to_owned(),
+                                        ValueMessage {
+                                            value: Some(ValueEnum::List(List {
+                                                value: intent_kinds
+                                                    .into_iter()
+                                                    .map(|intent_kind| ValueMessage {
+                                                        value: Some(ValueEnum::String(
+                                                            intent_kind.to_string(),
+                                                        )),
+                                                    })
+                                                    .collect(),
+                                            })),
+                                        },
+                                    )]),
+                                })
+                                .collect(),
+                        }))
+                    }
+                    _ => Err(Status::invalid_argument(
+                        "System does not support the specified intent.",
+                    )),
+                }?;
+
+                Ok(FulfillResponse {
+                    fulfillment: Some(Fulfillment { fulfillment: Some(fulfillment) }),
+                })
+            }
+            RuntimeBinding::SystemDiscover(url) => {
+                const SCHEMA_VERSION_STREAMING: &str = "chariott.streaming.v1";
+                const SCHEMA_REFERENCE: &str = "grpc+proto";
+
+                let fulfillment = FulfillmentEnum::Discover(DiscoverFulfillment {
+                    services: vec![Service {
+                        url: url.to_string(),
+                        schema_kind: SCHEMA_REFERENCE.to_owned(),
+                        schema_reference: SCHEMA_VERSION_STREAMING.to_owned(),
+                        metadata: HashMap::new(),
+                    }],
+                });
+
+                Ok(FulfillResponse {
+                    fulfillment: Some(Fulfillment { fulfillment: Some(fulfillment) }),
+                })
+            }
+            RuntimeBinding::SystemSubscribe(registry_change_events) => {
+                match arg.intent {
+                    Some(IntentEnum::Subscribe(subscribe_intent)) => registry_change_events
+                        .serve_subscriptions(
+                            subscribe_intent.channel_id,
+                            subscribe_intent.sources.into_iter().map(|s| s.into()),
+                        ),
+                    _ => Err(Status::invalid_argument(
+                        "System does not support the specified intent.",
+                    )),
+                }?;
+
+                Ok(FulfillResponse {
+                    fulfillment: Some(Fulfillment {
+                        fulfillment: Some(FulfillmentEnum::Subscribe(SubscribeFulfillment {})),
+                    }),
+                })
+            }
             #[cfg(test)]
             RuntimeBinding::Test(item) => item.execute(arg),
         }
@@ -117,7 +163,7 @@ pub(crate) mod tests {
         connection_provider::GrpcProvider,
         registry::{IntentConfiguration, IntentKind},
     };
-    use chariott_common::proto::common::InspectIntent;
+    use chariott_common::proto::common::{InspectIntent, InvokeFulfillment};
     use tonic::Code;
 
     use super::*;
@@ -128,14 +174,11 @@ pub(crate) mod tests {
     #[derive(Clone, Debug, PartialEq)]
     pub struct TestBinding {
         result: Result<i32, Code>,
-        expected_arg: Option<common::intent::Intent>,
+        expected_arg: Option<IntentEnum>,
     }
 
     impl TestBinding {
-        pub fn new(
-            result: Result<i32, Code>,
-            expected_arg: Option<common::intent::Intent>,
-        ) -> Self {
+        pub fn new(result: Result<i32, Code>, expected_arg: Option<IntentEnum>) -> Self {
             Self { result, expected_arg }
         }
 
@@ -143,36 +186,28 @@ pub(crate) mod tests {
             Self::new(result, None)
         }
 
-        pub fn execute(
-            &self,
-            arg: common::Intent,
-        ) -> Result<provider_api::FulfillResponse, Status> {
+        pub fn execute(&self, arg: IntentMessage) -> Result<FulfillResponse, Status> {
             if let Some(expected_arg) = self.expected_arg.clone() {
                 assert_eq!(expected_arg, arg.intent.unwrap());
             }
 
             self.result
-                .map(|value| provider_api::FulfillResponse {
-                    fulfillment: Some(common::Fulfillment {
-                        fulfillment: Some(common::fulfillment::Fulfillment::Invoke(
-                            common::InvokeFulfillment {
-                                r#return: Some(common::Value {
-                                    value: Some(common::value::Value::Int32(value)),
-                                }),
-                            },
-                        )),
+                .map(|value| FulfillResponse {
+                    fulfillment: Some(Fulfillment {
+                        fulfillment: Some(FulfillmentEnum::Invoke(InvokeFulfillment {
+                            r#return: Some(ValueMessage { value: Some(ValueEnum::Int32(value)) }),
+                        })),
                     }),
                 })
                 .map_err(|code| Status::new(code, "Some error"))
         }
 
-        pub fn parse_result(fulfillment: Result<common::Fulfillment, Status>) -> Result<i32, Code> {
+        pub fn parse_result(fulfillment: Result<Fulfillment, Status>) -> Result<i32, Code> {
             match fulfillment {
-                Ok(common::Fulfillment {
+                Ok(Fulfillment {
                     fulfillment:
-                        Some(common::fulfillment::Fulfillment::Invoke(common::InvokeFulfillment {
-                            r#return:
-                                Some(common::Value { value: Some(common::value::Value::Int32(value)) }),
+                        Some(FulfillmentEnum::Invoke(InvokeFulfillment {
+                            r#return: Some(ValueMessage { value: Some(ValueEnum::Int32(value)) }),
                         })),
                 }) => Ok(value),
                 Err(err) => Err(err.code()),
@@ -183,7 +218,7 @@ pub(crate) mod tests {
 
     async fn execute_with_empty_intent(binding: RuntimeBinding<GrpcProvider>) -> Result<i32, Code> {
         TestBinding::parse_result(
-            binding.execute(common::Intent { intent: None }).await.map(|r| r.fulfillment.unwrap()),
+            binding.execute(IntentMessage { intent: None }).await.map(|r| r.fulfillment.unwrap()),
         )
     }
 
@@ -233,7 +268,7 @@ pub(crate) mod tests {
     #[tokio::test]
     async fn system_binding_fails_with_non_supported_intent() {
         // arrange
-        let binding = RuntimeBinding::System(vec![]);
+        let binding = RuntimeBinding::SystemInspect(vec![]);
 
         // act
         let result = execute_with_empty_intent(binding).await;
@@ -276,13 +311,13 @@ pub(crate) mod tests {
                     .as_ref()
                     .unwrap()
                 {
-                    common::value::Value::List(l) => l,
+                    ValueEnum::List(l) => l,
                     _ => panic!("Not correct fulfillment"),
                 }
                 .value
                 .iter()
                 .map(|intent| match intent.value.as_ref().unwrap() {
-                    common::value::Value::String(s) => s.clone(),
+                    ValueEnum::String(s) => s.clone(),
                     _ => panic!("Not correct fulfillment"),
                 })
                 .collect();
@@ -320,22 +355,15 @@ pub(crate) mod tests {
         }
     }
 
-    async fn execute_system_inspect(
-        query: &str,
-        intents: Vec<IntentConfiguration>,
-    ) -> Vec<common::inspect_fulfillment::Entry> {
-        let response = RuntimeBinding::<GrpcProvider>::System(intents)
-            .execute(common::Intent {
-                intent: Some(common::intent::Intent::Inspect(InspectIntent {
-                    query: query.to_owned(),
-                })),
+    async fn execute_system_inspect(query: &str, intents: Vec<IntentConfiguration>) -> Vec<Entry> {
+        let response = RuntimeBinding::<GrpcProvider>::SystemInspect(intents)
+            .execute(IntentMessage {
+                intent: Some(IntentEnum::Inspect(InspectIntent { query: query.to_owned() })),
             })
             .await;
 
         match response.unwrap().fulfillment.unwrap().fulfillment {
-            Some(common::fulfillment::Fulfillment::Inspect(common::InspectFulfillment {
-                entries,
-            })) => entries,
+            Some(FulfillmentEnum::Inspect(InspectFulfillment { entries })) => entries,
             _ => panic!("Wrong fulfillment"),
         }
     }
