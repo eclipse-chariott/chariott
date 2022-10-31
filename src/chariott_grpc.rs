@@ -8,7 +8,8 @@ use url::Url;
 
 use crate::intent_broker::IntentBroker;
 use crate::registry::{
-    ExecutionLocality, IntentConfiguration, IntentKind, Registry, ServiceConfiguration, ServiceId,
+    ExecutionLocality, IntentConfiguration, IntentKind, Registry, RegistryObserver,
+    ServiceConfiguration, ServiceId,
 };
 use chariott_common::proto::*;
 use chariott_common::proto::{runtime as runtime_api, runtime::IntentRegistration};
@@ -25,20 +26,20 @@ const INTENT_MAPPING_WRITE: i32 = 3;
 const INTENT_MAPPING_INVOKE: i32 = 4;
 const INTENT_MAPPING_SUBSCRIBE: i32 = 5;
 
-pub struct ChariottServer {
+pub struct ChariottServer<T: RegistryObserver> {
     broker: IntentBroker,
-    registry: Arc<RwLock<Registry<IntentBroker>>>,
+    registry: Arc<RwLock<Registry<T>>>,
 }
 
-impl ChariottServer {
-    pub fn new(registry: Registry<IntentBroker>, broker: IntentBroker) -> Self {
+impl<T: RegistryObserver> ChariottServer<T> {
+    pub fn new(registry: Registry<T>, broker: IntentBroker) -> Self {
         Self { registry: Arc::new(RwLock::new(registry)), broker }
     }
 
     fn create_configruation_from_registration(
         intent: IntentRegistration,
     ) -> Result<IntentConfiguration, Status> {
-        ChariottServer::map_intent_value(intent.intent)
+        ChariottServer::<T>::map_intent_value(intent.intent)
             .map(|kind| IntentConfiguration::new(intent.namespace, kind))
     }
 
@@ -67,7 +68,9 @@ impl ChariottServer {
 }
 
 #[async_trait]
-impl runtime_api::chariott_service_server::ChariottService for ChariottServer {
+impl<T: RegistryObserver + Send + Sync + 'static>
+    runtime_api::chariott_service_server::ChariottService for ChariottServer<T>
+{
     async fn announce(
         &self,
         request: Request<runtime_api::AnnounceRequest>,
@@ -101,7 +104,7 @@ impl runtime_api::chariott_service_server::ChariottService for ChariottServer {
         let intents: Result<Vec<_>, _> = request
             .intents
             .into_iter()
-            .map(ChariottServer::create_configruation_from_registration)
+            .map(ChariottServer::<T>::create_configruation_from_registration)
             .collect();
         self.registry
             .write()
@@ -122,7 +125,7 @@ impl runtime_api::chariott_service_server::ChariottService for ChariottServer {
         let config = IntentConfiguration::new(
             request.namespace,
             match intent.intent {
-                Some(ref intent) => Ok(ChariottServer::map_intent_variant(intent)),
+                Some(ref intent) => Ok(ChariottServer::<T>::map_intent_variant(intent)),
                 None => Err(Status::invalid_argument("Intent is not known.")),
             }?,
         );
@@ -245,7 +248,7 @@ mod tests {
 
     #[test]
     fn intent_match_failure_are_caught() {
-        assert!(ChariottServer::map_intent_value(-1).is_err());
+        assert!(ChariottServer::<IntentBroker>::map_intent_value(-1).is_err());
     }
 
     #[test]
@@ -265,32 +268,32 @@ mod tests {
         }
 
         assert_eq!(
-            ChariottServer::map_intent_value(INTENT_MAPPING_DISCOVER).unwrap(),
+            ChariottServer::<IntentBroker>::map_intent_value(INTENT_MAPPING_DISCOVER).unwrap(),
             IntentKind::Discover
         );
 
         assert_eq!(
-            ChariottServer::map_intent_value(INTENT_MAPPING_INSPECT).unwrap(),
+            ChariottServer::<IntentBroker>::map_intent_value(INTENT_MAPPING_INSPECT).unwrap(),
             IntentKind::Inspect
         );
 
         assert_eq!(
-            ChariottServer::map_intent_value(INTENT_MAPPING_READ).unwrap(),
+            ChariottServer::<IntentBroker>::map_intent_value(INTENT_MAPPING_READ).unwrap(),
             IntentKind::Read
         );
 
         assert_eq!(
-            ChariottServer::map_intent_value(INTENT_MAPPING_WRITE).unwrap(),
+            ChariottServer::<IntentBroker>::map_intent_value(INTENT_MAPPING_WRITE).unwrap(),
             IntentKind::Write
         );
 
         assert_eq!(
-            ChariottServer::map_intent_value(INTENT_MAPPING_INVOKE).unwrap(),
+            ChariottServer::<IntentBroker>::map_intent_value(INTENT_MAPPING_INVOKE).unwrap(),
             IntentKind::Invoke
         );
 
         assert_eq!(
-            ChariottServer::map_intent_value(INTENT_MAPPING_SUBSCRIBE).unwrap(),
+            ChariottServer::<IntentBroker>::map_intent_value(INTENT_MAPPING_SUBSCRIBE).unwrap(),
             IntentKind::Subscribe
         );
     }
@@ -404,7 +407,7 @@ mod tests {
                 IntentKind::Subscribe,
             ),
         ] {
-            assert_eq!(expected, ChariottServer::map_intent_variant(&intent));
+            assert_eq!(expected, ChariottServer::<IntentBroker>::map_intent_variant(&intent));
         }
     }
 
@@ -436,7 +439,7 @@ mod tests {
         }
     }
 
-    fn setup() -> ChariottServer {
+    fn setup() -> ChariottServer<IntentBroker> {
         let broker = IntentBroker::new();
         ChariottServer::new(Registry::new(broker.clone()), broker)
     }

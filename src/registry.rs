@@ -9,6 +9,8 @@ use url::Url;
 
 use crate::registry::update::TransactionalRegistryUpdate;
 
+pub use events::RegistryChangeEvents;
+
 const SYSTEM_NAMESPACE: &str = "system";
 const SYSTEM_NAMESPACE_PREFIX: &str = "system.";
 
@@ -58,6 +60,79 @@ mod update {
     }
 }
 
+mod events {
+    use std::{
+        ops::Deref,
+        sync::atomic::{AtomicU64, Ordering},
+    };
+
+    use async_trait::async_trait;
+    use chariott_common::proto::streaming::{
+        channel_service_server::ChannelService, Event, OpenRequest,
+    };
+    use ess::EventSubSystem;
+    use tokio_stream::wrappers::ReceiverStream;
+    use tonic::{Response, Status};
+
+    use super::{RegistryChange, RegistryObserver};
+
+    pub struct RegistryChangeEvents {
+        sequence: AtomicU64,
+        ess: EventSubSystem<Box<str>, Box<str>, u64, Result<Event, Status>>,
+    }
+
+    impl RegistryChangeEvents {
+        pub fn new() -> Self {
+            Self { sequence: AtomicU64::new(0), ess: EventSubSystem::new() }
+        }
+    }
+
+    impl Default for RegistryChangeEvents {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
+    impl<T> RegistryObserver for T
+    where
+        T: Deref<Target = RegistryChangeEvents>,
+    {
+        fn on_intent_config_change<'a>(
+            &self,
+            changes: impl IntoIterator<Item = RegistryChange<'a>>,
+        ) {
+            const REGISTRY_CHANGED_EVENT_ID: &str = "changed";
+
+            if changes.into_iter().any(|change| match change {
+                RegistryChange::Add(_, _) => true,
+                RegistryChange::Modify(_, s) => s.is_empty(),
+            }) {
+                let sequence_number = self.sequence.fetch_add(1, Ordering::Relaxed);
+                self.ess.publish(REGISTRY_CHANGED_EVENT_ID, sequence_number);
+            }
+        }
+    }
+
+    #[async_trait]
+    impl ChannelService for RegistryChangeEvents {
+        type OpenStream = ReceiverStream<Result<Event, Status>>;
+
+        async fn open(
+            &self,
+            _: tonic::Request<OpenRequest>,
+        ) -> Result<Response<Self::OpenStream>, Status> {
+            const METADATA_KEY: &str = "x-chariott-channel-id";
+
+            let id: Box<str> = uuid::Uuid::new_v4().to_string().into();
+            let (_, receiver_stream) = self.ess.read_events(id.clone());
+            let mut response = Response::new(receiver_stream);
+            response.metadata_mut().insert(METADATA_KEY, id.to_string().try_into().unwrap());
+            Ok(response)
+        }
+    }
+}
+
+#[derive(Clone)]
 pub enum RegistryChange<'a> {
     Add(&'a IntentConfiguration, &'a HashSet<ServiceConfiguration>),
     Modify(&'a IntentConfiguration, &'a HashSet<ServiceConfiguration>),
@@ -67,6 +142,24 @@ pub enum RegistryChange<'a> {
 pub trait RegistryObserver {
     /// Handles observation on changed registry state.
     fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = RegistryChange<'a>>);
+}
+
+pub struct CompositeRegistryObserver<T, U>(T, U);
+
+impl<T, U> CompositeRegistryObserver<T, U> {
+    pub fn new(left: T, right: U) -> Self {
+        Self(left, right)
+    }
+}
+
+impl<T: RegistryObserver, U: RegistryObserver> RegistryObserver
+    for CompositeRegistryObserver<T, U>
+{
+    fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = RegistryChange<'a>>) {
+        let changes: Vec<_> = changes.into_iter().collect();
+        self.0.on_intent_config_change(changes.clone());
+        self.1.on_intent_config_change(changes);
+    }
 }
 
 #[derive(Clone, Debug)]

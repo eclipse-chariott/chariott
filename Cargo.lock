@@ -429,6 +429,7 @@ dependencies = [
  "async-recursion",
  "async-trait",
  "chariott-common",
+ "ess",
  "examples-common",
  "futures",
  "prost",

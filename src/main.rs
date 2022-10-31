@@ -5,7 +5,9 @@ use chariott::chariott_grpc::ChariottServer;
 use chariott::registry::Registry;
 use chariott::IntentBroker;
 use chariott_common::proto::runtime::chariott_service_server::ChariottServiceServer;
+use chariott_common::proto::streaming::channel_service_server::ChannelServiceServer;
 use chariott_common::shutdown::RouterExt as _;
+use std::sync::Arc;
 use tonic::transport::Server;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
@@ -16,6 +18,8 @@ pub(crate) const FILE_DESCRIPTOR_SET: &[u8] = tonic::include_file_descriptor_set
 #[tokio::main]
 #[cfg(not(tarpaulin_include))]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    use chariott::registry::{CompositeRegistryObserver, RegistryChangeEvents};
+
     let collector = tracing_subscriber::fmt()
         .with_env_filter(
             EnvFilter::builder()
@@ -27,7 +31,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     collector.init();
 
     let broker = IntentBroker::new();
-    let registry = Registry::new(broker.clone());
+    let ess = Arc::new(RegistryChangeEvents::new());
+    let registry = Registry::new(CompositeRegistryObserver::new(broker.clone(), ess.clone()));
 
     #[cfg(build = "debug")]
     let reflection_service = tonic_reflection::server::Builder::configure()
@@ -39,7 +44,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing::info!("chariott listening on {addr}");
 
     let router = Server::builder()
-        .add_service(ChariottServiceServer::new(ChariottServer::new(registry, broker)));
+        .add_service(ChariottServiceServer::new(ChariottServer::new(registry, broker)))
+        .add_service(ChannelServiceServer::from_arc(ess));
 
     #[cfg(build = "debug")]
     let router = router.add_service(reflection_service);

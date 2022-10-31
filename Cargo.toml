@@ -30,14 +30,17 @@ test = false
 async-recursion = "1.0"
 async-trait = { workspace = true }
 chariott-common = { workspace = true }
+ess = { path = "./ess" }
 prost = { workspace = true }
 prost-types = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread"] }
+tokio-stream = { workspace = true }
 tonic = { workspace = true }
 tonic-reflection = "0.5"
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 url = { workspace = true }
+uuid = { workspace = true }
 
 [workspace.dependencies]
 anyhow = "1.0"

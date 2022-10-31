@@ -135,7 +135,7 @@ async fn when_cancelled_shuts_down_provider() -> anyhow::Result<()> {
 
 struct Subject {
     namespace: String,
-    subject: ChariottServer,
+    subject: ChariottServer<IntentBroker>,
 }
 
 struct ProviderSetup {
