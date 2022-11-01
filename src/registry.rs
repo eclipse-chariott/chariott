@@ -50,12 +50,10 @@ mod update {
                 )
             });
 
-            observer.on_intent_config_change(services.into_iter().map(
-                |(kind, services, intent)| match kind {
-                    ChangeKind::Add => Change::Add(intent, services),
-                    ChangeKind::Modify => Change::Modify(intent, services),
-                },
-            ));
+            observer.on_change(services.into_iter().map(|(kind, services, intent)| match kind {
+                ChangeKind::Add => Change::Add(intent, services),
+                ChangeKind::Modify => Change::Modify(intent, services),
+            }));
         }
     }
 }
@@ -120,7 +118,7 @@ mod events {
     }
 
     impl Observer for ChangeEvents {
-        fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
+        fn on_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
             for namespace in changes
                 .into_iter()
                 .filter_map(|change| match change {
@@ -168,7 +166,7 @@ pub enum Change<'a> {
 /// Represents a type which can observe changes to the registry.
 pub trait Observer {
     /// Handles observation on changed registry state.
-    fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>);
+    fn on_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>);
 }
 
 pub struct CompositeObserver<T, U>(T, U);
@@ -180,10 +178,10 @@ impl<T, U> CompositeObserver<T, U> {
 }
 
 impl<T: Observer, U: Observer> Observer for CompositeObserver<T, U> {
-    fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
+    fn on_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
         let changes: Vec<_> = changes.into_iter().collect();
-        self.0.on_intent_config_change(changes.clone());
-        self.1.on_intent_config_change(changes);
+        self.0.on_change(changes.clone());
+        self.1.on_change(changes);
     }
 }
 
@@ -664,7 +662,7 @@ pub(crate) mod tests {
     }
 
     impl Observer for MockBroker {
-        fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
+        fn on_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
             for change in changes {
                 let (intent_configuration, service_configurations) = match change {
                     Change::Add(i, s) => (i, s),

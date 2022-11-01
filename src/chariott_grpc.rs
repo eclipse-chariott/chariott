@@ -425,7 +425,7 @@ mod tests {
     }
 
     impl Observer for MockBroker {
-        fn on_intent_config_change<'a>(&self, _: impl IntoIterator<Item = Change<'a>>) {
+        fn on_change<'a>(&self, _: impl IntoIterator<Item = Change<'a>>) {
             todo!()
         }
     }
