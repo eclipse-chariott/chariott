@@ -17,7 +17,7 @@ pub(crate) const FILE_DESCRIPTOR_SET: &[u8] = tonic::include_file_descriptor_set
 #[tokio::main]
 #[cfg(not(tarpaulin_include))]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    use chariott::registry::{ChangeEvents, CompositeObserver};
+    use chariott::registry::{ChangeEvents, Composite};
 
     let collector = tracing_subscriber::fmt()
         .with_env_filter(
@@ -31,7 +31,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let ess = ChangeEvents::new();
     let broker = IntentBroker::new("http://localhost:4243".parse().unwrap(), ess.clone());
-    let registry = Registry::new(CompositeObserver::new(broker.clone(), ess.clone()));
+    let registry = Registry::new(Composite::new(broker.clone(), ess.clone()));
 
     #[cfg(build = "debug")]
     let reflection_service = tonic_reflection::server::Builder::configure()

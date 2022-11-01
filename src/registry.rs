@@ -169,15 +169,15 @@ pub trait Observer {
     fn on_change<'a>(&self, changes: impl Iterator<Item = Change<'a>> + Clone);
 }
 
-pub struct CompositeObserver<T, U>(T, U);
+pub struct Composite<T, U>(T, U);
 
-impl<T, U> CompositeObserver<T, U> {
+impl<T, U> Composite<T, U> {
     pub fn new(left: T, right: U) -> Self {
         Self(left, right)
     }
 }
 
-impl<T: Observer, U: Observer> Observer for CompositeObserver<T, U> {
+impl<T: Observer, U: Observer> Observer for Composite<T, U> {
     fn on_change<'a>(&self, changes: impl Iterator<Item = Change<'a>> + Clone) {
         self.0.on_change(changes.clone());
         self.1.on_change(changes);
