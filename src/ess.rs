@@ -62,13 +62,7 @@ impl Observer for Ess {
             .into_iter()
             .filter_map(|change| match change {
                 Change::Add(intent, _) => Some(intent.namespace()),
-                Change::Modify(intent, services) => {
-                    if services.is_empty() {
-                        Some(intent.namespace())
-                    } else {
-                        None
-                    }
-                }
+                Change::Modify(_, _) => None,
                 Change::Remove(intent) => Some(intent.namespace()),
             })
             .collect::<HashSet<_>>()
@@ -93,5 +87,100 @@ impl ChannelService for Ess {
         let mut response = Response::new(receiver_stream);
         response.metadata_mut().insert(METADATA_KEY, id.to_string().try_into().unwrap());
         Ok(response)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{collections::HashSet, time::Duration};
+
+    use tokio_stream::StreamExt as _;
+
+    use crate::registry::{
+        tests::IntentConfigurationBuilder, Change, IntentConfiguration, Observer,
+    };
+
+    use super::Ess;
+
+    #[tokio::test]
+    async fn on_change_notifies_when_namespace_change_detected() {
+        const INTENT_A: &str = "A";
+        const INTENT_B: &str = "B";
+        const INTENT_C: &str = "C";
+
+        fn intent(nonce: &str) -> IntentConfiguration {
+            IntentConfigurationBuilder::with_nonce(nonce).build()
+        }
+
+        let services = HashSet::new(); // The observe logic does not care about which services serve a specific intent.
+        let intent_a = intent(INTENT_A);
+        let intent_b = intent(INTENT_B);
+        let intent_c = intent(INTENT_C);
+
+        test([Change::Add(&intent_a, &services)], [&intent_a]).await;
+        test(
+            [Change::Add(&intent_a, &services), Change::Modify(&intent_b, &services)],
+            [&intent_a],
+        )
+        .await;
+        test([Change::Modify(&intent_b, &services), Change::Remove(&intent_a)], [&intent_a]).await;
+        test(
+            [Change::Add(&intent_b, &services), Change::Remove(&intent_a)],
+            [&intent_b, &intent_a],
+        )
+        .await;
+        test(
+            [
+                Change::Add(&intent_b, &services),
+                Change::Remove(&intent_a),
+                Change::Modify(&intent_c, &services),
+            ],
+            [&intent_a, &intent_b],
+        )
+        .await;
+        test([Change::Modify(&intent_a, &services)], []).await;
+
+        async fn test<'a, 'b>(
+            changes: impl IntoIterator<Item = Change<'a>>,
+            expected_events: impl IntoIterator<Item = &'b IntentConfiguration>,
+        ) {
+            // arrange
+            const CLIENT_ID: &str = "CLIENT";
+
+            let subject = setup();
+            let (_, stream) = subject.0.read_events(CLIENT_ID.into());
+
+            // always subscribe to all possible namespace changes.
+            for nonce in [INTENT_A, INTENT_B, INTENT_C] {
+                let intent = IntentConfigurationBuilder::with_nonce(nonce).build();
+                subject.serve_subscriptions(CLIENT_ID, [intent.namespace().into()]).unwrap();
+            }
+
+            // act
+            subject.on_change(changes.into_iter().collect::<Vec<_>>().into_iter());
+
+            // assert
+            let mut expected_events =
+                expected_events.into_iter().map(|e| e.namespace()).collect::<Vec<_>>();
+
+            // collect the result while there are still events incoming.
+            let mut result = stream
+                .timeout(Duration::from_millis(100))
+                .take_while(|e| e.is_ok())
+                .map(|e| e.unwrap().unwrap().source)
+                .collect::<Vec<_>>()
+                .await;
+
+            // namespace change events can be delivered out of order. Sort
+            // before comparing.
+            result.sort();
+            expected_events.sort();
+
+            assert_eq!(result, expected_events);
+        }
+    }
+
+    fn setup() -> Ess {
+        Ess::new()
     }
 }
