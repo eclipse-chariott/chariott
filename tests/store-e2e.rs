@@ -157,15 +157,20 @@ async fn when_provider_registers_notifies_registry_observers() -> anyhow::Result
     let mut subject = setup().await;
 
     // act
-    let stream = subject.listen("system.registry", vec!["changed".into()]).await?;
+    let mut stream = subject.listen("system.registry", vec![namespace.clone().into()]).await?;
 
     builder.register_once(&mut None, true).await?;
 
     // assert
-    let result: Vec<_> = stream.take(1).collect().await;
-    let result = result.into_iter().next().unwrap().unwrap();
-
-    assert_eq!("changed", result.id.as_ref());
+    let timeout = Instant::now() + Duration::from_secs(5);
+    tokio::select! {
+        result = stream.next() => {
+            assert_eq!(namespace.as_str(), result.unwrap().unwrap().id.as_ref());
+        }
+        _ = sleep_until(timeout) => {
+            panic!("Did not receive registry change event.");
+        }
+    }
 
     Ok(())
 }

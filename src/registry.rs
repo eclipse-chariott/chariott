@@ -61,13 +61,7 @@ mod update {
 }
 
 mod events {
-    use std::{
-        sync::{
-            atomic::{AtomicU64, Ordering},
-            Arc,
-        },
-        time::SystemTime,
-    };
+    use std::{collections::HashSet, sync::Arc, time::SystemTime};
 
     use async_trait::async_trait;
     use chariott_common::proto::{
@@ -82,17 +76,14 @@ mod events {
 
     use super::{RegistryChange, RegistryObserver};
 
-    type Ess = EventSubSystem<Box<str>, Box<str>, u64, Result<Event, Status>>;
+    type Ess = EventSubSystem<Box<str>, Box<str>, (), Result<Event, Status>>;
 
     #[derive(Clone)]
-    pub struct RegistryChangeEvents {
-        sequence: Arc<AtomicU64>,
-        ess: Arc<Ess>,
-    }
+    pub struct RegistryChangeEvents(Arc<Ess>);
 
     impl RegistryChangeEvents {
         pub fn new() -> Self {
-            Self { sequence: Arc::new(AtomicU64::new(0)), ess: Arc::new(EventSubSystem::new()) }
+            Self(Arc::new(EventSubSystem::new()))
         }
 
         pub fn serve_subscriptions(
@@ -101,7 +92,7 @@ mod events {
             requested_subscriptions: impl IntoIterator<Item = Box<str>>,
         ) -> Result<(), Status> {
             let subscriptions = self
-                .ess
+                .0
                 .register_subscriptions(client_id.into(), requested_subscriptions)
                 .map_err(|_| Status::failed_precondition("Specified client does not exist."))?;
 
@@ -133,14 +124,21 @@ mod events {
             &self,
             changes: impl IntoIterator<Item = RegistryChange<'a>>,
         ) {
-            const REGISTRY_CHANGED_EVENT_ID: &str = "changed";
-
-            if changes.into_iter().any(|change| match change {
-                RegistryChange::Add(_, _) => true,
-                RegistryChange::Modify(_, s) => s.is_empty(),
-            }) {
-                let sequence_number = self.sequence.fetch_add(1, Ordering::Relaxed);
-                self.ess.publish(REGISTRY_CHANGED_EVENT_ID, sequence_number);
+            for namespace in changes
+                .into_iter()
+                .filter_map(|change| match change {
+                    RegistryChange::Add(intent, _) => Some(intent.namespace.as_str()),
+                    RegistryChange::Modify(intent, services) => {
+                        if services.is_empty() {
+                            Some(intent.namespace.as_str())
+                        } else {
+                            None
+                        }
+                    }
+                })
+                .collect::<HashSet<_>>()
+            {
+                self.0.publish(namespace, ());
             }
         }
     }
@@ -156,7 +154,7 @@ mod events {
             const METADATA_KEY: &str = "x-chariott-channel-id";
 
             let id: Box<str> = uuid::Uuid::new_v4().to_string().into();
-            let (_, receiver_stream) = self.ess.read_events(id.clone());
+            let (_, receiver_stream) = self.0.read_events(id.clone());
             let mut response = Response::new(receiver_stream);
             response.metadata_mut().insert(METADATA_KEY, id.to_string().try_into().unwrap());
             Ok(response)
