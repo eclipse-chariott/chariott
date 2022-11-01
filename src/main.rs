@@ -1,12 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+mod ext;
+
 use chariott::chariott_grpc::ChariottServer;
 use chariott::registry::{self, Registry};
 use chariott::IntentBroker;
 use chariott_common::config::try_env;
 use chariott_common::proto::runtime::chariott_service_server::ChariottServiceServer;
 use chariott_common::shutdown::{ctrl_c_cancellation, RouterExt as _};
+use ext::OptionExt as _;
 use std::sync::Arc;
 use std::time::Duration;
 use tonic::transport::Server;
@@ -32,7 +35,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let broker = IntentBroker::new();
 
     let registry_config = try_env::<u64>("CHARIOTT_REGISTRY_TTL_SECS")
-        .map_or(Ok(None), |r| r.map(Some))?
+        .ok()?
         .map(Duration::from_secs)
         .map(|v| registry::Config::default().set_entry_ttl(v))
         .unwrap_or_default();
