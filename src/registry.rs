@@ -444,6 +444,8 @@ pub(crate) mod tests {
         registry.upsert(service_a_reregistration.clone(), vec![intent_2.clone()]).unwrap();
 
         // assert
+        registry.observer.assert_number_of_changes(&[2]);
+
         registry.observer.assert_modified(&intent_1, |actual_services| {
             assert_eq!([service_b.build()], actual_services.as_slice());
         });
