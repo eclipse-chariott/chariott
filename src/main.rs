@@ -75,7 +75,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         break;
                     }
                 }
-                sleep(registry_entry_ttl).await;
             }
         })
     };
