@@ -18,6 +18,8 @@ pub(crate) const FILE_DESCRIPTOR_SET: &[u8] = tonic::include_file_descriptor_set
 #[tokio::main]
 #[cfg(not(tarpaulin_include))]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    const PORT: u16 = 4243;
+
     let collector = tracing_subscriber::fmt()
         .with_env_filter(
             EnvFilter::builder()
@@ -29,7 +31,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     collector.init();
 
     let ess = Ess::new();
-    let broker = IntentBroker::new("http://localhost:4243".parse().unwrap(), ess.clone());
+    let broker =
+        IntentBroker::new(format!("http://localhost:{PORT}").parse().unwrap(), ess.clone());
     let registry = Registry::new(Composite::new(broker.clone(), ess.clone()));
 
     #[cfg(build = "debug")]
@@ -38,7 +41,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build()?;
 
     tracing::info!("starting grpc services");
-    let addr = "0.0.0.0:4243".parse().unwrap();
+    let addr = format!("0.0.0.0:{PORT}").parse().unwrap();
     tracing::info!("chariott listening on {addr}");
 
     let router = Server::builder()
