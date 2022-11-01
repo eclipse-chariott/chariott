@@ -10,6 +10,7 @@ use ess::EventSubSystem;
 use tokio::spawn;
 use tokio_stream::wrappers::ReceiverStream;
 use tonic::{Response, Status};
+use uuid::Uuid;
 
 use crate::registry::{Change, Observer};
 
@@ -31,7 +32,7 @@ impl Ess {
         let subscriptions = self
             .0
             .register_subscriptions(client_id.into(), requested_subscriptions)
-            .map_err(|_| Status::failed_precondition("Specified client does not exist."))?;
+            .map_err(|_| Status::failed_precondition("The specified client does not exist."))?;
 
         for subscription in subscriptions {
             let source = subscription.event_id().to_string();
@@ -82,10 +83,10 @@ impl ChannelService for Ess {
     ) -> Result<Response<Self::OpenStream>, Status> {
         const METADATA_KEY: &str = "x-chariott-channel-id";
 
-        let id: Box<str> = uuid::Uuid::new_v4().to_string().into();
-        let (_, receiver_stream) = self.0.read_events(id.clone());
+        let id = Uuid::new_v4().to_string();
+        let (_, receiver_stream) = self.0.read_events(id.clone().into());
         let mut response = Response::new(receiver_stream);
-        response.metadata_mut().insert(METADATA_KEY, id.to_string().try_into().unwrap());
+        response.metadata_mut().insert(METADATA_KEY, id.try_into().unwrap());
         Ok(response)
     }
 }
@@ -94,7 +95,14 @@ impl ChannelService for Ess {
 mod tests {
     use std::{collections::HashSet, time::Duration};
 
+    use chariott_common::proto::{
+        common::value::Value as ValueEnum,
+        common::Value as ValueMessage,
+        streaming::{channel_service_server::ChannelService, OpenRequest},
+    };
+    use futures::Stream;
     use tokio_stream::StreamExt as _;
+    use tonic::{Code, Request};
 
     use crate::registry::{
         tests::IntentConfigurationBuilder, Change, IntentConfiguration, Observer,
@@ -164,12 +172,7 @@ mod tests {
                 expected_events.into_iter().map(|e| e.namespace()).collect::<Vec<_>>();
 
             // collect the result while there are still events incoming.
-            let mut result = stream
-                .timeout(Duration::from_millis(100))
-                .take_while(|e| e.is_ok())
-                .map(|e| e.unwrap().unwrap().source)
-                .collect::<Vec<_>>()
-                .await;
+            let mut result = exhaust(stream).map(|e| e.unwrap().source).collect::<Vec<_>>().await;
 
             // namespace change events can be delivered out of order. Sort
             // before comparing.
@@ -180,7 +183,78 @@ mod tests {
         }
     }
 
+    #[tokio::test]
+    async fn open_should_set_channel_id() {
+        // arrange
+        let subject = setup();
+
+        // act
+        let response = subject.open(Request::new(OpenRequest {})).await.unwrap();
+
+        // assert
+        assert!(!response.metadata().get("x-chariott-channel-id").unwrap().is_empty());
+    }
+
+    #[tokio::test]
+    async fn serve_subscriptions_should_serve_subscription_for_event() {
+        // arrange
+        const EVENT_A: &str = "test-event-a";
+        const EVENT_B: &str = "test-event-b";
+
+        let subject = setup();
+        let response = subject.open(Request::new(OpenRequest {})).await.unwrap();
+        let client_id = response.metadata().get("x-chariott-channel-id").unwrap().to_str().unwrap();
+
+        // act
+        subject.serve_subscriptions(client_id, [EVENT_A.into(), EVENT_B.into()]).unwrap();
+
+        // assert
+        subject.0.publish(EVENT_A, ());
+        subject.0.publish(EVENT_B, ());
+
+        let result = exhaust(response.into_inner())
+            .collect::<Vec<_>>()
+            .await
+            .into_iter()
+            .map(|e| e.unwrap())
+            .collect::<Vec<_>>();
+
+        // assert sources
+        assert_eq!(
+            vec![EVENT_A, EVENT_B],
+            result.iter().map(|e| e.source.clone()).collect::<Vec<_>>()
+        );
+
+        // assert sequence numbers
+        assert_eq!(1, result[0].seq);
+        assert_eq!(1, result[1].seq);
+
+        // assert payload
+        assert_eq!(Some(ValueMessage { value: Some(ValueEnum::Null(0)) }), result[0].value);
+    }
+
+    #[tokio::test]
+    async fn serve_subscriptions_should_error_when_no_client_active() {
+        // arrange
+        let subject = setup();
+
+        // act
+        let result = subject.serve_subscriptions("client", ["test-event".into()]);
+
+        // assert
+        let result = result.unwrap_err();
+        assert_eq!(Code::FailedPrecondition, result.code());
+        assert_eq!("The specified client does not exist.", result.message());
+    }
+
     fn setup() -> Ess {
         Ess::new()
+    }
+
+    // Takes values from a stream as long as the stream is still producing
+    // values. If the stream did not produce a value for 100ms, it ends the
+    // stream.
+    fn exhaust<T>(stream: impl Stream<Item = T>) -> impl Stream<Item = T> {
+        stream.timeout(Duration::from_millis(100)).take_while(|e| e.is_ok()).map(|e| e.unwrap())
     }
 }
