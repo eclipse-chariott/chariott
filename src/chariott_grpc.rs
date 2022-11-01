@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 use std::sync::{Arc, RwLock};
+use std::time::SystemTime;
 
 use tonic::{async_trait, Request, Response, Status};
 use url::Url;
@@ -106,7 +107,7 @@ impl runtime_api::chariott_service_server::ChariottService for ChariottServer {
         self.registry
             .write()
             .unwrap()
-            .upsert(svc_cfg, intents?)
+            .upsert(svc_cfg, intents?, SystemTime::now())
             .map_err(|e| Status::unknown(e.message()))?;
         Ok(Response::new(runtime_api::RegisterResponse {}))
     }
@@ -442,7 +443,7 @@ mod tests {
 
     fn setup() -> ChariottServer {
         let broker = IntentBroker::new();
-        ChariottServer::new(Registry::new(broker.clone()), broker)
+        ChariottServer::new(Registry::new(broker.clone(), Default::default()), broker)
     }
 
     fn create_announce_request() -> AnnounceRequest {

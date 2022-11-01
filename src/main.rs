@@ -27,7 +27,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     collector.init();
 
     let broker = IntentBroker::new();
-    let registry = Registry::new(broker.clone());
+    let registry = Registry::new(broker.clone(), Default::default());
 
     #[cfg(build = "debug")]
     let reflection_service = tonic_reflection::server::Builder::configure()

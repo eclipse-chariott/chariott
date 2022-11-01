@@ -3,6 +3,7 @@
 
 use core::fmt;
 use std::collections::{HashMap, HashSet};
+use std::time::{Duration, SystemTime};
 
 use chariott_common::error::Error;
 use url::Url;
@@ -20,19 +21,39 @@ pub trait RegistryObserver {
     );
 }
 
+#[derive(Debug, Clone)]
+pub struct Config {
+    entry_ttl: Duration,
+}
+
+impl Config {
+    pub fn set_entry_ttl(&mut self, value: Duration) -> &mut Self {
+        self.entry_ttl = value;
+        self
+    }
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self { entry_ttl: Duration::from_secs(15) }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct Registry<T: RegistryObserver> {
     external_services_by_intent: HashMap<IntentConfiguration, HashSet<ServiceConfiguration>>,
-    known_services: HashSet<ServiceConfiguration>,
+    known_services: HashMap<ServiceConfiguration, SystemTime>,
     observer: T,
+    config: Config,
 }
 
 impl<T: RegistryObserver> Registry<T> {
-    pub fn new(observer: T) -> Self {
+    pub fn new(observer: T, config: Config) -> Self {
         Self {
             external_services_by_intent: HashMap::new(),
-            known_services: HashSet::new(),
+            known_services: HashMap::new(),
             observer,
+            config,
         }
     }
 
@@ -40,13 +61,19 @@ impl<T: RegistryObserver> Registry<T> {
     /// the registry. As system services cannot be updated, invocations with a
     /// system service configuration results in undefined behavior.
     pub fn has_service(&self, key: &ServiceConfiguration) -> bool {
-        self.known_services.contains(key)
+        self.known_services.contains_key(key)
+    }
+
+    pub fn prune(&mut self, timestamp: SystemTime) {
+        self.known_services
+            .retain(|_, ts| timestamp.duration_since(*ts).unwrap() < self.config.entry_ttl)
     }
 
     pub fn upsert(
         &mut self,
         service_configuration: ServiceConfiguration,
         intent_configurations: Vec<IntentConfiguration>,
+        timestamp: SystemTime,
     ) -> Result<(), Error> {
         fn starts_with_ignore_ascii_case(string: &str, prefix: &str) -> bool {
             string.len() >= prefix.len()
@@ -83,7 +110,7 @@ impl<T: RegistryObserver> Registry<T> {
 
         // Remove the old service registration from the known services lookup.
 
-        self.known_services.retain(|service| service.id != service_configuration.id);
+        self.known_services.retain(|service, _| service.id != service_configuration.id);
 
         // Add the new service registrations and resolve the new Bindings to be
         // used for each intent.
@@ -106,7 +133,7 @@ impl<T: RegistryObserver> Registry<T> {
 
         // Add the service to the lookup for known services.
 
-        self.known_services.insert(service_configuration);
+        self.known_services.insert(service_configuration, timestamp);
         Ok(())
     }
 
@@ -210,6 +237,11 @@ impl fmt::Display for IntentKind {
 #[cfg(test)]
 pub(crate) mod tests {
     use std::sync::Mutex;
+    use std::time::SystemTime;
+
+    fn now() -> SystemTime {
+        SystemTime::now()
+    }
 
     use crate::registry::{ExecutionLocality, IntentKind, ServiceId};
 
@@ -233,7 +265,7 @@ pub(crate) mod tests {
         let intents = vec![IntentConfigurationBuilder::new().build()];
 
         // act
-        registry.upsert(service.clone(), intents).unwrap();
+        registry.upsert(service.clone(), intents, now()).unwrap();
 
         // assert
         assert!(registry.has_service(&service));
@@ -246,7 +278,7 @@ pub(crate) mod tests {
         let service = ServiceConfigurationBuilder::new().build();
 
         // act
-        registry.upsert(service.clone(), vec![]).unwrap();
+        registry.upsert(service.clone(), vec![], now()).unwrap();
 
         // assert
         assert!(registry.has_service(&service));
@@ -261,7 +293,7 @@ pub(crate) mod tests {
         let service = ServiceConfigurationBuilder::with_nonce("2").build();
 
         // act
-        registry.upsert(service.clone(), setup.intents.clone()).unwrap();
+        registry.upsert(service.clone(), setup.intents.clone(), now()).unwrap();
 
         // assert
         registry.observer.assert_number_of_refreshes(1);
@@ -280,7 +312,7 @@ pub(crate) mod tests {
         let updated_service = setup.service.url("http://updated_url").build();
 
         // act
-        registry.upsert(updated_service.clone(), setup.intents).unwrap();
+        registry.upsert(updated_service.clone(), setup.intents, now()).unwrap();
 
         // assert
         assert!(registry.has_service(&updated_service));
@@ -303,7 +335,7 @@ pub(crate) mod tests {
         let updated_service = setup.service.version("10.30.40").build();
 
         // act
-        registry.upsert(updated_service.clone(), setup.intents.clone()).unwrap();
+        registry.upsert(updated_service.clone(), setup.intents.clone(), now()).unwrap();
 
         // assert
         assert!(registry.has_service(&service));
@@ -333,12 +365,12 @@ pub(crate) mod tests {
         let intent_2 = IntentConfigurationBuilder::with_nonce("2").build();
 
         let mut registry = create_registry();
-        registry.upsert(service_a.clone().build(), vec![intent_1.clone()]).unwrap();
-        registry.upsert(service_b.clone().build(), vec![intent_1.clone()]).unwrap();
+        registry.upsert(service_a.clone().build(), vec![intent_1.clone()], now()).unwrap();
+        registry.upsert(service_b.clone().build(), vec![intent_1.clone()], now()).unwrap();
         registry.observer.clear();
 
         // act
-        registry.upsert(service_a_reregistration.clone(), vec![intent_2.clone()]).unwrap();
+        registry.upsert(service_a_reregistration.clone(), vec![intent_2.clone()], now()).unwrap();
 
         // assert
         registry.observer.assert_refreshed_with(&intent_1, |actual_services| {
@@ -362,7 +394,7 @@ pub(crate) mod tests {
             IntentConfiguration::new("some_other_namespace", IntentKind::Read);
 
         // act
-        registry.upsert(setup.service.build(), vec![reregistration_intent]).unwrap();
+        registry.upsert(setup.service.build(), vec![reregistration_intent], now()).unwrap();
 
         // assert
         registry.observer.assert_refreshed_with(&setup.intents[0], |services| {
@@ -385,10 +417,51 @@ pub(crate) mod tests {
 
             // act
             let result =
-                create_registry().upsert(service_configuration, vec![intent_configuration]);
+                create_registry().upsert(service_configuration, vec![intent_configuration], now());
 
             // assert
             assert!(result.is_err());
+        }
+    }
+
+    #[test]
+    fn prune_removes_expired_services() {
+        use std::time::Duration;
+
+        const ZERO: Duration = Duration::from_secs(0);
+
+        test(ZERO, ZERO, Duration::from_secs(14), true, true);
+        test(ZERO, ZERO, Duration::from_secs(15), false, false);
+        test(ZERO, Duration::from_secs(20), Duration::from_secs(5), false, true);
+        test(ZERO, Duration::from_secs(20), Duration::from_secs(10), false, true);
+        test(ZERO, Duration::from_secs(20), Duration::from_secs(15), false, false);
+
+        fn test(
+            first_registration_since_epoch: Duration,
+            second_since_first_registration: Duration,
+            prune_since_second_registration: Duration,
+            expect_first_registered: bool,
+            expect_second_registered: bool,
+        ) {
+            let mut time: SystemTime = SystemTime::UNIX_EPOCH;
+
+            let mut registry = create_registry();
+
+            let mut builder = ServiceConfigurationBuilder::dispense('a'..).into_iter();
+
+            let first = builder.next().unwrap().build();
+            time += first_registration_since_epoch;
+            registry.upsert(first.clone(), vec![], time).unwrap();
+
+            let second = builder.next().unwrap().build();
+            time += second_since_first_registration;
+            registry.upsert(second.clone(), vec![], time).unwrap();
+
+            time += prune_since_second_registration;
+            registry.prune(time);
+
+            assert_eq!(expect_first_registered, registry.has_service(&first));
+            assert_eq!(expect_second_registered, registry.has_service(&second));
         }
     }
 
@@ -503,7 +576,7 @@ pub(crate) mod tests {
     }
 
     fn create_registry() -> Registry<MockBroker> {
-        Registry::new(MockBroker::new())
+        Registry::new(MockBroker::new(), Default::default())
     }
 
     #[derive(Clone)]
@@ -521,12 +594,14 @@ pub(crate) mod tests {
         }
 
         fn build(self) -> Registry<MockBroker> {
-            let mut registry = Registry::new(MockBroker::new());
-            registry.upsert(self.service.clone().build(), self.intents).unwrap();
+            let mut registry = Registry::new(MockBroker::new(), Default::default());
+            registry.upsert(self.service.clone().build(), self.intents, now()).unwrap();
             registry.observer.clear();
             registry
         }
     }
+
+    use std::fmt::Display;
 
     #[derive(Clone)]
     pub struct ServiceConfigurationBuilder(ServiceConfiguration);
@@ -536,7 +611,13 @@ pub(crate) mod tests {
             Self::with_nonce("0")
         }
 
-        pub fn with_nonce(nonce: &str) -> Self {
+        pub fn dispense(
+            nonce: impl IntoIterator<Item = impl Display>,
+        ) -> impl IntoIterator<Item = ServiceConfigurationBuilder> {
+            nonce.into_iter().map(ServiceConfigurationBuilder::with_nonce)
+        }
+
+        pub fn with_nonce(nonce: impl std::fmt::Display) -> Self {
             Self(ServiceConfiguration::new(
                 ServiceId::new(format!("mock-service-{nonce}"), "0.1.0"),
                 format!("http://service-{nonce}").parse().unwrap(),
