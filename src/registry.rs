@@ -7,82 +7,8 @@ use std::collections::{HashMap, HashSet};
 use chariott_common::error::Error;
 use url::Url;
 
-use crate::registry::update::TransactionalRegistryUpdate;
-
 const SYSTEM_NAMESPACE: &str = "system";
 const SYSTEM_NAMESPACE_PREFIX: &str = "system.";
-
-mod update {
-    use std::collections::{HashMap, HashSet};
-
-    use super::{Change, IntentConfiguration, Observer, Registry};
-
-    enum ChangeKind {
-        Add,
-        Remove,
-        Modify,
-    }
-
-    pub struct TransactionalRegistryUpdate(HashMap<IntentConfiguration, ChangeKind>);
-
-    impl TransactionalRegistryUpdate {
-        pub fn new() -> Self {
-            Self(HashMap::new())
-        }
-
-        pub fn track_modify(&mut self, intent: IntentConfiguration) {
-            self.0
-                .entry(intent)
-                .and_modify(|e| {
-                    *e = match e {
-                        ChangeKind::Add => ChangeKind::Add,
-                        ChangeKind::Remove => ChangeKind::Modify,
-                        ChangeKind::Modify => ChangeKind::Modify,
-                    }
-                })
-                .or_insert(ChangeKind::Modify);
-        }
-
-        pub fn track_remove(&mut self, intent: IntentConfiguration) {
-            self.0.insert(intent, ChangeKind::Remove);
-        }
-
-        pub fn track_add(&mut self, intent: IntentConfiguration) {
-            self.0
-                .entry(intent)
-                .and_modify(|e| {
-                    *e = match e {
-                        ChangeKind::Add => ChangeKind::Add,
-                        ChangeKind::Remove => ChangeKind::Modify,
-                        ChangeKind::Modify => ChangeKind::Modify,
-                    }
-                })
-                .or_insert(ChangeKind::Add);
-        }
-
-        pub fn observe<T: Observer>(&self, observer: &T, registry: &Registry<T>) {
-            if self.0.is_empty() {
-                return;
-            }
-
-            let empty_set = HashSet::new();
-
-            let services = self.0.iter().map(|(intent, kind)| {
-                (
-                    kind,
-                    registry.external_services_by_intent.get(intent).unwrap_or(&empty_set),
-                    intent,
-                )
-            });
-
-            observer.on_change(services.into_iter().map(|(kind, services, intent)| match kind {
-                ChangeKind::Add => Change::Add(intent, services),
-                ChangeKind::Modify => Change::Modify(intent, services),
-                ChangeKind::Remove => Change::Remove(intent),
-            }));
-        }
-    }
-}
 
 #[derive(Clone)]
 pub enum Change<'a> {
@@ -154,9 +80,60 @@ impl<T: Observer> Registry<T> {
             ));
         }
 
+        #[derive(Copy, Clone, Debug)]
+        enum ChangeKind {
+            Add,
+            Remove,
+            Modify,
+        }
+
+        struct TransactionalRegistryUpdate(HashMap<IntentConfiguration, ChangeKind>);
+
+        impl TransactionalRegistryUpdate {
+            fn new() -> Self {
+                Self(HashMap::new())
+            }
+
+            fn transition(&mut self, intent: IntentConfiguration, to: ChangeKind) {
+                let from = self.0.get(&intent);
+                let value = match (from, to) {
+                    (None, _) => to,
+                    (Some(ChangeKind::Remove), ChangeKind::Add) => ChangeKind::Modify,
+                    (Some(ChangeKind::Modify), ChangeKind::Modify) => ChangeKind::Modify,
+                    (Some(ChangeKind::Add), ChangeKind::Modify) => ChangeKind::Add,
+                    (from, to) => {
+                        panic!(
+                            "{}",
+                            format!(
+                                "Bug: Transition from {from:?} to {to:?} must not be possible."
+                            )
+                        );
+                    }
+                };
+
+                self.0.insert(intent, value);
+            }
+
+            fn observe<T: Observer>(&self, observer: &T, registry: &Registry<T>) {
+                let changes = self.0.iter().map(|(intent, kind)| match kind {
+                    ChangeKind::Add => {
+                        Change::Add(intent, &registry.external_services_by_intent[intent])
+                    }
+                    ChangeKind::Modify => {
+                        Change::Modify(intent, &registry.external_services_by_intent[intent])
+                    }
+                    ChangeKind::Remove => Change::Remove(intent),
+                });
+
+                if changes.len() > 0 {
+                    observer.on_change(changes);
+                }
+            }
+        }
+
         // Track the changes to the registry for the current registry operation
 
-        let mut registry_changes = TransactionalRegistryUpdate::new();
+        let mut changes = TransactionalRegistryUpdate::new();
 
         // Upserting a registration should not happen frequently and has worse
         // performance than service resolution.
@@ -171,8 +148,8 @@ impl<T: Observer> Registry<T> {
             if service_count != services.len() {
                 // Track changes to registry.
                 match services.len() {
-                    0 => registry_changes.track_remove(intent_configuration.clone()),
-                    _ => registry_changes.track_modify(intent_configuration.clone()),
+                    0 => changes.transition(intent_configuration.clone(), ChangeKind::Remove),
+                    _ => changes.transition(intent_configuration.clone(), ChangeKind::Modify),
                 };
             }
 
@@ -190,8 +167,8 @@ impl<T: Observer> Registry<T> {
             // Update the list of registry changes.
 
             match self.external_services_by_intent.contains_key(&intent_configuration) {
-                true => registry_changes.track_modify(intent_configuration.clone()),
-                false => registry_changes.track_add(intent_configuration.clone()),
+                true => changes.transition(intent_configuration.clone(), ChangeKind::Modify),
+                false => changes.transition(intent_configuration.clone(), ChangeKind::Add),
             };
 
             // Update the service registry for a given intent.
@@ -208,7 +185,7 @@ impl<T: Observer> Registry<T> {
 
         // Notify the observer
 
-        registry_changes.observe(&self.observer, self);
+        changes.observe(&self.observer, self);
 
         Ok(())
     }
