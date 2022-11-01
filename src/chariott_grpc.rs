@@ -268,35 +268,19 @@ mod tests {
             IntentKind::Subscribe => {}
         }
 
-        assert_eq!(
-            ChariottServer::<IntentBroker>::map_intent_value(INTENT_MAPPING_DISCOVER).unwrap(),
-            IntentKind::Discover
-        );
+        fn test(intent_value: i32, kind: IntentKind) {
+            assert_eq!(
+                ChariottServer::<IntentBroker>::map_intent_value(intent_value).unwrap(),
+                kind
+            );
+        }
 
-        assert_eq!(
-            ChariottServer::<IntentBroker>::map_intent_value(INTENT_MAPPING_INSPECT).unwrap(),
-            IntentKind::Inspect
-        );
-
-        assert_eq!(
-            ChariottServer::<IntentBroker>::map_intent_value(INTENT_MAPPING_READ).unwrap(),
-            IntentKind::Read
-        );
-
-        assert_eq!(
-            ChariottServer::<IntentBroker>::map_intent_value(INTENT_MAPPING_WRITE).unwrap(),
-            IntentKind::Write
-        );
-
-        assert_eq!(
-            ChariottServer::<IntentBroker>::map_intent_value(INTENT_MAPPING_INVOKE).unwrap(),
-            IntentKind::Invoke
-        );
-
-        assert_eq!(
-            ChariottServer::<IntentBroker>::map_intent_value(INTENT_MAPPING_SUBSCRIBE).unwrap(),
-            IntentKind::Subscribe
-        );
+        test(INTENT_MAPPING_DISCOVER, IntentKind::Discover);
+        test(INTENT_MAPPING_INSPECT, IntentKind::Inspect);
+        test(INTENT_MAPPING_READ, IntentKind::Read);
+        test(INTENT_MAPPING_WRITE, IntentKind::Write);
+        test(INTENT_MAPPING_INVOKE, IntentKind::Invoke);
+        test(INTENT_MAPPING_SUBSCRIBE, IntentKind::Subscribe);
     }
 
     #[test]
