@@ -285,7 +285,7 @@ mod tests {
     }
 
     #[test]
-    fn when_resolve_succeeds_for_system_inspect() {
+    fn resolve_system_registry_succeeds() {
         // arrange
         let intent = IntentConfiguration::new("system.registry".to_owned(), IntentKind::Inspect);
         let setup = Setup::new();
@@ -298,6 +298,38 @@ mod tests {
         if let RuntimeBinding::SystemInspect(context) = result {
             assert!(context.contains(&Arc::new(intent)));
             assert!(context.contains(&Arc::new(setup.intent)));
+        } else {
+            panic!()
+        }
+    }
+
+    #[test]
+    fn resolve_succeeds_for_system_discover() {
+        // arrange
+        let intent = IntentConfiguration::new("system.registry".to_owned(), IntentKind::Discover);
+
+        // act
+        let result = Setup::new().build().resolve(&intent).unwrap();
+
+        // assert
+        if let RuntimeBinding::SystemDiscover(url) = result {
+            assert_eq!(Setup::STREAMING_URL.parse::<Url>().unwrap(), url);
+        } else {
+            panic!()
+        }
+    }
+
+    #[test]
+    fn resolve_succeeds_for_system_subscribe() {
+        // arrange
+        let intent = IntentConfiguration::new("system.registry".to_owned(), IntentKind::Subscribe);
+
+        // act
+        let result = Setup::new().build().resolve(&intent).unwrap();
+
+        // assert
+        if let RuntimeBinding::SystemSubscribe(_) = result {
+            // assertions on the ESS itself are covered by integration tests.
         } else {
             panic!()
         }
@@ -362,6 +394,8 @@ mod tests {
     }
 
     impl Setup {
+        const STREAMING_URL: &str = "https://localhost:4243";
+
         fn new() -> Self {
             let intent = IntentConfigurationBuilder::new().build();
             let service = ServiceConfigurationBuilder::new();
@@ -369,7 +403,7 @@ mod tests {
         }
 
         fn build(self) -> IntentBroker {
-            let broker = IntentBroker::new("https://localhost:4243".parse().unwrap(), Ess::new());
+            let broker = IntentBroker::new(Self::STREAMING_URL.parse().unwrap(), Ess::new());
 
             broker.on_change(
                 [Change::Add(&self.intent, &HashSet::from([self.service.build()]))].into_iter(),
