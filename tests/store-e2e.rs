@@ -3,14 +3,19 @@
 
 use std::{collections::HashSet, error::Error as _, time::Duration};
 
-use chariott_common::error::Error;
+use chariott_common::{
+    error::Error,
+    proto::runtime::{intent_registration::Intent, intent_service_registration::ExecutionLocality},
+};
 use common::get_uuid;
 use examples_common::chariott::{
     api::{Chariott, ChariottExt, Event, GrpcChariott},
+    registration::Builder as RegistrationBuilder,
     value::Value,
 };
 use futures::StreamExt as _;
 use tokio::time::{sleep_until, Instant};
+use uuid::Uuid;
 
 mod common;
 
@@ -131,6 +136,36 @@ async fn when_writing_to_a_different_key_does_not_publish_value() -> Result<(), 
             // No event received. Continue.
         }
     }
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn when_provider_registers_notifies_registry_observers() -> anyhow::Result<()> {
+    // arrange
+    let namespace = format!("e2e.registration.{}", Uuid::new_v4().to_string());
+
+    let builder = RegistrationBuilder::new(
+        "registration.provider.e2e",
+        "1.0.0",
+        "http://localhost:7090".parse().unwrap(),
+        &namespace,
+        [Intent::Inspect],
+        ExecutionLocality::Local,
+    );
+
+    let mut subject = setup().await;
+
+    // act
+    let stream = subject.listen("system.registry", vec!["changed".into()]).await?;
+
+    builder.register_once(&mut None, true).await?;
+
+    // assert
+    let result: Vec<_> = stream.take(1).collect().await;
+    let result = result.into_iter().next().unwrap().unwrap();
+
+    assert_eq!("changed", result.id.as_ref());
 
     Ok(())
 }

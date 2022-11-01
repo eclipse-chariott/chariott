@@ -70,8 +70,10 @@ mod events {
     };
 
     use async_trait::async_trait;
-    use chariott_common::proto::streaming::{
-        channel_service_server::ChannelService, Event, OpenRequest,
+    use chariott_common::proto::{
+        common::value::Value as ValueEnum,
+        common::Value as ValueMessage,
+        streaming::{channel_service_server::ChannelService, Event, OpenRequest},
     };
     use ess::EventSubSystem;
     use tokio::spawn;
@@ -109,7 +111,7 @@ mod events {
                 spawn(subscription.serve(move |_, seq| {
                     Ok(Event {
                         source: source.clone(),
-                        value: None,
+                        value: Some(ValueMessage { value: Some(ValueEnum::Null(0)) }),
                         seq,
                         timestamp: Some(SystemTime::now().into()),
                     })
