@@ -163,7 +163,10 @@ pub(crate) mod tests {
         connection_provider::GrpcProvider,
         registry::{IntentConfiguration, IntentKind},
     };
-    use chariott_common::proto::common::{InspectIntent, InvokeFulfillment};
+    use chariott_common::proto::common::{
+        fulfillment::Fulfillment as FulfillmentEnum, DiscoverFulfillment,
+        Fulfillment as FulfillmentMessage, InspectIntent, InvokeFulfillment,
+    };
     use tonic::Code;
 
     use super::*;
@@ -266,7 +269,7 @@ pub(crate) mod tests {
     }
 
     #[tokio::test]
-    async fn system_binding_fails_with_non_supported_intent() {
+    async fn system_inspect_binding_fails_with_non_supported_intent() {
         // arrange
         let binding = RuntimeBinding::SystemInspect(vec![]);
 
@@ -353,6 +356,35 @@ pub(crate) mod tests {
                 assert_group_is_none(NAMESPACE_3);
             }
         }
+    }
+
+    #[tokio::test]
+    async fn system_discover_binding_succeeds() {
+        // arrange
+        let url: Url = "http://localhost:4243".parse().unwrap();
+
+        // act
+        let result = RuntimeBinding::<GrpcProvider>::SystemDiscover(url.clone())
+            .execute(IntentMessage { intent: None })
+            .await
+            .unwrap();
+
+        // assert
+        assert_eq!(
+            FulfillResponse {
+                fulfillment: Some(FulfillmentMessage {
+                    fulfillment: Some(FulfillmentEnum::Discover(DiscoverFulfillment {
+                        services: vec![Service {
+                            url: url.to_string(),
+                            schema_kind: "grpc+proto".to_owned(),
+                            schema_reference: "chariott.streaming.v1".to_owned(),
+                            metadata: HashMap::new(),
+                        }],
+                    })),
+                }),
+            },
+            result
+        );
     }
 
     async fn execute_system_inspect(query: &str, intents: Vec<IntentConfiguration>) -> Vec<Entry> {
