@@ -142,6 +142,10 @@ async fn when_writing_to_a_different_key_does_not_publish_value() -> Result<(), 
 
 #[tokio::test]
 async fn when_provider_registers_notifies_registry_observers() -> anyhow::Result<()> {
+    fn namespace_event(namespace: &str) -> String {
+        format!("namespaces[{}]", namespace)
+    }
+
     // arrange
     let namespace = format!("e2e.registration.{}", Uuid::new_v4().to_string());
 
@@ -157,7 +161,8 @@ async fn when_provider_registers_notifies_registry_observers() -> anyhow::Result
     let mut subject = setup().await;
 
     // act
-    let mut stream = subject.listen("system.registry", vec![namespace.clone().into()]).await?;
+    let mut stream =
+        subject.listen("system.registry", vec![namespace_event(&namespace).into()]).await?;
 
     builder.register_once(&mut None, true).await?;
 
@@ -165,7 +170,7 @@ async fn when_provider_registers_notifies_registry_observers() -> anyhow::Result
     let timeout = Instant::now() + Duration::from_secs(5);
     tokio::select! {
         result = stream.next() => {
-            assert_eq!(namespace.as_str(), result.unwrap().unwrap().id.as_ref());
+            assert_eq!(namespace_event(&namespace).as_str(), result.unwrap().unwrap().id.as_ref());
         }
         _ = sleep_until(timeout) => {
             panic!("Did not receive registry change event.");

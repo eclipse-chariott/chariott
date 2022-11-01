@@ -68,7 +68,7 @@ impl Observer for Ess {
             })
             .collect::<HashSet<_>>()
         {
-            self.0.publish(namespace, ());
+            self.0.publish(format!("namespaces[{}]", namespace).as_str(), ());
         }
     }
 }
@@ -152,6 +152,10 @@ mod tests {
             changes: impl IntoIterator<Item = Change<'a>>,
             expected_events: impl IntoIterator<Item = &'b IntentConfiguration>,
         ) {
+            fn namespace_event(namespace: &str) -> String {
+                format!("namespaces[{}]", namespace)
+            }
+
             // arrange
             const CLIENT_ID: &str = "CLIENT";
 
@@ -161,15 +165,19 @@ mod tests {
             // always subscribe to all possible namespace changes.
             for nonce in [INTENT_A, INTENT_B, INTENT_C] {
                 let intent = IntentConfigurationBuilder::with_nonce(nonce).build();
-                subject.serve_subscriptions(CLIENT_ID, [intent.namespace().into()]).unwrap();
+                subject
+                    .serve_subscriptions(CLIENT_ID, [namespace_event(intent.namespace()).into()])
+                    .unwrap();
             }
 
             // act
             subject.on_change(changes.into_iter().collect::<Vec<_>>().into_iter());
 
             // assert
-            let mut expected_events =
-                expected_events.into_iter().map(|e| e.namespace()).collect::<Vec<_>>();
+            let mut expected_events = expected_events
+                .into_iter()
+                .map(|e| namespace_event(e.namespace()))
+                .collect::<Vec<_>>();
 
             // collect the result while there are still events incoming.
             let mut result = exhaust(stream).map(|e| e.unwrap().source).collect::<Vec<_>>().await;
