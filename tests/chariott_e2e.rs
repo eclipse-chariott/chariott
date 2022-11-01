@@ -13,8 +13,9 @@ use examples_common::chariott::{
     registration::Builder as RegistrationBuilder,
     value::Value,
 };
-use futures::StreamExt as _;
+use futures::pin_mut;
 use tokio::time::{sleep_until, Instant};
+use tokio_stream::StreamExt as _;
 use uuid::Uuid;
 
 mod common;
@@ -161,21 +162,16 @@ async fn when_provider_registers_notifies_registry_observers() -> anyhow::Result
     let mut subject = setup().await;
 
     // act
-    let mut stream =
+    let stream =
         subject.listen("system.registry", vec![namespace_event(&namespace).into()]).await?;
 
     builder.register_once(&mut None, true).await?;
 
     // assert
-    let timeout = Instant::now() + Duration::from_secs(5);
-    tokio::select! {
-        result = stream.next() => {
-            assert_eq!(namespace_event(&namespace).as_str(), result.unwrap().unwrap().id.as_ref());
-        }
-        _ = sleep_until(timeout) => {
-            panic!("Did not receive registry change event.");
-        }
-    }
+    let stream = stream.timeout(Duration::from_secs(5));
+    pin_mut!(stream);
+    let result = stream.next().await.unwrap();
+    assert_eq!(namespace_event(&namespace).as_str(), result.unwrap().unwrap().id.as_ref());
 
     Ok(())
 }
