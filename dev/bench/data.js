@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1667225043612,
+  "lastUpdate": 1667299246708,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -312,6 +312,84 @@ window.BENCHMARK_DATA = {
             "value": 8,
             "unit": "Millisecond",
             "range": "p95=12"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "patrick.schuler@microsoft.com",
+            "name": "Patrick Schuler",
+            "username": "p-schuler"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8cbe907a3297d0b944d57d5878ae8fef691bed41",
+          "message": "chore: remove PR title linting (#12)\n\nThis was used to try to force the use of conventional commit messages. It only enforces the PR title, but not the commit message itself. The flow is not clear and to avoid confusion, we want to disable this.",
+          "timestamp": "2022-11-01T11:25:54+01:00",
+          "tree_id": "01f781b36c45e586f143e71ae7f8bc7d44fba3dd",
+          "url": "https://github.com/eclipse/chariott/commit/8cbe907a3297d0b944d57d5878ae8fef691bed41"
+        },
+        "date": 1667299245597,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1764",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "5",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 28,
+            "unit": "Percent",
+            "range": "p95=29"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6509,
+            "unit": "Bytes",
+            "range": "p95=6734"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 5,
+            "unit": "Millisecond",
+            "range": "p95=9"
           }
         ]
       }
