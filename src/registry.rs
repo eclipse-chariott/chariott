@@ -376,6 +376,9 @@ pub(crate) mod tests {
         test("system.registry");
         test("system.foo");
         test("system.");
+        test("System");
+        test("SYSTEM");
+        test("SYSTEM.Registry");
 
         fn test(namespace: &str) {
             // arrange
