@@ -61,6 +61,10 @@ mod update {
         }
 
         pub fn observe<T: Observer>(&self, observer: &T, registry: &Registry<T>) {
+            if self.0.is_empty() {
+                return;
+            }
+
             let empty_set = HashSet::new();
 
             let services = self.0.iter().map(|(intent, kind)| {
@@ -308,7 +312,7 @@ impl fmt::Display for IntentKind {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use std::{collections::HashSet, sync::Mutex};
+    use std::sync::Mutex;
 
     use crate::registry::{ExecutionLocality, IntentKind, ServiceId};
 
@@ -363,8 +367,8 @@ pub(crate) mod tests {
         registry.upsert(service.clone(), setup.intents.clone()).unwrap();
 
         // assert
-        registry.observer.assert_number_of_refreshes(1);
-        registry.observer.assert_refreshed_with(&setup.intents[0], |actual_services| {
+        registry.observer.assert_number_of_changes(&[1]);
+        registry.observer.assert_modified(&setup.intents[0], |actual_services| {
             assert!(actual_services.contains(&setup.service.build()));
             assert!(actual_services.contains(&service));
         });
@@ -379,7 +383,7 @@ pub(crate) mod tests {
         let updated_service = setup.service.url("http://updated_url").build();
 
         // act
-        registry.upsert(updated_service.clone(), setup.intents).unwrap();
+        registry.upsert(updated_service.clone(), setup.intents.clone()).unwrap();
 
         // assert
         assert!(registry.has_service(&updated_service));
@@ -387,9 +391,10 @@ pub(crate) mod tests {
 
         // broker was refreshed only once, as changes are observed
         // "transactionally".
-        let refresh_calls = registry.observer.refresh_calls.lock().unwrap();
-        assert_eq!(1, refresh_calls.len());
-        assert_eq!([updated_service], refresh_calls[0].1.as_slice());
+        registry.observer.assert_number_of_changes(&[1]);
+        registry.observer.assert_modified(&setup.intents[0], |services| {
+            assert_eq!([updated_service], services.as_slice());
+        });
     }
 
     #[test]
@@ -406,7 +411,7 @@ pub(crate) mod tests {
         // assert
         assert!(registry.has_service(&service));
         assert!(registry.has_service(&updated_service));
-        registry.observer.assert_refreshed_with(&setup.intents[0], |actual_services| {
+        registry.observer.assert_modified(&setup.intents[0], |actual_services| {
             assert!(actual_services.contains(&service));
             assert!(actual_services.contains(&updated_service));
         });
@@ -439,11 +444,11 @@ pub(crate) mod tests {
         registry.upsert(service_a_reregistration.clone(), vec![intent_2.clone()]).unwrap();
 
         // assert
-        registry.observer.assert_refreshed_with(&intent_1, |actual_services| {
+        registry.observer.assert_modified(&intent_1, |actual_services| {
             assert_eq!([service_b.build()], actual_services.as_slice());
         });
 
-        registry.observer.assert_refreshed_with(&intent_2, |actual_services| {
+        registry.observer.assert_added(&intent_2, |actual_services| {
             assert_eq!([service_a_reregistration.clone()], actual_services.as_slice());
         });
 
@@ -463,9 +468,7 @@ pub(crate) mod tests {
         registry.upsert(setup.service.build(), vec![reregistration_intent]).unwrap();
 
         // assert
-        registry.observer.assert_refreshed_with(&setup.intents[0], |services| {
-            assert!(services.is_empty());
-        });
+        registry.observer.assert_removed(&setup.intents[0]);
     }
 
     #[test]
@@ -550,7 +553,13 @@ pub(crate) mod tests {
     }
 
     struct MockBroker {
-        refresh_calls: Mutex<Vec<(IntentConfiguration, Vec<ServiceConfiguration>)>>,
+        refresh_calls: Mutex<Vec<Vec<ChangeSnapshot>>>,
+    }
+
+    enum ChangeSnapshot {
+        Add(IntentConfiguration, Vec<ServiceConfiguration>),
+        Modify(IntentConfiguration, Vec<ServiceConfiguration>),
+        Remove(IntentConfiguration),
     }
 
     impl MockBroker {
@@ -562,47 +571,96 @@ pub(crate) mod tests {
             self.refresh_calls = Mutex::new(Vec::new());
         }
 
-        pub fn assert_refreshed_with(
+        pub fn assert_modified(
             &self,
             intent_configuration: &IntentConfiguration,
             assert: impl FnOnce(&Vec<ServiceConfiguration>),
         ) {
-            if let Some((_, actual_services)) = self.refresh_calls.lock().unwrap().iter().find(
-                |(actual_intent_configuration, _)| {
-                    actual_intent_configuration == intent_configuration
-                },
-            ) {
-                assert(actual_services);
-            } else {
-                panic!("Expected one invocation with {intent_configuration:?}.");
-            }
+            let services = self
+                .filter_map_change(intent_configuration, |change| match change {
+                    ChangeSnapshot::Modify(_, s) => Some(s.clone()),
+                    _ => None,
+                })
+                .unwrap_or_else(|| {
+                    panic!("Expected one modification for {intent_configuration:?}.")
+                });
+
+            assert(&services);
+        }
+
+        pub fn assert_added(
+            &self,
+            intent_configuration: &IntentConfiguration,
+            assert: impl FnOnce(&Vec<ServiceConfiguration>),
+        ) {
+            let services = self
+                .filter_map_change(intent_configuration, |change| match change {
+                    ChangeSnapshot::Add(_, s) => Some(s.clone()),
+                    _ => None,
+                })
+                .unwrap_or_else(|| panic!("Expected one addition for {intent_configuration:?}."));
+
+            assert(&services);
+        }
+
+        pub fn assert_removed(&self, intent_configuration: &IntentConfiguration) {
+            self.filter_map_change(intent_configuration, |change| match change {
+                ChangeSnapshot::Remove(_) => Some(()),
+                _ => None,
+            })
+            .unwrap_or_else(|| panic!("Expected one removal for {intent_configuration:?}."));
+        }
+
+        fn filter_map_change<T>(
+            &self,
+            expected_intent: &IntentConfiguration,
+            filter_map: fn(&ChangeSnapshot) -> Option<T>,
+        ) -> Option<T> {
+            self.refresh_calls.lock().unwrap().iter().flatten().find_map(|change| {
+                let actual_intent = match change {
+                    ChangeSnapshot::Add(i, _) => i,
+                    ChangeSnapshot::Modify(i, _) => i,
+                    ChangeSnapshot::Remove(i) => i,
+                };
+
+                if actual_intent != expected_intent {
+                    return None;
+                }
+
+                filter_map(change)
+            })
         }
 
         pub fn is_empty(&self) -> bool {
             self.refresh_calls.lock().unwrap().is_empty()
         }
 
-        pub fn assert_number_of_refreshes(&self, expected: usize) {
-            assert_eq!(expected, self.refresh_calls.lock().unwrap().len());
+        pub fn assert_number_of_changes(&self, expected: &[usize]) {
+            let refresh_calls = self.refresh_calls.lock().unwrap();
+            assert_eq!(expected.len(), refresh_calls.len());
+
+            for (expected, refresh_calls) in expected.iter().zip(refresh_calls.iter()) {
+                assert_eq!(*expected, refresh_calls.len());
+            }
         }
     }
 
     impl Observer for MockBroker {
         fn on_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
-            let empty_set = HashSet::new();
+            let changes = changes
+                .into_iter()
+                .map(|change| match change {
+                    Change::Add(i, s) => {
+                        ChangeSnapshot::Add(i.clone(), s.iter().cloned().collect())
+                    }
+                    Change::Modify(i, s) => {
+                        ChangeSnapshot::Modify(i.clone(), s.iter().cloned().collect())
+                    }
+                    Change::Remove(i) => ChangeSnapshot::Remove(i.clone()),
+                })
+                .collect();
 
-            for change in changes {
-                let (intent_configuration, service_configurations) = match change {
-                    Change::Add(i, s) => (i, s),
-                    Change::Modify(i, s) => (i, s),
-                    Change::Remove(i) => (i, &empty_set),
-                };
-
-                self.refresh_calls.lock().unwrap().push((
-                    intent_configuration.clone(),
-                    service_configurations.iter().cloned().collect(),
-                ))
-            }
+            self.refresh_calls.lock().unwrap().push(changes);
         }
     }
 
