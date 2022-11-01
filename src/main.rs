@@ -2,10 +2,12 @@
 // Licensed under the MIT license.
 
 use chariott::chariott_grpc::ChariottServer;
-use chariott::registry::Registry;
+use chariott::registry::{self, Registry};
 use chariott::IntentBroker;
+use chariott_common::config::try_env;
 use chariott_common::proto::runtime::chariott_service_server::ChariottServiceServer;
 use chariott_common::shutdown::RouterExt as _;
+use std::time::Duration;
 use tonic::transport::Server;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
@@ -27,7 +29,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     collector.init();
 
     let broker = IntentBroker::new();
-    let registry = Registry::new(broker.clone(), Default::default());
+
+    let registry_config = try_env::<u64>("CHARIOTT_REGISTRY_TTL_SECS")
+        .map_or(Ok(None), |r| r.map(Some))?
+        .map(Duration::from_secs)
+        .map(|v| registry::Config::default().set_entry_ttl(v))
+        .unwrap_or_default();
+
+    let registry = Registry::new(broker.clone(), registry_config);
 
     #[cfg(build = "debug")]
     let reflection_service = tonic_reflection::server::Builder::configure()
