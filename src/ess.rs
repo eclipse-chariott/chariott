@@ -69,6 +69,7 @@ impl Observer for Ess {
                         None
                     }
                 }
+                Change::Remove(intent) => Some(intent.namespace()),
             })
             .collect::<HashSet<_>>()
         {

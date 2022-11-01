@@ -18,8 +18,9 @@ mod update {
     use super::{Change, IntentConfiguration, Observer, Registry};
 
     enum ChangeKind {
-        Modify,
         Add,
+        Remove,
+        Modify,
     }
 
     pub struct TransactionalRegistryUpdate(HashMap<IntentConfiguration, ChangeKind>);
@@ -30,11 +31,33 @@ mod update {
         }
 
         pub fn track_modify(&mut self, intent: IntentConfiguration) {
-            self.0.entry(intent).or_insert(ChangeKind::Modify);
+            self.0
+                .entry(intent)
+                .and_modify(|e| {
+                    *e = match e {
+                        ChangeKind::Add => ChangeKind::Add,
+                        ChangeKind::Remove => ChangeKind::Modify,
+                        ChangeKind::Modify => ChangeKind::Modify,
+                    }
+                })
+                .or_insert(ChangeKind::Modify);
+        }
+
+        pub fn track_remove(&mut self, intent: IntentConfiguration) {
+            self.0.insert(intent, ChangeKind::Remove);
         }
 
         pub fn track_add(&mut self, intent: IntentConfiguration) {
-            self.0.entry(intent).or_insert(ChangeKind::Add);
+            self.0
+                .entry(intent)
+                .and_modify(|e| {
+                    *e = match e {
+                        ChangeKind::Add => ChangeKind::Add,
+                        ChangeKind::Remove => ChangeKind::Modify,
+                        ChangeKind::Modify => ChangeKind::Modify,
+                    }
+                })
+                .or_insert(ChangeKind::Add);
         }
 
         pub fn observe<T: Observer>(&self, observer: &T, registry: &Registry<T>) {
@@ -51,6 +74,7 @@ mod update {
             observer.on_change(services.into_iter().map(|(kind, services, intent)| match kind {
                 ChangeKind::Add => Change::Add(intent, services),
                 ChangeKind::Modify => Change::Modify(intent, services),
+                ChangeKind::Remove => Change::Remove(intent),
             }));
         }
     }
@@ -60,6 +84,7 @@ mod update {
 pub enum Change<'a> {
     Add(&'a IntentConfiguration, &'a HashSet<ServiceConfiguration>),
     Modify(&'a IntentConfiguration, &'a HashSet<ServiceConfiguration>),
+    Remove(&'a IntentConfiguration),
 }
 
 /// Represents a type which can observe changes to the registry.
@@ -140,8 +165,11 @@ impl<T: Observer> Registry<T> {
             services.retain(|service| service.id != service_configuration.id);
 
             if service_count != services.len() {
-                // Track changes to registry in case of changed services.
-                registry_changes.track_modify(intent_configuration.clone());
+                // Track changes to registry.
+                match services.len() {
+                    0 => registry_changes.track_remove(intent_configuration.clone()),
+                    _ => registry_changes.track_modify(intent_configuration.clone()),
+                };
             }
 
             !services.is_empty()
@@ -280,7 +308,7 @@ impl fmt::Display for IntentKind {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use std::sync::Mutex;
+    use std::{collections::HashSet, sync::Mutex};
 
     use crate::registry::{ExecutionLocality, IntentKind, ServiceId};
 
@@ -561,13 +589,14 @@ pub(crate) mod tests {
 
     impl Observer for MockBroker {
         fn on_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
+            let empty_set = HashSet::new();
+
             for change in changes {
                 let (intent_configuration, service_configurations) = match change {
                     Change::Add(i, s) => (i, s),
                     Change::Modify(i, s) => (i, s),
+                    Change::Remove(i) => (i, &empty_set),
                 };
-
-                println!("{:?}", service_configurations);
 
                 self.refresh_calls.lock().unwrap().push((
                     intent_configuration.clone(),

@@ -82,30 +82,33 @@ impl IntentBinder {
     fn refresh<'a>(&mut self, changes: impl IntoIterator<Item = Change<'a>>) {
         for change in changes {
             let (intent_configuration, service_configurations) = match change {
-                Change::Add(intent, services) => (intent, services),
-                Change::Modify(intent, services) => (intent, services),
+                Change::Add(intent, services) => (intent, Some(services)),
+                Change::Modify(intent, services) => (intent, Some(services)),
+                Change::Remove(intent) => (intent, None),
             };
 
             let mut cloud_service = None;
             let mut local_service = None;
 
-            for candidate in service_configurations {
-                match (candidate.locality(), &local_service, &cloud_service) {
-                    // Stop on the first cloud/local provider that is
-                    // found. This could be evolved in the future by
-                    // always comparing all candidates using a priority
-                    // as a tie-breaker (which does not yet exist).
-                    (_, Some(_), Some(_)) => {
-                        break;
+            if let Some(service_configurations) = service_configurations {
+                for candidate in service_configurations {
+                    match (candidate.locality(), &local_service, &cloud_service) {
+                        // Stop on the first cloud/local provider that is
+                        // found. This could be evolved in the future by
+                        // always comparing all candidates using a priority
+                        // as a tie-breaker (which does not yet exist).
+                        (_, Some(_), Some(_)) => {
+                            break;
+                        }
+                        (ExecutionLocality::Local, None, _) => {
+                            local_service = Some(candidate);
+                        }
+                        (ExecutionLocality::Cloud, _, None) => {
+                            cloud_service = Some(candidate);
+                        }
+                        (ExecutionLocality::Local, Some(_), None) => {}
+                        (ExecutionLocality::Cloud, None, Some(_)) => {}
                     }
-                    (ExecutionLocality::Local, None, _) => {
-                        local_service = Some(candidate);
-                    }
-                    (ExecutionLocality::Cloud, _, None) => {
-                        cloud_service = Some(candidate);
-                    }
-                    (ExecutionLocality::Local, Some(_), None) => {}
-                    (ExecutionLocality::Cloud, None, Some(_)) => {}
                 }
             }
 
