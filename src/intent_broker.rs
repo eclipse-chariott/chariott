@@ -32,7 +32,7 @@ struct IntentBinder {
 }
 
 impl IntentBinder {
-    pub fn new(streaming_url: Url, registry_change_events: Ess) -> Self {
+    pub fn new(streaming_url: Url, ess: Ess) -> Self {
         const SYSTEM_REGISTRY_NAMESPACE: &str = "system.registry";
 
         Self {
@@ -47,7 +47,7 @@ impl IntentBinder {
                 ),
                 (
                     IntentConfiguration::new(SYSTEM_REGISTRY_NAMESPACE, IntentKind::Subscribe),
-                    Binding::SystemSubscribe(registry_change_events),
+                    Binding::SystemSubscribe(ess),
                 ),
             ]),
         }
@@ -68,9 +68,7 @@ impl IntentBinder {
                     Box::new(binding_into_runtime_binding(broker, secondary)),
                 ),
                 Binding::SystemDiscover(url) => RuntimeBinding::SystemDiscover(url.clone()),
-                Binding::SystemSubscribe(registry_changed) => {
-                    RuntimeBinding::SystemSubscribe(registry_changed.clone())
-                }
+                Binding::SystemSubscribe(ess) => RuntimeBinding::SystemSubscribe(ess.clone()),
             }
         }
 
@@ -141,8 +139,8 @@ impl IntentBinder {
 pub struct IntentBroker(Arc<RwLock<IntentBinder>>);
 
 impl IntentBroker {
-    pub fn new(streaming_url: Url, registry_changed: Ess) -> Self {
-        Self(Arc::new(RwLock::new(IntentBinder::new(streaming_url, registry_changed))))
+    pub fn new(streaming_url: Url, ess: Ess) -> Self {
+        Self(Arc::new(RwLock::new(IntentBinder::new(streaming_url, ess))))
     }
 
     pub fn resolve(&self, intent: &IntentConfiguration) -> Option<RuntimeBinding<Provider>> {
