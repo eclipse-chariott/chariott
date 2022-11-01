@@ -180,7 +180,11 @@ mod tests {
                 .collect::<Vec<_>>();
 
             // collect the result while there are still events incoming.
-            let mut result = exhaust(stream).map(|e| e.unwrap().source).collect::<Vec<_>>().await;
+            let mut result = collect_when_stable(stream)
+                .await
+                .into_iter()
+                .map(|e| e.unwrap().source)
+                .collect::<Vec<_>>();
 
             // namespace change events can be delivered out of order. Sort
             // before comparing.
@@ -220,8 +224,7 @@ mod tests {
         subject.0.publish(EVENT_A, ());
         subject.0.publish(EVENT_B, ());
 
-        let result = exhaust(response.into_inner())
-            .collect::<Vec<_>>()
+        let result = collect_when_stable(response.into_inner())
             .await
             .into_iter()
             .map(|e| e.unwrap())
@@ -262,7 +265,13 @@ mod tests {
     // Takes values from a stream as long as the stream is still producing
     // values. If the stream did not produce a value for 100ms, it ends the
     // stream.
-    fn exhaust<T>(stream: impl Stream<Item = T>) -> impl Stream<Item = T> {
-        stream.timeout(Duration::from_millis(100)).take_while(|e| e.is_ok()).map(|e| e.unwrap())
+    async fn collect_when_stable<T>(stream: impl Stream<Item = T>) -> Vec<T> {
+        static STABILIZATION_TIMEOUT: Duration = Duration::from_millis(100);
+        stream
+            .timeout(STABILIZATION_TIMEOUT)
+            .take_while(|e| e.is_ok())
+            .map(|e| e.unwrap())
+            .collect()
+            .await
     }
 }
