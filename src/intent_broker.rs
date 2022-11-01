@@ -193,13 +193,26 @@ mod tests {
     }
 
     #[test]
-    fn when_refreshing_with_empty_services_does_no_longer_resolve_intent() {
+    fn when_modifying_with_empty_services_does_no_longer_resolve_intent() {
         // arrange
         let setup = Setup::new();
         let subject = setup.clone().build();
 
         // act
         subject.on_change([Change::Modify(&setup.intent, &HashSet::new())].into_iter());
+
+        // assert
+        assert!(subject.resolve(&setup.intent).is_none());
+    }
+
+    #[test]
+    fn when_removing_does_no_longer_resolve_intent() {
+        // arrange
+        let setup = Setup::new();
+        let subject = setup.clone().build();
+
+        // act
+        subject.on_change([Change::Remove(&setup.intent)].into_iter());
 
         // assert
         assert!(subject.resolve(&setup.intent).is_none());
