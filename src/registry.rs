@@ -9,7 +9,7 @@ use url::Url;
 
 use crate::registry::update::TransactionalRegistryUpdate;
 
-pub use events::RegistryChangeEvents;
+pub use events::ChangeEvents;
 
 const SYSTEM_NAMESPACE: &str = "system";
 const SYSTEM_NAMESPACE_PREFIX: &str = "system.";
@@ -17,7 +17,7 @@ const SYSTEM_NAMESPACE_PREFIX: &str = "system.";
 mod update {
     use std::collections::{HashMap, HashSet};
 
-    use super::{IntentConfiguration, Registry, RegistryChange, RegistryObserver};
+    use super::{Change, IntentConfiguration, Observer, Registry};
 
     enum ChangeKind {
         Modify,
@@ -39,7 +39,7 @@ mod update {
             self.0.entry(intent).or_insert(ChangeKind::Add);
         }
 
-        pub fn observe<T: RegistryObserver>(&self, observer: &T, registry: &Registry<T>) {
+        pub fn observe<T: Observer>(&self, observer: &T, registry: &Registry<T>) {
             let empty_set = HashSet::new();
 
             let services = self.0.iter().map(|(intent, kind)| {
@@ -52,8 +52,8 @@ mod update {
 
             observer.on_intent_config_change(services.into_iter().map(
                 |(kind, services, intent)| match kind {
-                    ChangeKind::Add => RegistryChange::Add(intent, services),
-                    ChangeKind::Modify => RegistryChange::Modify(intent, services),
+                    ChangeKind::Add => Change::Add(intent, services),
+                    ChangeKind::Modify => Change::Modify(intent, services),
                 },
             ));
         }
@@ -74,14 +74,14 @@ mod events {
     use tokio_stream::wrappers::ReceiverStream;
     use tonic::{Response, Status};
 
-    use super::{RegistryChange, RegistryObserver};
+    use super::{Change, Observer};
 
     type Ess = EventSubSystem<Box<str>, Box<str>, (), Result<Event, Status>>;
 
     #[derive(Clone)]
-    pub struct RegistryChangeEvents(Arc<Ess>);
+    pub struct ChangeEvents(Arc<Ess>);
 
-    impl RegistryChangeEvents {
+    impl ChangeEvents {
         pub fn new() -> Self {
             Self(Arc::new(EventSubSystem::new()))
         }
@@ -113,22 +113,19 @@ mod events {
         }
     }
 
-    impl Default for RegistryChangeEvents {
+    impl Default for ChangeEvents {
         fn default() -> Self {
             Self::new()
         }
     }
 
-    impl RegistryObserver for RegistryChangeEvents {
-        fn on_intent_config_change<'a>(
-            &self,
-            changes: impl IntoIterator<Item = RegistryChange<'a>>,
-        ) {
+    impl Observer for ChangeEvents {
+        fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
             for namespace in changes
                 .into_iter()
                 .filter_map(|change| match change {
-                    RegistryChange::Add(intent, _) => Some(intent.namespace.as_str()),
-                    RegistryChange::Modify(intent, services) => {
+                    Change::Add(intent, _) => Some(intent.namespace.as_str()),
+                    Change::Modify(intent, services) => {
                         if services.is_empty() {
                             Some(intent.namespace.as_str())
                         } else {
@@ -144,7 +141,7 @@ mod events {
     }
 
     #[async_trait]
-    impl ChannelService for RegistryChangeEvents {
+    impl ChannelService for ChangeEvents {
         type OpenStream = ReceiverStream<Result<Event, Status>>;
 
         async fn open(
@@ -163,29 +160,27 @@ mod events {
 }
 
 #[derive(Clone)]
-pub enum RegistryChange<'a> {
+pub enum Change<'a> {
     Add(&'a IntentConfiguration, &'a HashSet<ServiceConfiguration>),
     Modify(&'a IntentConfiguration, &'a HashSet<ServiceConfiguration>),
 }
 
 /// Represents a type which can observe changes to the registry.
-pub trait RegistryObserver {
+pub trait Observer {
     /// Handles observation on changed registry state.
-    fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = RegistryChange<'a>>);
+    fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>);
 }
 
-pub struct CompositeRegistryObserver<T, U>(T, U);
+pub struct CompositeObserver<T, U>(T, U);
 
-impl<T, U> CompositeRegistryObserver<T, U> {
+impl<T, U> CompositeObserver<T, U> {
     pub fn new(left: T, right: U) -> Self {
         Self(left, right)
     }
 }
 
-impl<T: RegistryObserver, U: RegistryObserver> RegistryObserver
-    for CompositeRegistryObserver<T, U>
-{
-    fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = RegistryChange<'a>>) {
+impl<T: Observer, U: Observer> Observer for CompositeObserver<T, U> {
+    fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
         let changes: Vec<_> = changes.into_iter().collect();
         self.0.on_intent_config_change(changes.clone());
         self.1.on_intent_config_change(changes);
@@ -193,13 +188,13 @@ impl<T: RegistryObserver, U: RegistryObserver> RegistryObserver
 }
 
 #[derive(Clone, Debug)]
-pub struct Registry<T: RegistryObserver> {
+pub struct Registry<T: Observer> {
     external_services_by_intent: HashMap<IntentConfiguration, HashSet<ServiceConfiguration>>,
     known_services: HashSet<ServiceConfiguration>,
     observer: T,
 }
 
-impl<T: RegistryObserver> Registry<T> {
+impl<T: Observer> Registry<T> {
     pub fn new(observer: T) -> Self {
         Self {
             external_services_by_intent: HashMap::new(),
@@ -393,9 +388,7 @@ pub(crate) mod tests {
 
     use crate::registry::{ExecutionLocality, IntentKind, ServiceId};
 
-    use super::{
-        IntentConfiguration, Registry, RegistryChange, RegistryObserver, ServiceConfiguration,
-    };
+    use super::{Change, IntentConfiguration, Observer, Registry, ServiceConfiguration};
 
     #[test]
     fn when_registry_does_not_contain_service_has_service_returns_false() {
@@ -670,15 +663,12 @@ pub(crate) mod tests {
         }
     }
 
-    impl RegistryObserver for MockBroker {
-        fn on_intent_config_change<'a>(
-            &self,
-            changes: impl IntoIterator<Item = RegistryChange<'a>>,
-        ) {
+    impl Observer for MockBroker {
+        fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
             for change in changes {
                 let (intent_configuration, service_configurations) = match change {
-                    RegistryChange::Add(i, s) => (i, s),
-                    RegistryChange::Modify(i, s) => (i, s),
+                    Change::Add(i, s) => (i, s),
+                    Change::Modify(i, s) => (i, s),
                 };
 
                 println!("{:?}", service_configurations);

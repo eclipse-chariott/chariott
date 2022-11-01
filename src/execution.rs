@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 
 use crate::connection_provider::{ConnectedProvider, ConnectionProvider};
-use crate::registry::{IntentConfiguration, RegistryChangeEvents};
+use crate::registry::{ChangeEvents, IntentConfiguration};
 use async_recursion::async_recursion;
 use chariott_common::proto::common::discover_fulfillment::Service;
 use chariott_common::proto::common::SubscribeFulfillment;
@@ -46,7 +46,7 @@ pub enum RuntimeBinding<T: ConnectionProvider> {
     Fallback(Box<RuntimeBinding<T>>, Box<RuntimeBinding<T>>),
     SystemInspect(Vec<IntentConfiguration>),
     SystemDiscover(Url),
-    SystemSubscribe(RegistryChangeEvents),
+    SystemSubscribe(ChangeEvents),
     #[cfg(test)]
     Test(tests::TestBinding),
 }

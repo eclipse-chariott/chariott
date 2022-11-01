@@ -12,8 +12,7 @@ use crate::{
     connection_provider::{ConnectionProvider, GrpcProvider, ReusableProvider},
     execution::RuntimeBinding,
     registry::{
-        ExecutionLocality, IntentConfiguration, IntentKind, RegistryChange, RegistryChangeEvents,
-        RegistryObserver,
+        Change, ChangeEvents, ExecutionLocality, IntentConfiguration, IntentKind, Observer,
     },
 };
 
@@ -25,7 +24,7 @@ enum Binding {
     Fallback(Box<Binding>, Box<Binding>),
     SystemInspect,
     SystemDiscover(Url),
-    SystemSubscribe(RegistryChangeEvents),
+    SystemSubscribe(ChangeEvents),
 }
 
 #[derive(Default)]
@@ -34,7 +33,7 @@ struct IntentBinder {
 }
 
 impl IntentBinder {
-    pub fn new(streaming_url: Url, registry_change_events: RegistryChangeEvents) -> Self {
+    pub fn new(streaming_url: Url, registry_change_events: ChangeEvents) -> Self {
         const SYSTEM_REGISTRY_NAMESPACE: &str = "system.registry";
 
         Self {
@@ -81,11 +80,11 @@ impl IntentBinder {
             .map(|binding| binding_into_runtime_binding(self, binding))
     }
 
-    fn refresh<'a>(&mut self, changes: impl IntoIterator<Item = RegistryChange<'a>>) {
+    fn refresh<'a>(&mut self, changes: impl IntoIterator<Item = Change<'a>>) {
         for change in changes {
             let (intent_configuration, service_configurations) = match change {
-                RegistryChange::Add(intent, services) => (intent, services),
-                RegistryChange::Modify(intent, services) => (intent, services),
+                Change::Add(intent, services) => (intent, services),
+                Change::Modify(intent, services) => (intent, services),
             };
 
             let mut cloud_service = None;
@@ -140,7 +139,7 @@ impl IntentBinder {
 pub struct IntentBroker(Arc<RwLock<IntentBinder>>);
 
 impl IntentBroker {
-    pub fn new(streaming_url: Url, registry_changed: RegistryChangeEvents) -> Self {
+    pub fn new(streaming_url: Url, registry_changed: ChangeEvents) -> Self {
         Self(Arc::new(RwLock::new(IntentBinder::new(streaming_url, registry_changed))))
     }
 
@@ -149,8 +148,8 @@ impl IntentBroker {
     }
 }
 
-impl RegistryObserver for IntentBroker {
-    fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = RegistryChange<'a>>) {
+impl Observer for IntentBroker {
+    fn on_intent_config_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
         self.0.write().unwrap().refresh(changes)
     }
 }
@@ -167,21 +166,18 @@ mod tests {
     use crate::{
         connection_provider::{GrpcProvider, ReusableProvider},
         execution::RuntimeBinding,
-        intent_broker::{IntentBroker, RegistryObserver as _},
+        intent_broker::{IntentBroker, Observer as _},
         registry::{
             tests::{IntentConfigurationBuilder, ServiceConfigurationBuilder},
-            ExecutionLocality, IntentConfiguration, IntentKind, RegistryChange,
-            RegistryChangeEvents,
+            Change, ChangeEvents, ExecutionLocality, IntentConfiguration, IntentKind,
         },
     };
 
     #[test]
     fn when_empty_does_not_resolve() {
         // arrange
-        let subject = IntentBroker::new(
-            "https://localhost:4243".parse().unwrap(),
-            RegistryChangeEvents::new(),
-        );
+        let subject =
+            IntentBroker::new("https://localhost:4243".parse().unwrap(), ChangeEvents::new());
 
         // act + assert
         assert!(subject.resolve(&IntentConfigurationBuilder::new().build()).is_none());
@@ -203,8 +199,7 @@ mod tests {
         let subject = setup.clone().build();
 
         // act
-        subject
-            .on_intent_config_change(vec![RegistryChange::Modify(&setup.intent, &HashSet::new())]);
+        subject.on_intent_config_change(vec![Change::Modify(&setup.intent, &HashSet::new())]);
 
         // assert
         assert!(subject.resolve(&setup.intent).is_none());
@@ -317,10 +312,8 @@ mod tests {
         let subject = setup.clone().build();
 
         // act
-        subject.on_intent_config_change([RegistryChange::Modify(
-            &setup.intent,
-            &HashSet::from([service_b]),
-        )]);
+        subject
+            .on_intent_config_change([Change::Modify(&setup.intent, &HashSet::from([service_b]))]);
 
         // assert
         let result = subject.resolve(&setup.intent).unwrap();
@@ -377,11 +370,9 @@ mod tests {
         }
 
         fn build(self) -> IntentBroker {
-            let broker = IntentBroker::new(
-                "https://localhost:4243".parse().unwrap(),
-                RegistryChangeEvents::new(),
-            );
-            broker.on_intent_config_change([RegistryChange::Add(
+            let broker =
+                IntentBroker::new("https://localhost:4243".parse().unwrap(), ChangeEvents::new());
+            broker.on_intent_config_change([Change::Add(
                 &self.intent,
                 &HashSet::from([self.service.build()]),
             )]);
@@ -399,10 +390,8 @@ mod tests {
         }
 
         fn combine(setups: impl IntoIterator<Item = Setup>) -> IntentBroker {
-            let broker = IntentBroker::new(
-                "https://localhost:4243".parse().unwrap(),
-                RegistryChangeEvents::new(),
-            );
+            let broker =
+                IntentBroker::new("https://localhost:4243".parse().unwrap(), ChangeEvents::new());
 
             let services_by_intent = setups.into_iter().fold(HashMap::new(), |mut acc, s| {
                 acc.entry(s.intent.clone()).or_insert_with(Vec::new).push(s.service);
@@ -410,7 +399,7 @@ mod tests {
             });
 
             for (intent, services) in services_by_intent {
-                broker.on_intent_config_change([RegistryChange::Add(
+                broker.on_intent_config_change([Change::Add(
                     &intent,
                     &services.clone().into_iter().map(|s| s.build()).collect(),
                 )]);

@@ -8,8 +8,8 @@ use url::Url;
 
 use crate::intent_broker::IntentBroker;
 use crate::registry::{
-    ExecutionLocality, IntentConfiguration, IntentKind, Registry, RegistryObserver,
-    ServiceConfiguration, ServiceId,
+    ExecutionLocality, IntentConfiguration, IntentKind, Observer, Registry, ServiceConfiguration,
+    ServiceId,
 };
 use chariott_common::proto::*;
 use chariott_common::proto::{runtime as runtime_api, runtime::IntentRegistration};
@@ -26,12 +26,12 @@ const INTENT_MAPPING_WRITE: i32 = 3;
 const INTENT_MAPPING_INVOKE: i32 = 4;
 const INTENT_MAPPING_SUBSCRIBE: i32 = 5;
 
-pub struct ChariottServer<T: RegistryObserver> {
+pub struct ChariottServer<T: Observer> {
     broker: IntentBroker,
     registry: Arc<RwLock<Registry<T>>>,
 }
 
-impl<T: RegistryObserver> ChariottServer<T> {
+impl<T: Observer> ChariottServer<T> {
     pub fn new(registry: Registry<T>, broker: IntentBroker) -> Self {
         Self { registry: Arc::new(RwLock::new(registry)), broker }
     }
@@ -68,8 +68,8 @@ impl<T: RegistryObserver> ChariottServer<T> {
 }
 
 #[async_trait]
-impl<T: RegistryObserver + Send + Sync + 'static>
-    runtime_api::chariott_service_server::ChariottService for ChariottServer<T>
+impl<T: Observer + Send + Sync + 'static> runtime_api::chariott_service_server::ChariottService
+    for ChariottServer<T>
 {
     async fn announce(
         &self,
@@ -175,7 +175,7 @@ fn map_locality_value(locality: i32) -> Result<ExecutionLocality, Status> {
 #[cfg(test)]
 mod tests {
     use crate::execution::RuntimeBinding;
-    use crate::registry::{Registry, RegistryChange, RegistryChangeEvents, RegistryObserver};
+    use crate::registry::{Change, ChangeEvents, Observer, Registry};
     use crate::{connection_provider::GrpcProvider, execution::tests::TestBinding};
     use chariott_common::proto::{
         common, runtime as runtime_api,
@@ -424,8 +424,8 @@ mod tests {
         }
     }
 
-    impl RegistryObserver for MockBroker {
-        fn on_intent_config_change<'a>(&self, _: impl IntoIterator<Item = RegistryChange<'a>>) {
+    impl Observer for MockBroker {
+        fn on_intent_config_change<'a>(&self, _: impl IntoIterator<Item = Change<'a>>) {
             todo!()
         }
     }
@@ -440,10 +440,8 @@ mod tests {
     }
 
     fn setup() -> ChariottServer<IntentBroker> {
-        let broker = IntentBroker::new(
-            "https://localhost:4243".parse().unwrap(),
-            RegistryChangeEvents::new(),
-        );
+        let broker =
+            IntentBroker::new("https://localhost:4243".parse().unwrap(), ChangeEvents::new());
         ChariottServer::new(Registry::new(broker.clone()), broker)
     }
 
