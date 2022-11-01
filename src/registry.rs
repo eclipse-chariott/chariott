@@ -23,18 +23,21 @@ pub trait Observer {
     fn on_change<'a>(&self, changes: impl Iterator<Item = Change<'a>> + Clone);
 }
 
-pub struct Composite<T, U>(T, U);
+pub struct Composite<T, U> {
+    left: T,
+    right: U,
+}
 
 impl<T, U> Composite<T, U> {
     pub fn new(left: T, right: U) -> Self {
-        Self(left, right)
+        Self { left, right }
     }
 }
 
 impl<T: Observer, U: Observer> Observer for Composite<T, U> {
     fn on_change<'a>(&self, changes: impl Iterator<Item = Change<'a>> + Clone) {
-        self.0.on_change(changes.clone());
-        self.1.on_change(changes);
+        self.left.on_change(changes.clone());
+        self.right.on_change(changes);
     }
 }
 
@@ -276,9 +279,12 @@ impl fmt::Display for IntentKind {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use std::sync::Mutex;
+    use std::sync::{
+        atomic::{AtomicBool, Ordering},
+        Mutex,
+    };
 
-    use crate::registry::{ExecutionLocality, IntentKind, ServiceId};
+    use crate::registry::{Composite, ExecutionLocality, IntentKind, ServiceId};
 
     use super::{Change, IntentConfiguration, Observer, Registry, ServiceConfiguration};
 
@@ -516,6 +522,32 @@ pub(crate) mod tests {
         fn test(expected: &str, intent_kind: IntentKind) {
             assert_eq!(expected, format!("{}", intent_kind));
         }
+    }
+
+    #[test]
+    fn composite_observes_both_inner_observers() {
+        // arrange
+        struct TestObserver {
+            invoked: AtomicBool,
+        }
+
+        impl Observer for TestObserver {
+            fn on_change<'a>(&self, _: impl Iterator<Item = Change<'a>> + Clone) {
+                self.invoked.fetch_or(true, Ordering::Relaxed);
+            }
+        }
+
+        let subject = Composite::new(
+            TestObserver { invoked: Default::default() },
+            TestObserver { invoked: Default::default() },
+        );
+
+        // act
+        subject.on_change([].into_iter());
+
+        // assert
+        assert!(subject.left.invoked.load(Ordering::Relaxed));
+        assert!(subject.right.invoked.load(Ordering::Relaxed));
     }
 
     struct MockBroker {
