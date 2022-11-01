@@ -27,12 +27,14 @@ pub struct Config {
 }
 
 impl Config {
+    pub const ENTRY_TTL_MIN: Duration = Duration::from_secs(2);
+
     pub fn entry_ttl(&self) -> Duration {
         self.entry_ttl
     }
 
-    pub fn set_entry_ttl(self, value: Duration) -> Self {
-        Self { entry_ttl: value }
+    pub fn set_entry_ttl_unchecked(self, value: Duration) -> Self {
+        Self { entry_ttl: std::cmp::max(value, Self::ENTRY_TTL_MIN) }
     }
 }
 
@@ -248,7 +250,34 @@ pub(crate) mod tests {
 
     use crate::registry::{ExecutionLocality, IntentKind, ServiceId};
 
-    use super::{IntentConfiguration, Registry, RegistryObserver, ServiceConfiguration};
+    use super::*;
+
+    #[test]
+    fn default_config() {
+        let config: Config = Default::default();
+
+        assert_eq!(Duration::from_secs(15), config.entry_ttl());
+    }
+
+    #[test]
+    fn config_set_entry_ttl_sets_new_value() {
+        let config: Config = Default::default();
+        let new_ttl = config.entry_ttl() + Duration::from_secs(60);
+
+        let ttl = config.set_entry_ttl_unchecked(new_ttl).entry_ttl();
+
+        assert_eq!(new_ttl, ttl);
+    }
+
+    #[test]
+    fn config_set_entry_ttl_sets_min_allowed_if_new_value_is_too_small() {
+        let config: Config = Default::default();
+        let new_ttl = Config::ENTRY_TTL_MIN - Duration::from_nanos(1);
+
+        let ttl = config.set_entry_ttl_unchecked(new_ttl).entry_ttl();
+
+        assert_eq!(Config::ENTRY_TTL_MIN, ttl);
+    }
 
     #[test]
     fn when_registry_does_not_contain_service_has_service_returns_false() {

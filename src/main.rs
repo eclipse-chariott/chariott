@@ -38,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let registry_config = try_env::<u64>("CHARIOTT_REGISTRY_TTL_SECS")
         .ok()?
         .map(Duration::from_secs)
-        .map(|v| registry::Config::default().set_entry_ttl(v))
+        .map(|v| registry::Config::default().set_entry_ttl_unchecked(v))
         .unwrap_or_default();
 
     let registry_entry_ttl = registry_config.entry_ttl();
