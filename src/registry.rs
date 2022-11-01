@@ -89,6 +89,8 @@ impl<T: Observer> Registry<T> {
             Modify,
         }
 
+        /// This method helps calculating the effective change based on a series
+        /// of isolated changes for a given intent.
         fn change(
             changes: &mut HashMap<IntentConfiguration, ChangeKind>,
             intent: IntentConfiguration,
