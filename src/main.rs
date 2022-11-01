@@ -12,6 +12,7 @@ use chariott_common::shutdown::{ctrl_c_cancellation, RouterExt as _};
 use ext::OptionExt as _;
 use std::sync::Arc;
 use std::time::Duration;
+use std::time::SystemTime;
 use tonic::transport::Server;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
@@ -67,7 +68,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let cancellation_token = ctrl_c_cancellation_token.clone();
         spawn(async move {
             loop {
-                server.prune_registry();
+                server.registry_do(|reg| reg.prune(SystemTime::now()));
                 select! {
                     _ = sleep(registry_entry_ttl) => {}
                     _ = cancellation_token.cancelled() => {

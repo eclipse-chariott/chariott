@@ -36,8 +36,9 @@ impl ChariottServer {
         Self { registry: Arc::new(RwLock::new(registry)), broker }
     }
 
-    pub fn prune_registry(&self) {
-        self.registry.write().unwrap().prune(SystemTime::now());
+    pub fn registry_do(&self, f: impl FnOnce(&mut Registry<IntentBroker>)) {
+        let mut registry = self.registry.write().unwrap();
+        f(&mut registry);
     }
 
     fn create_configruation_from_registration(
