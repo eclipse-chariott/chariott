@@ -10,10 +10,9 @@ use url::Url;
 
 use crate::{
     connection_provider::{ConnectionProvider, GrpcProvider, ReusableProvider},
+    ess::Ess,
     execution::RuntimeBinding,
-    registry::{
-        Change, ChangeEvents, ExecutionLocality, IntentConfiguration, IntentKind, Observer,
-    },
+    registry::{Change, ExecutionLocality, IntentConfiguration, IntentKind, Observer},
 };
 
 type Provider = ReusableProvider<GrpcProvider>;
@@ -24,7 +23,7 @@ enum Binding {
     Fallback(Box<Binding>, Box<Binding>),
     SystemInspect,
     SystemDiscover(Url),
-    SystemSubscribe(ChangeEvents),
+    SystemSubscribe(Ess),
 }
 
 #[derive(Default)]
@@ -33,7 +32,7 @@ struct IntentBinder {
 }
 
 impl IntentBinder {
-    pub fn new(streaming_url: Url, registry_change_events: ChangeEvents) -> Self {
+    pub fn new(streaming_url: Url, registry_change_events: Ess) -> Self {
         const SYSTEM_REGISTRY_NAMESPACE: &str = "system.registry";
 
         Self {
@@ -139,7 +138,7 @@ impl IntentBinder {
 pub struct IntentBroker(Arc<RwLock<IntentBinder>>);
 
 impl IntentBroker {
-    pub fn new(streaming_url: Url, registry_changed: ChangeEvents) -> Self {
+    pub fn new(streaming_url: Url, registry_changed: Ess) -> Self {
         Self(Arc::new(RwLock::new(IntentBinder::new(streaming_url, registry_changed))))
     }
 
@@ -165,19 +164,19 @@ mod tests {
 
     use crate::{
         connection_provider::{GrpcProvider, ReusableProvider},
+        ess::Ess,
         execution::RuntimeBinding,
         intent_broker::{IntentBroker, Observer as _},
         registry::{
             tests::{IntentConfigurationBuilder, ServiceConfigurationBuilder},
-            Change, ChangeEvents, ExecutionLocality, IntentConfiguration, IntentKind,
+            Change, ExecutionLocality, IntentConfiguration, IntentKind,
         },
     };
 
     #[test]
     fn when_empty_does_not_resolve() {
         // arrange
-        let subject =
-            IntentBroker::new("https://localhost:4243".parse().unwrap(), ChangeEvents::new());
+        let subject = IntentBroker::new("https://localhost:4243".parse().unwrap(), Ess::new());
 
         // act + assert
         assert!(subject.resolve(&IntentConfigurationBuilder::new().build()).is_none());
@@ -369,8 +368,7 @@ mod tests {
         }
 
         fn build(self) -> IntentBroker {
-            let broker =
-                IntentBroker::new("https://localhost:4243".parse().unwrap(), ChangeEvents::new());
+            let broker = IntentBroker::new("https://localhost:4243".parse().unwrap(), Ess::new());
 
             broker.on_change(
                 [Change::Add(&self.intent, &HashSet::from([self.service.build()]))].into_iter(),
@@ -390,8 +388,7 @@ mod tests {
         }
 
         fn combine(setups: impl IntoIterator<Item = Setup>) -> IntentBroker {
-            let broker =
-                IntentBroker::new("https://localhost:4243".parse().unwrap(), ChangeEvents::new());
+            let broker = IntentBroker::new("https://localhost:4243".parse().unwrap(), Ess::new());
 
             let services_by_intent = setups.into_iter().fold(HashMap::new(), |mut acc, s| {
                 acc.entry(s.intent.clone()).or_insert_with(Vec::new).push(s.service);

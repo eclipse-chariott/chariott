@@ -174,8 +174,9 @@ fn map_locality_value(locality: i32) -> Result<ExecutionLocality, Status> {
 
 #[cfg(test)]
 mod tests {
+    use crate::ess::Ess;
     use crate::execution::RuntimeBinding;
-    use crate::registry::{Change, ChangeEvents, Observer, Registry};
+    use crate::registry::{Change, Observer, Registry};
     use crate::{connection_provider::GrpcProvider, execution::tests::TestBinding};
     use chariott_common::proto::{
         common, runtime as runtime_api,
@@ -440,8 +441,7 @@ mod tests {
     }
 
     fn setup() -> ChariottServer<IntentBroker> {
-        let broker =
-            IntentBroker::new("https://localhost:4243".parse().unwrap(), ChangeEvents::new());
+        let broker = IntentBroker::new("https://localhost:4243".parse().unwrap(), Ess::new());
         ChariottServer::new(Registry::new(broker.clone()), broker)
     }
 

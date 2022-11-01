@@ -4,9 +4,9 @@
 use std::sync::atomic::{AtomicU16, Ordering};
 
 use async_trait::async_trait;
+use chariott::ess::Ess;
 use chariott::registry::{
-    ChangeEvents, ExecutionLocality, IntentConfiguration, IntentKind, ServiceConfiguration,
-    ServiceId,
+    ExecutionLocality, IntentConfiguration, IntentKind, ServiceConfiguration, ServiceId,
 };
 use chariott::{chariott_grpc::ChariottServer, registry::Registry, IntentBroker};
 use chariott_common::error::{Error, ResultExt as _};
@@ -162,7 +162,7 @@ async fn setup(provider: Provider) -> Subject {
 
 async fn setup_multiple(providers: impl IntoIterator<Item = ProviderSetup>) -> Subject {
     let namespace = "sdv.integration".to_owned();
-    let broker = IntentBroker::new("https://localhost:4243".parse().unwrap(), ChangeEvents::new());
+    let broker = IntentBroker::new("https://localhost:4243".parse().unwrap(), Ess::new());
     let mut registry = Registry::new(broker.clone());
 
     for ProviderSetup { provider, port, name, locality } in providers {

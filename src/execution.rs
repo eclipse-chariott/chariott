@@ -4,7 +4,8 @@
 use std::collections::HashMap;
 
 use crate::connection_provider::{ConnectedProvider, ConnectionProvider};
-use crate::registry::{ChangeEvents, IntentConfiguration};
+use crate::ess::Ess;
+use crate::registry::IntentConfiguration;
 use async_recursion::async_recursion;
 use chariott_common::proto::common::discover_fulfillment::Service;
 use chariott_common::proto::common::SubscribeFulfillment;
@@ -46,7 +47,7 @@ pub enum RuntimeBinding<T: ConnectionProvider> {
     Fallback(Box<RuntimeBinding<T>>, Box<RuntimeBinding<T>>),
     SystemInspect(Vec<IntentConfiguration>),
     SystemDiscover(Url),
-    SystemSubscribe(ChangeEvents),
+    SystemSubscribe(Ess),
     #[cfg(test)]
     Test(tests::TestBinding),
 }
@@ -79,7 +80,7 @@ where
 
                         let intents = intents
                             .into_iter()
-                            .filter(|e| regex.is_match(e.namespace_as_str()))
+                            .filter(|e| regex.is_match(e.namespace()))
                             .map(|ic| ic.into_namespaced_intent())
                             .group();
 
@@ -133,13 +134,12 @@ where
                     fulfillment: Some(Fulfillment { fulfillment: Some(fulfillment) }),
                 })
             }
-            RuntimeBinding::SystemSubscribe(registry_change_events) => {
+            RuntimeBinding::SystemSubscribe(ess) => {
                 match arg.intent {
-                    Some(IntentEnum::Subscribe(subscribe_intent)) => registry_change_events
-                        .serve_subscriptions(
-                            subscribe_intent.channel_id,
-                            subscribe_intent.sources.into_iter().map(|s| s.into()),
-                        ),
+                    Some(IntentEnum::Subscribe(subscribe_intent)) => ess.serve_subscriptions(
+                        subscribe_intent.channel_id,
+                        subscribe_intent.sources.into_iter().map(|s| s.into()),
+                    ),
                     _ => Err(Status::invalid_argument(
                         "System does not support the specified intent.",
                     )),

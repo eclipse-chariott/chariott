@@ -2,7 +2,8 @@
 // Licensed under the MIT license.
 
 use chariott::chariott_grpc::ChariottServer;
-use chariott::registry::Registry;
+use chariott::ess::Ess;
+use chariott::registry::{Composite, Registry};
 use chariott::IntentBroker;
 use chariott_common::proto::runtime::chariott_service_server::ChariottServiceServer;
 use chariott_common::proto::streaming::channel_service_server::ChannelServiceServer;
@@ -17,8 +18,6 @@ pub(crate) const FILE_DESCRIPTOR_SET: &[u8] = tonic::include_file_descriptor_set
 #[tokio::main]
 #[cfg(not(tarpaulin_include))]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    use chariott::registry::{ChangeEvents, Composite};
-
     let collector = tracing_subscriber::fmt()
         .with_env_filter(
             EnvFilter::builder()
@@ -29,7 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     collector.init();
 
-    let ess = ChangeEvents::new();
+    let ess = Ess::new();
     let broker = IntentBroker::new("http://localhost:4243".parse().unwrap(), ess.clone());
     let registry = Registry::new(Composite::new(broker.clone(), ess.clone()));
 
