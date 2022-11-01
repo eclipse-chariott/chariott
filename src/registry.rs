@@ -27,6 +27,10 @@ pub struct Config {
 }
 
 impl Config {
+    pub fn entry_ttl(&self) -> Duration {
+        self.entry_ttl
+    }
+
     pub fn set_entry_ttl(self, value: Duration) -> Self {
         Self { entry_ttl: value }
     }

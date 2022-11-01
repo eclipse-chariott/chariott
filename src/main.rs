@@ -6,7 +6,8 @@ use chariott::registry::{self, Registry};
 use chariott::IntentBroker;
 use chariott_common::config::try_env;
 use chariott_common::proto::runtime::chariott_service_server::ChariottServiceServer;
-use chariott_common::shutdown::RouterExt as _;
+use chariott_common::shutdown::{ctrl_c_cancellation, RouterExt as _};
+use std::sync::Arc;
 use std::time::Duration;
 use tonic::transport::Server;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -36,6 +37,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map(|v| registry::Config::default().set_entry_ttl(v))
         .unwrap_or_default();
 
+    let registry_entry_ttl = registry_config.entry_ttl();
     let registry = Registry::new(broker.clone(), registry_config);
 
     #[cfg(build = "debug")]
@@ -47,13 +49,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = "0.0.0.0:4243".parse().unwrap();
     tracing::info!("chariott listening on {addr}");
 
-    let router = Server::builder()
-        .add_service(ChariottServiceServer::new(ChariottServer::new(registry, broker)));
+    let server = Arc::new(ChariottServer::new(registry, broker));
+    let router =
+        Server::builder().add_service(ChariottServiceServer::from_arc(Arc::clone(&server)));
 
     #[cfg(build = "debug")]
     let router = router.add_service(reflection_service);
 
-    router.serve_with_ctrl_c_shutdown(addr).await?;
+    let ctrl_c_cancellation_token = ctrl_c_cancellation();
+
+    let prune_loop = {
+        use tokio::{select, spawn, time::sleep};
+
+        let cancellation_token = ctrl_c_cancellation_token.clone();
+        spawn(async move {
+            loop {
+                server.prune_registry();
+                select! {
+                    _ = sleep(registry_entry_ttl) => {}
+                    _ = cancellation_token.cancelled() => {
+                        break;
+                    }
+                }
+                sleep(registry_entry_ttl).await;
+            }
+        })
+    };
+
+    router.serve_with_cancellation(addr, ctrl_c_cancellation_token).await?;
+
+    prune_loop.await?;
 
     Ok(())
 }
