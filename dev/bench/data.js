@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1667299246708,
+  "lastUpdate": 1667311368543,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -378,6 +378,84 @@ window.BENCHMARK_DATA = {
             "value": 6509,
             "unit": "Bytes",
             "range": "p95=6734"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 5,
+            "unit": "Millisecond",
+            "range": "p95=9"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "46e700923cfadbddf4aaf6c8c14e2c5c5dd0e9d6",
+          "message": "chore: Bump serde from 1.0.145 to 1.0.147 (#1)\n\nBumps [serde](https://github.com/serde-rs/serde) from 1.0.145 to 1.0.147.\r\n- [Release notes](https://github.com/serde-rs/serde/releases)\r\n- [Commits](https://github.com/serde-rs/serde/compare/v1.0.145...v1.0.147)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: serde\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2022-11-01T14:11:54+01:00",
+          "tree_id": "bda12951023a5d5845102036906b508d269df880",
+          "url": "https://github.com/eclipse/chariott/commit/46e700923cfadbddf4aaf6c8c14e2c5c5dd0e9d6"
+        },
+        "date": 1667311367570,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1188",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "3",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 29,
+            "unit": "Percent",
+            "range": "p95=30"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6545,
+            "unit": "Bytes",
+            "range": "p95=6676"
           },
           {
             "name": "Invoke Throughput",
