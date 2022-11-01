@@ -12,8 +12,9 @@ use chariott_common::proto::common::SubscribeFulfillment;
 use chariott_common::proto::{
     common::{
         fulfillment::Fulfillment as FulfillmentEnum, inspect_fulfillment::Entry,
-        intent::Intent as IntentEnum, value::Value as ValueEnum, DiscoverFulfillment, Fulfillment,
-        InspectFulfillment, Intent as IntentMessage, List, Value as ValueMessage,
+        intent::Intent as IntentEnum, value::Value as ValueEnum, DiscoverFulfillment,
+        Fulfillment as FulfillmentMessage, InspectFulfillment, Intent as IntentMessage, List,
+        Value as ValueMessage,
     },
     provider::{FulfillRequest, FulfillResponse},
 };
@@ -59,6 +60,12 @@ where
 {
     #[async_recursion]
     pub async fn execute(self, arg: IntentMessage) -> Result<FulfillResponse, Status> {
+        fn fulfill_response(inner: FulfillmentEnum) -> Result<FulfillResponse, Status> {
+            Ok(FulfillResponse {
+                fulfillment: Some(FulfillmentMessage { fulfillment: Some(inner) }),
+            })
+        }
+
         match self {
             RuntimeBinding::Remote(mut provider) => provider
                 .connect()
@@ -74,82 +81,68 @@ where
                 }
             }
             RuntimeBinding::SystemInspect(intents) => {
-                let fulfillment = match arg.intent {
-                    Some(IntentEnum::Inspect(inspect_intent)) => {
-                        let regex = regex_from_query(&inspect_intent.query);
+                let fulfillment = if let Some(IntentEnum::Inspect(inspect_intent)) = arg.intent {
+                    let regex = regex_from_query(&inspect_intent.query);
 
-                        let intents = intents
+                    let intents = intents
+                        .into_iter()
+                        .filter(|e| regex.is_match(e.namespace()))
+                        .map(|ic| ic.into_namespaced_intent())
+                        .group();
+
+                    Ok(FulfillmentEnum::Inspect(InspectFulfillment {
+                        entries: intents
                             .into_iter()
-                            .filter(|e| regex.is_match(e.namespace()))
-                            .map(|ic| ic.into_namespaced_intent())
-                            .group();
-
-                        Ok(FulfillmentEnum::Inspect(InspectFulfillment {
-                            entries: intents
-                                .into_iter()
-                                .map(|(path, intent_kinds)| Entry {
-                                    path,
-                                    items: HashMap::from([(
-                                        REGISTERED_INTENTS_KEY.to_owned(),
-                                        ValueMessage {
-                                            value: Some(ValueEnum::List(List {
-                                                value: intent_kinds
-                                                    .into_iter()
-                                                    .map(|intent_kind| ValueMessage {
-                                                        value: Some(ValueEnum::String(
-                                                            intent_kind.to_string(),
-                                                        )),
-                                                    })
-                                                    .collect(),
-                                            })),
-                                        },
-                                    )]),
-                                })
-                                .collect(),
-                        }))
-                    }
-                    _ => Err(Status::invalid_argument(
-                        "System does not support the specified intent.",
-                    )),
+                            .map(|(path, intent_kinds)| Entry {
+                                path,
+                                items: HashMap::from([(
+                                    REGISTERED_INTENTS_KEY.to_owned(),
+                                    ValueMessage {
+                                        value: Some(ValueEnum::List(List {
+                                            value: intent_kinds
+                                                .into_iter()
+                                                .map(|intent_kind| ValueMessage {
+                                                    value: Some(ValueEnum::String(
+                                                        intent_kind.to_string(),
+                                                    )),
+                                                })
+                                                .collect(),
+                                        })),
+                                    },
+                                )]),
+                            })
+                            .collect(),
+                    }))
+                } else {
+                    Err(Status::invalid_argument("System does not support the specified intent."))
                 }?;
 
-                Ok(FulfillResponse {
-                    fulfillment: Some(Fulfillment { fulfillment: Some(fulfillment) }),
-                })
+                fulfill_response(fulfillment)
             }
             RuntimeBinding::SystemDiscover(url) => {
                 const SCHEMA_VERSION_STREAMING: &str = "chariott.streaming.v1";
                 const SCHEMA_REFERENCE: &str = "grpc+proto";
 
-                let fulfillment = FulfillmentEnum::Discover(DiscoverFulfillment {
+                fulfill_response(FulfillmentEnum::Discover(DiscoverFulfillment {
                     services: vec![Service {
                         url: url.to_string(),
                         schema_kind: SCHEMA_REFERENCE.to_owned(),
                         schema_reference: SCHEMA_VERSION_STREAMING.to_owned(),
                         metadata: HashMap::new(),
                     }],
-                });
-
-                Ok(FulfillResponse {
-                    fulfillment: Some(Fulfillment { fulfillment: Some(fulfillment) }),
-                })
+                }))
             }
             RuntimeBinding::SystemSubscribe(ess) => {
-                match arg.intent {
-                    Some(IntentEnum::Subscribe(subscribe_intent)) => ess.serve_subscriptions(
+                if let Some(IntentEnum::Subscribe(subscribe_intent)) = arg.intent {
+                    ess.serve_subscriptions(
                         subscribe_intent.channel_id,
                         subscribe_intent.sources.into_iter().map(|s| s.into()),
-                    ),
-                    _ => Err(Status::invalid_argument(
-                        "System does not support the specified intent.",
-                    )),
+                    )
+                } else {
+                    Err(Status::invalid_argument("System does not support the specified intent."))
                 }?;
 
-                Ok(FulfillResponse {
-                    fulfillment: Some(Fulfillment {
-                        fulfillment: Some(FulfillmentEnum::Subscribe(SubscribeFulfillment {})),
-                    }),
-                })
+                fulfill_response(FulfillmentEnum::Subscribe(SubscribeFulfillment {}))
             }
             #[cfg(test)]
             RuntimeBinding::Test(item) => item.execute(arg),
@@ -196,7 +189,7 @@ pub(crate) mod tests {
 
             self.result
                 .map(|value| FulfillResponse {
-                    fulfillment: Some(Fulfillment {
+                    fulfillment: Some(FulfillmentMessage {
                         fulfillment: Some(FulfillmentEnum::Invoke(InvokeFulfillment {
                             r#return: Some(ValueMessage { value: Some(ValueEnum::Int32(value)) }),
                         })),
@@ -205,9 +198,9 @@ pub(crate) mod tests {
                 .map_err(|code| Status::new(code, "Some error"))
         }
 
-        pub fn parse_result(fulfillment: Result<Fulfillment, Status>) -> Result<i32, Code> {
+        pub fn parse_result(fulfillment: Result<FulfillmentMessage, Status>) -> Result<i32, Code> {
             match fulfillment {
-                Ok(Fulfillment {
+                Ok(FulfillmentMessage {
                     fulfillment:
                         Some(FulfillmentEnum::Invoke(InvokeFulfillment {
                             r#return: Some(ValueMessage { value: Some(ValueEnum::Int32(value)) }),
