@@ -23,7 +23,7 @@ edition = "2021"
 license = "MIT"
 
 [[test]]
-name = "store-e2e"
+name = "chariott_e2e"
 test = false
 
 [dependencies]
