@@ -33,6 +33,7 @@ chariott-common = { workspace = true }
 prost = { workspace = true }
 prost-types = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread"] }
+tokio-util = { workspace = true }
 tonic = { workspace = true }
 tonic-reflection = "0.5"
 tracing = { workspace = true }

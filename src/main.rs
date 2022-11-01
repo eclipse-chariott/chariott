@@ -13,6 +13,7 @@ use ext::OptionExt as _;
 use std::sync::Arc;
 use std::time::Duration;
 use std::time::SystemTime;
+use tokio_util::sync::CancellationToken;
 use tonic::transport::Server;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
@@ -60,18 +61,27 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(build = "debug")]
     let router = router.add_service(reflection_service);
 
+    let error_cancellation_token = CancellationToken::new();
     let ctrl_c_cancellation_token = ctrl_c_cancellation();
 
     let prune_loop = {
         use tokio::{select, spawn, time::sleep};
 
-        let cancellation_token = ctrl_c_cancellation_token.clone();
+        let ctrl_c_cancellation_token = ctrl_c_cancellation_token.clone();
+        let error_cancellation_token = error_cancellation_token.child_token();
+
         spawn(async move {
+            tracing::debug!("Prune loop running (TTL = {registry_entry_ttl:?}).");
             loop {
                 server.registry_do(|reg| reg.prune(SystemTime::now()));
                 select! {
                     _ = sleep(registry_entry_ttl) => {}
-                    _ = cancellation_token.cancelled() => {
+                    _ = error_cancellation_token.cancelled() => {
+                        tracing::debug!("Prune loop aborting due to server error.");
+                        break;
+                    }
+                    _ = ctrl_c_cancellation_token.cancelled() => {
+                        tracing::debug!("Prune loop aborting due to cancellation.");
                         break;
                     }
                 }
@@ -79,9 +89,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         })
     };
 
-    router.serve_with_cancellation(addr, ctrl_c_cancellation_token).await?;
+    let router_serve = async {
+        match router.serve_with_cancellation(addr, ctrl_c_cancellation_token).await {
+            err @ Err(_) => {
+                error_cancellation_token.cancel();
+                err
+            }
+            res => res,
+        }
+    };
 
-    prune_loop.await?;
+    let (router_serve_result, prune_loop_result) = tokio::join!(router_serve, prune_loop);
+
+    router_serve_result?;
+    prune_loop_result?;
 
     Ok(())
 }
