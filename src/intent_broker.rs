@@ -199,7 +199,7 @@ mod tests {
         let subject = setup.clone().build();
 
         // act
-        subject.on_change(vec![Change::Modify(&setup.intent, &HashSet::new())]);
+        subject.on_change([Change::Modify(&setup.intent, &HashSet::new())].into_iter());
 
         // assert
         assert!(subject.resolve(&setup.intent).is_none());
@@ -312,7 +312,7 @@ mod tests {
         let subject = setup.clone().build();
 
         // act
-        subject.on_change([Change::Modify(&setup.intent, &HashSet::from([service_b]))]);
+        subject.on_change([Change::Modify(&setup.intent, &HashSet::from([service_b]))].into_iter());
 
         // assert
         let result = subject.resolve(&setup.intent).unwrap();
@@ -371,7 +371,11 @@ mod tests {
         fn build(self) -> IntentBroker {
             let broker =
                 IntentBroker::new("https://localhost:4243".parse().unwrap(), ChangeEvents::new());
-            broker.on_change([Change::Add(&self.intent, &HashSet::from([self.service.build()]))]);
+
+            broker.on_change(
+                [Change::Add(&self.intent, &HashSet::from([self.service.build()]))].into_iter(),
+            );
+
             broker
         }
 
@@ -395,10 +399,13 @@ mod tests {
             });
 
             for (intent, services) in services_by_intent {
-                broker.on_change([Change::Add(
-                    &intent,
-                    &services.clone().into_iter().map(|s| s.build()).collect(),
-                )]);
+                broker.on_change(
+                    [Change::Add(
+                        &intent,
+                        &services.clone().into_iter().map(|s| s.build()).collect(),
+                    )]
+                    .into_iter(),
+                );
             }
 
             broker

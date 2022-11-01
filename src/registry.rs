@@ -166,7 +166,7 @@ pub enum Change<'a> {
 /// Represents a type which can observe changes to the registry.
 pub trait Observer {
     /// Handles observation on changed registry state.
-    fn on_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>);
+    fn on_change<'a>(&self, changes: impl Iterator<Item = Change<'a>> + Clone);
 }
 
 pub struct CompositeObserver<T, U>(T, U);
@@ -178,8 +178,7 @@ impl<T, U> CompositeObserver<T, U> {
 }
 
 impl<T: Observer, U: Observer> Observer for CompositeObserver<T, U> {
-    fn on_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
-        let changes: Vec<_> = changes.into_iter().collect();
+    fn on_change<'a>(&self, changes: impl Iterator<Item = Change<'a>> + Clone) {
         self.0.on_change(changes.clone());
         self.1.on_change(changes);
     }
