@@ -70,8 +70,43 @@ impl<T: RegistryObserver> Registry<T> {
     }
 
     pub fn prune(&mut self, timestamp: SystemTime) {
+        let initial_known_services_len = self.known_services.len();
+
+        // prune services
+
         self.known_services
-            .retain(|_, ts| timestamp.duration_since(*ts).unwrap() < self.config.entry_ttl)
+            .retain(|_, ts| timestamp.duration_since(*ts).unwrap() < self.config.entry_ttl);
+
+        // if nothing changed then bail out early
+
+        if self.known_services.len() == initial_known_services_len {
+            return;
+        }
+
+        // synchronize the intents to services map, tracking which changed
+
+        let mut changed_intent_configurations = Vec::new();
+
+        self.external_services_by_intent.retain(|ic, scs| {
+            let initial_scs_len = scs.len();
+            scs.retain(|sc| self.known_services.contains_key(sc));
+            if scs.len() != initial_scs_len {
+                changed_intent_configurations.push(ic.clone());
+            }
+            !scs.is_empty()
+        });
+
+        // finally, tell observers about changes
+
+        for intent_configuration in changed_intent_configurations {
+            if let Some(service_configurations) =
+                self.external_services_by_intent.get(&intent_configuration)
+            {
+                self.observer.on_intent_config_change(intent_configuration, service_configurations);
+            } else {
+                self.observer.on_intent_config_change(intent_configuration, []);
+            }
+        }
     }
 
     pub fn upsert(
