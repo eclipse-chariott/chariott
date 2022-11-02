@@ -1,8 +1,8 @@
 use std::{sync::Arc, time::SystemTime};
 
 use crate::proto::{
-    common::value::Value as ValueEnum,
     common::Value as ValueMessage,
+    common::{value::Value as ValueEnum, SubscribeFulfillment, SubscribeIntent},
     streaming::{channel_service_server::ChannelService, Event, OpenRequest},
 };
 use async_trait::async_trait;
@@ -37,13 +37,15 @@ impl<T: Clone> Default for Ess<T> {
 impl<T: Clone + Send + 'static> Ess<T> {
     pub fn serve_subscriptions(
         &self,
-        client_id: impl Into<Box<str>>,
-        requested_subscriptions: impl IntoIterator<Item = Box<str>>,
+        subscribe_intent: SubscribeIntent,
         into_value: fn(T) -> ValueEnum,
-    ) -> Result<(), Status> {
+    ) -> Result<SubscribeFulfillment, Status> {
         let subscriptions = self
             .0
-            .register_subscriptions(client_id.into(), requested_subscriptions)
+            .register_subscriptions(
+                subscribe_intent.channel_id.into(),
+                subscribe_intent.sources.into_iter().map(|s| s.into()),
+            )
             .map_err(|_| Status::failed_precondition("The specified client does not exist."))?;
 
         for subscription in subscriptions {
@@ -59,7 +61,7 @@ impl<T: Clone + Send + 'static> Ess<T> {
             }));
         }
 
-        Ok(())
+        Ok(SubscribeFulfillment {})
     }
 }
 
@@ -95,8 +97,8 @@ mod tests {
     use std::time::Duration;
 
     use crate::proto::{
-        common::value::Value as ValueEnum,
         common::Value as ValueMessage,
+        common::{value::Value as ValueEnum, SubscribeIntent},
         streaming::{channel_service_server::ChannelService, OpenRequest},
     };
     use tokio_stream::{Stream, StreamExt as _};
@@ -124,13 +126,15 @@ mod tests {
 
         let subject = setup();
         let response = subject.open(Request::new(OpenRequest {})).await.unwrap();
-        let client_id = response.metadata().get("x-chariott-channel-id").unwrap().to_str().unwrap();
+        let channel_id =
+            response.metadata().get("x-chariott-channel-id").unwrap().to_str().unwrap().into();
 
         // act
         subject
-            .serve_subscriptions(client_id, [EVENT_A.into(), EVENT_B.into()], |_| {
-                ValueEnum::Null(0)
-            })
+            .serve_subscriptions(
+                SubscribeIntent { channel_id, sources: vec![EVENT_A.into(), EVENT_B.into()] },
+                |_| ValueEnum::Null(0),
+            )
             .unwrap();
 
         // assert
@@ -163,8 +167,10 @@ mod tests {
         let subject = setup();
 
         // act
-        let result =
-            subject.serve_subscriptions("client", ["test-event".into()], |_| ValueEnum::Null(0));
+        let result = subject.serve_subscriptions(
+            SubscribeIntent { channel_id: "client".into(), sources: vec!["test-event".into()] },
+            |_| ValueEnum::Null(0),
+        );
 
         // assert
         let result = result.unwrap_err();

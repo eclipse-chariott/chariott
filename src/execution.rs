@@ -8,7 +8,6 @@ use crate::ess::Ess;
 use crate::registry::IntentConfiguration;
 use async_recursion::async_recursion;
 use chariott_common::proto::common::discover_fulfillment::Service;
-use chariott_common::proto::common::SubscribeFulfillment;
 use chariott_common::proto::{
     common::{
         fulfillment::Fulfillment as FulfillmentEnum, inspect_fulfillment::Entry,
@@ -132,13 +131,9 @@ where
             }
             RuntimeBinding::SystemSubscribe(ess) => {
                 if let Some(IntentEnum::Subscribe(subscribe_intent)) = arg.intent {
-                    ess.serve_subscriptions(
-                        subscribe_intent.channel_id,
-                        subscribe_intent.sources.into_iter().map(|s| s.into()),
-                        |_| ValueEnum::Null(0),
-                    )?;
-
-                    fulfill_response(FulfillmentEnum::Subscribe(SubscribeFulfillment {}))
+                    fulfill_response(FulfillmentEnum::Subscribe(
+                        ess.serve_subscriptions(subscribe_intent, |_| ValueEnum::Null(0))?,
+                    ))
                 } else {
                     panic!("An intent other than 'Subscribe' was resolved to 'SystemSubscribe'.")
                 }
@@ -160,7 +155,8 @@ pub(crate) mod tests {
     use chariott_common::proto::{
         common::{
             fulfillment::Fulfillment as FulfillmentEnum, DiscoverFulfillment,
-            Fulfillment as FulfillmentMessage, InspectIntent, InvokeFulfillment, SubscribeIntent,
+            Fulfillment as FulfillmentMessage, InspectIntent, InvokeFulfillment,
+            SubscribeFulfillment, SubscribeIntent,
         },
         streaming::{channel_service_server::ChannelService, OpenRequest},
     };

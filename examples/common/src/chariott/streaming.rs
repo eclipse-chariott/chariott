@@ -3,10 +3,7 @@
 
 use chariott_common::{
     ess::Ess as InnerEss,
-    proto::common::{
-        fulfillment::Fulfillment, ReadFulfillment, ReadIntent, SubscribeFulfillment,
-        SubscribeIntent,
-    },
+    proto::common::{fulfillment::Fulfillment, ReadFulfillment, ReadIntent, SubscribeIntent},
 };
 use keyvalue::{InMemoryKeyValueStore, Observer};
 use std::sync::RwLock;
@@ -85,13 +82,8 @@ where
     T: Into<ProtoValue> + Clone + Send + Sync + 'static,
 {
     fn subscribe(&self, subscribe_intent: SubscribeIntent) -> Result<Fulfillment, Status> {
-        self.ess.as_ref().serve_subscriptions(
-            subscribe_intent.channel_id,
-            subscribe_intent.sources.into_iter().map(|v| v.into()),
-            |(_, v)| v.into(),
-        )?;
-
-        Ok(Fulfillment::Subscribe(SubscribeFulfillment {}))
+        let result = self.ess.as_ref().serve_subscriptions(subscribe_intent, |(_, v)| v.into())?;
+        Ok(Fulfillment::Subscribe(result))
     }
 
     fn read(&self, intent: ReadIntent) -> Fulfillment {

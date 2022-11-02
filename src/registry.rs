@@ -305,7 +305,10 @@ pub(crate) mod tests {
         },
     };
 
-    use chariott_common::{ess::Ess, proto::common::value::Value};
+    use chariott_common::{
+        ess::Ess,
+        proto::common::{value::Value, SubscribeIntent},
+    };
 
     use crate::{
         execution::tests::collect_when_stable,
@@ -651,8 +654,10 @@ pub(crate) mod tests {
                 let intent = IntentConfigurationBuilder::with_nonce(nonce).build();
                 subject
                     .serve_subscriptions(
-                        CLIENT_ID,
-                        [namespace_event(intent.namespace()).into()],
+                        SubscribeIntent {
+                            channel_id: CLIENT_ID.into(),
+                            sources: vec![namespace_event(intent.namespace())],
+                        },
                         |_| Value::Null(0),
                     )
                     .unwrap();
