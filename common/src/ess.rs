@@ -103,7 +103,7 @@ mod tests {
         common::{value::Value as ValueEnum, SubscribeIntent},
         streaming::{channel_service_server::ChannelService, OpenRequest},
     };
-    use tokio_stream::{Stream, StreamExt as _};
+    use tokio_stream::StreamExt as _;
     use tonic::{Code, Request};
 
     use super::Ess;
@@ -143,11 +143,13 @@ mod tests {
         subject.0.publish(EVENT_A, ());
         subject.0.publish(EVENT_B, ());
 
-        let result = collect_when_stable(response.into_inner())
-            .await
-            .into_iter()
-            .map(|e| e.unwrap())
-            .collect::<Vec<_>>();
+        let result = response
+            .into_inner()
+            .timeout(Duration::from_millis(100))
+            .take_while(|e| e.is_ok())
+            .map(|e| e.unwrap().unwrap())
+            .collect::<Vec<_>>()
+            .await;
 
         // assert sources
         assert_eq!(
@@ -182,15 +184,5 @@ mod tests {
 
     fn setup() -> Ess<()> {
         Default::default()
-    }
-
-    async fn collect_when_stable<T>(stream: impl Stream<Item = T>) -> Vec<T> {
-        static STABILIZATION_TIMEOUT: Duration = Duration::from_millis(100);
-        stream
-            .timeout(STABILIZATION_TIMEOUT)
-            .take_while(|e| e.is_ok())
-            .map(|e| e.unwrap())
-            .collect()
-            .await
     }
 }

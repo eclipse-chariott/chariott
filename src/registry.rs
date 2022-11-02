@@ -311,7 +311,7 @@ pub(crate) mod tests {
     };
 
     use crate::{
-        execution::tests::collect_when_stable,
+        execution::tests::StreamExt as _,
         registry::{Composite, ExecutionLocality, IntentKind, ServiceId},
     };
 
@@ -673,7 +673,8 @@ pub(crate) mod tests {
                 .collect::<Vec<_>>();
 
             // collect the result while there are still events incoming.
-            let mut result = collect_when_stable(stream)
+            let mut result = stream
+                .collect_when_stable()
                 .await
                 .into_iter()
                 .map(|e| e.unwrap().source)

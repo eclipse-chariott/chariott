@@ -152,6 +152,7 @@ pub(crate) mod tests {
         connection_provider::GrpcProvider,
         registry::{IntentConfiguration, IntentKind},
     };
+    use async_trait::async_trait;
     use chariott_common::proto::{
         common::{
             fulfillment::Fulfillment as FulfillmentEnum, DiscoverFulfillment,
@@ -415,7 +416,7 @@ pub(crate) mod tests {
 
         // assert that the correct subscription was served
         ess.as_ref().publish(EVENT, ());
-        let result = collect_when_stable(stream).await;
+        let result = stream.collect_when_stable().await;
         assert_eq!(1, result.len());
         assert_eq!(EVENT, result[0].as_ref().unwrap().source.as_str());
     }
@@ -433,13 +434,28 @@ pub(crate) mod tests {
         }
     }
 
-    pub async fn collect_when_stable<T>(stream: impl Stream<Item = T>) -> Vec<T> {
-        static STABILIZATION_TIMEOUT: Duration = Duration::from_millis(100);
-        stream
-            .timeout(STABILIZATION_TIMEOUT)
-            .take_while(|e| e.is_ok())
-            .map(|e| e.unwrap())
-            .collect()
-            .await
+    #[async_trait]
+    pub trait StreamExt: Stream {
+        /// Collects while the stream produces elements. If the stream does not
+        /// produce an element for longer than 100ms, it stops and returns a
+        /// collection of all emitted elements.
+        async fn collect_when_stable(self) -> Vec<Self::Item>;
+    }
+
+    #[async_trait]
+    impl<T> StreamExt for T
+    where
+        T: Stream + Send,
+        T::Item: Send,
+    {
+        async fn collect_when_stable(self) -> Vec<T::Item> {
+            static STABILIZATION_TIMEOUT: Duration = Duration::from_millis(100);
+
+            self.timeout(STABILIZATION_TIMEOUT)
+                .take_while(|e| e.is_ok())
+                .map(|e| e.unwrap())
+                .collect()
+                .await
+        }
     }
 }
