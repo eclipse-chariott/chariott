@@ -1,9 +1,15 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Portions Copyright (c) 2014 Jorge Aparicio
+// Licensed under the MIT license.
+
 pub trait OptionExt<T, E> {
     fn ok(self) -> Result<Option<T>, E>;
 }
 
 impl<T, E> OptionExt<T, E> for Option<Result<T, E>> {
     fn ok(self) -> Result<Option<T>, E> {
+        // Inspiration:
+        // https://github.com/rust-lang/rust-by-example/blob/8bbf12491b53ba85baf061e246349b570c704b65/src/error/multiple_error_types/option_result.md
         self.map_or(Ok(None), |r| r.map(Some))
     }
 }
