@@ -69,43 +69,37 @@ impl<T: RegistryObserver> Registry<T> {
         self.known_services.contains_key(key)
     }
 
-    pub fn prune(&mut self, timestamp: Instant) -> Option<Instant> {
+    fn prune_by(&mut self, predicate: impl Fn(&ServiceConfiguration, Instant) -> bool) -> bool {
         let initial_known_services_len = self.known_services.len();
 
-        // prune services
+        self.known_services.retain(|services, ts| predicate(services, *ts));
 
-        self.known_services.retain(|_, ts| timestamp.duration_since(*ts) < self.config.entry_ttl);
-
-        // if nothing changed then bail out early
-
-        if self.known_services.len() != initial_known_services_len {
-            // synchronize the intents to services map, tracking which changed
-
-            let mut changed_intent_configurations = Vec::new();
-
-            self.external_services_by_intent.retain(|ic, scs| {
-                let initial_scs_len = scs.len();
-                scs.retain(|sc| self.known_services.contains_key(sc));
-                if scs.len() != initial_scs_len {
-                    changed_intent_configurations.push(ic.clone());
-                }
-                !scs.is_empty()
-            });
-
-            // finally, tell observers about changes
-
-            for intent_configuration in changed_intent_configurations {
-                if let Some(service_configurations) =
-                    self.external_services_by_intent.get(&intent_configuration)
-                {
-                    self.observer
-                        .on_intent_config_change(intent_configuration, service_configurations);
-                } else {
-                    self.observer.on_intent_config_change(intent_configuration, []);
-                }
-            }
+        if self.known_services.len() == initial_known_services_len {
+            return false;
         }
 
+        // Prune the old service registrations and bindings.
+
+        self.external_services_by_intent.retain(|intent_configuration, services| {
+            let service_count = services.len();
+
+            services.retain(|service| self.known_services.contains_key(service));
+
+            if service_count != services.len() {
+                // If we changed the services, we need to refresh the broker.
+                self.observer
+                    .on_intent_config_change(intent_configuration.clone(), services.iter());
+            }
+
+            !services.is_empty()
+        });
+
+        true
+    }
+
+    pub fn prune(&mut self, timestamp: Instant) -> Option<Instant> {
+        let ttl = self.config.entry_ttl;
+        _ = self.prune_by(|_, ts| timestamp.duration_since(ts) < ttl);
         self.known_services.iter().map(|(_, ts)| *ts).min()
     }
 
@@ -132,25 +126,7 @@ impl<T: RegistryObserver> Registry<T> {
         // Upserting a registration should not happen frequently and has worse
         // performance than service resolution.
 
-        // Prune the old service registrations and bindings.
-
-        self.external_services_by_intent.retain(|intent_configuration, services| {
-            let service_count = services.len();
-
-            services.retain(|service| service.id != service_configuration.id);
-
-            if service_count != services.len() {
-                // If we changed the services, we need to refresh the broker.
-                self.observer
-                    .on_intent_config_change(intent_configuration.clone(), services.iter());
-            }
-
-            !services.is_empty()
-        });
-
-        // Remove the old service registration from the known services lookup.
-
-        self.known_services.retain(|service, _| service.id != service_configuration.id);
+        _ = self.prune_by(|service, _| service.id != service_configuration.id);
 
         // Add the new service registrations and resolve the new Bindings to be
         // used for each intent.
