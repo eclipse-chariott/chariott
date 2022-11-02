@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1667375147147,
+  "lastUpdate": 1667412484488,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -702,6 +702,84 @@ window.BENCHMARK_DATA = {
             "value": 5,
             "unit": "Millisecond",
             "range": "p95=9"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "daniellueddecke@users.noreply.github.com",
+            "name": "Daniel Lueddecke",
+            "username": "daniellueddecke"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6044c0cf92768a2dcc2a4f618744dbc98dc2305c",
+          "message": "Fix Chariott typos in read-me doc (#17)",
+          "timestamp": "2022-11-02T16:08:08+01:00",
+          "tree_id": "a20d8fb6f9a80575eb475007d2a83e4b6e8a0ae2",
+          "url": "https://github.com/eclipse/chariott/commit/6044c0cf92768a2dcc2a4f618744dbc98dc2305c"
+        },
+        "date": 1667412483271,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2008",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 34,
+            "unit": "Percent",
+            "range": "p95=36"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6402,
+            "unit": "Bytes",
+            "range": "p95=6607"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 7,
+            "unit": "Millisecond",
+            "range": "p95=12"
           }
         ]
       }
