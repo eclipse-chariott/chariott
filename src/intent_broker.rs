@@ -161,11 +161,11 @@ mod tests {
         sync::Arc,
     };
 
+    use chariott_common::ess::Ess;
     use url::Url;
 
     use crate::{
         connection_provider::{GrpcProvider, ReusableProvider},
-        ess::Ess,
         execution::RuntimeBinding,
         intent_broker::{IntentBroker, Observer as _},
         registry::{

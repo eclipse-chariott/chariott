@@ -2,9 +2,9 @@
 // Licensed under the MIT license.
 
 use chariott::chariott_grpc::ChariottServer;
-use chariott::ess::Ess;
 use chariott::registry::{Composite, Registry};
 use chariott::IntentBroker;
+use chariott_common::ess::Ess;
 use chariott_common::proto::runtime::chariott_service_server::ChariottServiceServer;
 use chariott_common::proto::streaming::channel_service_server::ChannelServiceServer;
 use chariott_common::shutdown::RouterExt as _;

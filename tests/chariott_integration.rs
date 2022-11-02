@@ -4,12 +4,12 @@
 use std::sync::atomic::{AtomicU16, Ordering};
 
 use async_trait::async_trait;
-use chariott::ess::Ess;
 use chariott::registry::{
     ExecutionLocality, IntentConfiguration, IntentKind, ServiceConfiguration, ServiceId,
 };
 use chariott::{chariott_grpc::ChariottServer, registry::Registry, IntentBroker};
 use chariott_common::error::{Error, ResultExt as _};
+use chariott_common::ess::Ess;
 use chariott_common::proto::common::{intent::Intent as InnerIntent, Intent};
 use chariott_common::proto::runtime::chariott_service_server::ChariottService;
 use chariott_common::proto::runtime::{FulfillRequest, FulfillResponse};

@@ -135,6 +135,7 @@ where
                     ess.serve_subscriptions(
                         subscribe_intent.channel_id,
                         subscribe_intent.sources.into_iter().map(|s| s.into()),
+                        |_| ValueEnum::Null(0),
                     )?;
 
                     fulfill_response(FulfillmentEnum::Subscribe(SubscribeFulfillment {}))
@@ -150,9 +151,10 @@ where
 
 #[cfg(test)]
 pub(crate) mod tests {
+    use std::time::Duration;
+
     use crate::{
         connection_provider::GrpcProvider,
-        ess::tests::collect_when_stable,
         registry::{IntentConfiguration, IntentKind},
     };
     use chariott_common::proto::{
@@ -162,6 +164,8 @@ pub(crate) mod tests {
         },
         streaming::{channel_service_server::ChannelService, OpenRequest},
     };
+    use futures::Stream;
+    use tokio_stream::StreamExt as _;
     use tonic::{Code, Request};
 
     use super::*;
@@ -414,7 +418,7 @@ pub(crate) mod tests {
         );
 
         // assert that the correct subscription was served
-        ess.publish(EVENT);
+        ess.as_ref().publish(EVENT, ());
         let result = collect_when_stable(stream).await;
         assert_eq!(1, result.len());
         assert_eq!(EVENT, result[0].as_ref().unwrap().source.as_str());
@@ -431,5 +435,15 @@ pub(crate) mod tests {
             Some(FulfillmentEnum::Inspect(InspectFulfillment { entries })) => entries,
             _ => panic!("Wrong fulfillment"),
         }
+    }
+
+    pub async fn collect_when_stable<T>(stream: impl Stream<Item = T>) -> Vec<T> {
+        static STABILIZATION_TIMEOUT: Duration = Duration::from_millis(100);
+        stream
+            .timeout(STABILIZATION_TIMEOUT)
+            .take_while(|e| e.is_ok())
+            .map(|e| e.unwrap())
+            .collect()
+            .await
     }
 }

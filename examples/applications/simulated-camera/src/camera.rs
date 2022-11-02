@@ -4,7 +4,6 @@
 use async_stream::try_stream;
 use chariott_common::error::Error;
 use core::panic;
-use examples_common::chariott::streaming::EventId;
 use examples_common::chariott::value::Value;
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -67,7 +66,7 @@ impl CameraLogic {
     pub async fn camera_loop(&self, cancellation_token: CancellationToken) -> Result<(), Error> {
         let images = self.get_images_from_folder()?;
         let mut cycle = images.iter().cycle();
-        let mut hashmap: HashMap<EventId, (Instant, Duration)> = HashMap::new();
+        let mut hashmap: HashMap<Box<str>, (Instant, Duration)> = HashMap::new();
         hashmap.insert("camera.2fpm".into(), (Instant::now(), Duration::from_secs(30)));
         hashmap.insert("camera.6fpm".into(), (Instant::now(), Duration::from_secs(10)));
         hashmap.insert("camera.12fpm".into(), (Instant::now(), Duration::from_secs(5)));

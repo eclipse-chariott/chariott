@@ -7,6 +7,8 @@ use std::collections::{HashMap, HashSet};
 use chariott_common::error::Error;
 use url::Url;
 
+use crate::ess::Ess;
+
 const SYSTEM_NAMESPACE: &str = "system";
 const SYSTEM_NAMESPACE_PREFIX: &str = "system.";
 
@@ -21,6 +23,22 @@ pub enum Change<'a> {
 pub trait Observer {
     /// Handles observation on changed registry state.
     fn on_change<'a>(&self, changes: impl Iterator<Item = Change<'a>> + Clone);
+}
+
+impl Observer for Ess {
+    fn on_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
+        for namespace in changes
+            .into_iter()
+            .filter_map(|change| match change {
+                Change::Add(intent, _) => Some(intent.namespace()),
+                Change::Modify(_, _) => None,
+                Change::Remove(intent) => Some(intent.namespace()),
+            })
+            .collect::<HashSet<_>>()
+        {
+            self.as_ref().publish(format!("namespaces[{}]", namespace).as_str(), ());
+        }
+    }
 }
 
 pub struct Composite<T, U> {
@@ -279,12 +297,20 @@ impl fmt::Display for IntentKind {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use std::sync::{
-        atomic::{AtomicBool, Ordering},
-        Mutex,
+    use std::{
+        collections::HashSet,
+        sync::{
+            atomic::{AtomicBool, Ordering},
+            Mutex,
+        },
     };
 
-    use crate::registry::{Composite, ExecutionLocality, IntentKind, ServiceId};
+    use chariott_common::{ess::Ess, proto::common::value::Value};
+
+    use crate::{
+        execution::tests::collect_when_stable,
+        registry::{Composite, ExecutionLocality, IntentKind, ServiceId},
+    };
 
     use super::{Change, IntentConfiguration, Observer, Registry, ServiceConfiguration};
 
@@ -566,6 +592,95 @@ pub(crate) mod tests {
         // assert
         assert!(subject.left.invoked.load(Ordering::Relaxed));
         assert!(subject.right.invoked.load(Ordering::Relaxed));
+    }
+
+    #[tokio::test]
+    async fn on_change_notifies_when_namespace_change_detected() {
+        const INTENT_A: &str = "A";
+        const INTENT_B: &str = "B";
+        const INTENT_C: &str = "C";
+
+        fn intent(nonce: &str) -> IntentConfiguration {
+            IntentConfigurationBuilder::with_nonce(nonce).build()
+        }
+
+        let services = HashSet::new(); // The observe logic does not care about which services serve a specific intent.
+        let intent_a = intent(INTENT_A);
+        let intent_b = intent(INTENT_B);
+        let intent_c = intent(INTENT_C);
+
+        test([Change::Add(&intent_a, &services)], [&intent_a]).await;
+        test(
+            [Change::Add(&intent_a, &services), Change::Modify(&intent_b, &services)],
+            [&intent_a],
+        )
+        .await;
+        test([Change::Modify(&intent_b, &services), Change::Remove(&intent_a)], [&intent_a]).await;
+        test(
+            [Change::Add(&intent_b, &services), Change::Remove(&intent_a)],
+            [&intent_b, &intent_a],
+        )
+        .await;
+        test(
+            [
+                Change::Add(&intent_b, &services),
+                Change::Remove(&intent_a),
+                Change::Modify(&intent_c, &services),
+            ],
+            [&intent_a, &intent_b],
+        )
+        .await;
+        test([Change::Modify(&intent_a, &services)], []).await;
+
+        async fn test<'a, 'b>(
+            changes: impl IntoIterator<Item = Change<'a>>,
+            expected_events: impl IntoIterator<Item = &'b IntentConfiguration>,
+        ) {
+            fn namespace_event(namespace: &str) -> String {
+                format!("namespaces[{}]", namespace)
+            }
+
+            // arrange
+            const CLIENT_ID: &str = "CLIENT";
+
+            let subject = Ess::new();
+            let (_, stream) = subject.as_ref().read_events(CLIENT_ID.into());
+
+            // always subscribe to all possible namespace changes.
+            for nonce in [INTENT_A, INTENT_B, INTENT_C] {
+                let intent = IntentConfigurationBuilder::with_nonce(nonce).build();
+                subject
+                    .serve_subscriptions(
+                        CLIENT_ID,
+                        [namespace_event(intent.namespace()).into()],
+                        |_| Value::Null(0),
+                    )
+                    .unwrap();
+            }
+
+            // act
+            subject.on_change(changes.into_iter().collect::<Vec<_>>().into_iter());
+
+            // assert
+            let mut expected_events = expected_events
+                .into_iter()
+                .map(|e| namespace_event(e.namespace()))
+                .collect::<Vec<_>>();
+
+            // collect the result while there are still events incoming.
+            let mut result = collect_when_stable(stream)
+                .await
+                .into_iter()
+                .map(|e| e.unwrap().source)
+                .collect::<Vec<_>>();
+
+            // namespace change events can be delivered out of order. Sort
+            // before comparing.
+            result.sort();
+            expected_events.sort();
+
+            assert_eq!(result, expected_events);
+        }
     }
 
     struct MockBroker {

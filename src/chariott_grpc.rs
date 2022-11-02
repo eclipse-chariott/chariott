@@ -174,10 +174,10 @@ fn map_locality_value(locality: i32) -> Result<ExecutionLocality, Status> {
 
 #[cfg(test)]
 mod tests {
-    use crate::ess::Ess;
     use crate::execution::RuntimeBinding;
     use crate::registry::{Change, Observer, Registry};
     use crate::{connection_provider::GrpcProvider, execution::tests::TestBinding};
+    use chariott_common::ess::Ess;
     use chariott_common::proto::{
         common, runtime as runtime_api,
         runtime::{

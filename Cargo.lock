@@ -450,16 +450,20 @@ dependencies = [
 name = "chariott-common"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
+ "ess",
  "prost",
  "prost-types",
  "regex",
  "serde",
  "tempfile",
  "tokio",
+ "tokio-stream",
  "tokio-util",
  "tonic",
  "tonic-build",
  "tracing",
+ "uuid",
 ]
 
 [[package]]
