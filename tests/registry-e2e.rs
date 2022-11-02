@@ -16,7 +16,7 @@ use tokio::time::*;
 mod common;
 
 #[tokio::test]
-async fn provider_is_registered_on_inspection() -> Result<(), anyhow::Error> {
+async fn expired_registrations_are_pruned_after_ttl() -> Result<(), anyhow::Error> {
     // arrange
     let namespace = format!("e2e.registration.{}", get_uuid());
 
