@@ -19,6 +19,9 @@
 /// Generic error handling
 pub mod error;
 
+/// Extension traits
+pub mod ext;
+
 // Configuration related utilites
 pub mod config;
 

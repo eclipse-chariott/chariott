@@ -2,10 +2,10 @@
 // Licensed under the MIT license.
 
 use chariott::chariott_grpc::ChariottServer;
-use chariott::ext::OptionExt as _;
 use chariott::registry::{self, Registry};
 use chariott::IntentBroker;
 use chariott_common::config::try_env;
+use chariott_common::ext::OptionExt as _;
 use chariott_common::proto::runtime::chariott_service_server::ChariottServiceServer;
 use chariott_common::shutdown::{ctrl_c_cancellation, RouterExt as _};
 use std::sync::Arc;
