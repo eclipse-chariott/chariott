@@ -514,21 +514,44 @@ pub(crate) mod tests {
 
             let mut registry = create_registry();
 
-            let mut builder = ServiceConfigurationBuilder::dispense('a'..).into_iter();
+            let mut service_builder = ServiceConfigurationBuilder::dispense('a'..).into_iter();
+            let mut intent_builder = IntentConfigurationBuilder::dispense('a'..).into_iter();
 
-            let first = builder.next().unwrap().build();
+            let first_service = service_builder.next().unwrap().build();
+            let first_intent = intent_builder.next().unwrap().build();
             time += first_registration_since_epoch;
-            registry.upsert(first.clone(), vec![], time).unwrap();
+            registry.upsert(first_service.clone(), vec![first_intent.clone()], time).unwrap();
 
-            let second = builder.next().unwrap().build();
+            let second_service = service_builder.next().unwrap().build();
+            let second_intent = intent_builder.next().unwrap().build();
             time += second_since_first_registration;
-            registry.upsert(second.clone(), vec![], time).unwrap();
+            registry.upsert(second_service.clone(), vec![second_intent.clone()], time).unwrap();
+
+            registry.observer.clear();
 
             time += prune_since_second_registration;
             registry.prune(time);
 
-            assert_eq!(expect_first_registered, registry.has_service(&first));
-            assert_eq!(expect_second_registered, registry.has_service(&second));
+            assert_eq!(expect_first_registered, registry.has_service(&first_service));
+            assert_eq!(expect_second_registered, registry.has_service(&second_service));
+
+            let refreshes = registry.observer.refresh_calls.lock().unwrap();
+            // remove the refreshes due to upserts
+            let expected_refreshes_len =
+                !expect_first_registered as usize + !expect_second_registered as usize;
+
+            assert_eq!(expected_refreshes_len, refreshes.len());
+
+            for (ic, scs) in refreshes.iter() {
+                assert!(scs.is_empty());
+                if *ic == first_intent {
+                    assert!(!expect_first_registered);
+                } else if *ic == second_intent {
+                    assert!(!expect_second_registered);
+                } else {
+                    panic!("unhandled case?");
+                }
+            }
         }
     }
 
@@ -680,8 +703,8 @@ pub(crate) mod tests {
 
         pub fn dispense(
             nonce: impl IntoIterator<Item = impl Display>,
-        ) -> impl IntoIterator<Item = ServiceConfigurationBuilder> {
-            nonce.into_iter().map(ServiceConfigurationBuilder::with_nonce)
+        ) -> impl IntoIterator<Item = Self> {
+            nonce.into_iter().map(Self::with_nonce)
         }
 
         pub fn with_nonce(nonce: impl std::fmt::Display) -> Self {
@@ -725,7 +748,13 @@ pub(crate) mod tests {
             Self::with_nonce("0")
         }
 
-        pub fn with_nonce(nonce: &str) -> Self {
+        pub fn dispense(
+            nonce: impl IntoIterator<Item = impl Display>,
+        ) -> impl IntoIterator<Item = Self> {
+            nonce.into_iter().map(Self::with_nonce)
+        }
+
+        pub fn with_nonce(nonce: impl std::fmt::Display) -> Self {
             Self(IntentConfiguration::new(format!("namespace-{nonce}"), IntentKind::Discover))
         }
 
