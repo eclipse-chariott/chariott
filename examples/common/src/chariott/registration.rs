@@ -140,7 +140,7 @@ impl Builder {
         }
     }
 
-    async fn register_once(
+    pub async fn register_once(
         &self,
         client: &mut Option<ChariottServiceClient<Channel>>,
         first_iteration: bool,

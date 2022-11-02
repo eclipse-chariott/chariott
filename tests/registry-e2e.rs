@@ -1,0 +1,50 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
+use std::time::Duration;
+
+use chariott_common::proto::runtime::{
+    intent_registration::Intent, intent_service_registration::ExecutionLocality,
+};
+use common::get_uuid;
+use examples_common::chariott::{
+    api::{Chariott, GrpcChariott},
+    registration::Builder as RegistrationBuilder,
+};
+use tokio::time::*;
+
+mod common;
+
+#[tokio::test]
+async fn provider_is_registered_on_inspection() -> Result<(), anyhow::Error> {
+    // arrange
+    let namespace = format!("e2e.registration.{}", get_uuid());
+
+    let builder = RegistrationBuilder::new(
+        "e2e",
+        "1.0.0",
+        "http://localhost/".parse().unwrap(),
+        &namespace,
+        [Intent::Inspect],
+        ExecutionLocality::Local,
+    );
+
+    let mut chariott = setup().await;
+
+    // act
+    builder.register_once(&mut None, true).await?;
+
+    let initial_entries = chariott.inspect("system.registry", namespace.clone()).await?;
+    sleep(Duration::from_secs(5)).await;
+    let entries = chariott.inspect("system.registry", namespace).await?;
+
+    // assert
+    assert_eq!(1, initial_entries.len());
+    assert_eq!(0, entries.len());
+
+    Ok(())
+}
+
+async fn setup() -> impl Chariott {
+    GrpcChariott::connect().await.unwrap()
+}
