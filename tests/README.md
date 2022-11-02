@@ -7,13 +7,16 @@ To run the tests, you can either use the CI, or run the tests locally.
 
 ## Running the tests locally
 
-1. Run `cargo build --release -p chariott -p kv-app` to build the required projects.
-2. Run Chariott and the Key-Value app in the background, using
-   `CHARIOTT_REGISTRY_TTL_SECS=2 ./target/release/chariott &` and
-   `./target/release/kv-app &` (assuming you are in the repository root). If
-   you want to display debug logs, make sure to set the log level via the
-   `RUST_LOG` environment variable.
-3. Execute the tests using `cargo test --test "*e2e"`.
+Assuming the current working directory is the project root, run:
+
+```sh
+cargo build --release -p chariott -p kv-app
+CHARIOTT_REGISTRY_TTL_SECS=2 ./target/release/chariott &
+./target/release/kv-app &
+cargo test --test '*e2e'
+```
+
+If you want to display debug logs, make sure to set the log level via the `RUST_LOG` environment variable.
 
 ## Running the tests locally with Docker in WSL2
 
