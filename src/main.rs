@@ -1,15 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-mod ext;
-
 use chariott::chariott_grpc::ChariottServer;
+use chariott::ext::OptionExt as _;
 use chariott::registry::{self, Registry};
 use chariott::IntentBroker;
 use chariott_common::config::try_env;
 use chariott_common::proto::runtime::chariott_service_server::ChariottServiceServer;
 use chariott_common::shutdown::{ctrl_c_cancellation, RouterExt as _};
-use ext::OptionExt as _;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::{select, time::sleep_until, time::Instant as TokioInstant};
