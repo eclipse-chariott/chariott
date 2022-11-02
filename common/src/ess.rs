@@ -19,8 +19,8 @@ type InnerEss<T> = EventSubSystem<Box<str>, Box<str>, T, Result<Event, Status>>;
 
 /// [`SharedEss`](SharedEss) integrates the reusable
 /// [`EventSubSystem`](EventSubSystem) component with the Chariott gRPC
-/// streaming contract. Cloning [`Ess`](Ess) is cheap, it will not create a new
-/// instance but refer to the same underlying instance instead.
+/// streaming contract. Cloning [`SharedEss`](SharedEss) is cheap, it will not
+/// create a new instance but refer to the same underlying instance instead.
 #[derive(Clone)]
 pub struct SharedEss<T>(Arc<InnerEss<T>>);
 
