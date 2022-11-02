@@ -65,12 +65,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let prune_loop = {
         use std::time::Instant;
-        use tokio::{select, spawn, time::sleep_until, time::Instant as TokioInstant};
+        use tokio::{select, time::sleep_until, time::Instant as TokioInstant};
 
         let ctrl_c_cancellation_token = ctrl_c_cancellation_token.clone();
         let error_cancellation_token = error_cancellation_token.child_token();
 
-        spawn(async move {
+        async move {
             tracing::debug!("Prune loop running (TTL = {registry_entry_ttl:?}).");
             loop {
                 let wakeup_deadline = server.registry_do(|reg| {
@@ -88,7 +88,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
             }
-        })
+        }
     };
 
     let router_serve = async {
@@ -101,10 +101,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    let (router_serve_result, prune_loop_result) = tokio::join!(router_serve, prune_loop);
+    let (router_serve_result, _) = tokio::join!(router_serve, prune_loop);
 
     router_serve_result?;
-    prune_loop_result?;
 
     Ok(())
 }
