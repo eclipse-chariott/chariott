@@ -26,6 +26,10 @@ license = "MIT"
 name = "store-e2e"
 test = false
 
+[[test]]
+name = "registry-e2e"
+test = false
+
 [dependencies]
 async-recursion = "1.0"
 async-trait = { workspace = true }
