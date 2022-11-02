@@ -12,7 +12,6 @@ use chariott_common::shutdown::{ctrl_c_cancellation, RouterExt as _};
 use ext::OptionExt as _;
 use std::sync::Arc;
 use std::time::Duration;
-use std::time::SystemTime;
 use tokio_util::sync::CancellationToken;
 use tonic::transport::Server;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -65,7 +64,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let ctrl_c_cancellation_token = ctrl_c_cancellation();
 
     let prune_loop = {
-        use tokio::{select, spawn, time::sleep};
+        use std::time::Instant;
+        use tokio::{select, spawn, time::sleep_until, time::Instant as TokioInstant};
 
         let ctrl_c_cancellation_token = ctrl_c_cancellation_token.clone();
         let error_cancellation_token = error_cancellation_token.child_token();
@@ -73,9 +73,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         spawn(async move {
             tracing::debug!("Prune loop running (TTL = {registry_entry_ttl:?}).");
             loop {
-                server.registry_do(|reg| reg.prune(SystemTime::now()));
+                let wakeup_deadline = server.registry_do(|reg| {
+                    reg.prune(Instant::now()).unwrap_or(Instant::now() + registry_entry_ttl)
+                });
                 select! {
-                    _ = sleep(registry_entry_ttl) => {}
+                    _ = sleep_until(TokioInstant::from_std(wakeup_deadline)) => {}
                     _ = error_cancellation_token.cancelled() => {
                         tracing::debug!("Prune loop aborting due to server error.");
                         break;

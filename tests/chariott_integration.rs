@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 use std::sync::atomic::{AtomicU16, Ordering};
-use std::time::SystemTime;
+use std::time::Instant;
 
 use async_trait::async_trait;
 use chariott::registry::{
@@ -172,7 +172,7 @@ async fn setup_multiple(providers: impl IntoIterator<Item = ProviderSetup>) -> S
             .upsert(
                 ServiceConfiguration::new(ServiceId::new(name, "1.0.0"), url, locality),
                 vec![IntentConfiguration::new(namespace.clone(), IntentKind::Invoke)],
-                SystemTime::now(),
+                Instant::now(),
             )
             .unwrap();
     }

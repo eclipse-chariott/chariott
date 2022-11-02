@@ -3,7 +3,7 @@
 
 use core::fmt;
 use std::collections::{HashMap, HashSet};
-use std::time::{Duration, SystemTime};
+use std::time::{Duration, Instant};
 
 use chariott_common::error::Error;
 use url::Url;
@@ -47,7 +47,7 @@ impl Default for Config {
 #[derive(Clone, Debug)]
 pub struct Registry<T: RegistryObserver> {
     external_services_by_intent: HashMap<IntentConfiguration, HashSet<ServiceConfiguration>>,
-    known_services: HashMap<ServiceConfiguration, SystemTime>,
+    known_services: HashMap<ServiceConfiguration, Instant>,
     observer: T,
     config: Config,
 }
@@ -69,51 +69,51 @@ impl<T: RegistryObserver> Registry<T> {
         self.known_services.contains_key(key)
     }
 
-    pub fn prune(&mut self, timestamp: SystemTime) {
+    pub fn prune(&mut self, timestamp: Instant) -> Option<Instant> {
         let initial_known_services_len = self.known_services.len();
 
         // prune services
 
-        self.known_services
-            .retain(|_, ts| timestamp.duration_since(*ts).unwrap() < self.config.entry_ttl);
+        self.known_services.retain(|_, ts| timestamp.duration_since(*ts) < self.config.entry_ttl);
 
         // if nothing changed then bail out early
 
-        if self.known_services.len() == initial_known_services_len {
-            return;
+        if self.known_services.len() != initial_known_services_len {
+            // synchronize the intents to services map, tracking which changed
+
+            let mut changed_intent_configurations = Vec::new();
+
+            self.external_services_by_intent.retain(|ic, scs| {
+                let initial_scs_len = scs.len();
+                scs.retain(|sc| self.known_services.contains_key(sc));
+                if scs.len() != initial_scs_len {
+                    changed_intent_configurations.push(ic.clone());
+                }
+                !scs.is_empty()
+            });
+
+            // finally, tell observers about changes
+
+            for intent_configuration in changed_intent_configurations {
+                if let Some(service_configurations) =
+                    self.external_services_by_intent.get(&intent_configuration)
+                {
+                    self.observer
+                        .on_intent_config_change(intent_configuration, service_configurations);
+                } else {
+                    self.observer.on_intent_config_change(intent_configuration, []);
+                }
+            }
         }
 
-        // synchronize the intents to services map, tracking which changed
-
-        let mut changed_intent_configurations = Vec::new();
-
-        self.external_services_by_intent.retain(|ic, scs| {
-            let initial_scs_len = scs.len();
-            scs.retain(|sc| self.known_services.contains_key(sc));
-            if scs.len() != initial_scs_len {
-                changed_intent_configurations.push(ic.clone());
-            }
-            !scs.is_empty()
-        });
-
-        // finally, tell observers about changes
-
-        for intent_configuration in changed_intent_configurations {
-            if let Some(service_configurations) =
-                self.external_services_by_intent.get(&intent_configuration)
-            {
-                self.observer.on_intent_config_change(intent_configuration, service_configurations);
-            } else {
-                self.observer.on_intent_config_change(intent_configuration, []);
-            }
-        }
+        self.known_services.iter().map(|(_, ts)| *ts).min()
     }
 
     pub fn upsert(
         &mut self,
         service_configuration: ServiceConfiguration,
         intent_configurations: Vec<IntentConfiguration>,
-        timestamp: SystemTime,
+        timestamp: Instant,
     ) -> Result<(), Error> {
         fn starts_with_ignore_ascii_case(string: &str, prefix: &str) -> bool {
             string.len() >= prefix.len()
@@ -277,10 +277,10 @@ impl fmt::Display for IntentKind {
 #[cfg(test)]
 pub(crate) mod tests {
     use std::sync::Mutex;
-    use std::time::SystemTime;
+    use std::time::Instant;
 
-    fn now() -> SystemTime {
-        SystemTime::now()
+    fn now() -> Instant {
+        Instant::now()
     }
 
     use crate::registry::{ExecutionLocality, IntentKind, ServiceId};
@@ -512,7 +512,7 @@ pub(crate) mod tests {
         ) {
             // arrange
 
-            let mut time: SystemTime = SystemTime::UNIX_EPOCH;
+            let mut time: Instant = Instant::now();
 
             let mut registry = create_registry();
 

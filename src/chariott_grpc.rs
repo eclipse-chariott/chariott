@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 use std::sync::{Arc, RwLock};
-use std::time::SystemTime;
+use std::time::Instant;
 
 use tonic::{async_trait, Request, Response, Status};
 use url::Url;
@@ -36,9 +36,9 @@ impl ChariottServer {
         Self { registry: Arc::new(RwLock::new(registry)), broker }
     }
 
-    pub fn registry_do(&self, f: impl FnOnce(&mut Registry<IntentBroker>)) {
+    pub fn registry_do<T>(&self, f: impl FnOnce(&mut Registry<IntentBroker>) -> T) -> T {
         let mut registry = self.registry.write().unwrap();
-        f(&mut registry);
+        f(&mut registry)
     }
 
     fn create_configruation_from_registration(
@@ -112,7 +112,7 @@ impl runtime_api::chariott_service_server::ChariottService for ChariottServer {
         self.registry
             .write()
             .unwrap()
-            .upsert(svc_cfg, intents?, SystemTime::now())
+            .upsert(svc_cfg, intents?, Instant::now())
             .map_err(|e| Status::unknown(e.message()))?;
         Ok(Response::new(runtime_api::RegisterResponse {}))
     }
