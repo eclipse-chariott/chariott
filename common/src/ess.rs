@@ -17,26 +17,26 @@ use uuid::Uuid;
 
 type InnerEss<T> = EventSubSystem<Box<str>, Box<str>, T, Result<Event, Status>>;
 
-/// [`Ess`](Ess) (short for event sub-system) integrates the reusable
+/// [`SharedEss`](SharedEss) integrates the reusable
 /// [`EventSubSystem`](EventSubSystem) component with the Chariott gRPC
 /// streaming contract. Cloning [`Ess`](Ess) is cheap, it will not create a new
 /// instance but refer to the same underlying instance instead.
 #[derive(Clone)]
-pub struct Ess<T>(Arc<InnerEss<T>>);
+pub struct SharedEss<T>(Arc<InnerEss<T>>);
 
-impl<T: Clone> Ess<T> {
+impl<T: Clone> SharedEss<T> {
     pub fn new() -> Self {
         Self(Arc::new(EventSubSystem::new()))
     }
 }
 
-impl<T: Clone> Default for Ess<T> {
+impl<T: Clone> Default for SharedEss<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T: Clone + Send + 'static> Ess<T> {
+impl<T: Clone + Send + 'static> SharedEss<T> {
     pub fn serve_subscriptions(
         &self,
         subscribe_intent: SubscribeIntent,
@@ -68,7 +68,7 @@ impl<T: Clone + Send + 'static> Ess<T> {
 }
 
 #[async_trait]
-impl<T> ChannelService for Ess<T>
+impl<T> ChannelService for SharedEss<T>
 where
     T: Clone + Send + Sync + 'static,
 {
@@ -88,7 +88,7 @@ where
     }
 }
 
-impl<T> AsRef<InnerEss<T>> for Ess<T> {
+impl<T> AsRef<InnerEss<T>> for SharedEss<T> {
     fn as_ref(&self) -> &InnerEss<T> {
         self.0.as_ref()
     }
@@ -106,7 +106,7 @@ mod tests {
     use tokio_stream::StreamExt as _;
     use tonic::{Code, Request};
 
-    use super::Ess;
+    use super::SharedEss;
 
     #[tokio::test]
     async fn open_should_set_channel_id() {
@@ -182,7 +182,7 @@ mod tests {
         assert_eq!("The specified client does not exist.", result.message());
     }
 
-    fn setup() -> Ess<()> {
+    fn setup() -> SharedEss<()> {
         Default::default()
     }
 }

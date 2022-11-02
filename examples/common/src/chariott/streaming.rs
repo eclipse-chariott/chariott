@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 use chariott_common::{
-    ess::Ess as InnerEss,
+    ess::SharedEss as InnerEss,
     proto::common::{fulfillment::Fulfillment, ReadFulfillment, ReadIntent, SubscribeIntent},
 };
 use keyvalue::{InMemoryKeyValueStore, Observer};

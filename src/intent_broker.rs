@@ -161,7 +161,7 @@ mod tests {
         sync::Arc,
     };
 
-    use chariott_common::ess::Ess;
+    use chariott_common::ess::SharedEss;
     use url::Url;
 
     use crate::{
@@ -177,7 +177,8 @@ mod tests {
     #[test]
     fn when_empty_does_not_resolve() {
         // arrange
-        let subject = IntentBroker::new("https://localhost:4243".parse().unwrap(), Ess::new());
+        let subject =
+            IntentBroker::new("https://localhost:4243".parse().unwrap(), SharedEss::new());
 
         // act + assert
         assert!(subject.resolve(&IntentConfigurationBuilder::new().build()).is_none());
@@ -416,7 +417,7 @@ mod tests {
         }
 
         fn build(self) -> IntentBroker {
-            let broker = IntentBroker::new(Self::STREAMING_URL.parse().unwrap(), Ess::new());
+            let broker = IntentBroker::new(Self::STREAMING_URL.parse().unwrap(), SharedEss::new());
 
             broker.on_change(
                 [Change::Add(&self.intent, &HashSet::from([self.service.build()]))].into_iter(),
@@ -436,7 +437,8 @@ mod tests {
         }
 
         fn combine(setups: impl IntoIterator<Item = Setup>) -> IntentBroker {
-            let broker = IntentBroker::new("https://localhost:4243".parse().unwrap(), Ess::new());
+            let broker =
+                IntentBroker::new("https://localhost:4243".parse().unwrap(), SharedEss::new());
 
             let services_by_intent = setups.into_iter().fold(HashMap::new(), |mut acc, s| {
                 acc.entry(s.intent.clone()).or_insert_with(Vec::new).push(s.service);

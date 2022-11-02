@@ -306,7 +306,7 @@ pub(crate) mod tests {
     };
 
     use chariott_common::{
-        ess::Ess,
+        ess::SharedEss,
         proto::common::{value::Value, SubscribeIntent},
     };
 
@@ -646,7 +646,7 @@ pub(crate) mod tests {
             // arrange
             const CLIENT_ID: &str = "CLIENT";
 
-            let subject = Ess::new();
+            let subject = SharedEss::new();
             let (_, stream) = subject.as_ref().read_events(CLIENT_ID.into());
 
             // always subscribe to all possible namespace changes.

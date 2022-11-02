@@ -4,7 +4,7 @@
 use chariott::chariott_grpc::ChariottServer;
 use chariott::registry::{Composite, Registry};
 use chariott::IntentBroker;
-use chariott_common::ess::Ess;
+use chariott_common::ess::SharedEss;
 use chariott_common::proto::runtime::chariott_service_server::ChariottServiceServer;
 use chariott_common::proto::streaming::channel_service_server::ChannelServiceServer;
 use chariott_common::shutdown::RouterExt as _;
@@ -30,7 +30,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     collector.init();
 
-    let ess = Ess::new();
+    let ess = SharedEss::new();
     let broker =
         IntentBroker::new(format!("http://localhost:{PORT}").parse().unwrap(), ess.clone());
     let registry = Registry::new(Composite::new(broker.clone(), ess.clone()));
