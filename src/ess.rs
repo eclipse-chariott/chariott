@@ -49,6 +49,11 @@ impl Ess {
 
         Ok(())
     }
+
+    #[cfg(test)]
+    pub fn publish(&self, id: &str) {
+        self.0.publish(id, ());
+    }
 }
 
 impl Default for Ess {
@@ -92,7 +97,7 @@ impl ChannelService for Ess {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use std::{collections::HashSet, time::Duration};
 
     use chariott_common::proto::{
@@ -265,7 +270,7 @@ mod tests {
     // Takes values from a stream as long as the stream is still producing
     // values. If the stream did not produce a value for 100ms, it ends the
     // stream.
-    async fn collect_when_stable<T>(stream: impl Stream<Item = T>) -> Vec<T> {
+    pub async fn collect_when_stable<T>(stream: impl Stream<Item = T>) -> Vec<T> {
         static STABILIZATION_TIMEOUT: Duration = Duration::from_millis(100);
         stream
             .timeout(STABILIZATION_TIMEOUT)

@@ -154,13 +154,17 @@ where
 pub(crate) mod tests {
     use crate::{
         connection_provider::GrpcProvider,
+        ess::tests::collect_when_stable,
         registry::{IntentConfiguration, IntentKind},
     };
-    use chariott_common::proto::common::{
-        fulfillment::Fulfillment as FulfillmentEnum, DiscoverFulfillment,
-        Fulfillment as FulfillmentMessage, InspectIntent, InvokeFulfillment,
+    use chariott_common::proto::{
+        common::{
+            fulfillment::Fulfillment as FulfillmentEnum, DiscoverFulfillment,
+            Fulfillment as FulfillmentMessage, InspectIntent, InvokeFulfillment, SubscribeIntent,
+        },
+        streaming::{channel_service_server::ChannelService, OpenRequest},
     };
-    use tonic::Code;
+    use tonic::{Code, Request};
 
     use super::*;
 
@@ -378,6 +382,45 @@ pub(crate) mod tests {
             },
             result
         );
+    }
+
+    #[tokio::test]
+    async fn system_subscribe_binding_succeeds() {
+        // arrange
+        const EVENT: &str = "test-event";
+
+        let ess = Ess::new();
+        let response = ess.open(Request::new(OpenRequest {})).await.unwrap();
+        let channel_id =
+            response.metadata().get("x-chariott-channel-id").unwrap().to_str().unwrap().into();
+        let stream = response.into_inner();
+
+        // act
+        let result = RuntimeBinding::<GrpcProvider>::SystemSubscribe(ess.clone())
+            .execute(IntentMessage {
+                intent: Some(IntentEnum::Subscribe(SubscribeIntent {
+                    channel_id,
+                    sources: vec![EVENT.into()],
+                })),
+            })
+            .await
+            .unwrap();
+
+        // assert the form of the response
+        assert_eq!(
+            FulfillResponse {
+                fulfillment: Some(FulfillmentMessage {
+                    fulfillment: Some(FulfillmentEnum::Subscribe(SubscribeFulfillment {})),
+                }),
+            },
+            result
+        );
+
+        // assert that the correct subscription was served
+        ess.publish(EVENT);
+        let result = collect_when_stable(stream).await;
+        assert_eq!(1, result.len());
+        assert_eq!(EVENT, result[0].as_ref().unwrap().source.as_str());
     }
 
     async fn execute_system_inspect(query: &str, intents: Vec<IntentConfiguration>) -> Vec<Entry> {
