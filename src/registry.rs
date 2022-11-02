@@ -510,6 +510,8 @@ pub(crate) mod tests {
             expect_first_registered: bool,
             expect_second_registered: bool,
         ) {
+            // arrange
+
             let mut time: SystemTime = SystemTime::UNIX_EPOCH;
 
             let mut registry = create_registry();
@@ -530,7 +532,12 @@ pub(crate) mod tests {
             registry.observer.clear();
 
             time += prune_since_second_registration;
+
+            // act
+
             registry.prune(time);
+
+            // assert
 
             assert_eq!(expect_first_registered, registry.has_service(&first_service));
             assert_eq!(expect_second_registered, registry.has_service(&second_service));
