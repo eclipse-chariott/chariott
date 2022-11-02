@@ -33,10 +33,14 @@ This will build the Chariott and KV App Docker images, and run the tests.
 When adding new tests, refer to the `store-e2e.rs` to see which components we
 reuse for the E2E tests. Make sure to add a configuration section for the test
 crate to the `Cargo.toml`, to ensure that E2E tests are not executed when
-running unit tests:
+running unit tests, e.g.:
 
 ```toml
 [[test]]
-name = "store-e2e"
+name = "foo-e2e"
+test = false
+
+[[test]]
+name = "bar-e2e"
 test = false
 ```
