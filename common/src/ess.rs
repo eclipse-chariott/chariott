@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 use std::{sync::Arc, time::SystemTime};
 
 use crate::proto::{
