@@ -13,7 +13,7 @@ Assuming the current working directory is the project root, run:
 cargo build --release -p chariott -p kv-app
 CHARIOTT_REGISTRY_TTL_SECS=7 ./target/release/chariott &
 ./target/release/kv-app &
-cargo test --test '*e2e'
+CHARIOTT_REGISTRY_TTL_SECS=7 cargo test --test '*e2e'
 ```
 
 If you want to display debug logs, make sure to set the log level via the `RUST_LOG` environment variable.
