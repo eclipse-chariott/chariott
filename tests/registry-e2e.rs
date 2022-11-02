@@ -35,7 +35,7 @@ async fn expired_registrations_are_pruned_after_ttl() -> Result<(), anyhow::Erro
     builder.register_once(&mut None, true).await?;
 
     let initial_entries = chariott.inspect("system.registry", namespace.clone()).await?;
-    sleep(Duration::from_secs(5)).await;
+    sleep(Duration::from_secs(7)).await;
     let entries = chariott.inspect("system.registry", namespace).await?;
 
     // assert

@@ -11,7 +11,7 @@ Assuming the current working directory is the project root, run:
 
 ```sh
 cargo build --release -p chariott -p kv-app
-CHARIOTT_REGISTRY_TTL_SECS=2 ./target/release/chariott &
+CHARIOTT_REGISTRY_TTL_SECS=7 ./target/release/chariott &
 ./target/release/kv-app &
 cargo test --test '*e2e'
 ```
