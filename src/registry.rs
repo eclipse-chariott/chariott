@@ -444,6 +444,24 @@ pub(crate) mod tests {
     }
 
     #[test]
+    fn when_upserting_same_intent_twice_is_idempotent() {
+        // arrange
+        let mut registry = create_registry();
+        let intent = IntentConfigurationBuilder::new().build();
+        let service = ServiceConfigurationBuilder::new().build();
+
+        // act
+        registry.upsert(service.clone(), vec![intent.clone(), intent.clone()]).unwrap();
+
+        // assert
+        assert!(registry.has_service(&service));
+        registry.observer.assert_added(&intent, |services| {
+            assert_eq!(1, services.len());
+            assert_eq!(&vec![service], services);
+        });
+    }
+
+    #[test]
     fn when_upserting_system_binding_returns_error() {
         test("system");
         test("system.registry");
