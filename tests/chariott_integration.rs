@@ -18,7 +18,6 @@ use common::get_uuid;
 use examples_common::chariott::{
     api::{Chariott, ChariottCommunication},
     proto::streaming::channel_service_server::ChannelServiceServer,
-    streaming::StreamingStore,
     value::Value,
 };
 use provider::Provider;
@@ -118,7 +117,7 @@ async fn when_cancelled_shuts_down_provider() -> anyhow::Result<()> {
     let cancellation_token = CancellationToken::new();
     let handle = spawn(
         Server::builder()
-            .add_service(ChannelServiceServer::new(StreamingStore::<Value>::new()))
+            .add_service(ChannelServiceServer::new(Ess::<()>::new()))
             .serve_with_cancellation(
                 format!("0.0.0.0:{}", get_port()).parse().unwrap(),
                 cancellation_token.child_token(),

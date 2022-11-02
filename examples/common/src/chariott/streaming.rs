@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-use async_trait::async_trait;
 use chariott_common::{
     ess::Ess as InnerEss,
     proto::common::{
@@ -11,14 +10,9 @@ use chariott_common::{
 };
 use keyvalue::{InMemoryKeyValueStore, Observer};
 use std::sync::RwLock;
-use tokio_stream::wrappers::ReceiverStream;
-use tonic::{Response, Status};
+use tonic::Status;
 
-use crate::chariott::proto::{
-    common::value::Value as ProtoValue,
-    common::Value as ValueMessage,
-    streaming::{channel_service_server::ChannelService, Event as ProtoEvent, OpenRequest},
-};
+use crate::chariott::proto::{common::value::Value as ProtoValue, common::Value as ValueMessage};
 
 type EventId = Box<str>;
 
@@ -64,16 +58,6 @@ impl<T> StreamingStore<T>
 where
     T: Into<ProtoValue> + Clone + Send + Sync + 'static,
 {
-    /// Subscribes to the specified event identifiers and serves the
-    /// subscriptions on detached tasks.
-    pub fn serve(
-        &self,
-        client_id: impl Into<Box<str>>,
-        requested_subscriptions: impl IntoIterator<Item = EventId>,
-    ) -> Result<(), Status> {
-        self.ess.as_ref().serve_subscriptions(client_id, requested_subscriptions, |(_, v)| v.into())
-    }
-
     /// Read a value from the store.
     pub fn get(&self, key: &EventId) -> Option<T> {
         self.store.read().unwrap().get(key).cloned()
@@ -85,18 +69,9 @@ where
     }
 }
 
-#[async_trait]
-impl<T> ChannelService for StreamingStore<T>
-where
-    T: Clone + Send + Sync + 'static,
-{
-    type OpenStream = ReceiverStream<Result<ProtoEvent, Status>>;
-
-    async fn open(
-        &self,
-        request: tonic::Request<OpenRequest>,
-    ) -> Result<Response<Self::OpenStream>, Status> {
-        self.ess.as_ref().open(request).await
+impl<T> AsRef<InnerEss<(EventId, T)>> for StreamingStore<T> {
+    fn as_ref(&self) -> &InnerEss<(EventId, T)> {
+        &self.ess.0
     }
 }
 
@@ -110,9 +85,10 @@ where
     T: Into<ProtoValue> + Clone + Send + Sync + 'static,
 {
     fn subscribe(&self, subscribe_intent: SubscribeIntent) -> Result<Fulfillment, Status> {
-        self.serve(
+        self.ess.as_ref().serve_subscriptions(
             subscribe_intent.channel_id,
             subscribe_intent.sources.into_iter().map(|v| v.into()),
+            |(_, v)| v.into(),
         )?;
 
         Ok(Fulfillment::Subscribe(SubscribeFulfillment {}))
