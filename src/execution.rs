@@ -81,7 +81,7 @@ where
                 }
             }
             RuntimeBinding::SystemInspect(intents) => {
-                let fulfillment = if let Some(IntentEnum::Inspect(inspect_intent)) = arg.intent {
+                if let Some(IntentEnum::Inspect(inspect_intent)) = arg.intent {
                     let regex = regex_from_query(&inspect_intent.query);
 
                     let intents = intents
@@ -90,7 +90,7 @@ where
                         .map(|ic| ic.into_namespaced_intent())
                         .group();
 
-                    Ok(FulfillmentEnum::Inspect(InspectFulfillment {
+                    fulfill_response(FulfillmentEnum::Inspect(InspectFulfillment {
                         entries: intents
                             .into_iter()
                             .map(|(path, intent_kinds)| Entry {
@@ -114,10 +114,8 @@ where
                             .collect(),
                     }))
                 } else {
-                    Err(Status::invalid_argument("System does not support the specified intent."))
-                }?;
-
-                fulfill_response(fulfillment)
+                    panic!("An intent other than 'Inspect' was resolved to 'SystemInspect'.")
+                }
             }
             RuntimeBinding::SystemDiscover(url) => {
                 const SCHEMA_VERSION_STREAMING: &str = "chariott.streaming.v1";
@@ -137,12 +135,12 @@ where
                     ess.serve_subscriptions(
                         subscribe_intent.channel_id,
                         subscribe_intent.sources.into_iter().map(|s| s.into()),
-                    )
-                } else {
-                    Err(Status::invalid_argument("System does not support the specified intent."))
-                }?;
+                    )?;
 
-                fulfill_response(FulfillmentEnum::Subscribe(SubscribeFulfillment {}))
+                    fulfill_response(FulfillmentEnum::Subscribe(SubscribeFulfillment {}))
+                } else {
+                    panic!("An intent other than 'Subscribe' was resolved to 'SystemSubscribe'.")
+                }
             }
             #[cfg(test)]
             RuntimeBinding::Test(item) => item.execute(arg),
@@ -266,16 +264,9 @@ pub(crate) mod tests {
     }
 
     #[tokio::test]
+    #[should_panic = "An intent other than 'Inspect' was resolved to 'SystemInspect'."]
     async fn system_inspect_binding_fails_with_non_supported_intent() {
-        // arrange
-        let binding = RuntimeBinding::SystemInspect(vec![]);
-
-        // act
-        let result = execute_with_empty_intent(binding).await;
-
-        // assert
-        assert!(result.is_err());
-        assert_eq!(Code::InvalidArgument, result.unwrap_err());
+        _ = execute_with_empty_intent(RuntimeBinding::SystemInspect(vec![])).await;
     }
 
     #[tokio::test]
@@ -382,6 +373,12 @@ pub(crate) mod tests {
             },
             result
         );
+    }
+
+    #[tokio::test]
+    #[should_panic = "An intent other than 'Subscribe' was resolved to 'SystemSubscribe'."]
+    async fn system_subscribe_binding_fails_with_non_supported_intent() {
+        _ = execute_with_empty_intent(RuntimeBinding::SystemSubscribe(Ess::new())).await;
     }
 
     #[tokio::test]
