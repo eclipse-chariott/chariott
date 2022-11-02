@@ -11,7 +11,8 @@ use chariott_common::proto::runtime::chariott_service_server::ChariottServiceSer
 use chariott_common::shutdown::{ctrl_c_cancellation, RouterExt as _};
 use ext::OptionExt as _;
 use std::sync::Arc;
-use std::time::Duration;
+use std::time::{Duration, Instant};
+use tokio::{select, time::sleep_until, time::Instant as TokioInstant};
 use tokio_util::sync::CancellationToken;
 use tonic::transport::Server;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -64,9 +65,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let ctrl_c_cancellation_token = ctrl_c_cancellation();
 
     let prune_loop = {
-        use std::time::Instant;
-        use tokio::{select, time::sleep_until, time::Instant as TokioInstant};
-
         let ctrl_c_cancellation_token = ctrl_c_cancellation_token.clone();
         let error_cancellation_token = error_cancellation_token.child_token();
 
