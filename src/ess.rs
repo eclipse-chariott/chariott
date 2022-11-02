@@ -259,7 +259,7 @@ mod tests {
     }
 
     fn setup() -> Ess {
-        Ess::new()
+        Default::default()
     }
 
     // Takes values from a stream as long as the stream is still producing
