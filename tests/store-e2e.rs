@@ -3,20 +3,14 @@
 
 use std::{collections::HashSet, error::Error as _, time::Duration};
 
-use chariott_common::{
-    error::Error,
-    proto::runtime::{intent_registration::Intent, intent_service_registration::ExecutionLocality},
-};
+use chariott_common::error::Error;
 use common::get_uuid;
 use examples_common::chariott::{
     api::{Chariott, ChariottExt, Event, GrpcChariott},
-    registration::Builder as RegistrationBuilder,
     value::Value,
 };
-use futures::pin_mut;
 use tokio::time::{sleep_until, Instant};
 use tokio_stream::StreamExt as _;
-use uuid::Uuid;
 
 mod common;
 
@@ -137,41 +131,6 @@ async fn when_writing_to_a_different_key_does_not_publish_value() -> Result<(), 
             // No event received. Continue.
         }
     }
-
-    Ok(())
-}
-
-#[tokio::test]
-async fn when_provider_registers_notifies_registry_observers() -> anyhow::Result<()> {
-    fn namespace_event(namespace: &str) -> String {
-        format!("namespaces[{}]", namespace)
-    }
-
-    // arrange
-    let namespace = format!("e2e.registration.{}", Uuid::new_v4().to_string());
-
-    let builder = RegistrationBuilder::new(
-        "registration.provider.e2e",
-        "1.0.0",
-        "http://localhost:7090".parse().unwrap(),
-        &namespace,
-        [Intent::Inspect],
-        ExecutionLocality::Local,
-    );
-
-    let mut subject = setup().await;
-
-    // act
-    let stream =
-        subject.listen("system.registry", vec![namespace_event(&namespace).into()]).await?;
-
-    builder.register_once(&mut None, true).await?;
-
-    // assert
-    let stream = stream.timeout(Duration::from_secs(5));
-    pin_mut!(stream);
-    let result = stream.next().await.unwrap();
-    assert_eq!(namespace_event(&namespace).as_str(), result.unwrap().unwrap().id.as_ref());
 
     Ok(())
 }
