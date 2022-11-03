@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 use std::sync::atomic::{AtomicU16, Ordering};
+use std::time::Instant;
 
 use async_trait::async_trait;
 use chariott::registry::{
@@ -162,7 +163,7 @@ async fn setup(provider: Provider) -> Subject {
 async fn setup_multiple(providers: impl IntoIterator<Item = ProviderSetup>) -> Subject {
     let namespace = "sdv.integration".to_owned();
     let broker = IntentBroker::new();
-    let mut registry = Registry::new(broker.clone());
+    let mut registry = Registry::new(broker.clone(), Default::default());
 
     for ProviderSetup { provider, port, name, locality } in providers {
         let url = provider.serve(port).await;
@@ -171,6 +172,7 @@ async fn setup_multiple(providers: impl IntoIterator<Item = ProviderSetup>) -> S
             .upsert(
                 ServiceConfiguration::new(ServiceId::new(name, "1.0.0"), url, locality),
                 vec![IntentConfiguration::new(namespace.clone(), IntentKind::Invoke)],
+                Instant::now(),
             )
             .unwrap();
     }

@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 use std::sync::{Arc, RwLock};
+use std::time::Instant;
 
 use tonic::{async_trait, Request, Response, Status};
 use url::Url;
@@ -33,6 +34,11 @@ pub struct ChariottServer {
 impl ChariottServer {
     pub fn new(registry: Registry<IntentBroker>, broker: IntentBroker) -> Self {
         Self { registry: Arc::new(RwLock::new(registry)), broker }
+    }
+
+    pub fn registry_do<T>(&self, f: impl FnOnce(&mut Registry<IntentBroker>) -> T) -> T {
+        let mut registry = self.registry.write().unwrap();
+        f(&mut registry)
     }
 
     fn create_configruation_from_registration(
@@ -77,7 +83,7 @@ impl runtime_api::chariott_service_server::ChariottService for ChariottServer {
             .service
             .ok_or_else(|| Status::new(tonic::Code::InvalidArgument, "service is required"))?;
         let svc_cfg = resolve_service_configuration(service)?;
-        let registration_state = if self.registry.read().unwrap().has_service(&svc_cfg) {
+        let registration_state = if self.registry.write().unwrap().touch(&svc_cfg, Instant::now()) {
             tracing::debug!("Service {:#?} already announced", svc_cfg);
             runtime_api::RegistrationState::NotChanged
         } else {
@@ -106,7 +112,7 @@ impl runtime_api::chariott_service_server::ChariottService for ChariottServer {
         self.registry
             .write()
             .unwrap()
-            .upsert(svc_cfg, intents?)
+            .upsert(svc_cfg, intents?, Instant::now())
             .map_err(|e| Status::unknown(e.message()))?;
         Ok(Response::new(runtime_api::RegisterResponse {}))
     }
@@ -442,7 +448,7 @@ mod tests {
 
     fn setup() -> ChariottServer {
         let broker = IntentBroker::new();
-        ChariottServer::new(Registry::new(broker.clone()), broker)
+        ChariottServer::new(Registry::new(broker.clone(), Default::default()), broker)
     }
 
     fn create_announce_request() -> AnnounceRequest {
