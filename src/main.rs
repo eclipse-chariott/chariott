@@ -36,7 +36,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let broker = IntentBroker::new(
         format!(
             "http://{}:{}",
-            env(EXTERNAL_HOST_NAME_ENV).unwrap_or_else(|| "localhost".to_string()),
+            env::<String>(EXTERNAL_HOST_NAME_ENV).as_deref().unwrap_or("localhost"),
             PORT
         )
         .parse()
