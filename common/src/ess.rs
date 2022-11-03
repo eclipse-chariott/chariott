@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-use std::{sync::Arc, time::SystemTime, ops::Deref};
+use std::{ops::Deref, sync::Arc, time::SystemTime};
 
 use crate::proto::{
     common::Value as ValueMessage,
@@ -81,7 +81,7 @@ where
         const METADATA_KEY: &str = "x-chariott-channel-id";
 
         let id = Uuid::new_v4().to_string();
-        let (_, receiver_stream) = self.0.read_events(id.clone().into());
+        let (_, receiver_stream) = self.read_events(id.clone().into());
         let mut response = Response::new(receiver_stream);
         response.metadata_mut().insert(METADATA_KEY, id.try_into().unwrap());
         Ok(response)
@@ -142,8 +142,8 @@ mod tests {
             .unwrap();
 
         // assert
-        subject.0.publish(EVENT_A, ());
-        subject.0.publish(EVENT_B, ());
+        subject.publish(EVENT_A, ());
+        subject.publish(EVENT_B, ());
 
         let result = response
             .into_inner()
