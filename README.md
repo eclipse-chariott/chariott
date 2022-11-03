@@ -1,7 +1,7 @@
 # Project Chariott
 
 - [What is Chariott?](#what-is-chariott)
-- [How to develop with Charriott](#how-to-develop-with-charriott)
+- [How to develop with Chariott](#how-to-develop-with-chariott)
   - [Terminology](#terminology)
   - [Concept of Intents](#concept-of-intents)
 - [Getting started](#getting-started)
