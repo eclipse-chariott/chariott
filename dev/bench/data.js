@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1667412484488,
+  "lastUpdate": 1667474567702,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -780,6 +780,84 @@ window.BENCHMARK_DATA = {
             "value": 7,
             "unit": "Millisecond",
             "range": "p95=12"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "22341213+bastbu@users.noreply.github.com",
+            "name": "Bastian Burger",
+            "username": "bastbu"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "13e5a5ea488d1df51795476bd3e885f77922cffc",
+          "message": "Cancel in-progress CI workflow runs for open PRs (#19)",
+          "timestamp": "2022-11-03T11:01:42+01:00",
+          "tree_id": "4ebaa9727ad9319536ec83cc8a543ebd61da9881",
+          "url": "https://github.com/eclipse/chariott/commit/13e5a5ea488d1df51795476bd3e885f77922cffc"
+        },
+        "date": 1667474566419,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1764",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "5",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 39,
+            "unit": "Percent",
+            "range": "p95=41"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6718,
+            "unit": "Bytes",
+            "range": "p95=6722"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 8,
+            "unit": "Millisecond",
+            "range": "p95=13"
           }
         ]
       }
