@@ -590,6 +590,42 @@ pub(crate) mod tests {
     }
 
     #[test]
+    fn touch_returns_false_if_service_is_unregistered() {
+        // arrange
+        let mut registry = create_registry();
+        let service = ServiceConfigurationBuilder::new().build();
+
+        // act
+        let found = registry.touch(&service, now());
+
+        // assert
+        assert!(!found);
+    }
+
+    #[test]
+    fn touch_updates_timestamp() {
+        // arrange
+        let mut now = now();
+        let mut registry = create_registry();
+        let service = ServiceConfigurationBuilder::new().build();
+        let intent = IntentConfigurationBuilder::new().build();
+        registry.upsert(service.clone(), vec![intent], now).unwrap();
+
+        // act
+        now += Duration::from_secs(10);
+        _ = registry.prune(now);
+        let found1 = registry.touch(&service, now);
+
+        now += Duration::from_secs(15);
+        _ = registry.prune(now);
+        let found2 = registry.touch(&service, now);
+
+        // assert
+        assert!(found1);
+        assert!(found2);
+    }
+
+    #[test]
     fn test_create_new_service_configuration() {
         let service = ServiceConfiguration::new(
             ServiceId::new("name", "version"),
