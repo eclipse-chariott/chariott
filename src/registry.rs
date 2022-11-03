@@ -503,7 +503,7 @@ pub(crate) mod tests {
     ) {
         let mut registry = create_registry();
 
-        let epoch: Instant = Instant::now();
+        let epoch: Instant = now();
         let setup = ServiceConfigurationBuilder::dispense(1..)
             .into_iter()
             .map(|b| b.build())
@@ -540,7 +540,7 @@ pub(crate) mod tests {
 
         // arrange
 
-        let mut time: Instant = Instant::now();
+        let mut time = now();
 
         let mut registry = create_registry();
 
