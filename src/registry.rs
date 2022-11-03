@@ -116,7 +116,7 @@ impl<T: RegistryObserver> Registry<T> {
     pub fn prune(&mut self, timestamp: Instant) -> (Specificity, Instant) {
         use Specificity::*;
         let ttl = self.config.entry_ttl;
-        _ = self.prune_by(|_, ts| timestamp.duration_since(ts) >= ttl);
+        _ = self.prune_by(|_, ts| timestamp.duration_since(ts) > ttl);
         self.known_services
             .iter()
             .map(|(_, ts)| *ts + ttl)
@@ -532,11 +532,12 @@ pub(crate) mod tests {
 
         const ZERO: Duration = Duration::from_secs(0);
 
-        test(ZERO, ZERO, Duration::from_secs(14), true, true);
-        test(ZERO, ZERO, Duration::from_secs(15), false, false);
+        test(ZERO, ZERO, Duration::from_secs(15), true, true);
+        test(ZERO, ZERO, Duration::from_secs(16), false, false);
         test(ZERO, Duration::from_secs(20), Duration::from_secs(5), false, true);
         test(ZERO, Duration::from_secs(20), Duration::from_secs(10), false, true);
-        test(ZERO, Duration::from_secs(20), Duration::from_secs(15), false, false);
+        test(ZERO, Duration::from_secs(20), Duration::from_secs(15), false, true);
+        test(ZERO, Duration::from_secs(20), Duration::from_secs(16), false, false);
 
         fn test(
             first_registration_since_epoch: Duration,
