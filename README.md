@@ -1,7 +1,7 @@
 # Project Chariott
 
 - [What is Chariott?](#what-is-chariott)
-- [How to develop with Charriott](#how-to-develop-with-charriott)
+- [How to develop with Chariott](#how-to-develop-with-chariott)
   - [Terminology](#terminology)
   - [Concept of Intents](#concept-of-intents)
 - [Getting started](#getting-started)
@@ -21,12 +21,12 @@
 ## What is Chariott?
 
 Chariott is a [gRPC](https://grpc.io) service that provides a common interface for interacting with applications.
-Applications communicate between each other through Chariott. Charriott provides the necessary services to enable
+Applications communicate between each other through Chariott. Chariott provides the necessary services to enable
 application lifecycle management and communication between applications. This is done by having applications register
 an _intent_ which Chariott will then _fulfil_ by brokering the communication with the appropriate application to
 fulfil that intent. Applications which fulfil these intents are known as _providers_.
 
-## How to develop with Charriott
+## How to develop with Chariott
 
 Chariott provides gRPC interfaces to interact from a client application. The
 client application can be written in any language that supports gRPC. The
