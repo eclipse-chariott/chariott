@@ -314,16 +314,6 @@ pub(crate) mod tests {
     }
 
     #[test]
-    fn when_registry_does_not_contain_service_has_service_returns_false() {
-        // arrange
-        let registry = create_registry();
-        let service = ServiceConfigurationBuilder::new().build();
-
-        // act + assert
-        assert!(!registry.has_service(&service));
-    }
-
-    #[test]
     fn when_upserting_contains_service() {
         // arrange
         let mut registry = create_registry();
