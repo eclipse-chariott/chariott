@@ -62,31 +62,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let error_cancellation_token = CancellationToken::new();
     let ctrl_c_cancellation_token = ctrl_c_cancellation();
 
-    let prune_loop = {
-        let ctrl_c_cancellation_token = ctrl_c_cancellation_token.clone();
-        let error_cancellation_token = error_cancellation_token.child_token();
-
-        async move {
-            tracing::debug!("Prune loop running (TTL = {registry_entry_ttl:?}).");
-            loop {
-                let wakeup_deadline = server.registry_do(|reg| {
-                    let now = Instant::now();
-                    reg.prune(now).unwrap_or_else(|| now + registry_entry_ttl)
-                });
-                select! {
-                    _ = sleep_until(TokioInstant::from_std(wakeup_deadline)) => {}
-                    _ = error_cancellation_token.cancelled() => {
-                        tracing::debug!("Prune loop aborting due to server error.");
-                        break;
-                    }
-                    _ = ctrl_c_cancellation_token.cancelled() => {
-                        tracing::debug!("Prune loop aborting due to cancellation.");
-                        break;
-                    }
-                }
-            }
-        }
-    };
+    let registry_prune_loop = registry_prune_loop(
+        server,
+        registry_entry_ttl,
+        ctrl_c_cancellation_token.clone(),
+        error_cancellation_token.child_token(),
+    );
 
     let router_serve = async {
         match router.serve_with_cancellation(addr, ctrl_c_cancellation_token).await {
@@ -98,9 +79,35 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    let (router_serve_result, _) = tokio::join!(router_serve, prune_loop);
+    let (router_serve_result, _) = tokio::join!(router_serve, registry_prune_loop);
 
     router_serve_result?;
 
     Ok(())
+}
+
+async fn registry_prune_loop(
+    server: Arc<ChariottServer>,
+    registry_entry_ttl: Duration,
+    ctrl_c_cancellation_token: CancellationToken,
+    error_cancellation_token: CancellationToken,
+) {
+    tracing::debug!("Prune loop running (TTL = {registry_entry_ttl:?}).");
+    loop {
+        let wakeup_deadline = server.registry_do(|reg| {
+            let now = Instant::now();
+            reg.prune(now).unwrap_or_else(|| now + registry_entry_ttl)
+        });
+        select! {
+            _ = sleep_until(TokioInstant::from_std(wakeup_deadline)) => {}
+            _ = error_cancellation_token.cancelled() => {
+                tracing::debug!("Prune loop aborting due to server error.");
+                break;
+            }
+            _ = ctrl_c_cancellation_token.cancelled() => {
+                tracing::debug!("Prune loop aborting due to cancellation.");
+                break;
+            }
+        }
+    }
 }
