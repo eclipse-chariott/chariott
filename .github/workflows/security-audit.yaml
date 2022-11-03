@@ -10,6 +10,11 @@ on:
   schedule:
     - cron: "0 0 * * *" # once a day at midnight UTC
     # NB: that cron trigger on GH actions runs only on the default branch
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   security_audit:
     runs-on: ubuntu-latest

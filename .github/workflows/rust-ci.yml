@@ -19,6 +19,10 @@ on:
       - 'Cargo.lock'
       - 'Cargo.toml'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 env:
   CARGO_TERM_COLOR: always
 
