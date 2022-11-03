@@ -22,12 +22,6 @@ impl<T: Clone + Send + 'static> Observer<EventId, T> for Ess<T> {
     }
 }
 
-impl<T> AsRef<InnerEss<(EventId, T)>> for Ess<T> {
-    fn as_ref(&self) -> &InnerEss<(EventId, T)> {
-        &self.0
-    }
-}
-
 /// Represents an in-memory store that contains a blanket implementation for
 /// integration with the Chariott streaming API. It generalizes over any type of
 /// value to be published, as long as that value can be transformed into a value
@@ -35,6 +29,12 @@ impl<T> AsRef<InnerEss<(EventId, T)>> for Ess<T> {
 pub struct StreamingStore<T> {
     ess: Ess<T>,
     store: RwLock<InMemoryKeyValueStore<EventId, T, Ess<T>>>,
+}
+
+impl<T> StreamingStore<T> {
+    pub fn ess(&self) -> &InnerEss<(EventId, T)> {
+        &self.ess.0
+    }
 }
 
 impl<T: Clone + Send + 'static> StreamingStore<T> {
@@ -66,12 +66,6 @@ where
     }
 }
 
-impl<T> AsRef<InnerEss<(EventId, T)>> for StreamingStore<T> {
-    fn as_ref(&self) -> &InnerEss<(EventId, T)> {
-        &self.ess.0
-    }
-}
-
 pub trait ProtoExt {
     fn subscribe(&self, subscribe_intent: SubscribeIntent) -> Result<Fulfillment, Status>;
     fn read(&self, intent: ReadIntent) -> Fulfillment;
@@ -82,7 +76,7 @@ where
     T: Into<ProtoValue> + Clone + Send + Sync + 'static,
 {
     fn subscribe(&self, subscribe_intent: SubscribeIntent) -> Result<Fulfillment, Status> {
-        let result = self.ess.as_ref().serve_subscriptions(subscribe_intent, |(_, v)| v.into())?;
+        let result = self.ess().serve_subscriptions(subscribe_intent, |(_, v)| v.into())?;
         Ok(Fulfillment::Subscribe(result))
     }
 
