@@ -64,6 +64,7 @@ tracing = { version = "0.1" }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 uuid = { version = "1.2.1", features = ["v4"] }
 url = "2.2"
+test-case = "2.2.2"
 
 [build-dependencies]
 tonic-build = { workspace = true }
@@ -76,6 +77,7 @@ futures = { workspace = true }
 tokio-util = { workspace = true }
 uuid = { workspace = true }
 tokio-stream = { workspace = true }
+test-case = { workspace = true }
 
 [profile.release]
 strip = true

@@ -276,6 +276,7 @@ impl fmt::Display for IntentKind {
 pub(crate) mod tests {
     use std::sync::Mutex;
     use std::time::Instant;
+    use test_case::test_case;
 
     use crate::registry::{ExecutionLocality, IntentKind, ServiceId};
 
@@ -489,111 +490,101 @@ pub(crate) mod tests {
         }
     }
 
-    #[test]
-    fn prune_returns_next_prune_time() {
-        use Specificity::*;
+    #[test_case(Specificity::Default, 15, 0, [])]
+    #[test_case(Specificity::Default, 15, 5, [])]
+    #[test_case(Specificity::Default, 15, 15, [])]
+    #[test_case(Specificity::Specific, 17, 0, [6, 2, 4])]
+    #[test_case(Specificity::Specific, 7, 10, [6, 2, 4])]
+    fn prune_schedule(
+        expected_specificity: Specificity,
+        expected_seconds_since_prune: u64,
+        prune_seconds: u64,
+        seconds: impl IntoIterator<Item = u64>,
+    ) {
+        let mut registry = create_registry();
 
-        test(Default, 15, 0, []);
-        test(Default, 15, 5, []);
-        test(Default, 15, 15, []);
-        test(Specific, 17, 0, [6, 2, 4]);
-        test(Specific, 7, 10, [6, 2, 4]);
+        let epoch: Instant = Instant::now();
+        let setup = ServiceConfigurationBuilder::dispense(1..)
+            .into_iter()
+            .map(|b| b.build())
+            .zip(IntentConfigurationBuilder::dispense(1..).into_iter().map(|b| vec![b.build()]))
+            .zip(seconds.into_iter().map(|s| epoch + Duration::from_secs(s)));
 
-        fn test(
-            expected_specificity: Specificity,
-            expected_seconds_since_prune: u64,
-            prune_seconds: u64,
-            seconds: impl IntoIterator<Item = u64>,
-        ) {
-            let mut registry = create_registry();
-
-            let epoch: Instant = Instant::now();
-            let setup = ServiceConfigurationBuilder::dispense(1..)
-                .into_iter()
-                .map(|b| b.build())
-                .zip(IntentConfigurationBuilder::dispense(1..).into_iter().map(|b| vec![b.build()]))
-                .zip(seconds.into_iter().map(|s| epoch + Duration::from_secs(s)));
-
-            for ((service, intents), timestamp) in setup {
-                registry.upsert(service.clone(), intents.clone(), timestamp).unwrap();
-            }
-
-            let prune_time = epoch + Duration::from_secs(prune_seconds);
-            let (specificity, t) = registry.prune(prune_time);
-
-            assert_eq!(expected_specificity, specificity);
-            assert_eq!(expected_seconds_since_prune, t.duration_since(prune_time).as_secs());
+        for ((service, intents), timestamp) in setup {
+            registry.upsert(service.clone(), intents.clone(), timestamp).unwrap();
         }
+
+        let prune_time = epoch + Duration::from_secs(prune_seconds);
+        let (specificity, t) = registry.prune(prune_time);
+
+        assert_eq!(expected_specificity, specificity);
+        assert_eq!(expected_seconds_since_prune, t.duration_since(prune_time).as_secs());
     }
 
-    #[test]
-    fn prune_removes_expired_services() {
-        use std::time::Duration;
+    #[test_case(0, 0, 15, true, true)]
+    #[test_case(0, 0, 16, false, false)]
+    #[test_case(0, 20, 5, false, true)]
+    #[test_case(0, 20, 10, false, true)]
+    #[test_case(0, 20, 15, false, true)]
+    #[test_case(0, 20, 16, false, false)]
+    fn prune_removes_expired_services(
+        first_registration_since_epoch: u64,
+        second_since_first_registration: u64,
+        prune_since_second_registration: u64,
+        expect_first_registered: bool,
+        expect_second_registered: bool,
+    ) {
+        let first_registration_since_epoch = Duration::from_secs(first_registration_since_epoch);
+        let second_since_first_registration = Duration::from_secs(second_since_first_registration);
+        let prune_since_second_registration = Duration::from_secs(prune_since_second_registration);
 
-        const ZERO: Duration = Duration::from_secs(0);
+        // arrange
 
-        test(ZERO, ZERO, Duration::from_secs(15), true, true);
-        test(ZERO, ZERO, Duration::from_secs(16), false, false);
-        test(ZERO, Duration::from_secs(20), Duration::from_secs(5), false, true);
-        test(ZERO, Duration::from_secs(20), Duration::from_secs(10), false, true);
-        test(ZERO, Duration::from_secs(20), Duration::from_secs(15), false, true);
-        test(ZERO, Duration::from_secs(20), Duration::from_secs(16), false, false);
+        let mut time: Instant = Instant::now();
 
-        fn test(
-            first_registration_since_epoch: Duration,
-            second_since_first_registration: Duration,
-            prune_since_second_registration: Duration,
-            expect_first_registered: bool,
-            expect_second_registered: bool,
-        ) {
-            // arrange
+        let mut registry = create_registry();
 
-            let mut time: Instant = Instant::now();
+        let mut service_builder = ServiceConfigurationBuilder::dispense('a'..).into_iter();
+        let mut intent_builder = IntentConfigurationBuilder::dispense('a'..).into_iter();
 
-            let mut registry = create_registry();
+        let first_service = service_builder.next().unwrap().build();
+        let first_intent = intent_builder.next().unwrap().build();
+        time += first_registration_since_epoch;
+        registry.upsert(first_service.clone(), vec![first_intent.clone()], time).unwrap();
 
-            let mut service_builder = ServiceConfigurationBuilder::dispense('a'..).into_iter();
-            let mut intent_builder = IntentConfigurationBuilder::dispense('a'..).into_iter();
+        let second_service = service_builder.next().unwrap().build();
+        let second_intent = intent_builder.next().unwrap().build();
+        time += second_since_first_registration;
+        registry.upsert(second_service.clone(), vec![second_intent.clone()], time).unwrap();
 
-            let first_service = service_builder.next().unwrap().build();
-            let first_intent = intent_builder.next().unwrap().build();
-            time += first_registration_since_epoch;
-            registry.upsert(first_service.clone(), vec![first_intent.clone()], time).unwrap();
+        registry.observer.clear();
 
-            let second_service = service_builder.next().unwrap().build();
-            let second_intent = intent_builder.next().unwrap().build();
-            time += second_since_first_registration;
-            registry.upsert(second_service.clone(), vec![second_intent.clone()], time).unwrap();
+        time += prune_since_second_registration;
 
-            registry.observer.clear();
+        // act
 
-            time += prune_since_second_registration;
+        registry.prune(time);
 
-            // act
+        // assert
 
-            registry.prune(time);
+        assert_eq!(expect_first_registered, registry.has_service(&first_service));
+        assert_eq!(expect_second_registered, registry.has_service(&second_service));
 
-            // assert
+        let refreshes = registry.observer.refresh_calls.lock().unwrap();
+        // remove the refreshes due to upserts
+        let expected_refreshes_len =
+            !expect_first_registered as usize + !expect_second_registered as usize;
 
-            assert_eq!(expect_first_registered, registry.has_service(&first_service));
-            assert_eq!(expect_second_registered, registry.has_service(&second_service));
+        assert_eq!(expected_refreshes_len, refreshes.len());
 
-            let refreshes = registry.observer.refresh_calls.lock().unwrap();
-            // remove the refreshes due to upserts
-            let expected_refreshes_len =
-                !expect_first_registered as usize + !expect_second_registered as usize;
-
-            assert_eq!(expected_refreshes_len, refreshes.len());
-
-            for (ic, scs) in refreshes.iter() {
-                assert!(scs.is_empty());
-                if *ic == first_intent {
-                    assert!(!expect_first_registered);
-                } else if *ic == second_intent {
-                    assert!(!expect_second_registered);
-                } else {
-                    panic!("unhandled case?");
-                }
+        for (ic, scs) in refreshes.iter() {
+            assert!(scs.is_empty());
+            if *ic == first_intent {
+                assert!(!expect_first_registered);
+            } else if *ic == second_intent {
+                assert!(!expect_second_registered);
+            } else {
+                panic!("unhandled case?");
             }
         }
     }
