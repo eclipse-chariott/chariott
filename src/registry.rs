@@ -88,7 +88,7 @@ impl<T: RegistryObserver> Registry<T> {
     fn prune_by(&mut self, predicate: impl Fn(&ServiceConfiguration, Instant) -> bool) -> bool {
         let initial_known_services_len = self.known_services.len();
 
-        self.known_services.retain(|services, ts| predicate(services, *ts));
+        self.known_services.retain(|services, ts| !predicate(services, *ts));
 
         if self.known_services.len() == initial_known_services_len {
             return false;
@@ -116,7 +116,7 @@ impl<T: RegistryObserver> Registry<T> {
     pub fn prune(&mut self, timestamp: Instant) -> (Specificity, Instant) {
         use Specificity::*;
         let ttl = self.config.entry_ttl;
-        _ = self.prune_by(|_, ts| timestamp.duration_since(ts) < ttl);
+        _ = self.prune_by(|_, ts| timestamp.duration_since(ts) >= ttl);
         self.known_services
             .iter()
             .map(|(_, ts)| *ts + ttl)
@@ -148,7 +148,7 @@ impl<T: RegistryObserver> Registry<T> {
         // Upserting a registration should not happen frequently and has worse
         // performance than service resolution.
 
-        _ = self.prune_by(|service, _| service.id != service_configuration.id);
+        _ = self.prune_by(|service, _| service.id == service_configuration.id);
 
         // Add the new service registrations and resolve the new Bindings to be
         // used for each intent.
