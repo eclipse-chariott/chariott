@@ -70,7 +70,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             tracing::debug!("Prune loop running (TTL = {registry_entry_ttl:?}).");
             loop {
                 let wakeup_deadline = server.registry_do(|reg| {
-                    reg.prune(Instant::now()).unwrap_or(Instant::now() + registry_entry_ttl)
+                    let now = Instant::now();
+                    reg.prune(now).unwrap_or_else(|| now + registry_entry_ttl)
                 });
                 select! {
                     _ = sleep_until(TokioInstant::from_std(wakeup_deadline)) => {}
