@@ -74,7 +74,7 @@ jobs:
           name: code-coverage-report
           path: cobertura.xml
       - uses: 5monkeys/cobertura-action@master
-        if: ${{ github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
+        if: ${{ github.event_name == 'pull_request' && github.repository == 'eclipse/chariott' && github.actor != 'dependabot[bot]' }}
         with:
           path: cobertura.xml
           repo_token: ${{ secrets.GITHUB_TOKEN }}
