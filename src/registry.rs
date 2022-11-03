@@ -277,13 +277,13 @@ pub(crate) mod tests {
     use std::sync::Mutex;
     use std::time::Instant;
 
-    fn now() -> Instant {
-        Instant::now()
-    }
-
     use crate::registry::{ExecutionLocality, IntentKind, ServiceId};
 
     use super::*;
+
+    fn now() -> Instant {
+        Instant::now()
+    }
 
     #[test]
     fn default_config() {
