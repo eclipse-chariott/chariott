@@ -6,12 +6,14 @@ use std::time::Duration;
 use chariott_common::proto::runtime::{
     intent_registration::Intent, intent_service_registration::ExecutionLocality,
 };
+use common::get_uuid;
 use examples_common::chariott::{
     api::{Chariott, ChariottExt as _, GrpcChariott},
     registration::Builder as RegistrationBuilder,
 };
 use tokio_stream::StreamExt as _;
-use uuid::Uuid;
+
+mod common;
 
 #[tokio::test]
 async fn when_provider_registers_notifies_registry_observers() -> anyhow::Result<()> {
@@ -20,7 +22,7 @@ async fn when_provider_registers_notifies_registry_observers() -> anyhow::Result
     }
 
     // arrange
-    let namespace = format!("e2e.registration.{}", Uuid::new_v4());
+    let namespace = format!("e2e.registration.{}", get_uuid());
 
     let builder = RegistrationBuilder::new(
         "registration.provider.e2e",
