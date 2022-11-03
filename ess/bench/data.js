@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1667479108612,
+  "lastUpdate": 1667496732055,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -779,6 +779,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 251763480,
             "range": "± 839591",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "22341213+bastbu@users.noreply.github.com",
+            "name": "Bastian Burger",
+            "username": "bastbu"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "387f4c7acc91b2ffe37f03ca933b6f3d94815f14",
+          "message": "Add unit tests cases for capitalized system upsert (#14)",
+          "timestamp": "2022-11-03T18:26:38+01:00",
+          "tree_id": "2e8cb72509a5cd176999662a83778babb8060eb3",
+          "url": "https://github.com/eclipse/chariott/commit/387f4c7acc91b2ffe37f03ca933b6f3d94815f14"
+        },
+        "date": 1667496730853,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 490391,
+            "range": "± 59462",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2980683,
+            "range": "± 263317",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 27779823,
+            "range": "± 1687648",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 4179727,
+            "range": "± 327719",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 29873159,
+            "range": "± 2175910",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 268681889,
+            "range": "± 13692145",
             "unit": "ns/iter"
           }
         ]
