@@ -40,7 +40,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map(|v| registry::Config::default().set_entry_ttl_bounded(v))
         .unwrap_or_default();
 
-    let registry_entry_ttl = registry_config.entry_ttl();
+    tracing::debug!("Registry entry TTL = {} (seconds)", registry_config.entry_ttl().as_secs_f64());
     let registry = Registry::new(broker.clone(), registry_config);
 
     #[cfg(build = "debug")]
@@ -64,7 +64,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let registry_prune_loop = registry_prune_loop(
         server,
-        registry_entry_ttl,
         ctrl_c_cancellation_token.clone(),
         error_cancellation_token.child_token(),
     );
@@ -88,15 +87,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn registry_prune_loop(
     server: Arc<ChariottServer>,
-    registry_entry_ttl: Duration,
     ctrl_c_cancellation_token: CancellationToken,
     error_cancellation_token: CancellationToken,
 ) {
-    tracing::debug!("Prune loop running (TTL = {registry_entry_ttl:?}).");
+    tracing::debug!("Prune loop running.");
     loop {
-        let wakeup_deadline = server.registry_do(|reg| {
+        let (_, wakeup_deadline) = server.registry_do(|reg| {
             let now = Instant::now();
-            reg.prune(now).unwrap_or_else(|| now + registry_entry_ttl)
+            reg.prune(now)
         });
         select! {
             _ = sleep_until(TokioInstant::from_std(wakeup_deadline)) => {}

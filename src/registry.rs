@@ -44,6 +44,12 @@ impl Default for Config {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum Specificity {
+    Default,
+    Specific,
+}
+
 #[derive(Clone, Debug)]
 pub struct Registry<T: RegistryObserver> {
     external_services_by_intent: HashMap<IntentConfiguration, HashSet<ServiceConfiguration>>,
@@ -107,10 +113,16 @@ impl<T: RegistryObserver> Registry<T> {
         true
     }
 
-    pub fn prune(&mut self, timestamp: Instant) -> Option<Instant> {
+    pub fn prune(&mut self, timestamp: Instant) -> (Specificity, Instant) {
+        use Specificity::*;
         let ttl = self.config.entry_ttl;
         _ = self.prune_by(|_, ts| timestamp.duration_since(ts) < ttl);
-        self.known_services.iter().map(|(_, ts)| *ts).min()
+        self.known_services
+            .iter()
+            .map(|(_, ts)| *ts + ttl)
+            .min()
+            .map(|t| (Specific, t))
+            .unwrap_or((Default, timestamp + ttl))
     }
 
     pub fn upsert(
@@ -474,6 +486,43 @@ pub(crate) mod tests {
 
             // assert
             assert!(result.is_err());
+        }
+    }
+
+    #[test]
+    fn prune_returns_next_prune_time() {
+        use Specificity::*;
+
+        test(Default, 15, 0, []);
+        test(Default, 15, 5, []);
+        test(Default, 15, 15, []);
+        test(Specific, 17, 0, [6, 2, 4]);
+        test(Specific, 7, 10, [6, 2, 4]);
+
+        fn test(
+            expected_specificity: Specificity,
+            expected_seconds_since_prune: u64,
+            prune_seconds: u64,
+            seconds: impl IntoIterator<Item = u64>,
+        ) {
+            let mut registry = create_registry();
+
+            let epoch: Instant = Instant::now();
+            let setup = ServiceConfigurationBuilder::dispense(1..)
+                .into_iter()
+                .map(|b| b.build())
+                .zip(IntentConfigurationBuilder::dispense(1..).into_iter().map(|b| vec![b.build()]))
+                .zip(seconds.into_iter().map(|s| epoch + Duration::from_secs(s)));
+
+            for ((service, intents), timestamp) in setup {
+                registry.upsert(service.clone(), intents.clone(), timestamp).unwrap();
+            }
+
+            let prune_time = epoch + Duration::from_secs(prune_seconds);
+            let (specificity, t) = registry.prune(prune_time);
+
+            assert_eq!(expected_specificity, specificity);
+            assert_eq!(expected_seconds_since_prune, t.duration_since(prune_time).as_secs());
         }
     }
 
