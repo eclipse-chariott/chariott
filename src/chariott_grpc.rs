@@ -83,7 +83,7 @@ impl runtime_api::chariott_service_server::ChariottService for ChariottServer {
             .service
             .ok_or_else(|| Status::new(tonic::Code::InvalidArgument, "service is required"))?;
         let svc_cfg = resolve_service_configuration(service)?;
-        let registration_state = if self.registry.read().unwrap().has_service(&svc_cfg) {
+        let registration_state = if self.registry.write().unwrap().touch(&svc_cfg, Instant::now()) {
             tracing::debug!("Service {:#?} already announced", svc_cfg);
             runtime_api::RegistrationState::NotChanged
         } else {

@@ -65,8 +65,18 @@ impl<T: RegistryObserver> Registry<T> {
     /// Returns whether the specified service configuration is already known to
     /// the registry. As system services cannot be updated, invocations with a
     /// system service configuration results in undefined behavior.
-    pub fn has_service(&self, key: &ServiceConfiguration) -> bool {
+    #[cfg(test)]
+    fn has_service(&self, key: &ServiceConfiguration) -> bool {
         self.known_services.contains_key(key)
+    }
+
+    pub fn touch(&mut self, key: &ServiceConfiguration, timestamp: Instant) -> bool {
+        if let Some(ts) = self.known_services.get_mut(key) {
+            *ts = timestamp;
+            true
+        } else {
+            false
+        }
     }
 
     fn prune_by(&mut self, predicate: impl Fn(&ServiceConfiguration, Instant) -> bool) -> bool {
