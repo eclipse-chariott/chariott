@@ -4,6 +4,7 @@
 use chariott::chariott_grpc::ChariottServer;
 use chariott::registry::{Composite, Registry};
 use chariott::IntentBroker;
+use chariott_common::config::env;
 use chariott_common::ess::SharedEss;
 use chariott_common::proto::runtime::chariott_service_server::ChariottServiceServer;
 use chariott_common::proto::streaming::channel_service_server::ChannelServiceServer;
@@ -18,6 +19,7 @@ pub(crate) const FILE_DESCRIPTOR_SET: &[u8] = tonic::include_file_descriptor_set
 #[tokio::main]
 #[cfg(not(tarpaulin_include))]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    const EXTERNAL_HOST_NAME_ENV: &str = "EXTERNAL_HOST_NAME";
     const PORT: u16 = 4243;
 
     let collector = tracing_subscriber::fmt()
@@ -31,8 +33,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     collector.init();
 
     let ess = SharedEss::new();
-    let broker =
-        IntentBroker::new(format!("http://localhost:{PORT}").parse().unwrap(), ess.clone());
+    let broker = IntentBroker::new(
+        format!(
+            "http://{}:{}",
+            env(EXTERNAL_HOST_NAME_ENV).unwrap_or_else(|| "localhost".to_string()),
+            PORT
+        )
+        .parse()
+        .unwrap(),
+        ess.clone(),
+    );
     let registry = Registry::new(Composite::new(broker.clone(), ess.clone()));
 
     #[cfg(build = "debug")]
