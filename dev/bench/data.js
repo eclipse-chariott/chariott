@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1667474567702,
+  "lastUpdate": 1667476853685,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -856,6 +856,84 @@ window.BENCHMARK_DATA = {
           {
             "name": "Latency",
             "value": 8,
+            "unit": "Millisecond",
+            "range": "p95=13"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "code@raboof.com",
+            "name": "Atif Aziz",
+            "username": "atifaziz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f26a3b1c2ce193d4a218cd64449962840cdbd2a7",
+          "message": "Fix read-me section link + title typo (#21)",
+          "timestamp": "2022-11-03T11:45:48+01:00",
+          "tree_id": "aeb4fa989914f39e998f067f7b8f8bb7ce499eeb",
+          "url": "https://github.com/eclipse/chariott/commit/f26a3b1c2ce193d4a218cd64449962840cdbd2a7"
+        },
+        "date": 1667476852598,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1764",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "5",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 38,
+            "unit": "Percent",
+            "range": "p95=39"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6672,
+            "unit": "Bytes",
+            "range": "p95=6706"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 7,
             "unit": "Millisecond",
             "range": "p95=13"
           }
