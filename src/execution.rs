@@ -415,7 +415,7 @@ pub(crate) mod tests {
         );
 
         // assert that the correct subscription was served
-        ess.as_ref().publish(EVENT, ());
+        ess.publish(EVENT, ());
         let result = stream.collect_when_stable().await;
         assert_eq!(1, result.len());
         assert_eq!(EVENT, result[0].as_ref().unwrap().source.as_str());

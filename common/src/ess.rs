@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-use std::{sync::Arc, time::SystemTime};
+use std::{sync::Arc, time::SystemTime, ops::Deref};
 
 use crate::proto::{
     common::Value as ValueMessage,
@@ -88,8 +88,10 @@ where
     }
 }
 
-impl<T> AsRef<InnerEss<T>> for SharedEss<T> {
-    fn as_ref(&self) -> &InnerEss<T> {
+impl<T> Deref for SharedEss<T> {
+    type Target = InnerEss<T>;
+
+    fn deref(&self) -> &Self::Target {
         self.0.as_ref()
     }
 }

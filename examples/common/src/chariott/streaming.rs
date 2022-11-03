@@ -18,7 +18,7 @@ struct Ess<T>(InnerEss<(EventId, T)>);
 
 impl<T: Clone + Send + 'static> Observer<EventId, T> for Ess<T> {
     fn on_set(&mut self, key: &EventId, value: &T) {
-        self.0.as_ref().publish(key, (key.clone(), value.clone()));
+        self.0.publish(key, (key.clone(), value.clone()));
     }
 }
 

@@ -36,7 +36,7 @@ impl Observer for Ess {
             })
             .collect::<HashSet<_>>()
         {
-            self.as_ref().publish(format!("namespaces[{}]", namespace).as_str(), ());
+            self.publish(format!("namespaces[{}]", namespace).as_str(), ());
         }
     }
 }
@@ -647,7 +647,7 @@ pub(crate) mod tests {
             const CLIENT_ID: &str = "CLIENT";
 
             let subject = SharedEss::new();
-            let (_, stream) = subject.as_ref().read_events(CLIENT_ID.into());
+            let (_, stream) = subject.read_events(CLIENT_ID.into());
 
             // always subscribe to all possible namespace changes.
             for nonce in [INTENT_A, INTENT_B, INTENT_C] {
