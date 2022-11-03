@@ -33,7 +33,7 @@ impl Config {
         self.entry_ttl
     }
 
-    pub fn set_entry_ttl_unchecked(self, value: Duration) -> Self {
+    pub fn set_entry_ttl_bounded(self, value: Duration) -> Self {
         Self { entry_ttl: std::cmp::max(value, Self::ENTRY_TTL_MIN) }
     }
 }
@@ -275,7 +275,7 @@ pub(crate) mod tests {
         let config: Config = Default::default();
         let new_ttl = config.entry_ttl() + Duration::from_secs(60);
 
-        let ttl = config.set_entry_ttl_unchecked(new_ttl).entry_ttl();
+        let ttl = config.set_entry_ttl_bounded(new_ttl).entry_ttl();
 
         assert_eq!(new_ttl, ttl);
     }
@@ -285,7 +285,7 @@ pub(crate) mod tests {
         let config: Config = Default::default();
         let new_ttl = Config::ENTRY_TTL_MIN - Duration::from_nanos(1);
 
-        let ttl = config.set_entry_ttl_unchecked(new_ttl).entry_ttl();
+        let ttl = config.set_entry_ttl_bounded(new_ttl).entry_ttl();
 
         assert_eq!(Config::ENTRY_TTL_MIN, ttl);
     }
