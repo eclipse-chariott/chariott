@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1667475967261,
+  "lastUpdate": 1667479108612,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -719,6 +719,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 258633154,
             "range": "± 275444",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "22341213+bastbu@users.noreply.github.com",
+            "name": "Bastian Burger",
+            "username": "bastbu"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "73b3ab27bf96b603aad98b65e369e64dd18fbda2",
+          "message": "Fix CI for PRs from clones (#20)",
+          "timestamp": "2022-11-03T13:10:01+01:00",
+          "tree_id": "10eb63b9fd8043260f77d5f19cc1a20d647427d0",
+          "url": "https://github.com/eclipse/chariott/commit/73b3ab27bf96b603aad98b65e369e64dd18fbda2"
+        },
+        "date": 1667479107729,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 453182,
+            "range": "± 8570",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2648265,
+            "range": "± 9637",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 24963454,
+            "range": "± 48027",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 4173479,
+            "range": "± 21213",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 26289707,
+            "range": "± 327666",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 251763480,
+            "range": "± 839591",
             "unit": "ns/iter"
           }
         ]
