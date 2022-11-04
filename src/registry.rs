@@ -37,7 +37,7 @@ impl Observer for Ess {
             })
             .collect::<HashSet<_>>()
         {
-            self.publish(format!("namespaces[{}]", namespace).as_str(), ());
+            self.publish(format!("namespaces/{}", namespace).as_str(), ());
         }
     }
 }
@@ -880,7 +880,7 @@ pub(crate) mod tests {
             expected_events: impl IntoIterator<Item = &'b IntentConfiguration>,
         ) {
             fn namespace_event(namespace: &str) -> String {
-                format!("namespaces[{}]", namespace)
+                format!("namespaces/{}", namespace)
             }
 
             // arrange

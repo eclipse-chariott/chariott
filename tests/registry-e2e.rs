@@ -50,7 +50,7 @@ async fn expired_registrations_are_pruned_after_ttl() -> Result<(), anyhow::Erro
 #[tokio::test]
 async fn when_provider_registers_notifies_registry_observers() -> anyhow::Result<()> {
     fn namespace_event(namespace: &str) -> String {
-        format!("namespaces[{}]", namespace)
+        format!("namespaces/{}", namespace)
     }
 
     // arrange
