@@ -9,8 +9,8 @@ use examples_common::chariott::{
     api::{Chariott, ChariottExt, Event, GrpcChariott},
     value::Value,
 };
-use futures::StreamExt as _;
 use tokio::time::{sleep_until, Instant};
+use tokio_stream::StreamExt as _;
 
 mod common;
 

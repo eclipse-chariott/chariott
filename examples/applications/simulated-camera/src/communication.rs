@@ -48,7 +48,7 @@ pub async fn serve(url: Url, address: SocketAddr) -> Result<(), Error> {
                 url,
                 Arc::clone(&streaming_store),
             )))
-            .add_service(ChannelServiceServer::from_arc(streaming_store))
+            .add_service(ChannelServiceServer::new(streaming_store.ess().clone()))
             .serve_with_cancellation(address, server_token),
     );
 

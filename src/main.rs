@@ -3,11 +3,16 @@
 
 use chariott::chariott_grpc::ChariottServer;
 use chariott::registry::{self, Registry};
+use chariott::streaming::StreamingEss;
 use chariott::IntentBroker;
-use chariott_common::config::try_env;
+use chariott_common::config::{env, try_env};
 use chariott_common::ext::OptionExt as _;
-use chariott_common::proto::runtime::chariott_service_server::ChariottServiceServer;
+use chariott_common::proto::{
+    runtime::chariott_service_server::ChariottServiceServer,
+    streaming::channel_service_server::ChannelServiceServer,
+};
 use chariott_common::shutdown::{ctrl_c_cancellation, RouterExt as _};
+use registry::Composite;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::{select, time::sleep_until, time::Instant as TokioInstant};
@@ -22,6 +27,9 @@ pub(crate) const FILE_DESCRIPTOR_SET: &[u8] = tonic::include_file_descriptor_set
 #[tokio::main]
 #[cfg(not(tarpaulin_include))]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    const EXTERNAL_HOST_NAME_ENV: &str = "EXTERNAL_HOST_NAME";
+    const PORT: u16 = 4243;
+
     let collector = tracing_subscriber::fmt()
         .with_env_filter(
             EnvFilter::builder()
@@ -32,7 +40,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     collector.init();
 
-    let broker = IntentBroker::new();
+    let streaming_ess = StreamingEss::new();
+    let broker = IntentBroker::new(
+        format!(
+            "http://{}:{}",
+            env::<String>(EXTERNAL_HOST_NAME_ENV).as_deref().unwrap_or("localhost"),
+            PORT
+        )
+        .parse()
+        .unwrap(),
+        streaming_ess.clone(),
+    );
 
     let registry_config = try_env::<u64>("CHARIOTT_REGISTRY_TTL_SECS")
         .ok()?
@@ -41,7 +59,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap_or_default();
 
     tracing::debug!("Registry entry TTL = {} (seconds)", registry_config.entry_ttl().as_secs_f64());
-    let registry = Registry::new(broker.clone(), registry_config);
+
+    let registry =
+        Registry::new(Composite::new(broker.clone(), streaming_ess.clone()), registry_config);
 
     #[cfg(build = "debug")]
     let reflection_service = tonic_reflection::server::Builder::configure()
@@ -49,12 +69,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build()?;
 
     tracing::info!("starting grpc services");
-    let addr = "0.0.0.0:4243".parse().unwrap();
+    let addr = format!("0.0.0.0:{PORT}").parse().unwrap();
     tracing::info!("chariott listening on {addr}");
 
     let server = Arc::new(ChariottServer::new(registry, broker));
-    let router =
-        Server::builder().add_service(ChariottServiceServer::from_arc(Arc::clone(&server)));
+    let router = Server::builder()
+        .add_service(ChariottServiceServer::from_arc(Arc::clone(&server)))
+        .add_service(ChannelServiceServer::new(streaming_ess));
 
     #[cfg(build = "debug")]
     let router = router.add_service(reflection_service);
@@ -86,7 +107,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn registry_prune_loop(
-    server: Arc<ChariottServer>,
+    server: Arc<ChariottServer<Composite<IntentBroker, StreamingEss>>>,
     ctrl_c_cancellation_token: CancellationToken,
     error_cancellation_token: CancellationToken,
 ) {

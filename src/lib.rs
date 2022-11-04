@@ -7,3 +7,4 @@ mod execution;
 mod intent_broker;
 pub use intent_broker::IntentBroker;
 pub mod registry;
+pub mod streaming;

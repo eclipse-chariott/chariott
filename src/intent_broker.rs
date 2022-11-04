@@ -6,37 +6,50 @@ use std::{
     sync::{Arc, RwLock},
 };
 
+use url::Url;
+
 use crate::{
     connection_provider::{ConnectionProvider, GrpcProvider, ReusableProvider},
     execution::RuntimeBinding,
-    registry::{
-        ExecutionLocality, IntentConfiguration, IntentKind, RegistryObserver, ServiceConfiguration,
-    },
+    registry::{Change, ExecutionLocality, IntentConfiguration, IntentKind, Observer},
+    streaming::StreamingEss,
 };
 
 type Provider = ReusableProvider<GrpcProvider>;
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 enum Binding {
     Remote(Provider),
     Fallback(Box<Binding>, Box<Binding>),
-    System,
+    SystemInspect,
+    SystemDiscover(Url),
+    SystemSubscribe(StreamingEss),
 }
 
-#[derive(Debug, Default)]
+#[derive(Default)]
 struct IntentBinder {
     bindings_by_intent: HashMap<IntentConfiguration, Binding>,
 }
 
 impl IntentBinder {
-    pub fn new() -> Self {
-        let system_intents = [IntentConfiguration::new("system.registry", IntentKind::Inspect)];
+    pub fn new(streaming_url: Url, streaming_ess: StreamingEss) -> Self {
+        const SYSTEM_REGISTRY_NAMESPACE: &str = "system.registry";
 
         Self {
-            bindings_by_intent: system_intents
-                .into_iter()
-                .map(|intent_configuration| (intent_configuration, Binding::System))
-                .collect(),
+            bindings_by_intent: HashMap::from([
+                (
+                    IntentConfiguration::new(SYSTEM_REGISTRY_NAMESPACE, IntentKind::Inspect),
+                    Binding::SystemInspect,
+                ),
+                (
+                    IntentConfiguration::new(SYSTEM_REGISTRY_NAMESPACE, IntentKind::Discover),
+                    Binding::SystemDiscover(streaming_url),
+                ),
+                (
+                    IntentConfiguration::new(SYSTEM_REGISTRY_NAMESPACE, IntentKind::Subscribe),
+                    Binding::SystemSubscribe(streaming_ess),
+                ),
+            ]),
         }
     }
 
@@ -46,14 +59,16 @@ impl IntentBinder {
             binding: &Binding,
         ) -> RuntimeBinding<Provider> {
             match binding {
-                Binding::System => {
-                    RuntimeBinding::System(broker.bindings_by_intent.keys().cloned().collect())
-                }
+                Binding::SystemInspect => RuntimeBinding::SystemInspect(
+                    broker.bindings_by_intent.keys().cloned().collect(),
+                ),
                 Binding::Remote(provider) => RuntimeBinding::Remote(provider.clone()),
                 Binding::Fallback(primary, secondary) => RuntimeBinding::Fallback(
                     Box::new(binding_into_runtime_binding(broker, primary)),
                     Box::new(binding_into_runtime_binding(broker, secondary)),
                 ),
+                Binding::SystemDiscover(url) => RuntimeBinding::SystemDiscover(url.clone()),
+                Binding::SystemSubscribe(ess) => RuntimeBinding::SystemSubscribe(ess.clone()),
             }
         }
 
@@ -62,60 +77,70 @@ impl IntentBinder {
             .map(|binding| binding_into_runtime_binding(self, binding))
     }
 
-    fn refresh<'a>(
-        &mut self,
-        intent_configuration: IntentConfiguration,
-        service_configurations: impl IntoIterator<Item = &'a ServiceConfiguration>,
-    ) {
-        let mut cloud_service = None;
-        let mut local_service = None;
+    fn refresh<'a>(&mut self, changes: impl IntoIterator<Item = Change<'a>>) {
+        for change in changes {
+            let (intent_configuration, service_configurations) = match change {
+                Change::Add(intent, services) => (intent, Some(services)),
+                Change::Modify(intent, services) => (intent, Some(services)),
+                Change::Remove(intent) => (intent, None),
+            };
 
-        for candidate in service_configurations {
-            match (candidate.locality(), &local_service, &cloud_service) {
-                // Stop on the first cloud/local provider that is
-                // found. This could be evolved in the future by
-                // always comparing all candidates using a priority
-                // as a tie-breaker (which does not yet exist).
-                (_, Some(_), Some(_)) => {
-                    break;
+            let mut cloud_service = None;
+            let mut local_service = None;
+
+            if let Some(service_configurations) = service_configurations {
+                for candidate in service_configurations {
+                    match (candidate.locality(), &local_service, &cloud_service) {
+                        // Stop on the first cloud/local provider that is
+                        // found. This could be evolved in the future by
+                        // always comparing all candidates using a priority
+                        // as a tie-breaker (which does not yet exist).
+                        (_, Some(_), Some(_)) => {
+                            break;
+                        }
+                        (ExecutionLocality::Local, None, _) => {
+                            local_service = Some(candidate);
+                        }
+                        (ExecutionLocality::Cloud, _, None) => {
+                            cloud_service = Some(candidate);
+                        }
+                        (ExecutionLocality::Local, Some(_), None) => {}
+                        (ExecutionLocality::Cloud, None, Some(_)) => {}
+                    }
                 }
-                (ExecutionLocality::Local, None, _) => {
-                    local_service = Some(candidate);
-                }
-                (ExecutionLocality::Cloud, _, None) => {
-                    cloud_service = Some(candidate);
-                }
-                (ExecutionLocality::Local, Some(_), None) => {}
-                (ExecutionLocality::Cloud, None, Some(_)) => {}
             }
-        }
 
-        let binding = match (local_service, cloud_service) {
-            (Some(local_service), Some(cloud_service)) => Some(Binding::Fallback(
-                Box::new(Binding::Remote(Provider::new(cloud_service.url().to_owned()))),
-                Box::new(Binding::Remote(Provider::new(local_service.url().to_owned()))),
-            )),
-            (Some(service), None) => Some(Binding::Remote(Provider::new(service.url().to_owned()))),
-            (None, Some(service)) => Some(Binding::Remote(Provider::new(service.url().to_owned()))),
-            (None, None) => None,
-        };
+            let binding = match (local_service, cloud_service) {
+                (Some(local_service), Some(cloud_service)) => Some(Binding::Fallback(
+                    Box::new(Binding::Remote(Provider::new(cloud_service.url().to_owned()))),
+                    Box::new(Binding::Remote(Provider::new(local_service.url().to_owned()))),
+                )),
+                (Some(service), None) => {
+                    Some(Binding::Remote(Provider::new(service.url().to_owned())))
+                }
+                (None, Some(service)) => {
+                    Some(Binding::Remote(Provider::new(service.url().to_owned())))
+                }
+                (None, None) => None,
+            };
 
-        if let Some(binding) = binding {
-            self.bindings_by_intent.insert(intent_configuration, binding);
-        } else {
-            self.bindings_by_intent.remove(&intent_configuration);
+            if let Some(binding) = binding {
+                self.bindings_by_intent.insert(intent_configuration.clone(), binding);
+            } else {
+                self.bindings_by_intent.remove(intent_configuration);
+            }
         }
     }
 }
 
 /// Brokers intents based on internal state. Cloning is cheap and only increases
 /// a reference count to shared mutable state.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct IntentBroker(Arc<RwLock<IntentBinder>>);
 
 impl IntentBroker {
-    pub fn new() -> Self {
-        Self(Arc::new(RwLock::new(IntentBinder::new())))
+    pub fn new(streaming_url: Url, streaming_ess: StreamingEss) -> Self {
+        Self(Arc::new(RwLock::new(IntentBinder::new(streaming_url, streaming_ess))))
     }
 
     pub fn resolve(&self, intent: &IntentConfiguration) -> Option<RuntimeBinding<Provider>> {
@@ -123,36 +148,37 @@ impl IntentBroker {
     }
 }
 
-impl RegistryObserver for IntentBroker {
-    fn on_intent_config_change<'a>(
-        &self,
-        intent_configuration: IntentConfiguration,
-        service_configurations: impl IntoIterator<Item = &'a ServiceConfiguration>,
-    ) {
-        self.0.write().unwrap().refresh(intent_configuration, service_configurations)
+impl Observer for IntentBroker {
+    fn on_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
+        self.0.write().unwrap().refresh(changes)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use std::{collections::HashMap, sync::Arc};
+    use std::{
+        collections::{HashMap, HashSet},
+        sync::Arc,
+    };
 
+    use chariott_common::streaming_ess::StreamingEss;
     use url::Url;
 
     use crate::{
         connection_provider::{GrpcProvider, ReusableProvider},
         execution::RuntimeBinding,
-        intent_broker::{IntentBroker, RegistryObserver as _},
+        intent_broker::{IntentBroker, Observer as _},
         registry::{
             tests::{IntentConfigurationBuilder, ServiceConfigurationBuilder},
-            ExecutionLocality, IntentConfiguration, IntentKind, ServiceConfiguration,
+            Change, ExecutionLocality, IntentConfiguration, IntentKind,
         },
     };
 
     #[test]
     fn when_empty_does_not_resolve() {
         // arrange
-        let subject = IntentBroker::new();
+        let subject =
+            IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new());
 
         // act + assert
         assert!(subject.resolve(&IntentConfigurationBuilder::new().build()).is_none());
@@ -168,13 +194,26 @@ mod tests {
     }
 
     #[test]
-    fn when_refreshing_with_empty_services_does_no_longer_resolve_intent() {
+    fn when_modifying_with_empty_services_does_no_longer_resolve_intent() {
         // arrange
         let setup = Setup::new();
         let subject = setup.clone().build();
 
         // act
-        subject.on_intent_config_change(setup.intent.clone(), vec![]);
+        subject.on_change([Change::Modify(&setup.intent, &HashSet::new())].into_iter());
+
+        // assert
+        assert!(subject.resolve(&setup.intent).is_none());
+    }
+
+    #[test]
+    fn when_removing_does_no_longer_resolve_intent() {
+        // arrange
+        let setup = Setup::new();
+        let subject = setup.clone().build();
+
+        // act
+        subject.on_change([Change::Remove(&setup.intent)].into_iter());
 
         // assert
         assert!(subject.resolve(&setup.intent).is_none());
@@ -260,7 +299,7 @@ mod tests {
     }
 
     #[test]
-    fn when_resolve_succeeds_for_system_inspect() {
+    fn resolve_system_registry_succeeds() {
         // arrange
         let intent = IntentConfiguration::new("system.registry".to_owned(), IntentKind::Inspect);
         let setup = Setup::new();
@@ -270,9 +309,41 @@ mod tests {
         let result = subject.resolve(&intent).unwrap();
 
         // assert
-        if let RuntimeBinding::System(context) = result {
+        if let RuntimeBinding::SystemInspect(context) = result {
             assert!(context.contains(&Arc::new(intent)));
             assert!(context.contains(&Arc::new(setup.intent)));
+        } else {
+            panic!()
+        }
+    }
+
+    #[test]
+    fn resolve_succeeds_for_system_discover() {
+        // arrange
+        let intent = IntentConfiguration::new("system.registry".to_owned(), IntentKind::Discover);
+
+        // act
+        let result = Setup::new().build().resolve(&intent).unwrap();
+
+        // assert
+        if let RuntimeBinding::SystemDiscover(url) = result {
+            assert_eq!(Setup::STREAMING_URL.parse::<Url>().unwrap(), url);
+        } else {
+            panic!()
+        }
+    }
+
+    #[test]
+    fn resolve_succeeds_for_system_subscribe() {
+        // arrange
+        let intent = IntentConfiguration::new("system.registry".to_owned(), IntentKind::Subscribe);
+
+        // act
+        let result = Setup::new().build().resolve(&intent).unwrap();
+
+        // assert
+        if let RuntimeBinding::SystemSubscribe(_) = result {
+            // assertions on the ESS itself are covered by integration tests.
         } else {
             panic!()
         }
@@ -287,7 +358,7 @@ mod tests {
         let subject = setup.clone().build();
 
         // act
-        subject.on_intent_config_change(setup.intent.clone(), vec![&service_b]);
+        subject.on_change([Change::Modify(&setup.intent, &HashSet::from([service_b]))].into_iter());
 
         // assert
         let result = subject.resolve(&setup.intent).unwrap();
@@ -337,6 +408,8 @@ mod tests {
     }
 
     impl Setup {
+        const STREAMING_URL: &str = "https://localhost:4243";
+
         fn new() -> Self {
             let intent = IntentConfigurationBuilder::new().build();
             let service = ServiceConfigurationBuilder::new();
@@ -344,8 +417,13 @@ mod tests {
         }
 
         fn build(self) -> IntentBroker {
-            let broker = IntentBroker::new();
-            broker.on_intent_config_change(self.intent.clone(), vec![&self.service.build()]);
+            let broker =
+                IntentBroker::new(Self::STREAMING_URL.parse().unwrap(), StreamingEss::new());
+
+            broker.on_change(
+                [Change::Add(&self.intent, &HashSet::from([self.service.build()]))].into_iter(),
+            );
+
             broker
         }
 
@@ -360,7 +438,8 @@ mod tests {
         }
 
         fn combine(setups: impl IntoIterator<Item = Setup>) -> IntentBroker {
-            let broker = IntentBroker::new();
+            let broker =
+                IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new());
 
             let services_by_intent = setups.into_iter().fold(HashMap::new(), |mut acc, s| {
                 acc.entry(s.intent.clone()).or_insert_with(Vec::new).push(s.service);
@@ -368,9 +447,13 @@ mod tests {
             });
 
             for (intent, services) in services_by_intent {
-                let services: Vec<ServiceConfiguration> =
-                    services.clone().into_iter().map(|s| s.build()).collect();
-                broker.on_intent_config_change(intent, services.iter());
+                broker.on_change(
+                    [Change::Add(
+                        &intent,
+                        &services.clone().into_iter().map(|s| s.build()).collect(),
+                    )]
+                    .into_iter(),
+                );
             }
 
             broker

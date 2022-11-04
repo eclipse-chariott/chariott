@@ -38,7 +38,7 @@ async fn wain() -> Result<(), Error> {
 
     Server::builder()
         .add_service(ProviderServiceServer::from_arc(Arc::clone(&provider)))
-        .add_service(ChannelServiceServer::from_arc(streaming_store))
+        .add_service(ChannelServiceServer::new(streaming_store.ess().clone()))
         .serve_with_ctrl_c_shutdown(socket_address)
         .await
 }

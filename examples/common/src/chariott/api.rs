@@ -309,9 +309,11 @@ impl<T: ChariottCommunication> Chariott for T {
         .await?
         .fulfillment()
         .and_then(|read: ReadFulfillment| match read.value {
-            Some(value) => Value::try_from(value)
-                .map_err(|_| Error::new("Could not parse read value."))
-                .map(Some),
+            Some(value) => value
+                .value
+                .map(|v| Value::try_from(v).map_err(|_| Error::new("Could not parse read value.")))
+                // TODO: replace with common::OptionExt after #13
+                .map_or(Ok(None), |r| r.map(Some)),
             None => Ok(None),
         })
     }

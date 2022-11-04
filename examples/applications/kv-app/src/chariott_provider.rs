@@ -12,7 +12,8 @@ use url::Url;
 use examples_common::chariott::proto::{
     self,
     common::{
-        fulfillment, intent, DiscoverFulfillment, Fulfillment, Value, WriteFulfillment, WriteIntent,
+        fulfillment, intent, value::Value, DiscoverFulfillment, Fulfillment, WriteFulfillment,
+        WriteIntent,
     },
     provider::*,
 };
@@ -31,7 +32,10 @@ impl ChariottProvider {
 
     fn write(&self, intent: WriteIntent) -> Result<WriteFulfillment, Status> {
         let key = intent.key.into();
-        let value = intent.value.ok_or_else(|| Status::unknown("Value must be specified."))?;
+        let value = intent
+            .value
+            .and_then(|v| v.value)
+            .ok_or_else(|| Status::unknown("Value must be specified."))?;
         self.streaming_store.set(key, value);
         Ok(WriteFulfillment {})
     }
