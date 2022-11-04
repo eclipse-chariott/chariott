@@ -9,20 +9,19 @@ use crate::proto::{
     streaming::{channel_service_server::ChannelService, Event, OpenRequest},
 };
 use async_trait::async_trait;
-use ess::EventSubSystem;
 use tokio::spawn;
 use tokio_stream::wrappers::ReceiverStream;
 use tonic::{Response, Status};
 use uuid::Uuid;
 
-type InnerEss<T> = EventSubSystem<Box<str>, Box<str>, T, Result<Event, Status>>;
+type EventSubSystem<T> = ess::EventSubSystem<Box<str>, Box<str>, T, Result<Event, Status>>;
 
 /// [`SharedEss`](SharedEss) integrates the reusable
-/// [`EventSubSystem`](EventSubSystem) component with the Chariott gRPC
+/// [`EventSubSystem`](ess::EventSubSystem) component with the Chariott gRPC
 /// streaming contract. Cloning [`SharedEss`](SharedEss) is cheap, it will not
 /// create a new instance but refer to the same underlying instance instead.
 #[derive(Clone)]
-pub struct SharedEss<T>(Arc<InnerEss<T>>);
+pub struct SharedEss<T>(Arc<EventSubSystem<T>>);
 
 impl<T: Clone> SharedEss<T> {
     pub fn new() -> Self {
@@ -88,7 +87,7 @@ where
 }
 
 impl<T> Deref for SharedEss<T> {
-    type Target = InnerEss<T>;
+    type Target = EventSubSystem<T>;
 
     fn deref(&self) -> &Self::Target {
         self.0.as_ref()
