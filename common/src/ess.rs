@@ -43,7 +43,6 @@ impl<T: Clone + Send + 'static> SharedEss<T> {
         into_value: fn(T) -> ValueEnum,
     ) -> Result<SubscribeFulfillment, Status> {
         let subscriptions = self
-            .0
             .register_subscriptions(
                 subscribe_intent.channel_id.into(),
                 subscribe_intent.sources.into_iter().map(|s| s.into()),
