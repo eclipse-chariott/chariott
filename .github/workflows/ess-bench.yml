@@ -12,6 +12,10 @@ on:
       - 'ess/**'
       - '.github/workflows/ess-bench.yml'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 permissions:
   contents: write
   deployments: write
@@ -19,8 +23,9 @@ permissions:
 env:
   # Push the results to gh-pages only on merge to main.
   AUTO_PUSH: ${{ github.event_name == 'push' }}
-  # Comment the performance numbers of the load tests only on PRs.
-  COMMENT_ALWAYS: ${{ github.event_name == 'pull_request' }}
+  # Comment the performance numbers of the load tests only on PRs and if the PR
+  # comes from within the Eclipse organization.
+  COMMENT_ALWAYS: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'eclipse/chariott' }}
 
 jobs:
   benchmark:

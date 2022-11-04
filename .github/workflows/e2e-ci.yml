@@ -16,8 +16,13 @@ on:
       - 'Cargo.lock'
       - 'Cargo.toml'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 env:
   CARGO_TERM_COLOR: always
+  CHARIOTT_REGISTRY_TTL_SECS: 7
 
 jobs:
   e2e:
@@ -57,7 +62,10 @@ jobs:
 
       - name: Start Chariott
         run: |
-          docker run -d --name chariott --network host -e RUST_LOG=debug chariott:1
+          docker run -d --name chariott --network host \
+            -e RUST_LOG=debug \
+            -e CHARIOTT_REGISTRY_TTL_SECS \
+            chariott:1
 
       - name: Start KV-App
         run: |

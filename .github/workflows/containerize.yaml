@@ -20,6 +20,10 @@ on:
       - "Dockerfile"
       - ".github/workflows/containerize.yaml"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 env:
   IMAGE_NAME: ${{ github.repository }}
 

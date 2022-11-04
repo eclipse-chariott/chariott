@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 use std::sync::{Arc, RwLock};
+use std::time::Instant;
 
 use tonic::{async_trait, Request, Response, Status};
 use url::Url;
@@ -34,6 +35,11 @@ pub struct ChariottServer<T: Observer> {
 impl<T: Observer> ChariottServer<T> {
     pub fn new(registry: Registry<T>, broker: IntentBroker) -> Self {
         Self { registry: Arc::new(RwLock::new(registry)), broker }
+    }
+
+    pub fn registry_do<U>(&self, f: impl FnOnce(&mut Registry<T>) -> U) -> U {
+        let mut registry = self.registry.write().unwrap();
+        f(&mut registry)
     }
 
     fn create_configruation_from_registration(
@@ -80,7 +86,7 @@ impl<T: Observer + Send + Sync + 'static> runtime_api::chariott_service_server::
             .service
             .ok_or_else(|| Status::new(tonic::Code::InvalidArgument, "service is required"))?;
         let svc_cfg = resolve_service_configuration(service)?;
-        let registration_state = if self.registry.read().unwrap().has_service(&svc_cfg) {
+        let registration_state = if self.registry.write().unwrap().touch(&svc_cfg, Instant::now()) {
             tracing::debug!("Service {:#?} already announced", svc_cfg);
             runtime_api::RegistrationState::NotChanged
         } else {
@@ -109,7 +115,7 @@ impl<T: Observer + Send + Sync + 'static> runtime_api::chariott_service_server::
         self.registry
             .write()
             .unwrap()
-            .upsert(svc_cfg, intents?)
+            .upsert(svc_cfg, intents?, Instant::now())
             .map_err(|e| Status::unknown(e.message()))?;
         Ok(Response::new(runtime_api::RegisterResponse {}))
     }
@@ -426,7 +432,7 @@ mod tests {
 
     fn setup() -> ChariottServer<IntentBroker> {
         let broker = IntentBroker::new("https://localhost:4243".parse().unwrap(), SharedEss::new());
-        ChariottServer::new(Registry::new(broker.clone()), broker)
+        ChariottServer::new(Registry::new(broker.clone(), Default::default()), broker)
     }
 
     fn create_announce_request() -> AnnounceRequest {

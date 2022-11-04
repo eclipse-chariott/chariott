@@ -19,6 +19,10 @@ on:
       - 'Cargo.lock'
       - 'Cargo.toml'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -74,7 +78,7 @@ jobs:
           name: code-coverage-report
           path: cobertura.xml
       - uses: 5monkeys/cobertura-action@master
-        if: ${{ github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'eclipse/chariott' && github.actor != 'dependabot[bot]' }}
         with:
           path: cobertura.xml
           repo_token: ${{ secrets.GITHUB_TOKEN }}

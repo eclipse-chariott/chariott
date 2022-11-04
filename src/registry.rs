@@ -3,6 +3,7 @@
 
 use core::fmt;
 use std::collections::{HashMap, HashSet};
+use std::time::{Duration, Instant};
 
 use chariott_common::error::Error;
 use url::Url;
@@ -59,33 +60,123 @@ impl<T: Observer, U: Observer> Observer for Composite<T, U> {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct Config {
+    entry_ttl: Duration,
+}
+
+impl Config {
+    pub const ENTRY_TTL_MIN: Duration = Duration::from_secs(2);
+
+    pub fn entry_ttl(&self) -> Duration {
+        self.entry_ttl
+    }
+
+    pub fn set_entry_ttl_bounded(self, value: Duration) -> Self {
+        Self { entry_ttl: std::cmp::max(value, Self::ENTRY_TTL_MIN) }
+    }
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self { entry_ttl: Duration::from_secs(15) }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum Specificity {
+    Default,
+    Specific,
+}
+
 #[derive(Clone, Debug)]
 pub struct Registry<T: Observer> {
     external_services_by_intent: HashMap<IntentConfiguration, HashSet<ServiceConfiguration>>,
-    known_services: HashSet<ServiceConfiguration>,
+    known_services: HashMap<ServiceConfiguration, Instant>,
     observer: T,
+    config: Config,
 }
 
 impl<T: Observer> Registry<T> {
-    pub fn new(observer: T) -> Self {
+    pub fn new(observer: T, config: Config) -> Self {
         Self {
             external_services_by_intent: HashMap::new(),
-            known_services: HashSet::new(),
+            known_services: HashMap::new(),
             observer,
+            config,
         }
     }
 
     /// Returns whether the specified service configuration is already known to
     /// the registry. As system services cannot be updated, invocations with a
     /// system service configuration results in undefined behavior.
-    pub fn has_service(&self, key: &ServiceConfiguration) -> bool {
-        self.known_services.contains(key)
+    #[cfg(test)]
+    fn has_service(&self, key: &ServiceConfiguration) -> bool {
+        self.known_services.contains_key(key)
+    }
+
+    pub fn touch(&mut self, key: &ServiceConfiguration, timestamp: Instant) -> bool {
+        if let Some(ts) = self.known_services.get_mut(key) {
+            *ts = timestamp;
+            true
+        } else {
+            false
+        }
+    }
+
+    fn prune_by(
+        &mut self,
+        predicate: impl Fn(&ServiceConfiguration, Instant) -> bool,
+    ) -> ChangeSeries {
+        let mut change_series = ChangeSeries::new();
+
+        let initial_known_services_len = self.known_services.len();
+
+        self.known_services.retain(|services, ts| !predicate(services, *ts));
+
+        if self.known_services.len() == initial_known_services_len {
+            return change_series;
+        }
+
+        // Prune the old service registrations and bindings.
+
+        self.external_services_by_intent.retain(|intent_configuration, services| {
+            let service_count = services.len();
+
+            services.retain(|service| self.known_services.contains_key(service));
+
+            if service_count != services.len() {
+                match services.len() {
+                    0 => change_series.change(intent_configuration.clone(), ChangeKind::Remove),
+                    _ => change_series.change(intent_configuration.clone(), ChangeKind::Modify),
+                }
+            }
+
+            !services.is_empty()
+        });
+
+        change_series
+    }
+
+    pub fn prune(&mut self, timestamp: Instant) -> (Specificity, Instant) {
+        use Specificity::*;
+        let ttl = self.config.entry_ttl;
+        let change_series = self.prune_by(|_, ts| timestamp.duration_since(ts) > ttl);
+        change_series.observe(&self.observer, self);
+
+        self.known_services
+            .iter()
+            .map(|(_, ts)| *ts + ttl)
+            .min()
+            .map(|t| (Specific, t))
+            .unwrap_or((Default, timestamp + ttl))
     }
 
     pub fn upsert(
         &mut self,
         service_configuration: ServiceConfiguration,
         intent_configurations: Vec<IntentConfiguration>,
+        timestamp: Instant,
     ) -> Result<(), Error> {
         fn starts_with_ignore_ascii_case(string: &str, prefix: &str) -> bool {
             string.len() >= prefix.len()
@@ -101,64 +192,10 @@ impl<T: Observer> Registry<T> {
             ));
         }
 
-        // Track the changes to the registry for the current registry operation
-
-        #[derive(Copy, Clone, Debug)]
-        enum ChangeKind {
-            Add,
-            Remove,
-            Modify,
-        }
-
-        /// This method helps calculating the effective change based on a series
-        /// of isolated changes for a given intent.
-        fn change(
-            changes: &mut HashMap<IntentConfiguration, ChangeKind>,
-            intent: IntentConfiguration,
-            to: ChangeKind,
-        ) {
-            let from = changes.get(&intent);
-            let value = match (from, to) {
-                (None, _) => to,
-                (Some(ChangeKind::Remove), ChangeKind::Add) => ChangeKind::Modify,
-                (Some(ChangeKind::Modify), ChangeKind::Modify) => ChangeKind::Modify,
-                (Some(ChangeKind::Add), ChangeKind::Modify) => ChangeKind::Add,
-                (from, to) => {
-                    panic!(
-                        "{}",
-                        format!("Bug: Transition from {from:?} to {to:?} must not be possible.")
-                    );
-                }
-            };
-
-            changes.insert(intent, value);
-        }
-
-        let mut changes = HashMap::new();
-
         // Upserting a registration should not happen frequently and has worse
         // performance than service resolution.
 
-        // Prune the old service registrations and bindings.
-
-        self.external_services_by_intent.retain(|intent_configuration, services| {
-            let service_count = services.len();
-
-            services.retain(|service| service.id != service_configuration.id);
-
-            if service_count != services.len() {
-                match services.len() {
-                    0 => change(&mut changes, intent_configuration.clone(), ChangeKind::Remove),
-                    _ => change(&mut changes, intent_configuration.clone(), ChangeKind::Modify),
-                };
-            }
-
-            !services.is_empty()
-        });
-
-        // Remove the old service registration from the known services lookup.
-
-        self.known_services.retain(|service| service.id != service_configuration.id);
+        let mut change_series = self.prune_by(|service, _| service.id == service_configuration.id);
 
         // Add the new service registrations and resolve the new Bindings to be
         // used for each intent.
@@ -167,8 +204,8 @@ impl<T: Observer> Registry<T> {
             // Update the list of registry changes.
 
             match self.external_services_by_intent.contains_key(&intent_configuration) {
-                true => change(&mut changes, intent_configuration.clone(), ChangeKind::Modify),
-                false => change(&mut changes, intent_configuration.clone(), ChangeKind::Add),
+                true => change_series.change(intent_configuration.clone(), ChangeKind::Modify),
+                false => change_series.change(intent_configuration.clone(), ChangeKind::Add),
             };
 
             // Update the service registry for a given intent.
@@ -181,19 +218,11 @@ impl<T: Observer> Registry<T> {
 
         // Add the service to the lookup for known services.
 
-        self.known_services.insert(service_configuration);
+        self.known_services.insert(service_configuration, timestamp);
 
         // Notify the observer
 
-        let changes = changes.iter().map(|(intent, kind)| match kind {
-            ChangeKind::Add => Change::Add(intent, &self.external_services_by_intent[intent]),
-            ChangeKind::Modify => Change::Modify(intent, &self.external_services_by_intent[intent]),
-            ChangeKind::Remove => Change::Remove(intent),
-        });
-
-        if changes.len() > 0 {
-            self.observer.on_change(changes);
-        };
+        change_series.observe(&self.observer, self);
 
         Ok(())
     }
@@ -201,6 +230,57 @@ impl<T: Observer> Registry<T> {
     #[cfg(test)]
     pub fn count_external_intents(&self) -> usize {
         self.external_services_by_intent.len()
+    }
+}
+
+#[derive(Copy, Clone, Debug)]
+enum ChangeKind {
+    Add,
+    Remove,
+    Modify,
+}
+
+/// Tracks the effective change to a registry based on a _series_ of isolated
+/// changes for a given intent.
+struct ChangeSeries {
+    changes: HashMap<IntentConfiguration, ChangeKind>,
+}
+
+impl ChangeSeries {
+    pub fn new() -> Self {
+        Self { changes: HashMap::new() }
+    }
+
+    fn change(&mut self, intent: IntentConfiguration, to: ChangeKind) {
+        let from = self.changes.get(&intent);
+        let value = match (from, to) {
+            (None, _) => to,
+            (Some(ChangeKind::Remove), ChangeKind::Add) => ChangeKind::Modify,
+            (Some(ChangeKind::Modify), ChangeKind::Modify) => ChangeKind::Modify,
+            (Some(ChangeKind::Add), ChangeKind::Modify) => ChangeKind::Add,
+            (from, to) => {
+                panic!(
+                    "{}",
+                    format!("Bug: Transition from {from:?} to {to:?} must not be possible.")
+                );
+            }
+        };
+
+        self.changes.insert(intent, value);
+    }
+
+    fn observe<O: Observer>(self, observer: &O, registry: &Registry<O>) {
+        let changes = self.changes.iter().map(|(intent, kind)| match kind {
+            ChangeKind::Add => Change::Add(intent, &registry.external_services_by_intent[intent]),
+            ChangeKind::Modify => {
+                Change::Modify(intent, &registry.external_services_by_intent[intent])
+            }
+            ChangeKind::Remove => Change::Remove(intent),
+        });
+
+        if changes.len() > 0 {
+            observer.on_change(changes);
+        };
     }
 }
 
@@ -303,28 +383,51 @@ pub(crate) mod tests {
             atomic::{AtomicBool, Ordering},
             Mutex,
         },
+        time::Instant,
     };
 
     use chariott_common::{
         ess::SharedEss,
         proto::common::{value::Value, SubscribeIntent},
     };
+    use test_case::test_case;
 
     use crate::{
         execution::tests::StreamExt as _,
         registry::{Composite, ExecutionLocality, IntentKind, ServiceId},
     };
 
-    use super::{Change, IntentConfiguration, Observer, Registry, ServiceConfiguration};
+    use super::*;
+
+    fn now() -> Instant {
+        Instant::now()
+    }
 
     #[test]
-    fn when_registry_does_not_contain_service_has_service_returns_false() {
-        // arrange
-        let registry = create_registry();
-        let service = ServiceConfigurationBuilder::new().build();
+    fn default_config() {
+        let config: Config = Default::default();
 
-        // act + assert
-        assert!(!registry.has_service(&service));
+        assert_eq!(Duration::from_secs(15), config.entry_ttl());
+    }
+
+    #[test]
+    fn config_set_entry_ttl_sets_new_value() {
+        let config: Config = Default::default();
+        let new_ttl = config.entry_ttl() + Duration::from_secs(60);
+
+        let ttl = config.set_entry_ttl_bounded(new_ttl).entry_ttl();
+
+        assert_eq!(new_ttl, ttl);
+    }
+
+    #[test]
+    fn config_set_entry_ttl_sets_min_allowed_if_new_value_is_too_small() {
+        let config: Config = Default::default();
+        let new_ttl = Config::ENTRY_TTL_MIN - Duration::from_nanos(1);
+
+        let ttl = config.set_entry_ttl_bounded(new_ttl).entry_ttl();
+
+        assert_eq!(Config::ENTRY_TTL_MIN, ttl);
     }
 
     #[test]
@@ -335,7 +438,7 @@ pub(crate) mod tests {
         let intents = vec![IntentConfigurationBuilder::new().build()];
 
         // act
-        registry.upsert(service.clone(), intents).unwrap();
+        registry.upsert(service.clone(), intents, now()).unwrap();
 
         // assert
         assert!(registry.has_service(&service));
@@ -348,7 +451,7 @@ pub(crate) mod tests {
         let service = ServiceConfigurationBuilder::new().build();
 
         // act
-        registry.upsert(service.clone(), vec![]).unwrap();
+        registry.upsert(service.clone(), vec![], now()).unwrap();
 
         // assert
         assert!(registry.has_service(&service));
@@ -363,7 +466,7 @@ pub(crate) mod tests {
         let service = ServiceConfigurationBuilder::with_nonce("2").build();
 
         // act
-        registry.upsert(service.clone(), setup.intents.clone()).unwrap();
+        registry.upsert(service.clone(), setup.intents.clone(), now()).unwrap();
 
         // assert
         registry.observer.assert_number_of_changes(&[1]);
@@ -382,7 +485,7 @@ pub(crate) mod tests {
         let updated_service = setup.service.url("http://updated_url").build();
 
         // act
-        registry.upsert(updated_service.clone(), setup.intents.clone()).unwrap();
+        registry.upsert(updated_service.clone(), setup.intents.clone(), now()).unwrap();
 
         // assert
         assert!(registry.has_service(&updated_service));
@@ -405,7 +508,7 @@ pub(crate) mod tests {
         let updated_service = setup.service.version("10.30.40").build();
 
         // act
-        registry.upsert(updated_service.clone(), setup.intents.clone()).unwrap();
+        registry.upsert(updated_service.clone(), setup.intents.clone(), now()).unwrap();
 
         // assert
         assert!(registry.has_service(&service));
@@ -435,12 +538,12 @@ pub(crate) mod tests {
         let intent_2 = IntentConfigurationBuilder::with_nonce("2").build();
 
         let mut registry = create_registry();
-        registry.upsert(service_a.clone().build(), vec![intent_1.clone()]).unwrap();
-        registry.upsert(service_b.clone().build(), vec![intent_1.clone()]).unwrap();
+        registry.upsert(service_a.clone().build(), vec![intent_1.clone()], now()).unwrap();
+        registry.upsert(service_b.clone().build(), vec![intent_1.clone()], now()).unwrap();
         registry.observer.clear();
 
         // act
-        registry.upsert(service_a_reregistration.clone(), vec![intent_2.clone()]).unwrap();
+        registry.upsert(service_a_reregistration.clone(), vec![intent_2.clone()], now()).unwrap();
 
         // assert
         registry.observer.assert_number_of_changes(&[2]);
@@ -466,7 +569,7 @@ pub(crate) mod tests {
             IntentConfiguration::new("some_other_namespace", IntentKind::Read);
 
         // act
-        registry.upsert(setup.service.build(), vec![reregistration_intent]).unwrap();
+        registry.upsert(setup.service.build(), vec![reregistration_intent], now()).unwrap();
 
         // assert
         registry.observer.assert_removed(&setup.intents[0]);
@@ -480,7 +583,7 @@ pub(crate) mod tests {
         let service = ServiceConfigurationBuilder::new().build();
 
         // act
-        registry.upsert(service.clone(), vec![intent.clone(), intent.clone()]).unwrap();
+        registry.upsert(service.clone(), vec![intent.clone(), intent.clone()], now()).unwrap();
 
         // assert
         assert!(registry.has_service(&service));
@@ -496,6 +599,9 @@ pub(crate) mod tests {
         test("system.registry");
         test("system.foo");
         test("system.");
+        test("System");
+        test("SYSTEM");
+        test("SYSTEM.Registry");
 
         fn test(namespace: &str) {
             // arrange
@@ -505,11 +611,145 @@ pub(crate) mod tests {
 
             // act
             let result =
-                create_registry().upsert(service_configuration, vec![intent_configuration]);
+                create_registry().upsert(service_configuration, vec![intent_configuration], now());
 
             // assert
             assert!(result.is_err());
         }
+    }
+
+    #[test_case(Specificity::Default, 15, 0, [])]
+    #[test_case(Specificity::Default, 15, 5, [])]
+    #[test_case(Specificity::Default, 15, 15, [])]
+    #[test_case(Specificity::Specific, 17, 0, [6, 2, 4])]
+    #[test_case(Specificity::Specific, 7, 10, [6, 2, 4])]
+    fn prune_schedule(
+        expected_specificity: Specificity,
+        expected_seconds_since_prune: u64,
+        prune_seconds: u64,
+        seconds: impl IntoIterator<Item = u64>,
+    ) {
+        let mut registry = create_registry();
+
+        let epoch: Instant = now();
+        let setup = ServiceConfigurationBuilder::dispense(1..)
+            .into_iter()
+            .map(|b| b.build())
+            .zip(IntentConfigurationBuilder::dispense(1..).into_iter().map(|b| vec![b.build()]))
+            .zip(seconds.into_iter().map(|s| epoch + Duration::from_secs(s)));
+
+        for ((service, intents), timestamp) in setup {
+            registry.upsert(service.clone(), intents.clone(), timestamp).unwrap();
+        }
+
+        let prune_time = epoch + Duration::from_secs(prune_seconds);
+        let (specificity, t) = registry.prune(prune_time);
+
+        assert_eq!(expected_specificity, specificity);
+        assert_eq!(expected_seconds_since_prune, t.duration_since(prune_time).as_secs());
+    }
+
+    #[test_case(0, 0, 15, true, true)]
+    #[test_case(0, 0, 16, false, false)]
+    #[test_case(0, 20, 5, false, true)]
+    #[test_case(0, 20, 10, false, true)]
+    #[test_case(0, 20, 15, false, true)]
+    #[test_case(0, 20, 16, false, false)]
+    fn prune_removes_expired_services(
+        first_registration_since_epoch: u64,
+        second_since_first_registration: u64,
+        prune_since_second_registration: u64,
+        expect_first_registered: bool,
+        expect_second_registered: bool,
+    ) {
+        let first_registration_since_epoch = Duration::from_secs(first_registration_since_epoch);
+        let second_since_first_registration = Duration::from_secs(second_since_first_registration);
+        let prune_since_second_registration = Duration::from_secs(prune_since_second_registration);
+
+        // arrange
+
+        let mut time = now();
+
+        let mut registry = create_registry();
+
+        let mut service_builder = ServiceConfigurationBuilder::dispense('a'..).into_iter();
+        let mut intent_builder = IntentConfigurationBuilder::dispense('a'..).into_iter();
+
+        let first_service = service_builder.next().unwrap().build();
+        let first_intent = intent_builder.next().unwrap().build();
+        time += first_registration_since_epoch;
+        registry.upsert(first_service.clone(), vec![first_intent.clone()], time).unwrap();
+
+        let second_service = service_builder.next().unwrap().build();
+        let second_intent = intent_builder.next().unwrap().build();
+        time += second_since_first_registration;
+        registry.upsert(second_service.clone(), vec![second_intent.clone()], time).unwrap();
+
+        registry.observer.clear();
+
+        time += prune_since_second_registration;
+
+        // act
+
+        registry.prune(time);
+
+        // assert
+
+        assert_eq!(expect_first_registered, registry.has_service(&first_service));
+        assert_eq!(expect_second_registered, registry.has_service(&second_service));
+
+        registry.observer.assert_number_of_changes(
+            match (expect_first_registered, expect_second_registered) {
+                (true, true) => &[],
+                (true, false) => &[1],
+                (false, true) => &[1],
+                (false, false) => &[2],
+            },
+        );
+
+        if !expect_first_registered {
+            registry.observer.assert_removed(&first_intent);
+        }
+
+        if !expect_second_registered {
+            registry.observer.assert_removed(&second_intent);
+        }
+    }
+
+    #[test]
+    fn touch_returns_false_if_service_is_unregistered() {
+        // arrange
+        let mut registry = create_registry();
+        let service = ServiceConfigurationBuilder::new().build();
+
+        // act
+        let found = registry.touch(&service, now());
+
+        // assert
+        assert!(!found);
+    }
+
+    #[test]
+    fn touch_updates_timestamp() {
+        // arrange
+        let mut now = now();
+        let mut registry = create_registry();
+        let service = ServiceConfigurationBuilder::new().build();
+        let intent = IntentConfigurationBuilder::new().build();
+        registry.upsert(service.clone(), vec![intent], now).unwrap();
+
+        // act
+        now += Duration::from_secs(10);
+        _ = registry.prune(now);
+        let found1 = registry.touch(&service, now);
+
+        now += Duration::from_secs(15);
+        _ = registry.prune(now);
+        let found2 = registry.touch(&service, now);
+
+        // assert
+        assert!(found1);
+        assert!(found2);
     }
 
     #[test]
@@ -802,7 +1042,7 @@ pub(crate) mod tests {
     }
 
     fn create_registry() -> Registry<MockBroker> {
-        Registry::new(MockBroker::new())
+        Registry::new(MockBroker::new(), Default::default())
     }
 
     #[derive(Clone)]
@@ -820,12 +1060,14 @@ pub(crate) mod tests {
         }
 
         fn build(self) -> Registry<MockBroker> {
-            let mut registry = Registry::new(MockBroker::new());
-            registry.upsert(self.service.clone().build(), self.intents).unwrap();
+            let mut registry = Registry::new(MockBroker::new(), Default::default());
+            registry.upsert(self.service.clone().build(), self.intents, now()).unwrap();
             registry.observer.clear();
             registry
         }
     }
+
+    use std::fmt::Display;
 
     #[derive(Clone)]
     pub struct ServiceConfigurationBuilder(ServiceConfiguration);
@@ -835,7 +1077,13 @@ pub(crate) mod tests {
             Self::with_nonce("0")
         }
 
-        pub fn with_nonce(nonce: &str) -> Self {
+        pub fn dispense(
+            nonce: impl IntoIterator<Item = impl Display>,
+        ) -> impl IntoIterator<Item = Self> {
+            nonce.into_iter().map(Self::with_nonce)
+        }
+
+        pub fn with_nonce(nonce: impl std::fmt::Display) -> Self {
             Self(ServiceConfiguration::new(
                 ServiceId::new(format!("mock-service-{nonce}"), "0.1.0"),
                 format!("http://service-{nonce}").parse().unwrap(),
@@ -876,7 +1124,13 @@ pub(crate) mod tests {
             Self::with_nonce("0")
         }
 
-        pub fn with_nonce(nonce: &str) -> Self {
+        pub fn dispense(
+            nonce: impl IntoIterator<Item = impl Display>,
+        ) -> impl IntoIterator<Item = Self> {
+            nonce.into_iter().map(Self::with_nonce)
+        }
+
+        pub fn with_nonce(nonce: impl std::fmt::Display) -> Self {
             Self(IntentConfiguration::new(format!("namespace-{nonce}"), IntentKind::Discover))
         }
 

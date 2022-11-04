@@ -46,5 +46,5 @@ else
       git push -f --set-upstream origin "$BRANCH_NAME"
       ## token needs repo access and read:org
       echo "$GITHUB_PAT_TOKEN" | gh auth login --with-token
-      gh pr create -B main -H "$BRANCH_NAME" --title $PR_TITLE --body 'This PR is merging latest changes related to notice file. Please review them before approving.'
+      gh pr create -B main -H "$BRANCH_NAME" --title "$PR_TITLE" --body 'This PR is merging latest changes related to notice file. Please review them before approving.'
 fi
