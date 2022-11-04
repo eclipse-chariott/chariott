@@ -151,18 +151,15 @@ mod tests {
             .collect::<Vec<_>>()
             .await;
 
-        // assert sources
-        assert_eq!(
-            vec![EVENT_A, EVENT_B],
-            result.iter().map(|e| e.source.clone()).collect::<Vec<_>>()
-        );
+        let expected_sources = [EVENT_A, EVENT_B];
 
-        // assert sequence numbers
-        assert_eq!(1, result[0].seq);
-        assert_eq!(1, result[1].seq);
+        assert_eq!(expected_sources.len(), result.len());
 
-        // assert payload
-        assert_eq!(Some(ValueMessage { value: Some(ValueEnum::Null(0)) }), result[0].value);
+        for (expected_source, actual) in expected_sources.into_iter().zip(result) {
+            assert_eq!(expected_source, actual.source.as_str());
+            assert_eq!(1, actual.seq);
+            assert_eq!(Some(ValueMessage { value: Some(ValueEnum::Null(0)) }), actual.value);
+        }
     }
 
     #[tokio::test]
