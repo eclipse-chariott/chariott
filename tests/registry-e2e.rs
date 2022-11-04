@@ -59,7 +59,7 @@ async fn when_provider_registers_notifies_registry_observers() -> anyhow::Result
     let builder = RegistrationBuilder::new(
         "registration.provider.e2e",
         "1.0.0",
-        "http://test-url:7090".parse().unwrap(), // arbitrary url, the provider will never be invoked
+        "http://localhost:7090".parse().unwrap(), // arbitrary url, the provider will never be invoked
         &namespace,
         [Intent::Inspect],
         ExecutionLocality::Local,
