@@ -4,8 +4,8 @@
 use std::collections::HashMap;
 
 use crate::connection_provider::{ConnectedProvider, ConnectionProvider};
-use crate::ess::Ess;
 use crate::registry::IntentConfiguration;
+use crate::streaming::StreamingEss;
 use async_recursion::async_recursion;
 use chariott_common::proto::common::discover_fulfillment::Service;
 use chariott_common::proto::{
@@ -47,7 +47,7 @@ pub enum RuntimeBinding<T: ConnectionProvider> {
     Fallback(Box<RuntimeBinding<T>>, Box<RuntimeBinding<T>>),
     SystemInspect(Vec<IntentConfiguration>),
     SystemDiscover(Url),
-    SystemSubscribe(Ess),
+    SystemSubscribe(StreamingEss),
     #[cfg(test)]
     Test(tests::TestBinding),
 }
@@ -379,7 +379,7 @@ pub(crate) mod tests {
     #[tokio::test]
     #[should_panic = "An intent other than 'Subscribe' was resolved to 'SystemSubscribe'."]
     async fn system_subscribe_binding_fails_with_non_supported_intent() {
-        _ = execute_with_empty_intent(RuntimeBinding::SystemSubscribe(Ess::new())).await;
+        _ = execute_with_empty_intent(RuntimeBinding::SystemSubscribe(StreamingEss::new())).await;
     }
 
     #[tokio::test]
@@ -387,14 +387,14 @@ pub(crate) mod tests {
         // arrange
         const EVENT: &str = "test-event";
 
-        let ess = Ess::new();
-        let response = ess.open(Request::new(OpenRequest {})).await.unwrap();
+        let streaming_ess = StreamingEss::new();
+        let response = streaming_ess.open(Request::new(OpenRequest {})).await.unwrap();
         let channel_id =
             response.metadata().get("x-chariott-channel-id").unwrap().to_str().unwrap().into();
         let stream = response.into_inner();
 
         // act
-        let result = RuntimeBinding::<GrpcProvider>::SystemSubscribe(ess.clone())
+        let result = RuntimeBinding::<GrpcProvider>::SystemSubscribe(streaming_ess.clone())
             .execute(IntentMessage {
                 intent: Some(IntentEnum::Subscribe(SubscribeIntent {
                     channel_id,
@@ -415,7 +415,7 @@ pub(crate) mod tests {
         );
 
         // assert that the correct subscription was served
-        ess.publish(EVENT, ());
+        streaming_ess.publish(EVENT, ());
         let result = stream.collect_when_stable().await;
         assert_eq!(1, result.len());
         assert_eq!(EVENT, result[0].as_ref().unwrap().source.as_str());

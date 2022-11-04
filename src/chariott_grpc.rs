@@ -182,8 +182,8 @@ fn map_locality_value(locality: i32) -> Result<ExecutionLocality, Status> {
 mod tests {
     use crate::execution::RuntimeBinding;
     use crate::registry::{Change, Observer, Registry};
+    use crate::streaming::StreamingEss;
     use crate::{connection_provider::GrpcProvider, execution::tests::TestBinding};
-    use chariott_common::ess::SharedEss;
     use chariott_common::proto::{
         common, runtime as runtime_api,
         runtime::{
@@ -431,7 +431,8 @@ mod tests {
     }
 
     fn setup() -> ChariottServer<IntentBroker> {
-        let broker = IntentBroker::new("https://localhost:4243".parse().unwrap(), SharedEss::new());
+        let broker =
+            IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new());
         ChariottServer::new(Registry::new(broker.clone(), Default::default()), broker)
     }
 

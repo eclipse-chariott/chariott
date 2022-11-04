@@ -2,8 +2,8 @@
 // Licensed under the MIT license.
 
 use chariott_common::{
-    ess::SharedEss as InnerEss,
     proto::common::{fulfillment::Fulfillment, ReadFulfillment, ReadIntent, SubscribeIntent},
+    streaming_ess::StreamingEss as InnerEss,
 };
 use keyvalue::{InMemoryKeyValueStore, Observer};
 use std::sync::RwLock;

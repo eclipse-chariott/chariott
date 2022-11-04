@@ -8,7 +8,7 @@ use std::time::{Duration, Instant};
 use chariott_common::error::Error;
 use url::Url;
 
-use crate::ess::Ess;
+use crate::streaming::StreamingEss;
 
 const SYSTEM_NAMESPACE: &str = "system";
 const SYSTEM_NAMESPACE_PREFIX: &str = "system.";
@@ -26,7 +26,7 @@ pub trait Observer {
     fn on_change<'a>(&self, changes: impl Iterator<Item = Change<'a>> + Clone);
 }
 
-impl Observer for Ess {
+impl Observer for StreamingEss {
     fn on_change<'a>(&self, changes: impl IntoIterator<Item = Change<'a>>) {
         for namespace in changes
             .into_iter()
@@ -387,8 +387,8 @@ pub(crate) mod tests {
     };
 
     use chariott_common::{
-        ess::SharedEss,
         proto::common::{value::Value, SubscribeIntent},
+        streaming_ess::StreamingEss,
     };
     use test_case::test_case;
 
@@ -886,7 +886,7 @@ pub(crate) mod tests {
             // arrange
             const CLIENT_ID: &str = "CLIENT";
 
-            let subject = SharedEss::new();
+            let subject = StreamingEss::new();
             let (_, stream) = subject.read_events(CLIENT_ID.into());
 
             // always subscribe to all possible namespace changes.

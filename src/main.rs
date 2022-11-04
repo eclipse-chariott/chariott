@@ -2,11 +2,10 @@
 // Licensed under the MIT license.
 
 use chariott::chariott_grpc::ChariottServer;
-use chariott::ess::Ess;
 use chariott::registry::{self, Registry};
+use chariott::streaming::StreamingEss;
 use chariott::IntentBroker;
 use chariott_common::config::{env, try_env};
-use chariott_common::ess::SharedEss;
 use chariott_common::ext::OptionExt as _;
 use chariott_common::proto::{
     runtime::chariott_service_server::ChariottServiceServer,
@@ -41,7 +40,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     collector.init();
 
-    let ess = SharedEss::new();
+    let streaming_ess = StreamingEss::new();
     let broker = IntentBroker::new(
         format!(
             "http://{}:{}",
@@ -50,7 +49,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .parse()
         .unwrap(),
-        ess.clone(),
+        streaming_ess.clone(),
     );
 
     let registry_config = try_env::<u64>("CHARIOTT_REGISTRY_TTL_SECS")
@@ -61,7 +60,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     tracing::debug!("Registry entry TTL = {} (seconds)", registry_config.entry_ttl().as_secs_f64());
 
-    let registry = Registry::new(Composite::new(broker.clone(), ess.clone()), registry_config);
+    let registry =
+        Registry::new(Composite::new(broker.clone(), streaming_ess.clone()), registry_config);
 
     #[cfg(build = "debug")]
     let reflection_service = tonic_reflection::server::Builder::configure()
@@ -75,7 +75,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let server = Arc::new(ChariottServer::new(registry, broker));
     let router = Server::builder()
         .add_service(ChariottServiceServer::from_arc(Arc::clone(&server)))
-        .add_service(ChannelServiceServer::new(ess));
+        .add_service(ChannelServiceServer::new(streaming_ess));
 
     #[cfg(build = "debug")]
     let router = router.add_service(reflection_service);
@@ -107,7 +107,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn registry_prune_loop(
-    server: Arc<ChariottServer<Composite<IntentBroker, Ess>>>,
+    server: Arc<ChariottServer<Composite<IntentBroker, StreamingEss>>>,
     ctrl_c_cancellation_token: CancellationToken,
     error_cancellation_token: CancellationToken,
 ) {

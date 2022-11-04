@@ -26,7 +26,7 @@ pub mod ext;
 pub mod config;
 
 /// Integration of the event sub-system with the gRPC streaming contract.
-pub mod ess;
+pub mod streaming_ess;
 
 /// Protobuf generated files.
 pub mod proto;

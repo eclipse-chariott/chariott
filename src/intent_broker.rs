@@ -10,9 +10,9 @@ use url::Url;
 
 use crate::{
     connection_provider::{ConnectionProvider, GrpcProvider, ReusableProvider},
-    ess::Ess,
     execution::RuntimeBinding,
     registry::{Change, ExecutionLocality, IntentConfiguration, IntentKind, Observer},
+    streaming::StreamingEss,
 };
 
 type Provider = ReusableProvider<GrpcProvider>;
@@ -23,7 +23,7 @@ enum Binding {
     Fallback(Box<Binding>, Box<Binding>),
     SystemInspect,
     SystemDiscover(Url),
-    SystemSubscribe(Ess),
+    SystemSubscribe(StreamingEss),
 }
 
 #[derive(Default)]
@@ -32,7 +32,7 @@ struct IntentBinder {
 }
 
 impl IntentBinder {
-    pub fn new(streaming_url: Url, ess: Ess) -> Self {
+    pub fn new(streaming_url: Url, streaming_ess: StreamingEss) -> Self {
         const SYSTEM_REGISTRY_NAMESPACE: &str = "system.registry";
 
         Self {
@@ -47,7 +47,7 @@ impl IntentBinder {
                 ),
                 (
                     IntentConfiguration::new(SYSTEM_REGISTRY_NAMESPACE, IntentKind::Subscribe),
-                    Binding::SystemSubscribe(ess),
+                    Binding::SystemSubscribe(streaming_ess),
                 ),
             ]),
         }
@@ -139,8 +139,8 @@ impl IntentBinder {
 pub struct IntentBroker(Arc<RwLock<IntentBinder>>);
 
 impl IntentBroker {
-    pub fn new(streaming_url: Url, ess: Ess) -> Self {
-        Self(Arc::new(RwLock::new(IntentBinder::new(streaming_url, ess))))
+    pub fn new(streaming_url: Url, streaming_ess: StreamingEss) -> Self {
+        Self(Arc::new(RwLock::new(IntentBinder::new(streaming_url, streaming_ess))))
     }
 
     pub fn resolve(&self, intent: &IntentConfiguration) -> Option<RuntimeBinding<Provider>> {
@@ -161,7 +161,7 @@ mod tests {
         sync::Arc,
     };
 
-    use chariott_common::ess::SharedEss;
+    use chariott_common::streaming_ess::StreamingEss;
     use url::Url;
 
     use crate::{
@@ -178,7 +178,7 @@ mod tests {
     fn when_empty_does_not_resolve() {
         // arrange
         let subject =
-            IntentBroker::new("https://localhost:4243".parse().unwrap(), SharedEss::new());
+            IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new());
 
         // act + assert
         assert!(subject.resolve(&IntentConfigurationBuilder::new().build()).is_none());
@@ -417,7 +417,8 @@ mod tests {
         }
 
         fn build(self) -> IntentBroker {
-            let broker = IntentBroker::new(Self::STREAMING_URL.parse().unwrap(), SharedEss::new());
+            let broker =
+                IntentBroker::new(Self::STREAMING_URL.parse().unwrap(), StreamingEss::new());
 
             broker.on_change(
                 [Change::Add(&self.intent, &HashSet::from([self.service.build()]))].into_iter(),
@@ -438,7 +439,7 @@ mod tests {
 
         fn combine(setups: impl IntoIterator<Item = Setup>) -> IntentBroker {
             let broker =
-                IntentBroker::new("https://localhost:4243".parse().unwrap(), SharedEss::new());
+                IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new());
 
             let services_by_intent = setups.into_iter().fold(HashMap::new(), |mut acc, s| {
                 acc.entry(s.intent.clone()).or_insert_with(Vec::new).push(s.service);

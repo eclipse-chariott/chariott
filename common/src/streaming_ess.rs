@@ -16,26 +16,26 @@ use uuid::Uuid;
 
 type EventSubSystem<T> = ess::EventSubSystem<Box<str>, Box<str>, T, Result<Event, Status>>;
 
-/// [`SharedEss`](SharedEss) integrates the reusable
+/// [`StreamingEss`](StreamingEss) integrates the reusable
 /// [`EventSubSystem`](ess::EventSubSystem) component with the Chariott gRPC
-/// streaming contract. Cloning [`SharedEss`](SharedEss) is cheap, it will not
-/// create a new instance but refer to the same underlying instance instead.
+/// streaming contract. Cloning [`StreamingEss`](StreamingEss) is cheap, it will
+/// not create a new instance but refer to the same underlying instance instead.
 #[derive(Clone)]
-pub struct SharedEss<T>(Arc<EventSubSystem<T>>);
+pub struct StreamingEss<T>(Arc<EventSubSystem<T>>);
 
-impl<T: Clone> SharedEss<T> {
+impl<T: Clone> StreamingEss<T> {
     pub fn new() -> Self {
         Self(Arc::new(EventSubSystem::new()))
     }
 }
 
-impl<T: Clone> Default for SharedEss<T> {
+impl<T: Clone> Default for StreamingEss<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T: Clone + Send + 'static> SharedEss<T> {
+impl<T: Clone + Send + 'static> StreamingEss<T> {
     pub fn serve_subscriptions(
         &self,
         subscribe_intent: SubscribeIntent,
@@ -66,7 +66,7 @@ impl<T: Clone + Send + 'static> SharedEss<T> {
 }
 
 #[async_trait]
-impl<T> ChannelService for SharedEss<T>
+impl<T> ChannelService for StreamingEss<T>
 where
     T: Clone + Send + Sync + 'static,
 {
@@ -86,7 +86,7 @@ where
     }
 }
 
-impl<T> Deref for SharedEss<T> {
+impl<T> Deref for StreamingEss<T> {
     type Target = EventSubSystem<T>;
 
     fn deref(&self) -> &Self::Target {
@@ -106,7 +106,7 @@ mod tests {
     use tokio_stream::StreamExt as _;
     use tonic::{Code, Request};
 
-    use super::SharedEss;
+    use super::StreamingEss;
 
     #[tokio::test]
     async fn open_should_set_channel_id() {
@@ -182,7 +182,7 @@ mod tests {
         assert_eq!("The specified client does not exist.", result.message());
     }
 
-    fn setup() -> SharedEss<()> {
+    fn setup() -> StreamingEss<()> {
         Default::default()
     }
 }

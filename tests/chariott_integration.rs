@@ -8,9 +8,9 @@ use async_trait::async_trait;
 use chariott::registry::{
     ExecutionLocality, IntentConfiguration, IntentKind, ServiceConfiguration, ServiceId,
 };
+use chariott::streaming::StreamingEss;
 use chariott::{chariott_grpc::ChariottServer, registry::Registry, IntentBroker};
 use chariott_common::error::{Error, ResultExt as _};
-use chariott_common::ess::SharedEss;
 use chariott_common::proto::common::{intent::Intent as InnerIntent, Intent};
 use chariott_common::proto::runtime::chariott_service_server::ChariottService;
 use chariott_common::proto::runtime::{FulfillRequest, FulfillResponse};
@@ -118,7 +118,7 @@ async fn when_cancelled_shuts_down_provider() -> anyhow::Result<()> {
     let cancellation_token = CancellationToken::new();
     let handle = spawn(
         Server::builder()
-            .add_service(ChannelServiceServer::new(SharedEss::<()>::new()))
+            .add_service(ChannelServiceServer::new(StreamingEss::new()))
             .serve_with_cancellation(
                 format!("0.0.0.0:{}", get_port()).parse().unwrap(),
                 cancellation_token.child_token(),
@@ -162,7 +162,7 @@ async fn setup(provider: Provider) -> Subject {
 
 async fn setup_multiple(providers: impl IntoIterator<Item = ProviderSetup>) -> Subject {
     let namespace = "sdv.integration".to_owned();
-    let broker = IntentBroker::new("https://localhost:4243".parse().unwrap(), SharedEss::new());
+    let broker = IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new());
     let mut registry = Registry::new(broker.clone(), Default::default());
 
     for ProviderSetup { provider, port, name, locality } in providers {

@@ -6,5 +6,5 @@ mod connection_provider;
 mod execution;
 mod intent_broker;
 pub use intent_broker::IntentBroker;
-pub mod ess;
 pub mod registry;
+pub mod streaming;
