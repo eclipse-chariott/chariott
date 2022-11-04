@@ -49,8 +49,8 @@ async fn expired_registrations_are_pruned_after_ttl() -> Result<(), anyhow::Erro
 
 #[tokio::test]
 async fn when_provider_registers_notifies_registry_observers() -> anyhow::Result<()> {
-    fn namespace_event(namespace: &str) -> String {
-        format!("namespaces/{}", namespace)
+    fn namespace_event(namespace: &str) -> Box<str> {
+        format!("namespaces/{}", namespace).into()
     }
 
     // arrange
@@ -68,15 +68,14 @@ async fn when_provider_registers_notifies_registry_observers() -> anyhow::Result
     let mut subject = setup().await;
 
     // act
-    let stream =
-        subject.listen("system.registry", vec![namespace_event(&namespace).into()]).await?;
+    let stream = subject.listen("system.registry", vec![namespace_event(&namespace)]).await?;
 
     builder.register_once(&mut None, true).await?;
 
     // assert
     let stream = stream.timeout(Duration::from_secs(5)).take(1).collect::<Vec<_>>().await;
     let result = stream.into_iter().next().unwrap();
-    assert_eq!(namespace_event(&namespace).as_str(), result.unwrap().unwrap().id.as_ref());
+    assert_eq!(namespace_event(&namespace), result.unwrap().unwrap().id);
 
     Ok(())
 }
