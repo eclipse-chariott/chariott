@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1667554009406,
+  "lastUpdate": 1667580727320,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -1248,6 +1248,84 @@ window.BENCHMARK_DATA = {
             "value": 4,
             "unit": "Millisecond",
             "range": "p95=7"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "22341213+bastbu@users.noreply.github.com",
+            "name": "Bastian Burger",
+            "username": "bastbu"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8af649426d8c14205650118a5d26ba9f51e7c5aa",
+          "message": "Support subscription to registry changes (#15)",
+          "timestamp": "2022-11-04T17:37:04+01:00",
+          "tree_id": "a330a95278865ac4b683de6c480485b6d61e95a2",
+          "url": "https://github.com/eclipse/chariott/commit/8af649426d8c14205650118a5d26ba9f51e7c5aa"
+        },
+        "date": 1667580726389,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1764",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "5",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 33,
+            "unit": "Percent",
+            "range": "p95=35"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6791,
+            "unit": "Bytes",
+            "range": "p95=6827"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 7,
+            "unit": "Millisecond",
+            "range": "p95=11"
           }
         ]
       }
