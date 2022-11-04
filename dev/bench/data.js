@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1667498322733,
+  "lastUpdate": 1667554009406,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -1170,6 +1170,84 @@ window.BENCHMARK_DATA = {
             "value": 5,
             "unit": "Millisecond",
             "range": "p95=10"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "23ff8351d6926ca4a0baa47f569cc05cdd9ab745",
+          "message": "chore: Bump base64 from 0.13.0 to 0.13.1 (#4)\n\nBumps [base64](https://github.com/marshallpierce/rust-base64) from 0.13.0 to 0.13.1.\r\n- [Release notes](https://github.com/marshallpierce/rust-base64/releases)\r\n- [Changelog](https://github.com/marshallpierce/rust-base64/blob/master/RELEASE-NOTES.md)\r\n- [Commits](https://github.com/marshallpierce/rust-base64/compare/v0.13.0...v0.13.1)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: base64\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2022-11-04T10:15:06+01:00",
+          "tree_id": "1ffb8e8a26dfd4fd68f8062c10b02f9f189a7653",
+          "url": "https://github.com/eclipse/chariott/commit/23ff8351d6926ca4a0baa47f569cc05cdd9ab745"
+        },
+        "date": 1667554008586,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1912",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "6",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 23,
+            "unit": "Percent",
+            "range": "p95=24"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 3097,
+            "unit": "Bytes",
+            "range": "p95=3289"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 4,
+            "unit": "Millisecond",
+            "range": "p95=7"
           }
         ]
       }
