@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1667497591365,
+  "lastUpdate": 1667553624978,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -899,6 +899,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 251333090,
             "range": "± 755416",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "23ff8351d6926ca4a0baa47f569cc05cdd9ab745",
+          "message": "chore: Bump base64 from 0.13.0 to 0.13.1 (#4)\n\nBumps [base64](https://github.com/marshallpierce/rust-base64) from 0.13.0 to 0.13.1.\r\n- [Release notes](https://github.com/marshallpierce/rust-base64/releases)\r\n- [Changelog](https://github.com/marshallpierce/rust-base64/blob/master/RELEASE-NOTES.md)\r\n- [Commits](https://github.com/marshallpierce/rust-base64/compare/v0.13.0...v0.13.1)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: base64\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2022-11-04T10:15:06+01:00",
+          "tree_id": "1ffb8e8a26dfd4fd68f8062c10b02f9f189a7653",
+          "url": "https://github.com/eclipse/chariott/commit/23ff8351d6926ca4a0baa47f569cc05cdd9ab745"
+        },
+        "date": 1667553624054,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 475450,
+            "range": "± 9702",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2660515,
+            "range": "± 24462",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 24927242,
+            "range": "± 202674",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 3970978,
+            "range": "± 63270",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 26310689,
+            "range": "± 111051",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 251996554,
+            "range": "± 458908",
             "unit": "ns/iter"
           }
         ]
