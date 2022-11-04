@@ -3,7 +3,7 @@
 
 use chariott_common::{
     proto::common::{fulfillment::Fulfillment, ReadFulfillment, ReadIntent, SubscribeIntent},
-    streaming_ess::StreamingEss as InnerEss,
+    streaming_ess::StreamingEss,
 };
 use keyvalue::{InMemoryKeyValueStore, Observer};
 use std::sync::RwLock;
@@ -13,10 +13,12 @@ use crate::chariott::proto::{common::value::Value as ProtoValue, common::Value a
 
 type EventId = Box<str>;
 
+/// Wrapper around the [`StreamingEss`](StreamingEss) to allow implementing the
+/// `Observer` trait for said type.
 #[derive(Clone)]
-struct Ess<T>(InnerEss<(EventId, T)>);
+struct InternalStreamingEss<T>(StreamingEss<(EventId, T)>);
 
-impl<T: Clone + Send + 'static> Observer<EventId, T> for Ess<T> {
+impl<T: Clone + Send + 'static> Observer<EventId, T> for InternalStreamingEss<T> {
     fn on_set(&mut self, key: &EventId, value: &T) {
         self.0.publish(key, (key.clone(), value.clone()));
     }
@@ -27,19 +29,19 @@ impl<T: Clone + Send + 'static> Observer<EventId, T> for Ess<T> {
 /// value to be published, as long as that value can be transformed into a value
 /// which is compatible with the Proto contract.
 pub struct StreamingStore<T> {
-    ess: Ess<T>,
-    store: RwLock<InMemoryKeyValueStore<EventId, T, Ess<T>>>,
+    ess: InternalStreamingEss<T>,
+    store: RwLock<InMemoryKeyValueStore<EventId, T, InternalStreamingEss<T>>>,
 }
 
 impl<T> StreamingStore<T> {
-    pub fn ess(&self) -> &InnerEss<(EventId, T)> {
+    pub fn ess(&self) -> &StreamingEss<(EventId, T)> {
         &self.ess.0
     }
 }
 
 impl<T: Clone + Send + 'static> StreamingStore<T> {
     pub fn new() -> Self {
-        let ess = Ess(InnerEss::new());
+        let ess = InternalStreamingEss(StreamingEss::new());
         let store = RwLock::new(InMemoryKeyValueStore::new(Some(ess.clone())));
         Self { ess, store }
     }
