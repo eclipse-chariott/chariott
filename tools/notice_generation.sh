@@ -32,7 +32,7 @@ fi
 
 NOTICE_FILENAME="NOTICE"
 echo "Running cargo-about for NOTICE file generation..."
-cargo about generate --workspace devops/cg/about.hbs --config devops/cg/about.toml | sed -E 's/[ \t]+$//' > $NOTICE_FILENAME
+cargo about generate --workspace devops/cg/about.hbs --config devops/cg/about.toml | sed -E 's/[ \t]+\r?$//' > $NOTICE_FILENAME
 
 if [ -z "$(git diff --name-only $NOTICE_FILENAME)" ]
 then
