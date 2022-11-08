@@ -12,6 +12,7 @@ members = [
     "examples/applications/simulated-camera",
     "examples/common",
     "keyvalue",
+    "kuksa/kuksa_databroker/databroker",
 ]
 
 exclude = []

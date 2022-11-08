@@ -1,0 +1,12 @@
+[submodule "3rd-party-libs/jsoncons"]
+	path = kuksa-val-server/3rd-party-libs/jsoncons
+	url = https://github.com/danielaparker/jsoncons.git
+[submodule "3rd-party-libs/jwt-cpp"]
+	path = kuksa-val-server/3rd-party-libs/jwt-cpp
+	url = https://github.com/Thalhammer/jwt-cpp.git
+[submodule "3rd-party-libs/turtle"]
+	path = kuksa-val-server/3rd-party-libs/turtle
+	url = https://github.com/mat007/turtle.git
+[submodule "kuksa-feeders"]
+	path = kuksa-feeders
+	url = https://github.com/eclipse/kuksa.val.feeders.git
