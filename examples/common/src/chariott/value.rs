@@ -140,13 +140,13 @@ impl From<&str> for Value {
 
 impl From<i32> for Value {
     fn from(value: i32) -> Self {
-        Value(ValueEnum::Int32(value as _))
+        Value(ValueEnum::Int32(value))
     }
 }
 
 impl From<i64> for Value {
     fn from(value: i64) -> Self {
-        Value(ValueEnum::Int64(value as _))
+        Value(ValueEnum::Int64(value))
     }
 }
 
