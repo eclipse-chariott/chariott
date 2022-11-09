@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1667987029547,
+  "lastUpdate": 1667987494721,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -1139,6 +1139,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 249467075,
             "range": "± 634973",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2ec16c5b4c31eeffe0689281b1eb0490b148cbc3",
+          "message": "chore: Bump anyhow from 1.0.65 to 1.0.66 (#25)\n\nBumps [anyhow](https://github.com/dtolnay/anyhow) from 1.0.65 to 1.0.66.\r\n- [Release notes](https://github.com/dtolnay/anyhow/releases)\r\n- [Commits](https://github.com/dtolnay/anyhow/compare/1.0.65...1.0.66)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: anyhow\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2022-11-09T10:13:59+01:00",
+          "tree_id": "47b3dc2b8bc0bd967961698d1e7d6a2404ceed2a",
+          "url": "https://github.com/eclipse/chariott/commit/2ec16c5b4c31eeffe0689281b1eb0490b148cbc3"
+        },
+        "date": 1667987493370,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 528777,
+            "range": "± 37818",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3087215,
+            "range": "± 112253",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 28435767,
+            "range": "± 1076461",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 4799275,
+            "range": "± 249625",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 30553622,
+            "range": "± 741579",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 300321071,
+            "range": "± 2205074",
             "unit": "ns/iter"
           }
         ]
