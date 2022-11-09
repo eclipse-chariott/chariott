@@ -150,6 +150,18 @@ impl From<i64> for Value {
     }
 }
 
+impl From<f32> for Value {
+    fn from(value: f32) -> Self {
+        Value(ValueEnum::Float32(value))
+    }
+}
+
+impl From<f64> for Value {
+    fn from(value: f64) -> Self {
+        Value(ValueEnum::Float64(value))
+    }
+}
+
 impl From<bool> for Value {
     fn from(value: bool) -> Self {
         Value(ValueEnum::Bool(value))
