@@ -7,13 +7,12 @@ use crate::connection_provider::{ConnectedProvider, ConnectionProvider};
 use crate::registry::IntentConfiguration;
 use crate::streaming::StreamingEss;
 use async_recursion::async_recursion;
-use chariott_common::proto::common::discover_fulfillment::Service;
 use chariott_common::proto::{
     common::{
-        fulfillment::Fulfillment as FulfillmentEnum, inspect_fulfillment::Entry,
-        intent::Intent as IntentEnum, value::Value as ValueEnum, DiscoverFulfillment,
-        Fulfillment as FulfillmentMessage, InspectFulfillment, Intent as IntentMessage, List,
-        Value as ValueMessage,
+        discover_fulfillment::Service, fulfillment::Fulfillment as FulfillmentEnum,
+        inspect_fulfillment::Entry, intent::Intent as IntentEnum, value::Value as ValueEnum,
+        DiscoverFulfillment, Fulfillment as FulfillmentMessage, InspectFulfillment,
+        Intent as IntentMessage, List, Value as ValueMessage,
     },
     provider::{FulfillRequest, FulfillResponse},
 };

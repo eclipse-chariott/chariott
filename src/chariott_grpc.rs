@@ -4,6 +4,14 @@
 use std::sync::{Arc, RwLock};
 use std::time::Instant;
 
+use chariott_common::proto::{
+    common::intent::Intent,
+    runtime::{
+        chariott_service_server::ChariottService, AnnounceRequest, AnnounceResponse,
+        FulfillRequest, FulfillResponse, IntentRegistration, IntentServiceRegistration,
+        RegisterRequest, RegisterResponse, RegistrationState,
+    },
+};
 use tonic::{async_trait, Request, Response, Status};
 use url::Url;
 
@@ -12,8 +20,6 @@ use crate::registry::{
     ExecutionLocality, IntentConfiguration, IntentKind, Observer, Registry, ServiceConfiguration,
     ServiceId,
 };
-use chariott_common::proto::*;
-use chariott_common::proto::{runtime as runtime_api, runtime::IntentRegistration};
 
 // Enums are mapped to i32 in proto, we map
 // the values here to the actual values in the proto.
@@ -61,26 +67,24 @@ impl<T: Observer> ChariottServer<T> {
         }
     }
 
-    fn map_intent_variant(intent: &common::intent::Intent) -> IntentKind {
+    fn map_intent_variant(intent: &Intent) -> IntentKind {
         match intent {
-            common::intent::Intent::Discover(_) => IntentKind::Discover,
-            common::intent::Intent::Inspect(_) => IntentKind::Inspect,
-            common::intent::Intent::Read(_) => IntentKind::Read,
-            common::intent::Intent::Write(_) => IntentKind::Write,
-            common::intent::Intent::Invoke(_) => IntentKind::Invoke,
-            common::intent::Intent::Subscribe(_) => IntentKind::Subscribe,
+            Intent::Discover(_) => IntentKind::Discover,
+            Intent::Inspect(_) => IntentKind::Inspect,
+            Intent::Read(_) => IntentKind::Read,
+            Intent::Write(_) => IntentKind::Write,
+            Intent::Invoke(_) => IntentKind::Invoke,
+            Intent::Subscribe(_) => IntentKind::Subscribe,
         }
     }
 }
 
 #[async_trait]
-impl<T: Observer + Send + Sync + 'static> runtime_api::chariott_service_server::ChariottService
-    for ChariottServer<T>
-{
+impl<T: Observer + Send + Sync + 'static> ChariottService for ChariottServer<T> {
     async fn announce(
         &self,
-        request: Request<runtime_api::AnnounceRequest>,
-    ) -> Result<Response<runtime_api::AnnounceResponse>, Status> {
+        request: Request<AnnounceRequest>,
+    ) -> Result<Response<AnnounceResponse>, Status> {
         let service = request
             .into_inner()
             .service
@@ -88,21 +92,19 @@ impl<T: Observer + Send + Sync + 'static> runtime_api::chariott_service_server::
         let svc_cfg = resolve_service_configuration(service)?;
         let registration_state = if self.registry.write().unwrap().touch(&svc_cfg, Instant::now()) {
             tracing::debug!("Service {:#?} already announced", svc_cfg);
-            runtime_api::RegistrationState::NotChanged
+            RegistrationState::NotChanged
         } else {
             tracing::debug!("Service {:#?} not yet announced", svc_cfg);
-            runtime_api::RegistrationState::Announced
+            RegistrationState::Announced
         };
 
-        Ok(Response::new(runtime_api::AnnounceResponse {
-            registration_state: registration_state as i32,
-        }))
+        Ok(Response::new(AnnounceResponse { registration_state: registration_state as i32 }))
     }
 
     async fn register(
         &self,
-        request: Request<runtime_api::RegisterRequest>,
-    ) -> Result<Response<runtime_api::RegisterResponse>, Status> {
+        request: Request<RegisterRequest>,
+    ) -> Result<Response<RegisterResponse>, Status> {
         let request = request.into_inner();
         let service =
             request.service.ok_or_else(|| Status::invalid_argument("service is required"))?;
@@ -117,13 +119,13 @@ impl<T: Observer + Send + Sync + 'static> runtime_api::chariott_service_server::
             .unwrap()
             .upsert(svc_cfg, intents?, Instant::now())
             .map_err(|e| Status::unknown(e.message()))?;
-        Ok(Response::new(runtime_api::RegisterResponse {}))
+        Ok(Response::new(RegisterResponse {}))
     }
 
     async fn fulfill(
         &self,
-        request: Request<runtime_api::FulfillRequest>,
-    ) -> Result<Response<runtime_api::FulfillResponse>, Status> {
+        request: Request<FulfillRequest>,
+    ) -> Result<Response<FulfillResponse>, Status> {
         let request = request.into_inner();
         let intent =
             request.intent.ok_or_else(|| Status::invalid_argument("intent is required"))?;
@@ -148,12 +150,12 @@ impl<T: Observer + Send + Sync + 'static> runtime_api::chariott_service_server::
 
         let response = binding.execute(intent).await?;
 
-        Ok(tonic::Response::new(runtime_api::FulfillResponse { fulfillment: response.fulfillment }))
+        Ok(tonic::Response::new(FulfillResponse { fulfillment: response.fulfillment }))
     }
 }
 
 fn resolve_service_configuration(
-    service: runtime_api::IntentServiceRegistration,
+    service: IntentServiceRegistration,
 ) -> Result<ServiceConfiguration, Status> {
     map_locality_value(service.locality)
         .and_then(|locality| {
