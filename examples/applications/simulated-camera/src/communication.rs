@@ -11,11 +11,11 @@ use url::Url;
 
 use chariott_common::{
     error::{Error, ResultExt as _},
+    proto::{
+        provider::provider_service_server::ProviderServiceServer,
+        streaming::channel_service_server::ChannelServiceServer,
+    },
     shutdown::{ctrl_c_cancellation, RouterExt as _},
-};
-use examples_common::chariott::proto::{
-    provider::provider_service_server::ProviderServiceServer,
-    streaming::channel_service_server::ChannelServiceServer,
 };
 
 use crate::{

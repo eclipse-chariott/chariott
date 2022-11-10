@@ -2,14 +2,15 @@
 // Licensed under the MIT license.
 
 use chariott_common::{
-    proto::common::{fulfillment::Fulfillment, ReadFulfillment, ReadIntent, SubscribeIntent},
+    proto::common::{
+        fulfillment::Fulfillment, value::Value as ValueEnum, ReadFulfillment, ReadIntent,
+        SubscribeIntent, Value as ValueMessage,
+    },
     streaming_ess::StreamingEss,
 };
 use keyvalue::{InMemoryKeyValueStore, Observer};
 use std::sync::RwLock;
 use tonic::Status;
-
-use crate::chariott::proto::{common::value::Value as ProtoValue, common::Value as ValueMessage};
 
 type EventId = Box<str>;
 
@@ -55,7 +56,7 @@ impl<T: Clone + Send + 'static> Default for StreamingStore<T> {
 
 impl<T> StreamingStore<T>
 where
-    T: Into<ProtoValue> + Clone + Send + Sync + 'static,
+    T: Into<ValueEnum> + Clone + Send + Sync + 'static,
 {
     /// Read a value from the store.
     pub fn get(&self, key: &EventId) -> Option<T> {
@@ -75,7 +76,7 @@ pub trait ProtoExt {
 
 impl<T> ProtoExt for StreamingStore<T>
 where
-    T: Into<ProtoValue> + Clone + Send + Sync + 'static,
+    T: Into<ValueEnum> + Clone + Send + Sync + 'static,
 {
     fn subscribe(&self, subscribe_intent: SubscribeIntent) -> Result<Fulfillment, Status> {
         let result = self.ess().serve_subscriptions(subscribe_intent, |(_, v)| v.into())?;

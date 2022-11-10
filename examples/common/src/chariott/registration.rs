@@ -11,12 +11,13 @@ use url::Url;
 use chariott_common::{
     config,
     error::{Error, ResultExt},
+    proto::runtime::{
+        chariott_service_client::ChariottServiceClient, intent_registration::Intent,
+        intent_service_registration::ExecutionLocality, AnnounceRequest, IntentRegistration,
+        IntentServiceRegistration, RegisterRequest, RegistrationState,
+    },
 };
 
-use crate::chariott::proto::runtime_api::{
-    chariott_service_client::ChariottServiceClient, intent_service_registration::ExecutionLocality,
-    *,
-};
 use crate::url::UrlExt as _;
 
 const CHARIOTT_URL_KEY: &str = "CHARIOTT_URL";
@@ -34,7 +35,7 @@ pub struct Builder {
     announce_url: Url,
     provider_url: Url,
     namespace: Box<str>,
-    intents: Vec<intent_registration::Intent>,
+    intents: Vec<Intent>,
     chariott_url: Url,
     registration_interval: Duration,
     locality: ExecutionLocality,
@@ -46,7 +47,7 @@ impl Builder {
         version: &str,
         url: Url,
         namespace: &str,
-        intents: impl IntoIterator<Item = intent_registration::Intent>,
+        intents: impl IntoIterator<Item = Intent>,
         locality: ExecutionLocality,
     ) -> Self {
         let chariott_url = env::var(CHARIOTT_URL_KEY)

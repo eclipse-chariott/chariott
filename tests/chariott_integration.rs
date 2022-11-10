@@ -11,14 +11,15 @@ use chariott::registry::{
 use chariott::streaming::StreamingEss;
 use chariott::{chariott_grpc::ChariottServer, registry::Registry, IntentBroker};
 use chariott_common::error::{Error, ResultExt as _};
-use chariott_common::proto::common::{intent::Intent as InnerIntent, Intent};
-use chariott_common::proto::runtime::chariott_service_server::ChariottService;
-use chariott_common::proto::runtime::{FulfillRequest, FulfillResponse};
+use chariott_common::proto::{
+    common::{intent::Intent as InnerIntent, Intent},
+    runtime::{chariott_service_server::ChariottService, FulfillRequest, FulfillResponse},
+    streaming::channel_service_server::ChannelServiceServer,
+};
 use chariott_common::shutdown::RouterExt as _;
 use common::get_uuid;
 use examples_common::chariott::{
     api::{Chariott, ChariottCommunication},
-    proto::streaming::channel_service_server::ChannelServiceServer,
     value::Value,
 };
 use provider::Provider;

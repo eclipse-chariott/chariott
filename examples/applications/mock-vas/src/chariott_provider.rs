@@ -6,6 +6,14 @@ use std::sync::Arc;
 use std::vec;
 
 use async_trait::async_trait;
+use chariott_common::proto::{
+    common::{
+        discover_fulfillment::Service, fulfillment::Fulfillment as FulfillmentEnum,
+        intent::Intent as IntentEnum, DiscoverFulfillment, Fulfillment as FulfillmentMessage,
+        InvokeFulfillment, Value as ProtoValue,
+    },
+    provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
+};
 use examples_common::chariott;
 use examples_common::chariott::inspection::{fulfill, Entry};
 use examples_common::chariott::streaming::ProtoExt as _;
@@ -14,7 +22,6 @@ use tonic::{Request, Response, Status};
 use url::Url;
 
 use crate::simulation::VehicleSimulation;
-use examples_common::chariott::proto::*;
 
 pub const CABIN_TEMPERATURE_PROPERTY: &str = "Vehicle.Cabin.HVAC.AmbientAirTemperature";
 pub const BATTERY_LEVEL_PROPERTY: &str = "Vehicle.OBD.HybridBatteryRemaining";
@@ -73,28 +80,26 @@ fn command(path: &str, r#type: &str) -> Entry {
 }
 
 #[async_trait]
-impl provider::provider_service_server::ProviderService for ChariottProvider {
+impl ProviderService for ChariottProvider {
     async fn fulfill(
         &self,
-        request: Request<provider::FulfillRequest>,
-    ) -> Result<Response<provider::FulfillResponse>, Status> {
+        request: Request<FulfillRequest>,
+    ) -> Result<Response<FulfillResponse>, Status> {
         let response = match request
             .into_inner()
             .intent
             .and_then(|i| i.intent)
             .ok_or_else(|| Status::invalid_argument("Intent must be specified"))?
         {
-            common::intent::Intent::Discover(_) => {
-                common::fulfillment::Fulfillment::Discover(common::DiscoverFulfillment {
-                    services: vec![common::discover_fulfillment::Service {
-                        url: self.url.to_string(),
-                        schema_kind: SCHEMA_REFERENCE.to_owned(),
-                        schema_reference: SCHEMA_VERSION_STREAMING.to_owned(),
-                        metadata: HashMap::new(),
-                    }],
-                })
-            }
-            common::intent::Intent::Invoke(intent) => {
+            IntentEnum::Discover(_) => FulfillmentEnum::Discover(DiscoverFulfillment {
+                services: vec![Service {
+                    url: self.url.to_string(),
+                    schema_kind: SCHEMA_REFERENCE.to_owned(),
+                    schema_reference: SCHEMA_VERSION_STREAMING.to_owned(),
+                    metadata: HashMap::new(),
+                }],
+            }),
+            IntentEnum::Invoke(intent) => {
                 let args = intent
                     .args
                     .into_iter()
@@ -111,20 +116,18 @@ impl provider::provider_service_server::ProviderService for ChariottProvider {
                     })?
                     .into();
 
-                common::fulfillment::Fulfillment::Invoke(common::InvokeFulfillment {
-                    r#return: Some(common::Value { value: Some(result) }),
+                FulfillmentEnum::Invoke(InvokeFulfillment {
+                    r#return: Some(ProtoValue { value: Some(result) }),
                 })
             }
-            common::intent::Intent::Inspect(inspect) => fulfill(inspect.query, &*VDT_SCHEMA),
-            common::intent::Intent::Subscribe(subscribe) => {
-                self.streaming_store.subscribe(subscribe)?
-            }
-            common::intent::Intent::Read(read) => self.streaming_store.read(read),
+            IntentEnum::Inspect(inspect) => fulfill(inspect.query, &*VDT_SCHEMA),
+            IntentEnum::Subscribe(subscribe) => self.streaming_store.subscribe(subscribe)?,
+            IntentEnum::Read(read) => self.streaming_store.read(read),
             _ => return Err(Status::unknown("Unknown or unsupported intent!")),
         };
 
-        Ok(Response::new(provider::FulfillResponse {
-            fulfillment: Some(common::Fulfillment { fulfillment: Some(response) }),
+        Ok(Response::new(FulfillResponse {
+            fulfillment: Some(FulfillmentMessage { fulfillment: Some(response) }),
         }))
     }
 }
