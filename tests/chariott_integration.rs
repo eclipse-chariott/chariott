@@ -12,7 +12,7 @@ use chariott::streaming::StreamingEss;
 use chariott::{chariott_grpc::ChariottServer, registry::Registry, IntentBroker};
 use chariott_common::error::{Error, ResultExt as _};
 use chariott_common::proto::{
-    common::{intent::Intent as InnerIntent, Intent},
+    common::{intent::Intent as IntentEnum, Intent as IntentMessage},
     runtime::{chariott_service_server::ChariottService, FulfillRequest, FulfillResponse},
     streaming::channel_service_server::ChannelServiceServer,
 };
@@ -186,12 +186,12 @@ impl ChariottCommunication for Subject {
     async fn fulfill(
         &mut self,
         namespace: impl Into<Box<str>> + Send,
-        intent: InnerIntent,
+        intent: IntentEnum,
     ) -> Result<Response<FulfillResponse>, Error> {
         self.subject
             .fulfill(Request::new(FulfillRequest {
                 namespace: namespace.into().into(),
-                intent: Some(Intent { intent: Some(intent) }),
+                intent: Some(IntentMessage { intent: Some(intent) }),
             }))
             .await
             .map_err_with("Intent fulfillment failed.")
