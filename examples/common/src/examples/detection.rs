@@ -9,7 +9,9 @@ use prost::Message;
 
 use crate::chariott::value::Value;
 
-use super::proto::detection as detection_proto;
+use super::proto::detection::{
+    DetectEntry, DetectRequest as ProtoDetectRequest, DetectResponse as ProtoDetectResponse,
+};
 
 pub struct DetectRequest(Vec<u8>);
 
@@ -54,9 +56,9 @@ impl TryFrom<InvokeIntent> for DetectRequest {
             value.into_any().map_err(|_| Error::new("Argument was not of type 'Any'."))?;
 
         if type_url == "examples.detection.v1.DetectRequest" {
-            detection_proto::DetectRequest::decode(&*value)
+            ProtoDetectRequest::decode(&*value)
                 .map_err_with("DetectRequest decoding failed.")
-                .and_then(|detection_proto::DetectRequest { blob }| {
+                .and_then(|ProtoDetectRequest { blob }| {
                     blob.ok_or_else(|| Error::new("No blob was present."))
                 })
                 .map(|Blob { bytes, .. }| DetectRequest(bytes))
@@ -71,17 +73,14 @@ impl From<DetectResponse> for InvokeFulfillment {
         let entries = value
             .0
             .into_iter()
-            .map(|o| detection_proto::DetectEntry {
-                object: o.object.into(),
-                confidence: o.confidence,
-            })
+            .map(|o| DetectEntry { object: o.object.into(), confidence: o.confidence })
             .collect();
 
         InvokeFulfillment {
             r#return: Some(
                 Value::new_any(
                     "examples.detection.v1.DetectResponse".to_string(),
-                    detection_proto::DetectResponse { entries }.encode_to_vec(),
+                    ProtoDetectResponse { entries }.encode_to_vec(),
                 )
                 .into(),
             ),
