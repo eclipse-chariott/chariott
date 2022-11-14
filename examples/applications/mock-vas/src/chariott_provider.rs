@@ -8,9 +8,8 @@ use std::vec;
 use async_trait::async_trait;
 use chariott_proto::{
     common::{
-        discover_fulfillment::Service, fulfillment::Fulfillment as FulfillmentEnum,
-        intent::Intent as IntentEnum, DiscoverFulfillment, Fulfillment as FulfillmentMessage,
-        InvokeFulfillment, Value as ProtoValue,
+        discover_fulfillment::Service, DiscoverFulfillment, FulfillmentEnum, FulfillmentMessage,
+        IntentEnum, InvokeFulfillment, Value as ProtoValue,
     },
     provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
 };

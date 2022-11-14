@@ -10,10 +10,9 @@ use async_recursion::async_recursion;
 use chariott_common::query::regex_from_query;
 use chariott_proto::{
     common::{
-        discover_fulfillment::Service, fulfillment::Fulfillment as FulfillmentEnum,
-        inspect_fulfillment::Entry, intent::Intent as IntentEnum, value::Value as ValueEnum,
-        DiscoverFulfillment, Fulfillment as FulfillmentMessage, InspectFulfillment,
-        Intent as IntentMessage, List, Value as ValueMessage,
+        discover_fulfillment::Service, inspect_fulfillment::Entry, DiscoverFulfillment,
+        FulfillmentEnum, FulfillmentMessage, InspectFulfillment, IntentEnum, IntentMessage, List,
+        ValueEnum, ValueMessage,
     },
     provider::{FulfillRequest, FulfillResponse},
 };
@@ -154,9 +153,8 @@ pub(crate) mod tests {
     use async_trait::async_trait;
     use chariott_proto::{
         common::{
-            fulfillment::Fulfillment as FulfillmentEnum, DiscoverFulfillment,
-            Fulfillment as FulfillmentMessage, InspectIntent, InvokeFulfillment,
-            SubscribeFulfillment, SubscribeIntent,
+            DiscoverFulfillment, FulfillmentEnum, FulfillmentMessage, InspectIntent,
+            InvokeFulfillment, SubscribeFulfillment, SubscribeIntent,
         },
         streaming::{channel_service_server::ChannelService, OpenRequest},
     };

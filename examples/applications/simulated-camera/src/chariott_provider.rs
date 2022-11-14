@@ -7,8 +7,8 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use chariott_proto::{
     common::{
-        discover_fulfillment::Service, fulfillment::Fulfillment as FulfillmentEnum, intent::Intent,
-        DiscoverFulfillment, Fulfillment as FulfillmentMessage,
+        discover_fulfillment::Service, intent::Intent, DiscoverFulfillment, FulfillmentEnum,
+        FulfillmentMessage,
     },
     provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
 };

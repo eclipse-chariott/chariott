@@ -11,10 +11,7 @@ use chariott_common::{
     error::{Error, ResultExt as _},
 };
 use chariott_proto::{
-    common::{
-        fulfillment::Fulfillment as FulfillmentEnum, intent::Intent as IntentEnum,
-        Fulfillment as FulfillmentMessage, InvokeFulfillment,
-    },
+    common::{FulfillmentEnum, FulfillmentMessage, IntentEnum, InvokeFulfillment},
     provider::{
         provider_service_server::{ProviderService, ProviderServiceServer},
         FulfillRequest, FulfillResponse,

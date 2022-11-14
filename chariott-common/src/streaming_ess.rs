@@ -5,8 +5,8 @@ use std::{ops::Deref, sync::Arc, time::SystemTime};
 
 use async_trait::async_trait;
 use chariott_proto::{
-    common::Value as ValueMessage,
-    common::{value::Value as ValueEnum, SubscribeFulfillment, SubscribeIntent},
+    common::ValueMessage,
+    common::{SubscribeFulfillment, SubscribeIntent, ValueEnum},
     streaming::{channel_service_server::ChannelService, Event, OpenRequest},
 };
 use tokio::spawn;
@@ -99,8 +99,7 @@ mod tests {
     use std::time::Duration;
 
     use chariott_proto::{
-        common::Value as ValueMessage,
-        common::{value::Value as ValueEnum, SubscribeIntent},
+        common::{SubscribeIntent, ValueEnum, ValueMessage},
         streaming::{channel_service_server::ChannelService, OpenRequest},
     };
     use tokio_stream::StreamExt as _;

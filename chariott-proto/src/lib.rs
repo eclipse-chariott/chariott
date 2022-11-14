@@ -10,6 +10,12 @@ mod chariott {
     pub mod common {
         pub mod v1 {
             tonic::include_proto!("chariott.common.v1");
+            pub use fulfillment::Fulfillment as FulfillmentEnum;
+            pub use intent::Intent as IntentEnum;
+            pub use value::Value as ValueEnum;
+            pub use Fulfillment as FulfillmentMessage;
+            pub use Intent as IntentMessage;
+            pub use Value as ValueMessage;
         }
     }
     pub mod provider {

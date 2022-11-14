@@ -5,10 +5,7 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use async_trait::async_trait;
 use chariott_proto::{
-    common::{
-        fulfillment::Fulfillment as FulfillmentEnum, intent::Intent as IntentEnum,
-        Fulfillment as FulfillmentMessage, InvokeFulfillment, InvokeIntent,
-    },
+    common::{FulfillmentEnum, FulfillmentMessage, IntentEnum, InvokeFulfillment, InvokeIntent},
     provider::{
         provider_service_server::{ProviderService, ProviderServiceServer},
         FulfillRequest, FulfillResponse,

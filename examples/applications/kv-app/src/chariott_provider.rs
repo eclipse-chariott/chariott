@@ -11,9 +11,8 @@ use url::Url;
 
 use chariott_proto::{
     common::{
-        discover_fulfillment::Service, fulfillment::Fulfillment as FulfillmentEnum,
-        intent::Intent as IntentEnum, value::Value, DiscoverFulfillment,
-        Fulfillment as FulfillmentMessage, WriteFulfillment, WriteIntent,
+        discover_fulfillment::Service, value::Value, DiscoverFulfillment, FulfillmentEnum,
+        FulfillmentMessage, IntentEnum, WriteFulfillment, WriteIntent,
     },
     provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
 };

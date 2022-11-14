@@ -3,10 +3,7 @@
 
 use async_trait::async_trait;
 use chariott_proto::{
-    common::{
-        fulfillment::Fulfillment as FulfillmentEnum, intent::Intent as IntentEnum,
-        Fulfillment as FulfillmentMessage,
-    },
+    common::{FulfillmentEnum, FulfillmentMessage, IntentEnum},
     provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
 };
 use tonic::{Request, Response, Status};

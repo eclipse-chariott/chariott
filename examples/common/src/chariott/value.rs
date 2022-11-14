@@ -3,7 +3,7 @@
 
 use std::{error::Error, fmt::Display};
 
-use chariott_proto::common::{value::Value as ValueEnum, Blob, Value as ValueMessage};
+use chariott_proto::common::{Blob, ValueEnum, ValueMessage};
 
 #[derive(Debug)]
 pub struct InvalidType;

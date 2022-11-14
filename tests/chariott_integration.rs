@@ -13,7 +13,7 @@ use chariott::{chariott_grpc::ChariottServer, registry::Registry, IntentBroker};
 use chariott_common::error::{Error, ResultExt as _};
 use chariott_common::shutdown::RouterExt as _;
 use chariott_proto::{
-    common::{intent::Intent as IntentEnum, Intent as IntentMessage},
+    common::{IntentEnum, IntentMessage},
     runtime::{chariott_service_server::ChariottService, FulfillRequest, FulfillResponse},
     streaming::channel_service_server::ChannelServiceServer,
 };

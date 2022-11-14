@@ -3,8 +3,7 @@
 
 use chariott_common::streaming_ess::StreamingEss;
 use chariott_proto::common::{
-    fulfillment::Fulfillment, value::Value as ValueEnum, ReadFulfillment, ReadIntent,
-    SubscribeIntent, Value as ValueMessage,
+    fulfillment::Fulfillment, ReadFulfillment, ReadIntent, SubscribeIntent, ValueEnum, ValueMessage,
 };
 use keyvalue::{InMemoryKeyValueStore, Observer};
 use std::sync::RwLock;

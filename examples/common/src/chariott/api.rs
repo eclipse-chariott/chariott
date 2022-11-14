@@ -17,11 +17,10 @@ use async_trait::async_trait;
 use chariott_common::error::{Error, ResultExt as _};
 use chariott_proto::{
     common::{
-        discover_fulfillment::Service as ProtoService,
-        fulfillment::Fulfillment as ProtoFulfillment, intent::Intent as IntentEnum,
-        DiscoverFulfillment, DiscoverIntent, InspectFulfillment, InspectIntent,
-        Intent as IntentMessage, InvokeFulfillment, InvokeIntent, ReadFulfillment, ReadIntent,
-        SubscribeFulfillment, SubscribeIntent, WriteFulfillment, WriteIntent,
+        discover_fulfillment::Service as ProtoService, DiscoverFulfillment, DiscoverIntent,
+        FulfillmentEnum, InspectFulfillment, InspectIntent, IntentEnum, IntentMessage,
+        InvokeFulfillment, InvokeIntent, ReadFulfillment, ReadIntent, SubscribeFulfillment,
+        SubscribeIntent, WriteFulfillment, WriteIntent,
     },
     runtime::{chariott_service_client::ChariottServiceClient, FulfillRequest, FulfillResponse},
     streaming::{channel_service_client::ChannelServiceClient, OpenRequest},
@@ -33,7 +32,7 @@ use tracing::debug;
 const CHARIOTT_URL_KEY: &str = "CHARIOTT_URL";
 const DEFAULT_CHARIOTT_URL: &str = env!("DEFAULT_CHARIOTT_URL");
 
-struct Fulfillment(ProtoFulfillment);
+struct Fulfillment(FulfillmentEnum);
 
 trait FulfillResponseExt {
     fn fulfillment<F>(self) -> Result<F, Error>
@@ -71,12 +70,12 @@ macro_rules! impl_try_from_var {
     };
 }
 
-impl_try_from_var!(Fulfillment, ProtoFulfillment::Inspect, InspectFulfillment);
-impl_try_from_var!(Fulfillment, ProtoFulfillment::Read, ReadFulfillment);
-impl_try_from_var!(Fulfillment, ProtoFulfillment::Write, WriteFulfillment);
-impl_try_from_var!(Fulfillment, ProtoFulfillment::Invoke, InvokeFulfillment);
-impl_try_from_var!(Fulfillment, ProtoFulfillment::Subscribe, SubscribeFulfillment);
-impl_try_from_var!(Fulfillment, ProtoFulfillment::Discover, DiscoverFulfillment);
+impl_try_from_var!(Fulfillment, FulfillmentEnum::Inspect, InspectFulfillment);
+impl_try_from_var!(Fulfillment, FulfillmentEnum::Read, ReadFulfillment);
+impl_try_from_var!(Fulfillment, FulfillmentEnum::Write, WriteFulfillment);
+impl_try_from_var!(Fulfillment, FulfillmentEnum::Invoke, InvokeFulfillment);
+impl_try_from_var!(Fulfillment, FulfillmentEnum::Subscribe, SubscribeFulfillment);
+impl_try_from_var!(Fulfillment, FulfillmentEnum::Discover, DiscoverFulfillment);
 
 #[derive(Clone)]
 pub struct GrpcChariott {
