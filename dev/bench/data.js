@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668432326487,
+  "lastUpdate": 1668438609093,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -1704,6 +1704,84 @@ window.BENCHMARK_DATA = {
             "value": 6803,
             "unit": "Bytes",
             "range": "p95=6852"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 5,
+            "unit": "Millisecond",
+            "range": "p95=9"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "22341213+bastbu@users.noreply.github.com",
+            "name": "Bastian Burger",
+            "username": "bastbu"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e05a4f60562752c88af17073a7dd41b39170a920",
+          "message": "Upgrade to Rust 1.65 (#37)",
+          "timestamp": "2022-11-14T15:53:37+01:00",
+          "tree_id": "39009ae1e7b512b300d8ca680d6f66d4f6c2519e",
+          "url": "https://github.com/eclipse/chariott/commit/e05a4f60562752c88af17073a7dd41b39170a920"
+        },
+        "date": 1668438608371,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1188",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "3",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 27,
+            "unit": "Percent",
+            "range": "p95=28"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6619,
+            "unit": "Bytes",
+            "range": "p95=6815"
           },
           {
             "name": "Invoke Throughput",
