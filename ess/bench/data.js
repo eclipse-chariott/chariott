@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668438267513,
+  "lastUpdate": 1668438944814,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -1439,6 +1439,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 224685230,
             "range": "± 765011",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "22341213+bastbu@users.noreply.github.com",
+            "name": "Bastian Burger",
+            "username": "bastbu"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "285b00cbe0346a1a1feb14158a0bc59484068e52",
+          "message": "Remove tarpaulin from Devcontainer (#38)",
+          "timestamp": "2022-11-14T15:53:50+01:00",
+          "tree_id": "55fa5c5861051c753c7bcd31735bb7b90e39d017",
+          "url": "https://github.com/eclipse/chariott/commit/285b00cbe0346a1a1feb14158a0bc59484068e52"
+        },
+        "date": 1668438943922,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 482865,
+            "range": "± 9243",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2709785,
+            "range": "± 10494",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 25295762,
+            "range": "± 256343",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 4425741,
+            "range": "± 22066",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 26535172,
+            "range": "± 94505",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 254341656,
+            "range": "± 634309",
             "unit": "ns/iter"
           }
         ]
