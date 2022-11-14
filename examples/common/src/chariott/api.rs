@@ -14,21 +14,17 @@ use std::{
 use super::{inspection::Entry as InspectionEntry, value::Value};
 
 use async_trait::async_trait;
-use chariott_common::{
-    error::{Error, ResultExt as _},
-    proto::{
-        common::{
-            discover_fulfillment::Service as ProtoService,
-            fulfillment::Fulfillment as ProtoFulfillment, intent::Intent as IntentEnum,
-            DiscoverFulfillment, DiscoverIntent, InspectFulfillment, InspectIntent,
-            Intent as IntentMessage, InvokeFulfillment, InvokeIntent, ReadFulfillment, ReadIntent,
-            SubscribeFulfillment, SubscribeIntent, WriteFulfillment, WriteIntent,
-        },
-        runtime::{
-            chariott_service_client::ChariottServiceClient, FulfillRequest, FulfillResponse,
-        },
-        streaming::{channel_service_client::ChannelServiceClient, OpenRequest},
+use chariott_common::error::{Error, ResultExt as _};
+use chariott_proto::{
+    common::{
+        discover_fulfillment::Service as ProtoService,
+        fulfillment::Fulfillment as ProtoFulfillment, intent::Intent as IntentEnum,
+        DiscoverFulfillment, DiscoverIntent, InspectFulfillment, InspectIntent,
+        Intent as IntentMessage, InvokeFulfillment, InvokeIntent, ReadFulfillment, ReadIntent,
+        SubscribeFulfillment, SubscribeIntent, WriteFulfillment, WriteIntent,
     },
+    runtime::{chariott_service_client::ChariottServiceClient, FulfillRequest, FulfillResponse},
+    streaming::{channel_service_client::ChannelServiceClient, OpenRequest},
 };
 use futures::{stream::BoxStream, StreamExt};
 use tonic::{transport::Channel, Request, Response};

@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 use async_trait::async_trait;
-use chariott_common::proto::{
+use chariott_proto::{
     common::{
         fulfillment::Fulfillment as FulfillmentEnum, intent::Intent as IntentEnum,
         Fulfillment as FulfillmentMessage,

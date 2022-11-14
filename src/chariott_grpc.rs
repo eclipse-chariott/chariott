@@ -4,7 +4,7 @@
 use std::sync::{Arc, RwLock};
 use std::time::Instant;
 
-use chariott_common::proto::{
+use chariott_proto::{
     common::intent::Intent,
     runtime::{
         chariott_service_server::ChariottService, AnnounceRequest, AnnounceResponse,
@@ -186,7 +186,7 @@ mod tests {
     use crate::registry::{Change, Observer, Registry};
     use crate::streaming::StreamingEss;
     use crate::{connection_provider::GrpcProvider, execution::tests::TestBinding};
-    use chariott_common::proto::{
+    use chariott_proto::{
         common, runtime as runtime_api,
         runtime::{
             chariott_service_server::ChariottService, intent_registration, AnnounceRequest,

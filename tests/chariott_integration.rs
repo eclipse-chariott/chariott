@@ -11,12 +11,12 @@ use chariott::registry::{
 use chariott::streaming::StreamingEss;
 use chariott::{chariott_grpc::ChariottServer, registry::Registry, IntentBroker};
 use chariott_common::error::{Error, ResultExt as _};
-use chariott_common::proto::{
+use chariott_common::shutdown::RouterExt as _;
+use chariott_proto::{
     common::{intent::Intent as IntentEnum, Intent as IntentMessage},
     runtime::{chariott_service_server::ChariottService, FulfillRequest, FulfillResponse},
     streaming::channel_service_server::ChannelServiceServer,
 };
-use chariott_common::shutdown::RouterExt as _;
 use common::get_uuid;
 use examples_common::chariott::{
     api::{Chariott, ChariottCommunication},

@@ -7,11 +7,11 @@ use chariott::streaming::StreamingEss;
 use chariott::IntentBroker;
 use chariott_common::config::{env, try_env};
 use chariott_common::ext::OptionExt as _;
-use chariott_common::proto::{
+use chariott_common::shutdown::{ctrl_c_cancellation, RouterExt as _};
+use chariott_proto::{
     runtime::chariott_service_server::ChariottServiceServer,
     streaming::channel_service_server::ChannelServiceServer,
 };
-use chariott_common::shutdown::{ctrl_c_cancellation, RouterExt as _};
 use registry::Composite;
 use std::sync::Arc;
 use std::time::{Duration, Instant};

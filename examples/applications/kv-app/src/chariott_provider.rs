@@ -9,7 +9,7 @@ use tonic::{Request, Response, Status};
 
 use url::Url;
 
-use chariott_common::proto::{
+use chariott_proto::{
     common::{
         discover_fulfillment::Service, fulfillment::Fulfillment as FulfillmentEnum,
         intent::Intent as IntentEnum, value::Value, DiscoverFulfillment,

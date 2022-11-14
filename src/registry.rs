@@ -386,10 +386,8 @@ pub(crate) mod tests {
         time::Instant,
     };
 
-    use chariott_common::{
-        proto::common::{value::Value, SubscribeIntent},
-        streaming_ess::StreamingEss,
-    };
+    use chariott_common::streaming_ess::StreamingEss;
+    use chariott_proto::common::{value::Value, SubscribeIntent};
     use test_case::test_case;
 
     use crate::{

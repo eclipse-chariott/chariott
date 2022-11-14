@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use chariott_common::proto::{
+use chariott_proto::{
     common::{
         discover_fulfillment::Service, fulfillment::Fulfillment as FulfillmentEnum, intent::Intent,
         DiscoverFulfillment, Fulfillment as FulfillmentMessage,

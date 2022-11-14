@@ -3,7 +3,7 @@
 
 use anyhow::{anyhow, Error};
 use async_stream::try_stream;
-use chariott_common::proto::common::Blob;
+use chariott_proto::common::Blob;
 use examples_common::{
     chariott::{
         api::{Chariott, ChariottExt as _, GrpcChariott},

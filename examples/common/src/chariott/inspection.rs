@@ -3,11 +3,9 @@
 
 use std::{borrow::Borrow, collections::HashMap};
 
-use chariott_common::{
-    proto::common::{
-        fulfillment::Fulfillment, inspect_fulfillment::Entry as ProtoEntry, InspectFulfillment,
-    },
-    query::regex_from_query,
+use chariott_common::query::regex_from_query;
+use chariott_proto::common::{
+    fulfillment::Fulfillment, inspect_fulfillment::Entry as ProtoEntry, InspectFulfillment,
 };
 
 use super::value::Value;

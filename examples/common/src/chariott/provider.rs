@@ -40,7 +40,7 @@ use url::Url;
 
 use chariott_common::config::env;
 use chariott_common::error::{Error, ResultExt};
-use chariott_common::proto::runtime::{
+use chariott_proto::runtime::{
     intent_registration::Intent, intent_service_registration::ExecutionLocality,
 };
 

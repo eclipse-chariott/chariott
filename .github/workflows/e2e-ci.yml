@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - 'chariott-proto/**'
       - "common/**"
       - "ess/**"
       - "examples/**"

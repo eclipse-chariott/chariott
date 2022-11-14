@@ -6,12 +6,12 @@ mod chariott_provider;
 use std::sync::Arc;
 
 use chariott_common::error::Error;
-use chariott_common::proto::{
+use chariott_common::shutdown::RouterExt as _;
+use chariott_proto::{
     provider::provider_service_server::ProviderServiceServer,
     runtime::{intent_registration::Intent, intent_service_registration::ExecutionLocality},
     streaming::channel_service_server::ChannelServiceServer,
 };
-use chariott_common::shutdown::RouterExt as _;
 use examples_common::chariott;
 use tonic::transport::Server;
 

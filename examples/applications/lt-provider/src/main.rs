@@ -6,7 +6,11 @@ use std::{
     time::Duration,
 };
 
-use chariott_common::proto::{
+use chariott_common::{
+    config::env,
+    error::{Error, ResultExt as _},
+};
+use chariott_proto::{
     common::{
         fulfillment::Fulfillment as FulfillmentEnum, intent::Intent as IntentEnum,
         Fulfillment as FulfillmentMessage, InvokeFulfillment,
@@ -16,10 +20,6 @@ use chariott_common::proto::{
         FulfillRequest, FulfillResponse,
     },
     runtime::{intent_registration::Intent, intent_service_registration::ExecutionLocality},
-};
-use chariott_common::{
-    config::env,
-    error::{Error, ResultExt as _},
 };
 use examples_common::chariott;
 use examples_common::chariott::value::Value;

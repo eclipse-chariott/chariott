@@ -6,7 +6,7 @@ mod communication;
 mod simulation;
 
 use chariott_common::error::Error;
-use chariott_common::proto::runtime::{
+use chariott_proto::runtime::{
     intent_registration::Intent, intent_service_registration::ExecutionLocality,
 };
 use examples_common::chariott;

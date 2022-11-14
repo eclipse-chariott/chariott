@@ -3,12 +3,12 @@
 
 use std::{ops::Deref, sync::Arc, time::SystemTime};
 
-use crate::proto::{
+use async_trait::async_trait;
+use chariott_proto::{
     common::Value as ValueMessage,
     common::{value::Value as ValueEnum, SubscribeFulfillment, SubscribeIntent},
     streaming::{channel_service_server::ChannelService, Event, OpenRequest},
 };
-use async_trait::async_trait;
 use tokio::spawn;
 use tokio_stream::wrappers::ReceiverStream;
 use tonic::{Response, Status};
@@ -98,7 +98,7 @@ impl<T> Deref for StreamingEss<T> {
 mod tests {
     use std::time::Duration;
 
-    use crate::proto::{
+    use chariott_proto::{
         common::Value as ValueMessage,
         common::{value::Value as ValueEnum, SubscribeIntent},
         streaming::{channel_service_server::ChannelService, OpenRequest},

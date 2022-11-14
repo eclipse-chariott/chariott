@@ -7,7 +7,8 @@ use crate::connection_provider::{ConnectedProvider, ConnectionProvider};
 use crate::registry::IntentConfiguration;
 use crate::streaming::StreamingEss;
 use async_recursion::async_recursion;
-use chariott_common::proto::{
+use chariott_common::query::regex_from_query;
+use chariott_proto::{
     common::{
         discover_fulfillment::Service, fulfillment::Fulfillment as FulfillmentEnum,
         inspect_fulfillment::Entry, intent::Intent as IntentEnum, value::Value as ValueEnum,
@@ -16,7 +17,6 @@ use chariott_common::proto::{
     },
     provider::{FulfillRequest, FulfillResponse},
 };
-use chariott_common::query::regex_from_query;
 use tonic::Status;
 use url::Url;
 
@@ -152,7 +152,7 @@ pub(crate) mod tests {
         registry::{IntentConfiguration, IntentKind},
     };
     use async_trait::async_trait;
-    use chariott_common::proto::{
+    use chariott_proto::{
         common::{
             fulfillment::Fulfillment as FulfillmentEnum, DiscoverFulfillment,
             Fulfillment as FulfillmentMessage, InspectIntent, InvokeFulfillment,

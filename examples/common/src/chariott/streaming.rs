@@ -1,12 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-use chariott_common::{
-    proto::common::{
-        fulfillment::Fulfillment, value::Value as ValueEnum, ReadFulfillment, ReadIntent,
-        SubscribeIntent, Value as ValueMessage,
-    },
-    streaming_ess::StreamingEss,
+use chariott_common::streaming_ess::StreamingEss;
+use chariott_proto::common::{
+    fulfillment::Fulfillment, value::Value as ValueEnum, ReadFulfillment, ReadIntent,
+    SubscribeIntent, Value as ValueMessage,
 };
 use keyvalue::{InMemoryKeyValueStore, Observer};
 use std::sync::RwLock;

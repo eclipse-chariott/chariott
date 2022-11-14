@@ -3,20 +3,19 @@
 
 use std::{env, net::SocketAddr, time::Duration};
 
+use chariott_common::{
+    config,
+    error::{Error, ResultExt},
+};
+use chariott_proto::runtime::{
+    chariott_service_client::ChariottServiceClient, intent_registration::Intent,
+    intent_service_registration::ExecutionLocality, AnnounceRequest, IntentRegistration,
+    IntentServiceRegistration, RegisterRequest, RegistrationState,
+};
 use tokio::time::sleep;
 use tonic::transport::Channel;
 use tracing::warn;
 use url::Url;
-
-use chariott_common::{
-    config,
-    error::{Error, ResultExt},
-    proto::runtime::{
-        chariott_service_client::ChariottServiceClient, intent_registration::Intent,
-        intent_service_registration::ExecutionLocality, AnnounceRequest, IntentRegistration,
-        IntentServiceRegistration, RegisterRequest, RegistrationState,
-    },
-};
 
 use crate::url::UrlExt as _;
 

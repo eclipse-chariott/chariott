@@ -1,10 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-use chariott_common::{
-    error::{Error, ResultExt},
-    proto::common::{Blob, InvokeFulfillment, InvokeIntent},
-};
+use chariott_common::error::{Error, ResultExt};
+use chariott_proto::common::{Blob, InvokeFulfillment, InvokeIntent};
 use prost::Message;
 
 use crate::chariott::value::Value;

@@ -4,19 +4,18 @@
 use std::sync::Arc;
 use std::{env::args, net::SocketAddr};
 
+use chariott_common::{
+    error::{Error, ResultExt as _},
+    shutdown::{ctrl_c_cancellation, RouterExt as _},
+};
+use chariott_proto::{
+    provider::provider_service_server::ProviderServiceServer,
+    streaming::channel_service_server::ChannelServiceServer,
+};
 use futures::future::join_all;
 use tokio::spawn;
 use tonic::transport::Server;
 use url::Url;
-
-use chariott_common::{
-    error::{Error, ResultExt as _},
-    proto::{
-        provider::provider_service_server::ProviderServiceServer,
-        streaming::channel_service_server::ChannelServiceServer,
-    },
-    shutdown::{ctrl_c_cancellation, RouterExt as _},
-};
 
 use crate::{
     camera::CameraLogic,

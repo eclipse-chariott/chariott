@@ -9,6 +9,7 @@ anyhow = { workspace = true }
 async-std = "1.12"
 async-trait = { workspace = true }
 chariott-common = { workspace = true }
+chariott-proto = { workspace = true }
 ess = { path = "../../../ess/" }
 examples-common = { path = "../../common/" }
 futures = { workspace = true }
