@@ -42,7 +42,3 @@ COPY ../rust-toolchain .
 RUN rustup override set $(cat rust-toolchain) && \
     rustup component add clippy && \
     rustup component add rustfmt
-
-# The following takes a long time to complete.
-# We use a separate layer to hit the (layer) cache if possible.
-RUN cargo install cargo-tarpaulin

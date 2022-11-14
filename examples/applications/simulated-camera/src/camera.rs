@@ -123,7 +123,7 @@ impl CameraLogic {
     }
 }
 
-// In 1.64 clippy checks get_first
+// In 1.64 or later clippy checks get_first
 // as described in this lint rule https://rust-lang.github.io/rust-clippy/master/index.html#get_first
 // try_stream macro is still using accessing first element with `$crate::async_stream_impl::try_stream_inner!(($crate) $($tt)*).get(0)`
 #[allow(clippy::get_first)]
