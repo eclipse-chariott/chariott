@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668431803648,
+  "lastUpdate": 1668438267513,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -1379,6 +1379,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 297555312,
             "range": "± 14078506",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "22341213+bastbu@users.noreply.github.com",
+            "name": "Bastian Burger",
+            "username": "bastbu"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e05a4f60562752c88af17073a7dd41b39170a920",
+          "message": "Upgrade to Rust 1.65 (#37)",
+          "timestamp": "2022-11-14T15:53:37+01:00",
+          "tree_id": "39009ae1e7b512b300d8ca680d6f66d4f6c2519e",
+          "url": "https://github.com/eclipse/chariott/commit/e05a4f60562752c88af17073a7dd41b39170a920"
+        },
+        "date": 1668438266569,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 428890,
+            "range": "± 15835",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2439680,
+            "range": "± 16384",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 22224011,
+            "range": "± 212657",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 4176988,
+            "range": "± 66675",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 24031609,
+            "range": "± 82786",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 224685230,
+            "range": "± 765011",
             "unit": "ns/iter"
           }
         ]
