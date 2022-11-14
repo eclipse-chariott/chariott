@@ -3,7 +3,7 @@
 
 use std::time::Duration;
 
-use chariott_common::proto::runtime::{
+use chariott_proto::runtime::{
     intent_registration::Intent, intent_service_registration::ExecutionLocality,
 };
 use common::get_uuid;
