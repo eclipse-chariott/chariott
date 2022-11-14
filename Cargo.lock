@@ -454,8 +454,6 @@ dependencies = [
  "async-trait",
  "chariott-proto",
  "ess",
- "prost",
- "prost-types",
  "regex",
  "serde",
  "tempfile",
@@ -463,7 +461,6 @@ dependencies = [
  "tokio-stream",
  "tokio-util",
  "tonic",
- "tonic-build",
  "tracing",
  "uuid",
 ]
