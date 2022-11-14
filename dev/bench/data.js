@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668438609093,
+  "lastUpdate": 1668439884317,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -1794,6 +1794,84 @@ window.BENCHMARK_DATA = {
             "value": 5,
             "unit": "Millisecond",
             "range": "p95=9"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "22341213+bastbu@users.noreply.github.com",
+            "name": "Bastian Burger",
+            "username": "bastbu"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "285b00cbe0346a1a1feb14158a0bc59484068e52",
+          "message": "Remove tarpaulin from Devcontainer (#38)",
+          "timestamp": "2022-11-14T15:53:50+01:00",
+          "tree_id": "55fa5c5861051c753c7bcd31735bb7b90e39d017",
+          "url": "https://github.com/eclipse/chariott/commit/285b00cbe0346a1a1feb14158a0bc59484068e52"
+        },
+        "date": 1668439882124,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2008",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 40,
+            "unit": "Percent",
+            "range": "p95=41"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6680,
+            "unit": "Bytes",
+            "range": "p95=6795"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 8,
+            "unit": "Millisecond",
+            "range": "p95=13"
           }
         ]
       }
