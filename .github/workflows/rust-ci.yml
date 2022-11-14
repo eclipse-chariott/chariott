@@ -9,7 +9,7 @@ on:
       - main
     paths:
       - 'chariott-proto/**'
-      - 'common/**'
+      - 'chariott-common/**'
       - 'src/**'
       - 'tests/**'
       - 'proto/**'

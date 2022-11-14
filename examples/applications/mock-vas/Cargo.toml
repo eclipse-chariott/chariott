@@ -29,7 +29,7 @@ uuid = { workspace = true }
 
 [dev-dependencies]
 async-trait = { workspace = true }
-chariott-common = { path = "../../../common/" }
+chariott-common = { workspace = true }
 env_logger = "*"
 test-log = "0.2.10"
 tokio-test = "0.4.2"

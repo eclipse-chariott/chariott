@@ -7,7 +7,7 @@ license = "MIT"
 [dependencies]
 async-trait = { workspace = true }
 bytes = "1.2"
-chariott-common = { path = "../../common/" }
+chariott-common = { workspace = true }
 chariott-proto = { workspace = true }
 ess = { path = "../../ess/" }
 keyvalue = { path = "../../keyvalue" }
