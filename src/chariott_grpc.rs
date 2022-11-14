@@ -187,7 +187,7 @@ mod tests {
     use crate::streaming::StreamingEss;
     use crate::{connection_provider::GrpcProvider, execution::tests::TestBinding};
     use chariott_proto::{
-        common, runtime as runtime_api,
+        common,
         runtime::{
             chariott_service_server::ChariottService, intent_registration, AnnounceRequest,
             IntentRegistration, IntentServiceRegistration, RegisterRequest, RegistrationState,
@@ -336,7 +336,7 @@ mod tests {
 
         // act
         let result = subject
-            .fulfill(Request::new(runtime_api::FulfillRequest {
+            .fulfill(Request::new(FulfillRequest {
                 namespace: "system".to_owned(),
                 intent: Some(create_fulfill()),
             }))
@@ -356,10 +356,7 @@ mod tests {
 
         // act
         let result = subject
-            .fulfill(Request::new(runtime_api::FulfillRequest {
-                namespace: "system".to_owned(),
-                intent: None,
-            }))
+            .fulfill(Request::new(FulfillRequest { namespace: "system".to_owned(), intent: None }))
             .await;
 
         // assert
@@ -460,11 +457,11 @@ mod tests {
             intents: vec![
                 IntentRegistration {
                     namespace: "foo".to_string(),
-                    intent: runtime_api::intent_registration::Intent::Discover as i32,
+                    intent: intent_registration::Intent::Discover as i32,
                 },
                 IntentRegistration {
                     namespace: "bar".to_string(),
-                    intent: runtime_api::intent_registration::Intent::Discover as i32,
+                    intent: intent_registration::Intent::Discover as i32,
                 },
             ],
         }
@@ -481,15 +478,15 @@ mod tests {
             intents: vec![
                 IntentRegistration {
                     namespace: "foo".to_string(),
-                    intent: runtime_api::intent_registration::Intent::Discover as i32,
+                    intent: intent_registration::Intent::Discover as i32,
                 },
                 IntentRegistration {
                     namespace: "bar".to_string(),
-                    intent: runtime_api::intent_registration::Intent::Discover as i32,
+                    intent: intent_registration::Intent::Discover as i32,
                 },
                 IntentRegistration {
                     namespace: "baz".to_string(),
-                    intent: runtime_api::intent_registration::Intent::Discover as i32,
+                    intent: intent_registration::Intent::Discover as i32,
                 },
             ],
         }
