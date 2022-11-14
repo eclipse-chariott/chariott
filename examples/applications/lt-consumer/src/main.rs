@@ -225,7 +225,7 @@ async fn evaluate_docker_stats(
                 let cpu_delta =
                     cpu_stats.cpu_usage.total_usage - stats.precpu_stats.cpu_usage.total_usage;
 
-                if number_cpus == None {
+                if number_cpus.is_none() {
                     number_cpus = cpu_stats.cpu_usage.percpu_usage.map(|cpu| cpu.len());
                 }
 
