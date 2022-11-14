@@ -1061,7 +1061,7 @@ This page lists the licenses of the projects used in cargo-about.
 
 #### Used by
 
-- [prost]( https://github.com/tokio-rs/prost ) 0.11.0
+- [prost]( https://github.com/tokio-rs/prost ) 0.11.2
 - [prost-build]( https://github.com/tokio-rs/prost ) 0.11.1
 - [prost-derive]( https://github.com/tokio-rs/prost ) 0.11.0
 - [prost-types]( https://github.com/tokio-rs/prost ) 0.11.1
@@ -2338,7 +2338,7 @@ DEALINGS IN THE SOFTWARE.
 - [num-integer]( https://github.com/rust-num/num-integer ) 0.1.45
 - [num-rational]( https://github.com/rust-num/num-rational ) 0.4.1
 - [num-traits]( https://github.com/rust-num/num-traits ) 0.2.15
-- [regex]( https://github.com/rust-lang/regex ) 1.6.0
+- [regex]( https://github.com/rust-lang/regex ) 1.7.0
 - [regex-syntax]( https://github.com/rust-lang/regex ) 0.6.27
 - [threadpool]( https://github.com/rust-threadpool/rust-threadpool ) 1.8.1
 
@@ -3104,10 +3104,10 @@ DEALINGS IN THE SOFTWARE.
 
 #### Used by
 
-- [futures]( https://github.com/rust-lang/futures-rs ) 0.3.24
+- [futures]( https://github.com/rust-lang/futures-rs ) 0.3.25
 - [futures-channel]( https://github.com/rust-lang/futures-rs ) 0.3.25
 - [futures-core]( https://github.com/rust-lang/futures-rs ) 0.3.25
-- [futures-executor]( https://github.com/rust-lang/futures-rs ) 0.3.24
+- [futures-executor]( https://github.com/rust-lang/futures-rs ) 0.3.25
 - [futures-io]( https://github.com/rust-lang/futures-rs ) 0.3.25
 - [futures-macro]( https://github.com/rust-lang/futures-rs ) 0.3.25
 - [futures-sink]( https://github.com/rust-lang/futures-rs ) 0.3.25
@@ -6134,7 +6134,7 @@ DEALINGS IN THE SOFTWARE.
 #### Used by
 
 - [adler]( https://github.com/jonas-schievink/adler.git ) 1.0.2
-- [anyhow]( https://github.com/dtolnay/anyhow ) 1.0.65
+- [anyhow]( https://github.com/dtolnay/anyhow ) 1.0.66
 - [async-channel]( https://github.com/smol-rs/async-channel ) 1.7.1
 - [async-executor]( https://github.com/smol-rs/async-executor ) 1.4.1
 - [async-global-executor]( https://github.com/Keruspe/async-global-executor ) 2.3.0
@@ -6147,7 +6147,7 @@ DEALINGS IN THE SOFTWARE.
 - [blocking]( https://github.com/smol-rs/blocking ) 1.2.0
 - [cache-padded]( https://github.com/smol-rs/cache-padded ) 1.2.0
 - [concurrent-queue]( https://github.com/smol-rs/concurrent-queue ) 1.2.4
-- [env_logger]( https://github.com/env-logger-rs/env_logger/ ) 0.9.1
+- [env_logger]( https://github.com/env-logger-rs/env_logger/ ) 0.9.3
 - [event-listener]( https://github.com/smol-rs/event-listener ) 2.5.3
 - [fastrand]( https://github.com/smol-rs/fastrand ) 1.8.0
 - [futures-lite]( https://github.com/smol-rs/futures-lite ) 1.12.0
