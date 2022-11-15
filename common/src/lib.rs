@@ -12,7 +12,7 @@
 //! In order to get started, reference this library in your Cargo.toml
 //!
 //! ```toml
-//! chariott_common = { path = "../chariott-common/" }
+//! chariott_common = { path = "../common/" }
 //! ```
 //!
 

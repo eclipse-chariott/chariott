@@ -1,7 +1,7 @@
 [workspace]
 members = [
-    "chariott-common",
     "chariott-proto",
+    "common",
     "ess",
     "examples/applications/cloud-object-detection",
     "examples/applications/dog-mode-logic",
@@ -49,7 +49,7 @@ url = { workspace = true }
 [workspace.dependencies]
 anyhow = "1.0"
 async-trait = "0.1"
-chariott-common = { path = "./chariott-common/" }
+chariott-common = { path = "./common/" }
 chariott-proto = { path = "./chariott-proto/" }
 futures = { version = "0.3" }
 lazy_static = "1.4.0"
