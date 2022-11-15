@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668438944814,
+  "lastUpdate": 1668514335411,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -1499,6 +1499,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 254341656,
             "range": "± 634309",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "22341213+bastbu@users.noreply.github.com",
+            "name": "Bastian Burger",
+            "username": "bastbu"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b0d2add377f1740f26c52bfb4e234ce415b91b81",
+          "message": "Put proto types in own crate, unifying imports (#32)",
+          "timestamp": "2022-11-15T12:59:10+01:00",
+          "tree_id": "22be5a51e8c5bb48133bf33c85c0ecae2369af51",
+          "url": "https://github.com/eclipse/chariott/commit/b0d2add377f1740f26c52bfb4e234ce415b91b81"
+        },
+        "date": 1668514334097,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 434269,
+            "range": "± 24298",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3043235,
+            "range": "± 111060",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 29299020,
+            "range": "± 1252050",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 4173286,
+            "range": "± 170691",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 28711743,
+            "range": "± 1114679",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 281080313,
+            "range": "± 8184612",
             "unit": "ns/iter"
           }
         ]
