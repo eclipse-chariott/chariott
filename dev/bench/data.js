@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668514686528,
+  "lastUpdate": 1668521604334,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -1950,6 +1950,84 @@ window.BENCHMARK_DATA = {
             "value": 7,
             "unit": "Millisecond",
             "range": "p95=12"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dariuszparys@users.noreply.github.com",
+            "name": "Dariusz Parys",
+            "username": "dariuszparys"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b850c220bbfe66c00e6d248101d1d965a25f83b2",
+          "message": "Update rust-toolchain to TOML format (#43)",
+          "timestamp": "2022-11-15T14:49:33+01:00",
+          "tree_id": "da7174c7da3d25dc0b9f32bae469d3e18bd2ec4f",
+          "url": "https://github.com/eclipse/chariott/commit/b850c220bbfe66c00e6d248101d1d965a25f83b2"
+        },
+        "date": 1668521603684,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1912",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "6",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 25,
+            "unit": "Percent",
+            "range": "p95=26"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6660,
+            "unit": "Bytes",
+            "range": "p95=6836"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 5,
+            "unit": "Millisecond",
+            "range": "p95=8"
           }
         ]
       }
