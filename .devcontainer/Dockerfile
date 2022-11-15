@@ -35,7 +35,7 @@ RUN set -x && curl -sSL https://dot.net/v1/dotnet-install.sh | \
 # prompt to rebuild the container nor the Docker build cache to be invalidated.
 # Make sure to rebuild the container to ensure a fresh install of the new Rust
 # version also works.
-COPY ../rust-toolchain.toml .
+COPY ../rust-toolchain .
 
 # NB: we have to install also any components we need for our specific toolchain
 # version.

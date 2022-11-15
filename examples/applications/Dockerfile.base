@@ -45,7 +45,7 @@ ENV OPENSSL_DIR /musl
 
 WORKDIR /sdv
 
-COPY ./rust-toolchain.toml .
+COPY ./rust-toolchain .
 
 RUN rustup target add x86_64-unknown-linux-musl
 
