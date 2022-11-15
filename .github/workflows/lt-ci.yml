@@ -8,11 +8,11 @@ on:
     branches:
       - main
     paths:
-      - 'chariott-proto/**'
       - 'common/**'
       - 'src/**'
       - 'tests/**'
       - 'proto/**'
+      - 'proto.rs/**'
       - 'examples/**'
       - '.github/workflows/lt-ci.yml'
       - 'Cargo.lock'

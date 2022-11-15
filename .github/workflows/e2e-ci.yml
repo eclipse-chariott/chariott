@@ -5,12 +5,12 @@ on:
     branches:
       - main
     paths:
-      - 'chariott-proto/**'
       - "common/**"
       - "ess/**"
       - "examples/**"
       - "keyvalue/**"
       - "proto/**"
+      - 'proto.rs/**'
       - "src/**"
       - "tests/**"
       - ".github/workflows/e2e.yaml"

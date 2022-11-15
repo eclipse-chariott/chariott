@@ -1,6 +1,5 @@
 [workspace]
 members = [
-    "chariott-proto",
     "common",
     "ess",
     "examples/applications/cloud-object-detection",
@@ -13,6 +12,7 @@ members = [
     "examples/applications/simulated-camera",
     "examples/common",
     "keyvalue",
+    "proto.rs",
 ]
 
 exclude = []
@@ -50,7 +50,7 @@ url = { workspace = true }
 anyhow = "1.0"
 async-trait = "0.1"
 chariott-common = { path = "./common/" }
-chariott-proto = { path = "./chariott-proto/" }
+chariott-proto = { path = "./proto.rs/" }
 futures = { version = "0.3" }
 lazy_static = "1.4.0"
 prost = "0.11"
