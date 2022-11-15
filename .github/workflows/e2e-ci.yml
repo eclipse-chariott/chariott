@@ -15,7 +15,7 @@ on:
       - ".github/workflows/e2e.yaml"
       - 'Cargo.lock'
       - 'Cargo.toml'
-      - 'rust-toolchain'
+      - 'rust-toolchain.toml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -37,7 +37,7 @@ jobs:
           sudo apt-get install cmake protobuf-compiler libprotobuf-dev
 
       - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
+        run: rustup show
 
       - name: Cache Dependencies
         uses: Swatinem/rust-cache@v1

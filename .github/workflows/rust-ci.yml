@@ -18,7 +18,7 @@ on:
       - '.github/workflows/rust-ci.yml'
       - 'Cargo.lock'
       - 'Cargo.toml'
-      - 'rust-toolchain'
+      - 'rust-toolchain.toml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -65,7 +65,7 @@ jobs:
       - name: Install protobuf-compiler
         run: sudo apt-get install -y protobuf-compiler
       - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
+        run: rustup show
       - name: Cache Dependencies
         uses: Swatinem/rust-cache@v1
       - name: Run cargo-tarpaulin
