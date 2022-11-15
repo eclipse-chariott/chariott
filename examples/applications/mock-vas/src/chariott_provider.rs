@@ -9,7 +9,7 @@ use async_trait::async_trait;
 use chariott_proto::{
     common::{
         discover_fulfillment::Service, DiscoverFulfillment, FulfillmentEnum, FulfillmentMessage,
-        IntentEnum, InvokeFulfillment, Value as ProtoValue,
+        IntentEnum, InvokeFulfillment, ValueMessage,
     },
     provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
 };
@@ -116,7 +116,7 @@ impl ProviderService for ChariottProvider {
                     .into();
 
                 FulfillmentEnum::Invoke(InvokeFulfillment {
-                    r#return: Some(ProtoValue { value: Some(result) }),
+                    r#return: Some(ValueMessage { value: Some(result) }),
                 })
             }
             IntentEnum::Inspect(inspect) => fulfill(inspect.query, &*VDT_SCHEMA),
