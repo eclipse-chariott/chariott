@@ -8,7 +8,7 @@ use prost::Message;
 use crate::chariott::value::Value;
 
 use super::proto::detection::{
-    DetectEntry, DetectRequest as ProtoDetectRequest, DetectResponse as ProtoDetectResponse,
+    DetectEntry, DetectRequest as DetectRequestMessage, DetectResponse as DetectResponseMessage,
 };
 
 pub struct DetectRequest(Vec<u8>);
@@ -54,9 +54,9 @@ impl TryFrom<InvokeIntent> for DetectRequest {
             value.into_any().map_err(|_| Error::new("Argument was not of type 'Any'."))?;
 
         if type_url == "examples.detection.v1.DetectRequest" {
-            ProtoDetectRequest::decode(&*value)
+            DetectRequestMessage::decode(&*value)
                 .map_err_with("DetectRequest decoding failed.")
-                .and_then(|ProtoDetectRequest { blob }| {
+                .and_then(|DetectRequestMessage { blob }| {
                     blob.ok_or_else(|| Error::new("No blob was present."))
                 })
                 .map(|Blob { bytes, .. }| DetectRequest(bytes))
@@ -78,7 +78,7 @@ impl From<DetectResponse> for InvokeFulfillment {
             r#return: Some(
                 Value::new_any(
                     "examples.detection.v1.DetectResponse".to_string(),
-                    ProtoDetectResponse { entries }.encode_to_vec(),
+                    DetectResponseMessage { entries }.encode_to_vec(),
                 )
                 .into(),
             ),

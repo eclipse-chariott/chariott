@@ -17,7 +17,7 @@ use async_trait::async_trait;
 use chariott_common::error::{Error, ResultExt as _};
 use chariott_proto::{
     common::{
-        discover_fulfillment::Service as ProtoService, DiscoverFulfillment, DiscoverIntent,
+        discover_fulfillment::Service as ServiceMessage, DiscoverFulfillment, DiscoverIntent,
         FulfillmentEnum, InspectFulfillment, InspectIntent, IntentEnum, IntentMessage,
         InvokeFulfillment, InvokeIntent, ReadFulfillment, ReadIntent, SubscribeFulfillment,
         SubscribeIntent, WriteFulfillment, WriteIntent,
@@ -384,8 +384,8 @@ pub struct Service {
     pub schema_reference: Box<str>,
 }
 
-impl From<ProtoService> for Service {
-    fn from(value: ProtoService) -> Self {
+impl From<ServiceMessage> for Service {
+    fn from(value: ServiceMessage) -> Self {
         Service {
             url: value.url.into(),
             schema_kind: value.schema_kind.into(),

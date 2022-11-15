@@ -5,7 +5,7 @@ use std::{borrow::Borrow, collections::HashMap};
 
 use chariott_common::query::regex_from_query;
 use chariott_proto::common::{
-    fulfillment::Fulfillment, inspect_fulfillment::Entry as ProtoEntry, InspectFulfillment,
+    fulfillment::Fulfillment, inspect_fulfillment::Entry as EntryMessage, InspectFulfillment,
 };
 
 use super::value::Value;
@@ -38,7 +38,7 @@ pub fn fulfill<'a>(
         entries: entries
             .into_iter()
             .filter(|Entry(path, _)| regex.is_match(path))
-            .map(|Entry(path, items)| ProtoEntry {
+            .map(|Entry(path, items)| EntryMessage {
                 path: path.to_string(),
                 items: items.iter().map(|(k, v)| (k.to_string(), v.clone().into())).collect(),
             })
