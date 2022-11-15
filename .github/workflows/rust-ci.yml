@@ -36,9 +36,9 @@ jobs:
       - name: Install protobuf-compiler
         run: sudo apt-get install -y protobuf-compiler
       - name: Install stable toolchain
-        run: rustup show
-        with:
-          components: clippy, rustfmt
+        run: |
+          rustup show
+          rustup component add rustfmt clippy
       - name: Cache Dependencies
         uses: Swatinem/rust-cache@v1
       - run: cargo check --workspace --locked
