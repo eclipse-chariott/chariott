@@ -81,7 +81,7 @@ we use.
 
 > Note: If you use Devcontainers and you are running on Windows, make sure to check out the
 > repository on the WSL2 file system in your target distribution you're using.
-> At the current time Chariott only supports WSL2 dev containers.
+> At the current time Chariott only supports WSL2 and Linux as dev container hosts.
 
 ### Build all binaries and run tests
 
