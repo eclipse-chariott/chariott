@@ -11,7 +11,7 @@ use url::Url;
 use tonic::transport::Server;
 
 use chariott_common::error::{Error, ResultExt as _};
-use examples_common::chariott::proto::{
+use chariott_proto::{
     provider::provider_service_server::ProviderServiceServer,
     streaming::channel_service_server::ChannelServiceServer,
 };

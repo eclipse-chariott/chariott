@@ -6,9 +6,10 @@ mod chariott_provider;
 mod communication;
 
 use chariott_common::error::Error;
+use chariott_proto::runtime::{
+    intent_registration::Intent, intent_service_registration::ExecutionLocality,
+};
 use examples_common::chariott;
-use examples_common::chariott::proto::runtime_api::intent_registration::Intent;
-use examples_common::chariott::proto::runtime_api::intent_service_registration::ExecutionLocality;
 
 chariott::provider::main!(wain);
 

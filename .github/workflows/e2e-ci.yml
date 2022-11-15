@@ -10,6 +10,7 @@ on:
       - "examples/**"
       - "keyvalue/**"
       - "proto/**"
+      - 'proto.rs/**'
       - "src/**"
       - "tests/**"
       - ".github/workflows/e2e.yaml"

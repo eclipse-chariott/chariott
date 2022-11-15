@@ -3,9 +3,13 @@
 
 use anyhow::{anyhow, Error};
 use async_stream::try_stream;
-use examples_common::chariott::{
-    api::{Chariott, ChariottExt as _, GrpcChariott},
-    value::Value,
+use chariott_proto::common::Blob;
+use examples_common::{
+    chariott::{
+        api::{Chariott, ChariottExt as _, GrpcChariott},
+        value::Value,
+    },
+    examples::proto::detection::{DetectRequest, DetectResponse},
 };
 use futures::{stream::BoxStream, TryStreamExt};
 use tokio_stream::StreamExt;
@@ -45,9 +49,6 @@ pub(crate) async fn stream_dog_mode_status(
 async fn detect_dog(
     mut chariott: GrpcChariott,
 ) -> Result<BoxStream<'static, Result<bool, Error>>, Error> {
-    use examples_common::chariott::proto::common as common_proto;
-    use examples_common::examples::proto::detection as detection_proto;
-
     const CAMERA_NAMESPACE: &str = "sdv.camera.simulated";
     const FRAMES_METADATA_KEY: &str = "frames_per_minute";
     const OBJECT_DETECTION_NAMESPACE: &str = "sdv.detection";
@@ -106,8 +107,7 @@ async fn detect_dog(
             .into_blob()
             .map_err(|_| anyhow!("Unexpected image return type (expected: 'Blob')."))?;
 
-        let detect_request =
-            detection_proto::DetectRequest { blob: Some(common_proto::Blob { media_type, bytes }) };
+        let detect_request = DetectRequest { blob: Some(Blob { media_type, bytes }) };
 
         let mut detect_request_bytes = vec![];
         detect_request.encode(&mut detect_request_bytes)?;
@@ -127,7 +127,7 @@ async fn detect_dog(
             .into_any()
             .map_err(|_| anyhow!("Detection response was not of type 'Any'."))?;
 
-        let detected_categories: detection_proto::DetectResponse = Message::decode(&value[..])?;
+        let detected_categories: DetectResponse = Message::decode(&value[..])?;
         Ok(detected_categories.entries.iter().any(|e| e.object == DOG_CATEGORY_NAME))
     }
 

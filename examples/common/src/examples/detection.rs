@@ -2,11 +2,14 @@
 // Licensed under the MIT license.
 
 use chariott_common::error::{Error, ResultExt};
+use chariott_proto::common::{Blob, InvokeFulfillment, InvokeIntent};
 use prost::Message;
 
-use crate::chariott::{proto::common as common_proto, value::Value};
+use crate::chariott::value::Value;
 
-use super::proto::detection as detection_proto;
+use super::proto::detection::{
+    DetectEntry, DetectRequest as DetectRequestMessage, DetectResponse as DetectResponseMessage,
+};
 
 pub struct DetectRequest(Vec<u8>);
 
@@ -36,10 +39,10 @@ impl DetectionObject {
     }
 }
 
-impl TryFrom<common_proto::InvokeIntent> for DetectRequest {
+impl TryFrom<InvokeIntent> for DetectRequest {
     type Error = Error;
 
-    fn try_from(intent: common_proto::InvokeIntent) -> Result<Self, Self::Error> {
+    fn try_from(intent: InvokeIntent) -> Result<Self, Self::Error> {
         if intent.args.len() != 1 || intent.command != "detect" {
             return Err(Error::new("No command found which accepts the invocation arguments."));
         }
@@ -51,34 +54,31 @@ impl TryFrom<common_proto::InvokeIntent> for DetectRequest {
             value.into_any().map_err(|_| Error::new("Argument was not of type 'Any'."))?;
 
         if type_url == "examples.detection.v1.DetectRequest" {
-            detection_proto::DetectRequest::decode(&*value)
+            DetectRequestMessage::decode(&*value)
                 .map_err_with("DetectRequest decoding failed.")
-                .and_then(|detection_proto::DetectRequest { blob }| {
+                .and_then(|DetectRequestMessage { blob }| {
                     blob.ok_or_else(|| Error::new("No blob was present."))
                 })
-                .map(|common_proto::Blob { bytes, .. }| DetectRequest(bytes))
+                .map(|Blob { bytes, .. }| DetectRequest(bytes))
         } else {
             Err(Error::new("Argument was not of type 'examples.detection.v1.DetectRequest'."))
         }
     }
 }
 
-impl From<DetectResponse> for common_proto::InvokeFulfillment {
+impl From<DetectResponse> for InvokeFulfillment {
     fn from(value: DetectResponse) -> Self {
         let entries = value
             .0
             .into_iter()
-            .map(|o| detection_proto::DetectEntry {
-                object: o.object.into(),
-                confidence: o.confidence,
-            })
+            .map(|o| DetectEntry { object: o.object.into(), confidence: o.confidence })
             .collect();
 
-        common_proto::InvokeFulfillment {
+        InvokeFulfillment {
             r#return: Some(
                 Value::new_any(
                     "examples.detection.v1.DetectResponse".to_string(),
-                    detection_proto::DetectResponse { entries }.encode_to_vec(),
+                    DetectResponseMessage { entries }.encode_to_vec(),
                 )
                 .into(),
             ),

@@ -9,13 +9,12 @@ anyhow = { workspace = true }
 async-std = "1.12"
 async-trait = { workspace = true }
 chariott-common = { workspace = true }
+chariott-proto = { workspace = true }
 ess = { path = "../../../ess/" }
 examples-common = { path = "../../common/" }
 futures = { workspace = true }
 keyvalue = { path = "../../../keyvalue/" }
 lazy_static = { workspace = true }
-prost = { workspace = true }
-prost-types = { workspace = true }
 regex = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 tokio-stream = { workspace = true }

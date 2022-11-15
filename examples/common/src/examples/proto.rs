@@ -3,7 +3,7 @@
 
 mod chariott {
     pub mod common {
-        pub use crate::chariott::proto::common as v1;
+        pub use chariott_proto::common as v1;
     }
 }
 

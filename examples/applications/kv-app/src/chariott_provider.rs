@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use async_trait::async_trait;
 use examples_common::chariott::{self, streaming::ProtoExt as _};
@@ -9,13 +9,12 @@ use tonic::{Request, Response, Status};
 
 use url::Url;
 
-use examples_common::chariott::proto::{
-    self,
+use chariott_proto::{
     common::{
-        fulfillment, intent, value::Value, DiscoverFulfillment, Fulfillment, WriteFulfillment,
-        WriteIntent,
+        discover_fulfillment::Service, value::Value, DiscoverFulfillment, FulfillmentEnum,
+        FulfillmentMessage, IntentEnum, WriteFulfillment, WriteIntent,
     },
-    provider::*,
+    provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
 };
 
 pub type StreamingStore = chariott::streaming::StreamingStore<Value>;
@@ -42,7 +41,7 @@ impl ChariottProvider {
 }
 
 #[async_trait]
-impl provider_service_server::ProviderService for ChariottProvider {
+impl ProviderService for ChariottProvider {
     async fn fulfill(
         &self,
         request: Request<FulfillRequest>,
@@ -53,30 +52,23 @@ impl provider_service_server::ProviderService for ChariottProvider {
             .and_then(|i| i.intent)
             .ok_or_else(|| Status::invalid_argument("Intent must be specified."))?
         {
-            intent::Intent::Read(intent) => Ok(self.streaming_store.read(intent)),
-            intent::Intent::Write(intent) => {
-                self.write(intent).map(fulfillment::Fulfillment::Write)
-            }
-            intent::Intent::Subscribe(intent) => self.streaming_store.subscribe(intent),
-            intent::Intent::Discover(_intent) => {
-                use proto::common::discover_fulfillment::Service;
-                use std::collections::HashMap;
-
-                Ok(fulfillment::Fulfillment::Discover(DiscoverFulfillment {
-                    services: vec![Service {
-                        url: self.url.to_string(),
-                        schema_kind: "grpc+proto".to_owned(),
-                        schema_reference: "chariott.streaming.v1".to_owned(),
-                        metadata: HashMap::new(),
-                    }],
-                }))
-            }
+            IntentEnum::Read(intent) => Ok(self.streaming_store.read(intent)),
+            IntentEnum::Write(intent) => self.write(intent).map(FulfillmentEnum::Write),
+            IntentEnum::Subscribe(intent) => self.streaming_store.subscribe(intent),
+            IntentEnum::Discover(_intent) => Ok(FulfillmentEnum::Discover(DiscoverFulfillment {
+                services: vec![Service {
+                    url: self.url.to_string(),
+                    schema_kind: "grpc+proto".to_owned(),
+                    schema_reference: "chariott.streaming.v1".to_owned(),
+                    metadata: HashMap::new(),
+                }],
+            })),
             _ => Err(Status::unknown("Unsupported or unknown intent."))?,
         };
 
         fulfillment.map(|f| {
             Response::new(FulfillResponse {
-                fulfillment: Some(Fulfillment { fulfillment: Some(f) }),
+                fulfillment: Some(FulfillmentMessage { fulfillment: Some(f) }),
             })
         })
     }

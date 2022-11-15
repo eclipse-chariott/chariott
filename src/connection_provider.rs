@@ -4,11 +4,9 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use chariott_common::{
-    error::{Error, ResultExt as _},
-    proto::provider::{
-        provider_service_client::ProviderServiceClient, FulfillRequest, FulfillResponse,
-    },
+use chariott_common::error::{Error, ResultExt as _};
+use chariott_proto::provider::{
+    provider_service_client::ProviderServiceClient, FulfillRequest, FulfillResponse,
 };
 use tokio::sync::Mutex;
 use tonic::{transport::Channel, Request};
@@ -128,10 +126,8 @@ mod tests {
     };
 
     use async_trait::async_trait;
-    use chariott_common::{
-        error::Error,
-        proto::provider::{FulfillRequest, FulfillResponse},
-    };
+    use chariott_common::error::Error;
+    use chariott_proto::provider::{FulfillRequest, FulfillResponse};
     use url::Url;
 
     use super::{ConnectedProvider, ConnectionProvider, ReusableProvider};

@@ -8,6 +8,7 @@ license = "MIT"
 async-trait = { workspace = true }
 bytes = "1.2"
 chariott-common = { path = "../../common/" }
+chariott-proto = { workspace = true }
 ess = { path = "../../ess/" }
 keyvalue = { path = "../../keyvalue" }
 futures = { workspace = true }

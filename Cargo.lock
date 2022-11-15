@@ -429,6 +429,7 @@ dependencies = [
  "async-recursion",
  "async-trait",
  "chariott-common",
+ "chariott-proto",
  "examples-common",
  "futures",
  "prost",
@@ -451,9 +452,8 @@ name = "chariott-common"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "chariott-proto",
  "ess",
- "prost",
- "prost-types",
  "regex",
  "serde",
  "tempfile",
@@ -461,9 +461,18 @@ dependencies = [
  "tokio-stream",
  "tokio-util",
  "tonic",
- "tonic-build",
  "tracing",
  "uuid",
+]
+
+[[package]]
+name = "chariott-proto"
+version = "0.1.0"
+dependencies = [
+ "prost",
+ "prost-types",
+ "tonic",
+ "tonic-build",
 ]
 
 [[package]]
@@ -530,11 +539,10 @@ dependencies = [
  "async-trait",
  "base64",
  "chariott-common",
+ "chariott-proto",
  "examples-common",
  "futures",
  "lazy_static",
- "prost",
- "prost-types",
  "reqwest",
  "serde",
  "tokio",
@@ -808,6 +816,7 @@ dependencies = [
  "async-stream",
  "async-trait",
  "chariott-common",
+ "chariott-proto",
  "examples-common",
  "futures",
  "prost",
@@ -881,6 +890,7 @@ dependencies = [
  "async-trait",
  "bytes",
  "chariott-common",
+ "chariott-proto",
  "ess",
  "futures",
  "keyvalue",
@@ -1432,11 +1442,10 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "chariott-common",
+ "chariott-proto",
  "ess",
  "examples-common",
  "keyvalue",
- "prost",
- "prost-types",
  "tokio",
  "tokio-stream",
  "tonic",
@@ -1497,12 +1506,11 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "chariott-common",
+ "chariott-proto",
  "examples-common",
  "image",
  "lazy_static",
  "ndarray",
- "prost",
- "prost-types",
  "serde",
  "serde_json",
  "tensorflow",
@@ -1557,6 +1565,7 @@ name = "lt-provider-app"
 version = "0.1.0"
 dependencies = [
  "chariott-common",
+ "chariott-proto",
  "examples-common",
  "rand",
  "rand_distr",
@@ -1701,14 +1710,13 @@ dependencies = [
  "async-std",
  "async-trait",
  "chariott-common",
+ "chariott-proto",
  "env_logger",
  "ess",
  "examples-common",
  "futures",
  "keyvalue",
  "lazy_static",
- "prost",
- "prost-types",
  "regex",
  "test-log",
  "tokio",
@@ -2586,13 +2594,12 @@ dependencies = [
  "async-stream",
  "async-trait",
  "chariott-common",
+ "chariott-proto",
  "ess",
  "examples-common",
  "futures",
  "keyvalue",
  "lazy_static",
- "prost",
- "prost-types",
  "regex",
  "serde",
  "tokio",

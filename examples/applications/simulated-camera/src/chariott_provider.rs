@@ -5,13 +5,19 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use chariott_proto::{
+    common::{
+        discover_fulfillment::Service, intent::Intent, DiscoverFulfillment, FulfillmentEnum,
+        FulfillmentMessage,
+    },
+    provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
+};
 use tonic::{Request, Response, Status};
 use url::Url;
 
 use examples_common::chariott::{
     self,
     inspection::{fulfill, Entry},
-    proto::*,
     streaming::ProtoExt as _,
     value::Value,
 };
@@ -54,35 +60,33 @@ fn property(path: &str, fpm: i32) -> Entry {
 }
 
 #[async_trait]
-impl provider::provider_service_server::ProviderService for ChariottProvider {
+impl ProviderService for ChariottProvider {
     async fn fulfill(
         &self,
-        request: Request<provider::FulfillRequest>,
-    ) -> Result<Response<provider::FulfillResponse>, Status> {
+        request: Request<FulfillRequest>,
+    ) -> Result<Response<FulfillResponse>, Status> {
         let response = match request
             .into_inner()
             .intent
             .and_then(|i| i.intent)
             .ok_or_else(|| Status::invalid_argument("Intent must be specified"))?
         {
-            common::intent::Intent::Discover(_) => {
-                common::fulfillment::Fulfillment::Discover(common::DiscoverFulfillment {
-                    services: vec![common::discover_fulfillment::Service {
-                        url: self.url.to_string(),
-                        schema_kind: SCHEMA_REFERENCE.to_owned(),
-                        schema_reference: SCHEMA_VERSION_STREAMING.to_owned(),
-                        metadata: HashMap::new(),
-                    }],
-                })
-            }
-            common::intent::Intent::Inspect(inspect) => fulfill(inspect.query, &*CAMERA_SCHEMA),
-            common::intent::Intent::Subscribe(subscribe) => self.store.subscribe(subscribe)?,
-            common::intent::Intent::Read(read) => self.store.read(read),
+            Intent::Discover(_) => FulfillmentEnum::Discover(DiscoverFulfillment {
+                services: vec![Service {
+                    url: self.url.to_string(),
+                    schema_kind: SCHEMA_REFERENCE.to_owned(),
+                    schema_reference: SCHEMA_VERSION_STREAMING.to_owned(),
+                    metadata: HashMap::new(),
+                }],
+            }),
+            Intent::Inspect(inspect) => fulfill(inspect.query, &*CAMERA_SCHEMA),
+            Intent::Subscribe(subscribe) => self.store.subscribe(subscribe)?,
+            Intent::Read(read) => self.store.read(read),
             _ => Err(Status::not_found(""))?,
         };
 
-        Ok(Response::new(provider::FulfillResponse {
-            fulfillment: Some(common::Fulfillment { fulfillment: Some(response) }),
+        Ok(Response::new(FulfillResponse {
+            fulfillment: Some(FulfillmentMessage { fulfillment: Some(response) }),
         }))
     }
 }

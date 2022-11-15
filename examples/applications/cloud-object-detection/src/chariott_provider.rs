@@ -2,16 +2,17 @@
 // Licensed under the MIT license.
 
 use async_trait::async_trait;
+use chariott_proto::{
+    common::{FulfillmentEnum, FulfillmentMessage, IntentEnum},
+    provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
+};
 use tonic::{Request, Response, Status};
 use tracing::error;
 
 use crate::detection::DetectionLogic;
 
 use examples_common::{
-    chariott::{
-        inspection::{fulfill, Entry},
-        proto::{common, provider},
-    },
+    chariott::inspection::{fulfill, Entry},
     examples::detection::DetectRequest,
 };
 
@@ -37,21 +38,19 @@ lazy_static::lazy_static! {
 }
 
 #[async_trait]
-impl provider::provider_service_server::ProviderService for ChariottProvider {
+impl ProviderService for ChariottProvider {
     async fn fulfill(
         &self,
-        request: Request<provider::FulfillRequest>,
-    ) -> Result<Response<provider::FulfillResponse>, Status> {
+        request: Request<FulfillRequest>,
+    ) -> Result<Response<FulfillResponse>, Status> {
         let response = match request
             .into_inner()
             .intent
             .and_then(|i| i.intent)
             .ok_or_else(|| Status::invalid_argument("Intent must be specified"))?
         {
-            common::intent::Intent::Inspect(inspect) => {
-                fulfill(inspect.query, &*INSPECT_FULFILLMENT_SCHEMA)
-            }
-            common::intent::Intent::Invoke(intent) => {
+            IntentEnum::Inspect(inspect) => fulfill(inspect.query, &*INSPECT_FULFILLMENT_SCHEMA),
+            IntentEnum::Invoke(intent) => {
                 let arg = DetectRequest::try_from(intent)
                     .map_err(|e| Status::invalid_argument(e.to_string()))?;
 
@@ -60,13 +59,13 @@ impl provider::provider_service_server::ProviderService for ChariottProvider {
                     Status::unknown(format!("Error when invoking function: '{}'", e))
                 })?;
 
-                common::fulfillment::Fulfillment::Invoke(result.into())
+                FulfillmentEnum::Invoke(result.into())
             }
             _ => Err(Status::not_found(""))?,
         };
 
-        Ok(Response::new(provider::FulfillResponse {
-            fulfillment: Some(common::Fulfillment { fulfillment: Some(response) }),
+        Ok(Response::new(FulfillResponse {
+            fulfillment: Some(FulfillmentMessage { fulfillment: Some(response) }),
         }))
     }
 }

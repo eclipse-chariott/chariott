@@ -10,21 +10,16 @@ use chariott_common::{
     config::env,
     error::{Error, ResultExt as _},
 };
-use examples_common::chariott::proto::common::{
-    fulfillment::Fulfillment as InnerFulfillment, intent::Intent as InnerIntent, Fulfillment,
-    InvokeFulfillment,
-};
-use examples_common::chariott::proto::provider::{
-    provider_service_server::{ProviderService, ProviderServiceServer},
-    FulfillRequest, FulfillResponse,
-};
-use examples_common::chariott::value::Value;
-use examples_common::{
-    chariott,
-    chariott::proto::runtime_api::{
-        intent_registration::Intent, intent_service_registration::ExecutionLocality,
+use chariott_proto::{
+    common::{FulfillmentEnum, FulfillmentMessage, IntentEnum, InvokeFulfillment},
+    provider::{
+        provider_service_server::{ProviderService, ProviderServiceServer},
+        FulfillRequest, FulfillResponse,
     },
+    runtime::{intent_registration::Intent, intent_service_registration::ExecutionLocality},
 };
+use examples_common::chariott;
+use examples_common::chariott::value::Value;
 use rand::{rngs::SmallRng, SeedableRng};
 use rand_distr::{DistIter, Distribution, Normal};
 use tokio::time::sleep;
@@ -105,19 +100,19 @@ impl ProviderService for ChariottProvider {
             .and_then(|i| i.intent)
             .ok_or_else(|| Status::invalid_argument("Intent must be specified"))?
         {
-            InnerIntent::Invoke(_) => {
+            IntentEnum::Invoke(_) => {
                 if let Some(latency_distribution) = &self.latency_distribution {
                     let sample = latency_distribution.lock().unwrap().next().unwrap();
                     sleep(Duration::from_millis(sample as _)).await;
                 }
 
-                InnerFulfillment::Invoke(InvokeFulfillment { r#return: Some(Value::NULL.into()) })
+                FulfillmentEnum::Invoke(InvokeFulfillment { r#return: Some(Value::NULL.into()) })
             }
             _ => Err(Status::not_found(""))?,
         };
 
         Ok(Response::new(FulfillResponse {
-            fulfillment: Some(Fulfillment { fulfillment: Some(response) }),
+            fulfillment: Some(FulfillmentMessage { fulfillment: Some(response) }),
         }))
     }
 }

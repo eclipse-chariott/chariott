@@ -6,6 +6,7 @@ license = "MIT"
 
 [dependencies]
 chariott-common = { workspace = true }
+chariott-proto = { workspace = true }
 examples-common = { path = "../../common/" }
 rand = "0.8"
 rand_distr = "0.4"

@@ -4,13 +4,14 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use async_trait::async_trait;
-use examples_common::chariott::{
-    proto::{
-        common::{self as common_proto, InvokeFulfillment},
-        provider as provider_proto,
+use chariott_proto::{
+    common::{FulfillmentEnum, FulfillmentMessage, IntentEnum, InvokeFulfillment, InvokeIntent},
+    provider::{
+        provider_service_server::{ProviderService, ProviderServiceServer},
+        FulfillRequest, FulfillResponse,
     },
-    value::Value,
 };
+use examples_common::chariott::value::Value;
 use tokio::{net::TcpSocket, spawn};
 use tokio_stream::wrappers::TcpListenerStream;
 use tonic::{transport::Server, Request, Response, Status};
@@ -18,7 +19,7 @@ use url::Url;
 
 #[derive(Default)]
 pub struct Provider {
-    on_invoke: Option<fn(common_proto::InvokeIntent) -> Option<Value>>,
+    on_invoke: Option<fn(InvokeIntent) -> Option<Value>>,
     // Expand this type with other intents that are used for integration tests.
 }
 
@@ -27,10 +28,7 @@ impl Provider {
         Self { on_invoke: None }
     }
 
-    pub fn with_on_invoke(
-        self,
-        on_invoke: fn(common_proto::InvokeIntent) -> Option<Value>,
-    ) -> Self {
+    pub fn with_on_invoke(self, on_invoke: fn(InvokeIntent) -> Option<Value>) -> Self {
         Self { on_invoke: Some(on_invoke) }
     }
 
@@ -41,9 +39,7 @@ impl Provider {
 
         _ = spawn(
             Server::builder()
-                .add_service(provider_proto::provider_service_server::ProviderServiceServer::new(
-                    self,
-                ))
+                .add_service(ProviderServiceServer::new(self))
                 .serve_with_incoming(listener),
         );
 
@@ -52,21 +48,21 @@ impl Provider {
 }
 
 #[async_trait]
-impl provider_proto::provider_service_server::ProviderService for Provider {
+impl ProviderService for Provider {
     async fn fulfill(
         &self,
-        request: Request<provider_proto::FulfillRequest>,
-    ) -> Result<Response<provider_proto::FulfillResponse>, Status> {
+        request: Request<FulfillRequest>,
+    ) -> Result<Response<FulfillResponse>, Status> {
         let response = match request
             .into_inner()
             .intent
             .and_then(|i| i.intent)
             .ok_or_else(|| Status::invalid_argument("Intent must be specified"))?
         {
-            common_proto::intent::Intent::Invoke(intent) => {
+            IntentEnum::Invoke(intent) => {
                 if let Some(on_invoke) = self.on_invoke {
                     let result = on_invoke(intent);
-                    common_proto::fulfillment::Fulfillment::Invoke(InvokeFulfillment {
+                    FulfillmentEnum::Invoke(InvokeFulfillment {
                         r#return: result.map(|v| v.into()),
                     })
                 } else {
@@ -76,8 +72,8 @@ impl provider_proto::provider_service_server::ProviderService for Provider {
             _ => Err(Status::not_found(""))?,
         };
 
-        Ok(Response::new(provider_proto::FulfillResponse {
-            fulfillment: Some(common_proto::Fulfillment { fulfillment: Some(response) }),
+        Ok(Response::new(FulfillResponse {
+            fulfillment: Some(FulfillmentMessage { fulfillment: Some(response) }),
         }))
     }
 }

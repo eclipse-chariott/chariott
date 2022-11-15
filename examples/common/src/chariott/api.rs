@@ -11,18 +11,19 @@ use std::{
     env,
 };
 
-use super::{inspection::Entry as InspectionEntry, proto, value::Value};
+use super::{inspection::Entry as InspectionEntry, value::Value};
 
 use async_trait::async_trait;
-use chariott_common::{
-    error::{Error, ResultExt as _},
-    proto::{
-        common::{
-            fulfillment::Fulfillment as ProtoFulfillment, DiscoverFulfillment, InspectFulfillment,
-            InvokeFulfillment, ReadFulfillment, SubscribeFulfillment, WriteFulfillment,
-        },
-        runtime::FulfillResponse,
+use chariott_common::error::{Error, ResultExt as _};
+use chariott_proto::{
+    common::{
+        discover_fulfillment::Service as ServiceMessage, DiscoverFulfillment, DiscoverIntent,
+        FulfillmentEnum, InspectFulfillment, InspectIntent, IntentEnum, IntentMessage,
+        InvokeFulfillment, InvokeIntent, ReadFulfillment, ReadIntent, SubscribeFulfillment,
+        SubscribeIntent, WriteFulfillment, WriteIntent,
     },
+    runtime::{chariott_service_client::ChariottServiceClient, FulfillRequest, FulfillResponse},
+    streaming::{channel_service_client::ChannelServiceClient, OpenRequest},
 };
 use futures::{stream::BoxStream, StreamExt};
 use tonic::{transport::Channel, Request, Response};
@@ -31,7 +32,7 @@ use tracing::debug;
 const CHARIOTT_URL_KEY: &str = "CHARIOTT_URL";
 const DEFAULT_CHARIOTT_URL: &str = env!("DEFAULT_CHARIOTT_URL");
 
-struct Fulfillment(ProtoFulfillment);
+struct Fulfillment(FulfillmentEnum);
 
 trait FulfillResponseExt {
     fn fulfillment<F>(self) -> Result<F, Error>
@@ -69,27 +70,25 @@ macro_rules! impl_try_from_var {
     };
 }
 
-impl_try_from_var!(Fulfillment, ProtoFulfillment::Inspect, InspectFulfillment);
-impl_try_from_var!(Fulfillment, ProtoFulfillment::Read, ReadFulfillment);
-impl_try_from_var!(Fulfillment, ProtoFulfillment::Write, WriteFulfillment);
-impl_try_from_var!(Fulfillment, ProtoFulfillment::Invoke, InvokeFulfillment);
-impl_try_from_var!(Fulfillment, ProtoFulfillment::Subscribe, SubscribeFulfillment);
-impl_try_from_var!(Fulfillment, ProtoFulfillment::Discover, DiscoverFulfillment);
+impl_try_from_var!(Fulfillment, FulfillmentEnum::Inspect, InspectFulfillment);
+impl_try_from_var!(Fulfillment, FulfillmentEnum::Read, ReadFulfillment);
+impl_try_from_var!(Fulfillment, FulfillmentEnum::Write, WriteFulfillment);
+impl_try_from_var!(Fulfillment, FulfillmentEnum::Invoke, InvokeFulfillment);
+impl_try_from_var!(Fulfillment, FulfillmentEnum::Subscribe, SubscribeFulfillment);
+impl_try_from_var!(Fulfillment, FulfillmentEnum::Discover, DiscoverFulfillment);
 
 #[derive(Clone)]
 pub struct GrpcChariott {
-    client: proto::runtime_api::chariott_service_client::ChariottServiceClient<Channel>,
+    client: ChariottServiceClient<Channel>,
 }
 
 impl GrpcChariott {
     pub async fn connect() -> Result<Self, Error> {
         let chariott_url =
             env::var(CHARIOTT_URL_KEY).unwrap_or_else(|_| DEFAULT_CHARIOTT_URL.to_string());
-        let client = proto::runtime_api::chariott_service_client::ChariottServiceClient::connect(
-            chariott_url,
-        )
-        .await
-        .map_err_with("Connecting to Chariott failed.")?;
+        let client = ChariottServiceClient::connect(chariott_url)
+            .await
+            .map_err_with("Connecting to Chariott failed.")?;
 
         Ok(Self { client })
     }
@@ -100,11 +99,11 @@ impl ChariottCommunication for GrpcChariott {
     async fn fulfill(
         &mut self,
         namespace: impl Into<Box<str>> + Send,
-        intent: proto::common::intent::Intent,
+        intent: IntentEnum,
     ) -> Result<Response<FulfillResponse>, Error> {
         self.client
-            .fulfill(Request::new(proto::runtime_api::FulfillRequest {
-                intent: Some(proto::common::Intent { intent: Some(intent) }),
+            .fulfill(Request::new(FulfillRequest {
+                intent: Some(IntentMessage { intent: Some(intent) }),
                 namespace: namespace.into().into(),
             }))
             .await
@@ -119,7 +118,7 @@ pub trait ChariottCommunication: Send {
     async fn fulfill(
         &mut self,
         namespace: impl Into<Box<str>> + Send,
-        intent: proto::common::intent::Intent,
+        intent: IntentEnum,
     ) -> Result<Response<FulfillResponse>, Error>;
 }
 
@@ -178,21 +177,15 @@ impl<T: ChariottCommunication> Chariott for T {
 
         let args = args.into_iter().map(|arg| arg.into()).collect();
 
-        self.fulfill(
-            namespace,
-            proto::common::intent::Intent::Invoke(proto::common::InvokeIntent {
-                args,
-                command: command.into(),
-            }),
-        )
-        .await?
-        .fulfillment()
-        .and_then(|invoke: InvokeFulfillment| {
-            invoke
-                .r#return
-                .and_then(|v| v.try_into().ok())
-                .ok_or_else(|| Error::new("Return value could not be parsed."))
-        })
+        self.fulfill(namespace, IntentEnum::Invoke(InvokeIntent { args, command: command.into() }))
+            .await?
+            .fulfillment()
+            .and_then(|invoke: InvokeFulfillment| {
+                invoke
+                    .r#return
+                    .and_then(|v| v.try_into().ok())
+                    .ok_or_else(|| Error::new("Return value could not be parsed."))
+            })
     }
 
     async fn subscribe<I: IntoIterator<Item = Box<str>> + Send>(
@@ -208,10 +201,7 @@ impl<T: ChariottCommunication> Chariott for T {
 
         self.fulfill(
             namespace,
-            proto::common::intent::Intent::Subscribe(proto::common::SubscribeIntent {
-                channel_id: channel_id.into(),
-                sources,
-            }),
+            IntentEnum::Subscribe(SubscribeIntent { channel_id: channel_id.into(), sources }),
         )
         .await?
         .fulfillment()
@@ -225,15 +215,11 @@ impl<T: ChariottCommunication> Chariott for T {
         let namespace = namespace.into();
         debug!("Discovering services for namespace '{:?}'.", namespace);
 
-        self.fulfill(
-            namespace,
-            proto::common::intent::Intent::Discover(proto::common::DiscoverIntent {}),
+        self.fulfill(namespace, IntentEnum::Discover(DiscoverIntent {})).await?.fulfillment().map(
+            |discover: DiscoverFulfillment| {
+                discover.services.into_iter().map(|s| s.into()).collect()
+            },
         )
-        .await?
-        .fulfillment()
-        .map(|discover: DiscoverFulfillment| {
-            discover.services.into_iter().map(|s| s.into()).collect()
-        })
     }
 
     async fn inspect(
@@ -245,31 +231,26 @@ impl<T: ChariottCommunication> Chariott for T {
         let query = query.into();
         debug!("Inspecting namespace '{:?}' with query '{:?}'.", namespace, query);
 
-        self.fulfill(
-            namespace,
-            proto::common::intent::Intent::Inspect(proto::common::InspectIntent {
-                query: query.into(),
-            }),
-        )
-        .await?
-        .fulfillment()
-        .and_then(|inspect: InspectFulfillment| {
-            inspect
-                .entries
-                .into_iter()
-                .map(|e| {
-                    let items_parse_result: Result<HashMap<Box<str>, Value>, ()> = e
-                        .items
-                        .into_iter()
-                        .map(|(key, value)| value.try_into().map(|value| (key.into(), value)))
-                        .collect();
-                    match items_parse_result {
-                        Ok(items) => Ok(InspectionEntry::new(e.path, items)),
-                        Err(_) => Err(Error::new("Could not parse value.")),
-                    }
-                })
-                .collect()
-        })
+        self.fulfill(namespace, IntentEnum::Inspect(InspectIntent { query: query.into() }))
+            .await?
+            .fulfillment()
+            .and_then(|inspect: InspectFulfillment| {
+                inspect
+                    .entries
+                    .into_iter()
+                    .map(|e| {
+                        let items_parse_result: Result<HashMap<Box<str>, Value>, ()> = e
+                            .items
+                            .into_iter()
+                            .map(|(key, value)| value.try_into().map(|value| (key.into(), value)))
+                            .collect();
+                        match items_parse_result {
+                            Ok(items) => Ok(InspectionEntry::new(e.path, items)),
+                            Err(_) => Err(Error::new("Could not parse value.")),
+                        }
+                    })
+                    .collect()
+            })
     }
 
     async fn write(
@@ -283,10 +264,7 @@ impl<T: ChariottCommunication> Chariott for T {
 
         self.fulfill(
             namespace,
-            proto::common::intent::Intent::Write(proto::common::WriteIntent {
-                key: key.into(),
-                value: Some(value.into()),
-            }),
+            IntentEnum::Write(WriteIntent { key: key.into(), value: Some(value.into()) }),
         )
         .await?
         .fulfillment()
@@ -302,20 +280,19 @@ impl<T: ChariottCommunication> Chariott for T {
         let namespace = namespace.into();
         debug!("Reading key '{:?}' on namespace '{:?}'.", key, namespace);
 
-        self.fulfill(
-            namespace,
-            proto::common::intent::Intent::Read(proto::common::ReadIntent { key: key.into() }),
-        )
-        .await?
-        .fulfillment()
-        .and_then(|read: ReadFulfillment| match read.value {
-            Some(value) => value
-                .value
-                .map(|v| Value::try_from(v).map_err(|_| Error::new("Could not parse read value.")))
-                // TODO: replace with common::OptionExt after #13
-                .map_or(Ok(None), |r| r.map(Some)),
-            None => Ok(None),
-        })
+        self.fulfill(namespace, IntentEnum::Read(ReadIntent { key: key.into() }))
+            .await?
+            .fulfillment()
+            .and_then(|read: ReadFulfillment| match read.value {
+                Some(value) => value
+                    .value
+                    .map(|v| {
+                        Value::try_from(v).map_err(|_| Error::new("Could not parse read value."))
+                    })
+                    // TODO: replace with common::OptionExt after #13
+                    .map_or(Ok(None), |r| r.map(Some)),
+                None => Ok(None),
+            })
     }
 }
 
@@ -359,15 +336,12 @@ where
 
         debug!("Streaming endpoint for '{namespace:?}' is: {streaming_endpoint}");
 
-        let mut provider_client =
-            proto::streaming::channel_service_client::ChannelServiceClient::connect(
-                streaming_endpoint.into_string(),
-            )
+        let mut provider_client = ChannelServiceClient::connect(streaming_endpoint.into_string())
             .await
             .map_err_with("Connecting to streaming endpoint failed.")?;
 
         let response = provider_client
-            .open(Request::new(proto::streaming::OpenRequest {}))
+            .open(Request::new(OpenRequest {}))
             .await
             .map_err_with("Opening stream failed.")?;
 
@@ -410,8 +384,8 @@ pub struct Service {
     pub schema_reference: Box<str>,
 }
 
-impl From<proto::common::discover_fulfillment::Service> for Service {
-    fn from(value: proto::common::discover_fulfillment::Service) -> Self {
+impl From<ServiceMessage> for Service {
+    fn from(value: ServiceMessage) -> Self {
         Service {
             url: value.url.into(),
             schema_kind: value.schema_kind.into(),

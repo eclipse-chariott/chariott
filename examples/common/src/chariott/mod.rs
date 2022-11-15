@@ -3,7 +3,6 @@
 
 pub mod api;
 pub mod inspection;
-pub mod proto;
 pub mod provider;
 pub mod registration;
 pub mod streaming;

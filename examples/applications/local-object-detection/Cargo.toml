@@ -7,12 +7,11 @@ license = "MIT"
 [dependencies]
 async-trait = { workspace = true }
 chariott-common = { workspace = true }
+chariott-proto = { workspace = true }
 examples-common = { path = "../../common/" }
 image = "0.24.4"
 lazy_static = { workspace = true }
 ndarray = "0.15.6"
-prost = { workspace = true }
-prost-types = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tensorflow = "0.19.1"

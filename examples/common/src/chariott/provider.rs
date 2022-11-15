@@ -40,14 +40,15 @@ use url::Url;
 
 use chariott_common::config::env;
 use chariott_common::error::{Error, ResultExt};
-
-use super::proto::runtime_api::intent_service_registration::ExecutionLocality;
+use chariott_proto::runtime::{
+    intent_registration::Intent, intent_service_registration::ExecutionLocality,
+};
 
 pub async fn register(
     name: impl Into<&str>,
     version: impl Into<&str>,
     namespace: impl Into<&str>,
-    intents: impl IntoIterator<Item = super::proto::runtime_api::intent_registration::Intent>,
+    intents: impl IntoIterator<Item = Intent>,
     url_env_name: impl Into<&str>,
     url: impl Into<&str>,
     locality: ExecutionLocality,
