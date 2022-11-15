@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668514335411,
+  "lastUpdate": 1668520745876,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -1559,6 +1559,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 281080313,
             "range": "± 8184612",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dariuszparys@users.noreply.github.com",
+            "name": "Dariusz Parys",
+            "username": "dariuszparys"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b850c220bbfe66c00e6d248101d1d965a25f83b2",
+          "message": "Update rust-toolchain to TOML format (#43)",
+          "timestamp": "2022-11-15T14:49:33+01:00",
+          "tree_id": "da7174c7da3d25dc0b9f32bae469d3e18bd2ec4f",
+          "url": "https://github.com/eclipse/chariott/commit/b850c220bbfe66c00e6d248101d1d965a25f83b2"
+        },
+        "date": 1668520745224,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 397123,
+            "range": "± 12130",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2633384,
+            "range": "± 10058",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 25371143,
+            "range": "± 30956",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 3730547,
+            "range": "± 29514",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 26003484,
+            "range": "± 96463",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 262975603,
+            "range": "± 683033",
             "unit": "ns/iter"
           }
         ]
