@@ -35,7 +35,7 @@ jobs:
       - name: Install protobuf-compiler
         run: sudo apt-get install -y protobuf-compiler
       - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
+        run: rustup show
         with:
           components: clippy, rustfmt
       - name: Cache Dependencies
