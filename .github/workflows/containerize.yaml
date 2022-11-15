@@ -19,6 +19,7 @@ on:
       - "proto/**"
       - "Dockerfile"
       - ".github/workflows/containerize.yaml"
+      - "rust-toolchain.toml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -40,7 +41,7 @@ jobs:
 
       - name: Find Rust version
         id: rust_version
-        run: echo "::set-output name=RUST_VERSION::$(cat rust-toolchain)"
+        run: echo "::set-output name=RUST_VERSION::$(awk -F "=" '/channel/ {print $2}' rust-toolchain.toml)"
 
       - name: Set up Docker buildx
         id: buildx
