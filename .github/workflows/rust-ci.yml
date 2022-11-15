@@ -33,15 +33,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Install protobuf-compiler
         run: sudo apt-get install -y protobuf-compiler
+
       - name: Install stable toolchain
-        run: rustup show
+        run: |
+          rustup show
+          rustup component add rustfmt clippy
+
       - name: Cache Dependencies
         uses: Swatinem/rust-cache@v1
+
       - run: cargo check --workspace --locked
+
       - run: cargo clippy --all-targets --all-features --workspace --no-deps -- -D warnings
+
       - run: cargo fmt --all -- --check
+
       - name: Run doctest only
         # we run doctests here as cargo tarpaulin (our test runner)
         # requires nightly toolchain to do so
@@ -49,6 +58,7 @@ jobs:
         with:
           command: test
           args: --workspace --doc
+
       - name: Run cargo doc
         # This step is required to detect possible errors in docs that are not doctests.
         uses: actions-rs/cargo@v1
