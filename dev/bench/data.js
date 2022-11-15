@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668439884317,
+  "lastUpdate": 1668514686528,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -1872,6 +1872,84 @@ window.BENCHMARK_DATA = {
             "value": 8,
             "unit": "Millisecond",
             "range": "p95=13"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "22341213+bastbu@users.noreply.github.com",
+            "name": "Bastian Burger",
+            "username": "bastbu"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b0d2add377f1740f26c52bfb4e234ce415b91b81",
+          "message": "Put proto types in own crate, unifying imports (#32)",
+          "timestamp": "2022-11-15T12:59:10+01:00",
+          "tree_id": "22be5a51e8c5bb48133bf33c85c0ecae2369af51",
+          "url": "https://github.com/eclipse/chariott/commit/b0d2add377f1740f26c52bfb4e234ce415b91b81"
+        },
+        "date": 1668514685722,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1188",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "3",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 36,
+            "unit": "Percent",
+            "range": "p95=37"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6795,
+            "unit": "Bytes",
+            "range": "p95=6848"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 7,
+            "unit": "Millisecond",
+            "range": "p95=12"
           }
         ]
       }
