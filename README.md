@@ -1,11 +1,13 @@
 # Project Chariott
 
+- [CI Status](#ci-status)
 - [What is Chariott?](#what-is-chariott)
 - [How to develop with Chariott](#how-to-develop-with-chariott)
   - [Terminology](#terminology)
   - [Concept of Intents](#concept-of-intents)
 - [Getting started](#getting-started)
   - [Build all binaries and run tests](#build-all-binaries-and-run-tests)
+- [Using Podman instead of Docker](#using-podman-instead-of-docker)
 - [How to run the examples and interact with Chariott](#how-to-run-the-examples-and-interact-with-chariott)
 - [How to run the dog mode demo](#how-to-run-the-dog-mode-demo)
 - [Trademarks](#trademarks)
@@ -78,7 +80,8 @@ Devcontainer, refer to the `devcontainer.json` for a list of the plugins/tools
 we use.
 
 > Note: If you use Devcontainers and you are running on Windows, make sure to check out the
-> repository on the WSL2 file system for better performance.
+> repository on the WSL2 file system in your target distribution you're using.
+> At the current time Chariott only supports WSL2 dev containers.
 
 ### Build all binaries and run tests
 
@@ -86,6 +89,29 @@ we use.
 cargo build --workspace
 cargo test --workspace
 ```
+
+## Using Podman instead of Docker
+
+If you want to use podman you have to enable podman in Visual Studio Code like
+described [here](https://code.visualstudio.com/remote/advancedcontainers/docker-options#_podman)
+and update the `.devcontainer/devcontainer.json` file with the following additions:
+
+```Dockerfile
+  "runArgs": [
+    "--cap-add=SYS_PTRACE",
+    "--security-opt",
+    "seccomp=unconfined",
+    "--userns=keep-id"
+  ],
+
+  ...
+
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,Z",
+  "workspaceFolder": "/workspace",
+  "containerUser": "vscode"
+```
+
+> **NOTE**: Feel free to use another workspace folder name.
 
 ## How to run the examples and interact with Chariott
 
