@@ -1,1 +1,2 @@
-1.65
+[toolchain]
+channel = "1.65"

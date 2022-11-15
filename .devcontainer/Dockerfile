@@ -39,6 +39,5 @@ COPY ../rust-toolchain .
 
 # NB: we have to install also any components we need for our specific toolchain
 # version.
-RUN rustup override set $(cat rust-toolchain) && \
-    rustup component add clippy && \
+RUN rustup component add clippy && \
     rustup component add rustfmt
