@@ -41,7 +41,7 @@ jobs:
 
       - name: Find Rust version
         id: rust_version
-        run: echo "::set-output name=RUST_VERSION::$(awk -F "=" '/channel/ {print $2}' rust-toolchain)"
+        run: echo "::set-output name=RUST_VERSION::$(cat rust-toolchain)"
 
       - name: Set up Docker buildx
         id: buildx
