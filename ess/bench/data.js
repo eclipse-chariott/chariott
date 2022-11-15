@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668520745876,
+  "lastUpdate": 1668530209408,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -1619,6 +1619,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 262975603,
             "range": "± 683033",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dariuszparys@users.noreply.github.com",
+            "name": "Dariusz Parys",
+            "username": "dariuszparys"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "95912b1ed06b67614bb952d8c678838ac6f7dc58",
+          "message": "Fix Rust CI workflow (#44)",
+          "timestamp": "2022-11-15T17:27:50+01:00",
+          "tree_id": "06aefd6591b35b4b7bb11b605e81f784fecefd70",
+          "url": "https://github.com/eclipse/chariott/commit/95912b1ed06b67614bb952d8c678838ac6f7dc58"
+        },
+        "date": 1668530208374,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 396269,
+            "range": "± 5576",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2630223,
+            "range": "± 4073",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 25288227,
+            "range": "± 25439",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 3471436,
+            "range": "± 77128",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 25912276,
+            "range": "± 55037",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 252514694,
+            "range": "± 440465",
             "unit": "ns/iter"
           }
         ]
