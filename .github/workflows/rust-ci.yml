@@ -18,6 +18,7 @@ on:
       - '.github/workflows/rust-ci.yml'
       - 'Cargo.lock'
       - 'Cargo.toml'
+      - 'rust-toolchain'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

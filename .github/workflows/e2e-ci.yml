@@ -15,6 +15,7 @@ on:
       - ".github/workflows/e2e.yaml"
       - 'Cargo.lock'
       - 'Cargo.toml'
+      - 'rust-toolchain'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

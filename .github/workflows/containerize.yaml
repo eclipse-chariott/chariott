@@ -19,6 +19,7 @@ on:
       - "proto/**"
       - "Dockerfile"
       - ".github/workflows/containerize.yaml"
+      - "rust-toolchain"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
