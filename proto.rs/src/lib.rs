@@ -10,6 +10,11 @@ mod chariott {
     pub mod common {
         pub mod v1 {
             tonic::include_proto!("chariott.common.v1");
+
+            // Re-exporting these types under a different name makes it more
+            // ergonomic in scenarios where both the "outer" (*Message) and
+            // "inner" (*Enum) type is needed, without needing to add qualifiers
+            // for the two types.
             pub use fulfillment::Fulfillment as FulfillmentEnum;
             pub use intent::Intent as IntentEnum;
             pub use value::Value as ValueEnum;
