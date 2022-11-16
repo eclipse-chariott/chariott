@@ -6,8 +6,10 @@
   - [Terminology](#terminology)
   - [Concept of Intents](#concept-of-intents)
 - [Getting started](#getting-started)
+  - [Important Note](#important-note)
+  - [Devcontainer](#devcontainer)
   - [Build all binaries and run tests](#build-all-binaries-and-run-tests)
-- [Using Podman instead of Docker](#using-podman-instead-of-docker)
+  - [Using Podman instead of Docker](#using-podman-instead-of-docker)
 - [How to run the examples and interact with Chariott](#how-to-run-the-examples-and-interact-with-chariott)
 - [How to run the dog mode demo](#how-to-run-the-dog-mode-demo)
 - [Trademarks](#trademarks)
@@ -73,6 +75,15 @@ scenarios that are supported by Chariott. It can be found
 
 ## Getting started
 
+### Important Note
+
+The current source is developed and tested under WSL2 / Linux running Ubuntu 20.04
+on AMD64 architecture. It is not tested against any other configurations. You
+might experience missing support for other platforms, please feel free to
+contribute to close the gaps.
+
+### Devcontainer
+
 For development and running the examples, we recommend using the
 [Devcontainer](https://code.visualstudio.com/docs/remote/containers) template
 provided at `.devcontainer/devcontainer.json`. If you decide not to use the
@@ -81,7 +92,6 @@ we use.
 
 > Note: If you use Devcontainers and you are running on Windows, make sure to check out the
 > repository on the WSL2 file system in your target distribution you're using.
-> At the current time Chariott only supports WSL2 and Linux as dev container hosts.
 
 ### Build all binaries and run tests
 
@@ -90,7 +100,7 @@ cargo build --workspace
 cargo test --workspace
 ```
 
-## Using Podman instead of Docker
+### Using Podman instead of Docker
 
 If you want to use podman you have to enable podman in Visual Studio Code like
 described [here](https://code.visualstudio.com/remote/advancedcontainers/docker-options#_podman)
