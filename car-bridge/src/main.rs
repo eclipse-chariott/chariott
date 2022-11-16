@@ -5,7 +5,7 @@ use std::{env, error::Error, time::Duration};
 
 use chariott_common::shutdown::ctrl_c_cancellation;
 use paho_mqtt::{AsyncClient, ConnectOptionsBuilder, CreateOptionsBuilder, MQTT_VERSION_5, QOS_2};
-use tokio::{time::sleep, select};
+use tokio::{select, time::sleep};
 use tokio_stream::StreamExt as _;
 use tracing::{info, Level};
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
