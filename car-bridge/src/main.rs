@@ -1,9 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-use std::{env, error::Error};
+use std::{env, error::Error, time::Duration};
 
 use paho_mqtt::{AsyncClient, ConnectOptionsBuilder, CreateOptionsBuilder, MQTT_VERSION_5, QOS_2};
+use tokio::time::sleep;
 use tokio_stream::StreamExt as _;
 use tracing::{info, Level};
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
@@ -44,8 +45,18 @@ async fn main() -> Result<(), Box<dyn Error>> {
     info!("Subscribing to topic '{c2d_topic}'.");
     client.subscribe(c2d_topic, QOS_2).await?;
 
-    while let Some(Some(message)) = message_stream.next().await {
-        info!("(R) {message:?}");
+    while let Some(message) = message_stream.next().await {
+        if let Some(message) = message {
+            info!("(R) {message:?}");
+        }
+        else {
+            info!("Connection temporarily lost.");
+
+            while let Err(err) = client.reconnect().await {
+                info!("Trying to reconnect: {}.", err);
+                sleep(Duration::from_secs(5)).await;
+            }
+        }
     }
 
     Ok(())
