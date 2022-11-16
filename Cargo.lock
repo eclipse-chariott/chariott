@@ -405,6 +405,10 @@ name = "car-bridge"
 version = "0.1.0"
 dependencies = [
  "paho-mqtt",
+ "tokio",
+ "tokio-stream",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
