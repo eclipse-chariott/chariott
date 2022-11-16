@@ -3,8 +3,9 @@
 
 use std::{env, error::Error, time::Duration};
 
+use chariott_common::shutdown::ctrl_c_cancellation;
 use paho_mqtt::{AsyncClient, ConnectOptionsBuilder, CreateOptionsBuilder, MQTT_VERSION_5, QOS_2};
-use tokio::time::sleep;
+use tokio::{time::sleep, select};
 use tokio_stream::StreamExt as _;
 use tracing::{info, Level};
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
@@ -45,19 +46,36 @@ async fn main() -> Result<(), Box<dyn Error>> {
     info!("Subscribing to topic '{c2d_topic}'.");
     client.subscribe(c2d_topic, QOS_2).await?;
 
-    while let Some(message) = message_stream.next().await {
-        if let Some(message) = message {
-            info!("(R) {message:?}");
-        }
-        else {
-            info!("Connection temporarily lost.");
+    let cancellation_token = ctrl_c_cancellation();
 
-            while let Err(err) = client.reconnect().await {
-                info!("Trying to reconnect: {}.", err);
-                sleep(Duration::from_secs(5)).await;
+    loop {
+        select! {
+            message = message_stream.next() => {
+                if let Some(message) = message {
+                    if let Some(message) = message {
+                        info!("(R) {message:?}");
+                    }
+                    else {
+                        info!("Connection temporarily lost.");
+
+                        while let Err(err) = client.reconnect().await {
+                            info!("Trying to reconnect: {}.", err);
+                            sleep(Duration::from_secs(5)).await;
+                        }
+                    }
+                }
+                else {
+                    break;
+                }
+            }
+            _ = cancellation_token.cancelled() => {
+                break;
             }
         }
     }
+
+    info!("Disconnecting the client.");
+    client.disconnect(None).await?;
 
     Ok(())
 }

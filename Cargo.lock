@@ -404,6 +404,7 @@ checksum = "c1db59621ec70f09c5e9b597b220c7a2b43611f4710dc03ceb8748637775692c"
 name = "car-bridge"
 version = "0.1.0"
 dependencies = [
+ "chariott-common",
  "paho-mqtt",
  "tokio",
  "tokio-stream",
