@@ -59,7 +59,7 @@ impl MqttMessaging {
 
         // Get the stream before connecting the client, as otherwise messages
         // may be lost. If the Car Bridge restarts while the number of
-        // outstanding messages is larger than the buffer size, messages can be
+        // outstanding messages is larger than the buffer size, messages may be
         // lost.
 
         let receiver = client.get_stream(MQTT_CLIENT_BUFFER_SIZE);
@@ -74,8 +74,8 @@ impl MqttMessaging {
             .await
             .map_err_with("Could not connect to MQTT broker.")?;
 
-        // C2D messages must be delivered with QOS 2, as we can not guarantee
-        // that the fulfill requests they contain are always idempotent.
+        // C2D messages must be delivered with QOS 2, as we cannot assume that
+        // the fulfill requests they contain are always idempotent.
 
         client
             .subscribe(topic, QOS_2)
