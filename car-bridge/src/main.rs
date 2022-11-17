@@ -4,7 +4,9 @@
 use std::{env, error::Error, time::Duration};
 
 use chariott_common::shutdown::ctrl_c_cancellation;
-use paho_mqtt::{AsyncClient, ConnectOptionsBuilder, CreateOptionsBuilder, MQTT_VERSION_5, QOS_2};
+use paho_mqtt::{
+    AsyncClient, ConnectOptionsBuilder, CreateOptionsBuilder, Message, MQTT_VERSION_5, QOS_2,
+};
 use tokio::{select, time::sleep};
 use tokio_stream::StreamExt as _;
 use tracing::{info, Level};
@@ -44,7 +46,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let c2d_topic = format!("c2d/{vin}");
     info!("Subscribing to topic '{c2d_topic}'.");
-    client.subscribe(c2d_topic, QOS_2).await?;
+    client.subscribe(c2d_topic.clone(), QOS_2).await?;
+
+    // Publish a phony message.
+    client.publish(Message::new(c2d_topic, "Example payload", QOS_2)).await?;
 
     let cancellation_token = ctrl_c_cancellation();
 
