@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-use std::{env, error::Error, time::Duration};
+use std::{error::Error, time::Duration};
 
-use chariott_common::shutdown::ctrl_c_cancellation;
+use chariott_common::{config::env, shutdown::ctrl_c_cancellation};
 use paho_mqtt::{
     AsyncClient, ConnectOptionsBuilder, CreateOptionsBuilder, Message, MQTT_VERSION_5, QOS_2,
 };
@@ -27,8 +27,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .finish()
         .init();
 
-    let vin = env::var(VIN_ENV_NAME).unwrap_or_else(|_| DEFAULT_VIN.to_owned());
-    let host = env::var(BROKER_URL_ENV_NAME).unwrap_or_else(|_| DEFAULT_BROKER_URL.to_owned());
+    let vin = env::<String>(VIN_ENV_NAME).unwrap_or_else(|| DEFAULT_VIN.to_owned());
+    let host = env::<String>(BROKER_URL_ENV_NAME).unwrap_or_else(|| DEFAULT_BROKER_URL.to_owned());
 
     info!("Connecting to MQTT broker on '{host}'.");
 
