@@ -49,6 +49,7 @@ url = { workspace = true }
 
 [workspace.dependencies]
 anyhow = "1.0"
+async-stream = "0.3"
 async-trait = "0.1"
 chariott-common = { path = "./common/" }
 chariott-proto = { path = "./proto.rs/" }
