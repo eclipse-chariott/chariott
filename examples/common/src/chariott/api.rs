@@ -8,29 +8,25 @@
 use std::{
     collections::HashMap,
     convert::{TryFrom, TryInto},
-    env,
 };
 
 use super::{inspection::Entry as InspectionEntry, value::Value};
 
 use async_trait::async_trait;
-use chariott_common::error::{Error, ResultExt as _};
+use chariott_common::{error::{Error, ResultExt as _}, chariott_api::ChariottCommunication};
 use chariott_proto::{
     common::{
         discover_fulfillment::Service as ServiceMessage, DiscoverFulfillment, DiscoverIntent,
-        FulfillmentEnum, InspectFulfillment, InspectIntent, IntentEnum, IntentMessage,
-        InvokeFulfillment, InvokeIntent, ReadFulfillment, ReadIntent, SubscribeFulfillment,
-        SubscribeIntent, WriteFulfillment, WriteIntent,
+        FulfillmentEnum, InspectFulfillment, InspectIntent, IntentEnum, InvokeFulfillment,
+        InvokeIntent, ReadFulfillment, ReadIntent, SubscribeFulfillment, SubscribeIntent,
+        WriteFulfillment, WriteIntent,
     },
-    runtime::{chariott_service_client::ChariottServiceClient, FulfillRequest, FulfillResponse},
+    runtime::FulfillResponse,
     streaming::{channel_service_client::ChannelServiceClient, OpenRequest},
 };
 use futures::{stream::BoxStream, StreamExt};
-use tonic::{transport::Channel, Request, Response};
+use tonic::{Request, Response};
 use tracing::debug;
-
-const CHARIOTT_URL_KEY: &str = "CHARIOTT_URL";
-const DEFAULT_CHARIOTT_URL: &str = env!("DEFAULT_CHARIOTT_URL");
 
 struct Fulfillment(FulfillmentEnum);
 
@@ -76,51 +72,6 @@ impl_try_from_var!(Fulfillment, FulfillmentEnum::Write, WriteFulfillment);
 impl_try_from_var!(Fulfillment, FulfillmentEnum::Invoke, InvokeFulfillment);
 impl_try_from_var!(Fulfillment, FulfillmentEnum::Subscribe, SubscribeFulfillment);
 impl_try_from_var!(Fulfillment, FulfillmentEnum::Discover, DiscoverFulfillment);
-
-#[derive(Clone)]
-pub struct GrpcChariott {
-    client: ChariottServiceClient<Channel>,
-}
-
-impl GrpcChariott {
-    pub async fn connect() -> Result<Self, Error> {
-        let chariott_url =
-            env::var(CHARIOTT_URL_KEY).unwrap_or_else(|_| DEFAULT_CHARIOTT_URL.to_string());
-        let client = ChariottServiceClient::connect(chariott_url)
-            .await
-            .map_err_with("Connecting to Chariott failed.")?;
-
-        Ok(Self { client })
-    }
-}
-
-#[async_trait]
-impl ChariottCommunication for GrpcChariott {
-    async fn fulfill(
-        &mut self,
-        namespace: impl Into<Box<str>> + Send,
-        intent: IntentEnum,
-    ) -> Result<Response<FulfillResponse>, Error> {
-        self.client
-            .fulfill(Request::new(FulfillRequest {
-                intent: Some(IntentMessage { intent: Some(intent) }),
-                namespace: namespace.into().into(),
-            }))
-            .await
-            .map_err_with("Intent fulfillment failed.")
-    }
-}
-
-/// Chariott abstracts the Communication layer, but is based on the Protobuf
-/// definitions of the Chariott API.
-#[async_trait]
-pub trait ChariottCommunication: Send {
-    async fn fulfill(
-        &mut self,
-        namespace: impl Into<Box<str>> + Send,
-        intent: IntentEnum,
-    ) -> Result<Response<FulfillResponse>, Error>;
-}
 
 /// Chariott abstracts the Protobuf definitions that define Chariott's API.
 #[async_trait]

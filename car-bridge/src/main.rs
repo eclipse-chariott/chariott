@@ -3,12 +3,14 @@
 
 use std::{env, error::Error};
 
-use car_bridge::messaging::{Messaging, MqttMessaging};
-use chariott_common::shutdown::ctrl_c_cancellation;
-use paho_mqtt::{QOS_2, Message};
+use car_bridge::{
+    chariott::handle_message,
+    messaging::{Messaging, MqttMessaging},
+};
+use chariott_common::{chariott_api::GrpcChariott, shutdown::ctrl_c_cancellation};
 use tokio::select;
 use tokio_stream::StreamExt as _;
-use tracing::{info, Level};
+use tracing::Level;
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
 
 const VIN_ENV_NAME: &str = "VIN";
@@ -25,10 +27,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let vin = env::var(VIN_ENV_NAME).unwrap_or_else(|_| DEFAULT_VIN.to_owned());
 
+    let chariott = GrpcChariott::connect().await?;
+
     let client = MqttMessaging::connect(format!("c2d/{vin}")).await?;
     let mut messages = client.receive().await;
-
-    client.send(Message::new("c2d/1", "hello there", QOS_2)).await?;
 
     let cancellation_token = ctrl_c_cancellation();
 
@@ -36,7 +38,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         select! {
             message = messages.next() => {
                 if let Some(message) = message {
-                    info!("(R) {message:?}");
+                    // TODO: avoid backpressure issues.
+                    handle_message(&mut chariott.clone(), message.payload()).await?;
                 }
                 else {
                     break;
