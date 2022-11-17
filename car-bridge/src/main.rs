@@ -31,12 +31,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let chariott = GrpcChariott::connect().await?;
 
-    let mut messages = MqttMessaging::connect(format!("{}-receiver", vin.clone()))
-        .await?
-        .receive(format!("c2d/{vin}"))
-        .await?;
-
-    let sender = MqttMessaging::connect(format!("{}-sender", vin.clone())).await?;
+    let client = MqttMessaging::connect(format!("{}", vin)).await?;
+    let mut messages = client.receive(format!("c2d/{vin}")).await?;
 
     let cancellation_token = ctrl_c_cancellation();
 
@@ -51,7 +47,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     let mut properties = Properties::new();
                     properties.push_binary(PropertyCode::CorrelationData, message.properties().get_binary(PropertyCode::CorrelationData).unwrap())?;
                     let message = MessageBuilder::new().topic(message.properties().get_string(PropertyCode::ResponseTopic).unwrap()).payload(buffer).qos(QOS_2).finalize();
-                    sender.send(message).await?;
+                    client.send(message).await?;
                 }
                 else {
                     break;

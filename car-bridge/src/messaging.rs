@@ -17,7 +17,7 @@ use tracing::info;
 pub trait Messaging {
     type Message;
 
-    async fn receive(self, topic: String) -> Result<BoxStream<'static, Self::Message>, Error>;
+    async fn receive<'a>(&'a self, topic: String) -> Result<BoxStream<'a, Self::Message>, Error>;
     async fn send(&self, message: Self::Message) -> Result<(), Error>;
 }
 
@@ -82,7 +82,7 @@ impl MqttMessaging {
 impl Messaging for MqttMessaging {
     type Message = Message;
 
-    async fn receive(mut self, topic: String) -> Result<BoxStream<'static, Self::Message>, Error> {
+    async fn receive<'a>(&'a self, topic: String) -> Result<BoxStream<'a, Self::Message>, Error> {
         // C2D messages must be delivered with QOS 2, as we cannot assume that
         // the fulfill requests they contain are always idempotent.
 
@@ -91,8 +91,10 @@ impl Messaging for MqttMessaging {
             .await
             .map_err_with("Could not subscribe to topic for receiving C2D messages.")?;
 
+        let mut receiver = self.receiver.clone();
+
         let s = stream! {
-            while let Some(message) = self.receiver.next().await {
+            while let Some(message) = receiver.next().await {
                 if let Some(message) = message {
                     yield message;
                 }
