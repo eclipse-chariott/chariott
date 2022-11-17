@@ -137,6 +137,7 @@ async fn handle_message(
 
         let mut properties = Properties::new();
         properties.push_binary(PropertyCode::CorrelationData, correlation_data)?;
+        properties.push_string(PropertyCode::ContentType, "chariott.runtime.v1.FulfillResponse")?;
 
         response_sender
             .send((response_topic, MessageBuilder::new().payload(buffer).qos(QOS_2)))
