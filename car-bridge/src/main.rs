@@ -8,7 +8,7 @@ use car_bridge::{
     messaging::{Messaging, MqttMessaging},
 };
 use chariott_common::{chariott_api::GrpcChariott, shutdown::ctrl_c_cancellation};
-use paho_mqtt::{Message, QOS_2};
+use paho_mqtt::{MessageBuilder, Properties, PropertyCode, QOS_2};
 use prost::Message as _;
 use tokio::select;
 use tokio_stream::StreamExt as _;
@@ -48,7 +48,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     let response = fulfill(&mut chariott.clone(), message.payload()).await?;
                     let mut buffer = vec![];
                     response.encode(&mut buffer)?;
-                    sender.send(Message::new(format!("responses/{vin}"), buffer, QOS_2)).await?;
+                    let mut properties = Properties::new();
+                    properties.push_binary(PropertyCode::CorrelationData, message.properties().get_binary(PropertyCode::CorrelationData).unwrap())?;
+                    let message = MessageBuilder::new().topic(message.properties().get_string(PropertyCode::ResponseTopic).unwrap()).payload(buffer).qos(QOS_2).finalize();
+                    sender.send(message).await?;
                 }
                 else {
                     break;
