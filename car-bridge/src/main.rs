@@ -27,8 +27,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .finish()
         .init();
 
-    let vin = env::<String>(VIN_ENV_NAME).unwrap_or_else(|| DEFAULT_VIN.to_owned());
-    let host = env::<String>(BROKER_URL_ENV_NAME).unwrap_or_else(|| DEFAULT_BROKER_URL.to_owned());
+    let vin = env::<String>(VIN_ENV_NAME);
+    let vin = vin.as_deref().unwrap_or(DEFAULT_VIN);
+    let host = env::<String>(BROKER_URL_ENV_NAME);
+    let host = host.as_deref().unwrap_or(DEFAULT_BROKER_URL);
 
     info!("Connecting to MQTT broker on '{host}'.");
 
