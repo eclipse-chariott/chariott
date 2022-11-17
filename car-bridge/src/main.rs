@@ -5,7 +5,7 @@ use std::{env, error::Error};
 
 use car_bridge::{
     chariott::fulfill,
-    messaging::{Publisher, MqttMessaging, Subscriber},
+    messaging::{Subscriber, MqttMessaging, Publisher},
 };
 use chariott_common::{chariott_api::GrpcChariott, shutdown::ctrl_c_cancellation};
 use paho_mqtt::{MessageBuilder, Properties, PropertyCode, QOS_2};
@@ -32,7 +32,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let chariott = GrpcChariott::connect().await?;
 
     let client = MqttMessaging::connect(format!("{}", vin)).await?;
-    let mut messages = client.receive(format!("c2d/{vin}")).await?;
+    let mut messages = client.subscribe(format!("c2d/{vin}")).await?;
 
     let cancellation_token = ctrl_c_cancellation();
 
@@ -47,7 +47,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     let mut properties = Properties::new();
                     properties.push_binary(PropertyCode::CorrelationData, message.properties().get_binary(PropertyCode::CorrelationData).unwrap())?;
                     let topic = message.properties().get_string(PropertyCode::ResponseTopic).unwrap();
-                    client.send(topic, MessageBuilder::new().payload(buffer).qos(QOS_2)).await?;
+                    client.publish(topic, MessageBuilder::new().payload(buffer).qos(QOS_2)).await?;
                 }
                 else {
                     break;

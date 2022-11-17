@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 use chariott_common::{
     chariott_api::ChariottCommunication,
     error::{Error, ResultExt as _},
@@ -12,9 +15,6 @@ pub async fn fulfill(
 ) -> Result<FulfillResponse, Error> {
     let fulfill_request: FulfillRequest =
         Message::decode(message).map_err_with("Could not decode message.")?;
-
-    // Fulfill all requests against Chariott, without distinguishing between
-    // subscription- and non-subscription related requests.
 
     let intent_enum = fulfill_request
         .intent

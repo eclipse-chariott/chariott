@@ -14,19 +14,19 @@ use paho_mqtt::{
 use tracing::info;
 
 #[async_trait]
-pub trait Publisher {
-    type Message;
-    type Topic;
-
-    async fn receive<'a>(&'a self, topic: String) -> Result<BoxStream<'a, Self::Message>, Error>;
-}
-
-#[async_trait]
 pub trait Subscriber {
     type Message;
     type Topic;
 
-    async fn send(&self, topic: Self::Topic, message: Self::Message) -> Result<(), Error>;
+    async fn subscribe<'a>(&'a self, topic: String) -> Result<BoxStream<'a, Self::Message>, Error>;
+}
+
+#[async_trait]
+pub trait Publisher {
+    type Message;
+    type Topic;
+
+    async fn publish(&self, topic: Self::Topic, message: Self::Message) -> Result<(), Error>;
 }
 
 pub struct MqttMessaging {
@@ -87,11 +87,11 @@ impl MqttMessaging {
 }
 
 #[async_trait]
-impl Publisher for MqttMessaging {
+impl Subscriber for MqttMessaging {
     type Message = Message;
     type Topic = String;
 
-    async fn receive<'a>(&'a self, topic: String) -> Result<BoxStream<'a, Self::Message>, Error> {
+    async fn subscribe<'a>(&'a self, topic: String) -> Result<BoxStream<'a, Self::Message>, Error> {
         // C2D messages must be delivered with QOS 2, as we cannot assume that
         // the fulfill requests they contain are always idempotent.
 
@@ -122,11 +122,11 @@ impl Publisher for MqttMessaging {
 }
 
 #[async_trait]
-impl Subscriber for MqttMessaging {
+impl Publisher for MqttMessaging {
     type Message = MessageBuilder;
     type Topic = String;
 
-    async fn send(&self, topic: Self::Topic, message: Self::Message) -> Result<(), Error> {
+    async fn publish(&self, topic: Self::Topic, message: Self::Message) -> Result<(), Error> {
         self.client.publish(message.topic(topic).finalize()).await.map_err_with("Error when publishing a response.")
     }
 }
