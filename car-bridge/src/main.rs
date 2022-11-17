@@ -56,21 +56,19 @@ async fn main() -> Result<(), Box<dyn Error>> {
     loop {
         select! {
             message = message_stream.next() => {
+                let Some(message) = message else {
+                    break;
+                };
                 if let Some(message) = message {
-                    if let Some(message) = message {
-                        info!("(R) {message:?}");
-                    }
-                    else {
-                        info!("Connection temporarily lost.");
-
-                        while let Err(err) = client.reconnect().await {
-                            info!("Trying to reconnect: {}.", err);
-                            sleep(Duration::from_secs(5)).await;
-                        }
-                    }
+                    info!("(R) {message:?}");
                 }
                 else {
-                    break;
+                    info!("Connection temporarily lost.");
+
+                    while let Err(err) = client.reconnect().await {
+                        info!("Trying to reconnect: {}.", err);
+                        sleep(Duration::from_secs(5)).await;
+                    }
                 }
             }
             _ = cancellation_token.cancelled() => {
