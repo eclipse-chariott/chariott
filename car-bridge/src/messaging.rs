@@ -9,7 +9,8 @@ use async_trait::async_trait;
 use chariott_common::error::{Error, ResultExt as _};
 use futures::{stream::BoxStream, StreamExt as _};
 use paho_mqtt::{
-    AsyncClient, ConnectOptionsBuilder, CreateOptionsBuilder, Message, MQTT_VERSION_5, QOS_2, MessageBuilder,
+    AsyncClient, ConnectOptionsBuilder, CreateOptionsBuilder, Message, MessageBuilder,
+    MQTT_VERSION_5, QOS_2,
 };
 use tracing::info;
 
@@ -18,7 +19,11 @@ pub trait Subscriber {
     type Message;
     type Topic;
 
-    async fn subscribe<'a>(&'a self, topic: String) -> Result<BoxStream<'a, Self::Message>, Error>;
+    /// Subscribe to a message from publisher.
+    async fn subscribe(
+        &mut self,
+        topic: String,
+    ) -> Result<BoxStream<'static, Self::Message>, Error>;
 }
 
 #[async_trait]
@@ -26,12 +31,14 @@ pub trait Publisher {
     type Message;
     type Topic;
 
+    /// Publishes a message.
     async fn publish(&self, topic: Self::Topic, message: Self::Message) -> Result<(), Error>;
 }
 
 pub struct MqttMessaging {
     client: AsyncClient,
     receiver: Receiver<Option<Message>>,
+    is_subscribed: bool,
 }
 
 impl Drop for MqttMessaging {
@@ -42,6 +49,10 @@ impl Drop for MqttMessaging {
 }
 
 impl MqttMessaging {
+    /// Connects to the MQTT broker and starts listening on incoming messages.
+    /// If there was a persisted session before, messages may delivered before
+    /// the `connect` returns. Refer to the `Subscriber` implementation to get
+    /// access to the buffered messages.
     pub async fn connect(client_id: String) -> Result<Self, Error> {
         const BROKER_URL_ENV_NAME: &str = "BROKER_URL";
         const DEFAULT_BROKER_URL: &str = "tcp://localhost:1883";
@@ -82,7 +93,7 @@ impl MqttMessaging {
             .await
             .map_err_with("Could not connect to MQTT broker.")?;
 
-        Ok(Self { client, receiver })
+        Ok(Self { client, receiver, is_subscribed: false })
     }
 }
 
@@ -91,7 +102,25 @@ impl Subscriber for MqttMessaging {
     type Message = Message;
     type Topic = String;
 
-    async fn subscribe<'a>(&'a self, topic: String) -> Result<BoxStream<'a, Self::Message>, Error> {
+    /// Subscribes to a topic on the MQTT broker. Currently, this can only be
+    /// invoked once on `MqttMessaging`, due to the structure of the underlying
+    /// client.
+    async fn subscribe<'a>(
+        &'a mut self,
+        topic: String,
+    ) -> Result<BoxStream<'static, Self::Message>, Error> {
+        // TODO: By broadcasting the events on the underlying `Receiver` and
+        // filtering the broadcasted events by their topic name, we can support
+        // multiple subscriptions. Since this is currently not needed, we do not
+        // add said complexity to the implementation but fail at runtime
+        // instead.
+
+        if self.is_subscribed {
+            return Err(Error::new("Already receiving messages. It is currently not possible to subscribe multiple times."));
+        }
+
+        self.is_subscribed = true;
+
         // C2D messages must be delivered with QOS 2, as we cannot assume that
         // the fulfill requests they contain are always idempotent.
 
@@ -105,9 +134,7 @@ impl Subscriber for MqttMessaging {
         let s = stream! {
             while let Some(message) = receiver.next().await {
                 if let Some(message) = message {
-                    if topic == message.topic() {
-                        yield message;
-                    }
+                    yield message;
                 }
                 else {
                     // Automatic reconnect is used when connecting the
@@ -126,7 +153,11 @@ impl Publisher for MqttMessaging {
     type Message = MessageBuilder;
     type Topic = String;
 
+    /// Publish a message to an MQTT broker.
     async fn publish(&self, topic: Self::Topic, message: Self::Message) -> Result<(), Error> {
-        self.client.publish(message.topic(topic).finalize()).await.map_err_with("Error when publishing a response.")
+        self.client
+            .publish(message.topic(topic).finalize())
+            .await
+            .map_err_with("Error when publishing a response.")
     }
 }
