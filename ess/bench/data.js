@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668676417419,
+  "lastUpdate": 1668703632461,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -1739,6 +1739,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 295849615,
             "range": "± 3188193",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "code@raboof.com",
+            "name": "Atif Aziz",
+            "username": "atifaziz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "90dee0ea22f065f47fe9192f4e21c5667bbf061b",
+          "message": "Update to .NET 7 SDK (#49)",
+          "timestamp": "2022-11-17T16:59:22+01:00",
+          "tree_id": "f057b3fe6a71a1b801d056cdf2b4ba1435c10d09",
+          "url": "https://github.com/eclipse/chariott/commit/90dee0ea22f065f47fe9192f4e21c5667bbf061b"
+        },
+        "date": 1668703631820,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 526352,
+            "range": "± 82364",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3197813,
+            "range": "± 20448",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 29967095,
+            "range": "± 379238",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 5213081,
+            "range": "± 136924",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 31607276,
+            "range": "± 388491",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 301667595,
+            "range": "± 8073104",
             "unit": "ns/iter"
           }
         ]
