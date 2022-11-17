@@ -13,7 +13,10 @@ use std::{
 use super::{inspection::Entry as InspectionEntry, value::Value};
 
 use async_trait::async_trait;
-use chariott_common::{error::{Error, ResultExt as _}, chariott_api::ChariottCommunication};
+use chariott_common::{
+    chariott_api::ChariottCommunication,
+    error::{Error, ResultExt as _},
+};
 use chariott_proto::{
     common::{
         discover_fulfillment::Service as ServiceMessage, DiscoverFulfillment, DiscoverIntent,
