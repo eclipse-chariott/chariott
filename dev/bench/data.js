@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668531433438,
+  "lastUpdate": 1668676903403,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -2106,6 +2106,84 @@ window.BENCHMARK_DATA = {
             "value": 7,
             "unit": "Millisecond",
             "range": "p95=12"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dariuszparys@users.noreply.github.com",
+            "name": "Dariusz Parys",
+            "username": "dariuszparys"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8e2c46ff7c87ec2156d97b6c2317f89c865a8e1a",
+          "message": "Remove Alex recommends GH workflow (#48)",
+          "timestamp": "2022-11-17T10:07:56+01:00",
+          "tree_id": "42a96aabd7fdbf9c309d6597f0258c2c230dc447",
+          "url": "https://github.com/eclipse/chariott/commit/8e2c46ff7c87ec2156d97b6c2317f89c865a8e1a"
+        },
+        "date": 1668676902771,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2008",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 28,
+            "unit": "Percent",
+            "range": "p95=28"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6530,
+            "unit": "Bytes",
+            "range": "p95=6660"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 5,
+            "unit": "Millisecond",
+            "range": "p95=9"
           }
         ]
       }
