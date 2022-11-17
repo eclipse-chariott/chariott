@@ -51,8 +51,8 @@ impl Drop for MqttMessaging {
 impl MqttMessaging {
     /// Connects to the MQTT broker and starts listening on incoming messages.
     /// If there was a persisted session before, messages may delivered before
-    /// the `connect` returns. Refer to the `Subscriber` implementation to get
-    /// access to the buffered messages.
+    /// the `connect` returns. Refer to the `Subscriber` implementation for how
+    /// to get access to the buffered messages.
     pub async fn connect(client_id: String) -> Result<Self, Error> {
         const BROKER_URL_ENV_NAME: &str = "BROKER_URL";
         const DEFAULT_BROKER_URL: &str = "tcp://localhost:1883";
@@ -61,8 +61,8 @@ impl MqttMessaging {
         let host = env::var(BROKER_URL_ENV_NAME).unwrap_or_else(|_| DEFAULT_BROKER_URL.to_owned());
         // The client ID is used in conjunction with session persistence to
         // re-establish existing subscriptions on disconnect. TODO: if the
-        // broker goes down and does not persist the session, the client must
-        // reestablish the subscriptions.
+        // session was not persisted, the client must reestablish the
+        // subscriptions.
         let client_id = format!("car-bridge-{client_id}");
 
         info!("Connecting client '{client_id}' to MQTT broker at '{host}'.");
