@@ -75,17 +75,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     loop {
         select! {
             message = messages.next() => {
-                if let Some(message) = message {
-                    let mut chariott = chariott.clone();
-                    let response_sender = response_sender.clone();
-
-                    spawn(async move {
-                        handle_message(&mut chariott, response_sender, message).await;
-                    });
-                }
-                else {
+                let Some(message) = message else {
                     break;
-                }
+                };
+
+                let mut chariott = chariott.clone();
+                let response_sender = response_sender.clone();
+
+                spawn(async move {
+                    handle_message(&mut chariott, response_sender, message).await;
+                });
             }
             _ = cancellation_token.cancelled() => {
                 break;
