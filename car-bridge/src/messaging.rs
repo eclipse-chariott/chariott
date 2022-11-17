@@ -40,6 +40,11 @@ impl MqttMessaging {
         const MQTT_CLIENT_BUFFER_SIZE: usize = 25;
 
         let host = env::var(BROKER_URL_ENV_NAME).unwrap_or_else(|_| DEFAULT_BROKER_URL.to_owned());
+        // The client ID is used in conjunction with session persistence to
+        // re-establish existing subscriptions on disconnect. TODO: if the
+        // broker goes down and does not persist the session, the client must
+        // reestablish the subscriptions.
+        let client_id = format!("car-bridge-{topic}");
 
         info!("Connecting to MQTT broker on '{host}' and subscribing to '{topic}'.");
 
@@ -47,7 +52,7 @@ impl MqttMessaging {
             CreateOptionsBuilder::new()
                 .mqtt_version(MQTT_VERSION_5)
                 .server_uri(host)
-                .client_id(format!("car-bridge-{topic}"))
+                .client_id(client_id)
                 .finalize(),
         )
         .map_err_with("Failed to create MQTT client.")?;
@@ -58,9 +63,6 @@ impl MqttMessaging {
         // lost.
 
         let receiver = client.get_stream(MQTT_CLIENT_BUFFER_SIZE);
-
-        // TODO: if the broker goes down and does not persist the session, the
-        // client must reestablish the subscriptions.
 
         client
             .connect(
