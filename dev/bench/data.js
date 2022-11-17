@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668676903403,
+  "lastUpdate": 1668701970082,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -2184,6 +2184,84 @@ window.BENCHMARK_DATA = {
             "value": 5,
             "unit": "Millisecond",
             "range": "p95=9"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "code@raboof.com",
+            "name": "Atif Aziz",
+            "username": "atifaziz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "90dee0ea22f065f47fe9192f4e21c5667bbf061b",
+          "message": "Update to .NET 7 SDK (#49)",
+          "timestamp": "2022-11-17T16:59:22+01:00",
+          "tree_id": "f057b3fe6a71a1b801d056cdf2b4ba1435c10d09",
+          "url": "https://github.com/eclipse/chariott/commit/90dee0ea22f065f47fe9192f4e21c5667bbf061b"
+        },
+        "date": 1668701969468,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2008",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 25,
+            "unit": "Percent",
+            "range": "p95=26"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6652,
+            "unit": "Bytes",
+            "range": "p95=6702"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 4,
+            "unit": "Millisecond",
+            "range": "p95=8"
           }
         ]
       }
