@@ -7,12 +7,19 @@ use car_bridge::{
     chariott::fulfill,
     messaging::{MqttMessaging, Publisher, Subscriber},
 };
-use chariott_common::{chariott_api::GrpcChariott, config::env, shutdown::ctrl_c_cancellation};
-use paho_mqtt::{MessageBuilder, Properties, PropertyCode, QOS_2};
+use chariott_common::{
+    chariott_api::{ChariottCommunication, GrpcChariott},
+    config::env,
+    shutdown::ctrl_c_cancellation,
+};
+use paho_mqtt::{Message, MessageBuilder, Properties, PropertyCode, QOS_2};
 use prost::Message as _;
-use tokio::select;
+use tokio::{
+    select, spawn,
+    sync::mpsc::{self, Sender},
+};
 use tokio_stream::StreamExt as _;
-use tracing::Level;
+use tracing::{error, Level};
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
 
 const VIN_ENV_NAME: &str = "VIN";
@@ -37,18 +44,28 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let cancellation_token = ctrl_c_cancellation();
 
+    let (response_sender, mut response_receiver) = mpsc::channel(50);
+
+    spawn(async move {
+        while let Some((topic, message)) = response_receiver.recv().await {
+            if let Err(e) = client.publish(topic, message).await {
+                error!("Error when publishing message: '{:?}'.", e);
+            }
+        }
+    });
+
     loop {
         select! {
             message = messages.next() => {
                 if let Some(message) = message {
-                    // TODO: avoid backpressure issues.
-                    let response = fulfill(&mut chariott.clone(), message.payload()).await?;
-                    let mut buffer = vec![];
-                    response.encode(&mut buffer)?;
-                    let mut properties = Properties::new();
-                    properties.push_binary(PropertyCode::CorrelationData, message.properties().get_binary(PropertyCode::CorrelationData).unwrap())?;
-                    let topic = message.properties().get_string(PropertyCode::ResponseTopic).unwrap();
-                    client.publish(topic, MessageBuilder::new().payload(buffer).qos(QOS_2)).await?;
+                    let mut chariott = chariott.clone();
+                    let response_sender = response_sender.clone();
+
+                    // Handle message as separate task to avoid backpressure.
+
+                    spawn(async move {
+                        handle_message(&mut chariott, response_sender, message).await;
+                    });
                 }
                 else {
                     break;
@@ -61,4 +78,36 @@ async fn main() -> Result<(), Box<dyn Error>> {
     }
 
     Ok(())
+}
+
+async fn handle_message(
+    chariott: &mut impl ChariottCommunication,
+    response_sender: Sender<(String, MessageBuilder)>,
+    message: Message,
+) {
+    async fn inner(
+        chariott: &mut impl ChariottCommunication,
+        response_sender: Sender<(String, MessageBuilder)>,
+        message: Message,
+    ) -> Result<(), Box<dyn Error>> {
+        let response = fulfill(chariott, message.payload()).await?;
+
+        let mut buffer = vec![];
+        response.encode(&mut buffer)?;
+
+        let mut properties = Properties::new();
+        properties.push_binary(
+            PropertyCode::CorrelationData,
+            message.properties().get_binary(PropertyCode::CorrelationData).unwrap(),
+        )?;
+
+        let topic = message.properties().get_string(PropertyCode::ResponseTopic).unwrap();
+        response_sender.send((topic, MessageBuilder::new().payload(buffer).qos(QOS_2))).await?;
+
+        Ok(())
+    }
+
+    if let Err(e) = inner(chariott, response_sender, message).await {
+        error!("Error when handling message: '{e:?}'.");
+    }
 }
