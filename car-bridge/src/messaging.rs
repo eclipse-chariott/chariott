@@ -9,16 +9,24 @@ use async_trait::async_trait;
 use chariott_common::error::{Error, ResultExt as _};
 use futures::{stream::BoxStream, StreamExt as _};
 use paho_mqtt::{
-    AsyncClient, ConnectOptionsBuilder, CreateOptionsBuilder, Message, MQTT_VERSION_5, QOS_2,
+    AsyncClient, ConnectOptionsBuilder, CreateOptionsBuilder, Message, MQTT_VERSION_5, QOS_2, MessageBuilder,
 };
 use tracing::info;
 
 #[async_trait]
-pub trait Messaging {
+pub trait Publisher {
     type Message;
+    type Topic;
 
     async fn receive<'a>(&'a self, topic: String) -> Result<BoxStream<'a, Self::Message>, Error>;
-    async fn send(&self, message: Self::Message) -> Result<(), Error>;
+}
+
+#[async_trait]
+pub trait Subscriber {
+    type Message;
+    type Topic;
+
+    async fn send(&self, topic: Self::Topic, message: Self::Message) -> Result<(), Error>;
 }
 
 pub struct MqttMessaging {
@@ -79,8 +87,9 @@ impl MqttMessaging {
 }
 
 #[async_trait]
-impl Messaging for MqttMessaging {
+impl Publisher for MqttMessaging {
     type Message = Message;
+    type Topic = String;
 
     async fn receive<'a>(&'a self, topic: String) -> Result<BoxStream<'a, Self::Message>, Error> {
         // C2D messages must be delivered with QOS 2, as we cannot assume that
@@ -110,8 +119,14 @@ impl Messaging for MqttMessaging {
 
         Ok(s.boxed())
     }
+}
 
-    async fn send(&self, message: Self::Message) -> Result<(), Error> {
-        self.client.publish(message).await.map_err_with("Error when publishing a response.")
+#[async_trait]
+impl Subscriber for MqttMessaging {
+    type Message = MessageBuilder;
+    type Topic = String;
+
+    async fn send(&self, topic: Self::Topic, message: Self::Message) -> Result<(), Error> {
+        self.client.publish(message.topic(topic).finalize()).await.map_err_with("Error when publishing a response.")
     }
 }

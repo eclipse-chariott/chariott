@@ -5,7 +5,7 @@ use std::{env, error::Error};
 
 use car_bridge::{
     chariott::fulfill,
-    messaging::{Messaging, MqttMessaging},
+    messaging::{Publisher, MqttMessaging, Subscriber},
 };
 use chariott_common::{chariott_api::GrpcChariott, shutdown::ctrl_c_cancellation};
 use paho_mqtt::{MessageBuilder, Properties, PropertyCode, QOS_2};
@@ -46,8 +46,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     response.encode(&mut buffer)?;
                     let mut properties = Properties::new();
                     properties.push_binary(PropertyCode::CorrelationData, message.properties().get_binary(PropertyCode::CorrelationData).unwrap())?;
-                    let message = MessageBuilder::new().topic(message.properties().get_string(PropertyCode::ResponseTopic).unwrap()).payload(buffer).qos(QOS_2).finalize();
-                    client.send(message).await?;
+                    let topic = message.properties().get_string(PropertyCode::ResponseTopic).unwrap();
+                    client.send(topic, MessageBuilder::new().payload(buffer).qos(QOS_2)).await?;
                 }
                 else {
                     break;
