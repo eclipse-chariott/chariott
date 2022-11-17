@@ -37,7 +37,7 @@ impl MqttMessaging {
     pub async fn connect(client_id: String) -> Result<Self, Error> {
         const BROKER_URL_ENV_NAME: &str = "BROKER_URL";
         const DEFAULT_BROKER_URL: &str = "tcp://localhost:1883";
-        const MQTT_CLIENT_BUFFER_SIZE: usize = 25;
+        const MQTT_CLIENT_BUFFER_SIZE: usize = 200;
 
         let host = env::var(BROKER_URL_ENV_NAME).unwrap_or_else(|_| DEFAULT_BROKER_URL.to_owned());
         // The client ID is used in conjunction with session persistence to
@@ -87,7 +87,7 @@ impl Messaging for MqttMessaging {
         // the fulfill requests they contain are always idempotent.
 
         self.client
-            .subscribe(topic, QOS_2)
+            .subscribe(topic.clone(), QOS_2)
             .await
             .map_err_with("Could not subscribe to topic for receiving C2D messages.")?;
 
@@ -96,7 +96,9 @@ impl Messaging for MqttMessaging {
         let s = stream! {
             while let Some(message) = receiver.next().await {
                 if let Some(message) = message {
-                    yield message;
+                    if topic == message.topic() {
+                        yield message;
+                    }
                 }
                 else {
                     // Automatic reconnect is used when connecting the
