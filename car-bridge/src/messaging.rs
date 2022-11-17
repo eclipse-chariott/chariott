@@ -1,12 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-use std::{env, time::Duration};
+use std::time::Duration;
 
 use async_channel::Receiver;
 use async_stream::stream;
 use async_trait::async_trait;
-use chariott_common::error::{Error, ResultExt as _};
+use chariott_common::{
+    config::env,
+    error::{Error, ResultExt as _},
+};
 use futures::{stream::BoxStream, StreamExt as _};
 use paho_mqtt::{
     AsyncClient, ConnectOptionsBuilder, CreateOptionsBuilder, Message, MessageBuilder,
@@ -58,7 +61,9 @@ impl MqttMessaging {
         const DEFAULT_BROKER_URL: &str = "tcp://localhost:1883";
         const MQTT_CLIENT_BUFFER_SIZE: usize = 200;
 
-        let host = env::var(BROKER_URL_ENV_NAME).unwrap_or_else(|_| DEFAULT_BROKER_URL.to_owned());
+        let host = env::<String>(BROKER_URL_ENV_NAME);
+        let host = host.as_deref().unwrap_or(DEFAULT_BROKER_URL);
+
         // The client ID is used in conjunction with session persistence to
         // re-establish existing subscriptions on disconnect. TODO: if the
         // session was not persisted, the client must reestablish the
