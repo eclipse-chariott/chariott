@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "car-bridge",
     "common",
     "ess",
     "examples/applications/cloud-object-detection",
