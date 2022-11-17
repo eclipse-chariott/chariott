@@ -17,7 +17,7 @@ use tracing::info;
 pub trait Messaging {
     type Message;
 
-    async fn receive<'a>(&'a self) -> BoxStream<'a, Self::Message>;
+    async fn receive(self, topic: String) -> Result<BoxStream<'static, Self::Message>, Error>;
     async fn send(&self, message: Self::Message) -> Result<(), Error>;
 }
 
@@ -34,7 +34,7 @@ impl Drop for MqttMessaging {
 }
 
 impl MqttMessaging {
-    pub async fn connect(topic: String) -> Result<Self, Error> {
+    pub async fn connect(client_id: String) -> Result<Self, Error> {
         const BROKER_URL_ENV_NAME: &str = "BROKER_URL";
         const DEFAULT_BROKER_URL: &str = "tcp://localhost:1883";
         const MQTT_CLIENT_BUFFER_SIZE: usize = 25;
@@ -44,9 +44,9 @@ impl MqttMessaging {
         // re-establish existing subscriptions on disconnect. TODO: if the
         // broker goes down and does not persist the session, the client must
         // reestablish the subscriptions.
-        let client_id = format!("car-bridge-{topic}");
+        let client_id = format!("car-bridge-{client_id}");
 
-        info!("Connecting to MQTT broker on '{host}' and subscribing to '{topic}'.");
+        info!("Connecting client '{client_id}' to MQTT broker at '{host}'.");
 
         let mut client = AsyncClient::new(
             CreateOptionsBuilder::new()
@@ -74,14 +74,6 @@ impl MqttMessaging {
             .await
             .map_err_with("Could not connect to MQTT broker.")?;
 
-        // C2D messages must be delivered with QOS 2, as we cannot assume that
-        // the fulfill requests they contain are always idempotent.
-
-        client
-            .subscribe(topic, QOS_2)
-            .await
-            .map_err_with("Could not subscribe to topic for receiving C2D messages.")?;
-
         Ok(Self { client, receiver })
     }
 }
@@ -90,11 +82,17 @@ impl MqttMessaging {
 impl Messaging for MqttMessaging {
     type Message = Message;
 
-    async fn receive<'a>(&'a self) -> BoxStream<'a, Self::Message> {
-        let mut receiver = self.receiver.clone();
+    async fn receive(mut self, topic: String) -> Result<BoxStream<'static, Self::Message>, Error> {
+        // C2D messages must be delivered with QOS 2, as we cannot assume that
+        // the fulfill requests they contain are always idempotent.
+
+        self.client
+            .subscribe(topic, QOS_2)
+            .await
+            .map_err_with("Could not subscribe to topic for receiving C2D messages.")?;
 
         let s = stream! {
-            while let Some(message) = receiver.next().await {
+            while let Some(message) = self.receiver.next().await {
                 if let Some(message) = message {
                     yield message;
                 }
@@ -106,7 +104,7 @@ impl Messaging for MqttMessaging {
             }
         };
 
-        s.boxed()
+        Ok(s.boxed())
     }
 
     async fn send(&self, message: Self::Message) -> Result<(), Error> {

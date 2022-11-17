@@ -29,8 +29,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let chariott = GrpcChariott::connect().await?;
 
-    let client = MqttMessaging::connect(format!("c2d/{vin}")).await?;
-    let mut messages = client.receive().await;
+    let client = MqttMessaging::connect(vin.clone()).await?;
+    let mut messages = client.receive(format!("c2d/{vin}")).await?;
 
     let cancellation_token = ctrl_c_cancellation();
 
