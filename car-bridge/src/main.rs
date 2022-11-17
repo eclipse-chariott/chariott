@@ -4,10 +4,12 @@
 use std::{env, error::Error};
 
 use car_bridge::{
-    chariott::handle_message,
+    chariott::fulfill,
     messaging::{Messaging, MqttMessaging},
 };
 use chariott_common::{chariott_api::GrpcChariott, shutdown::ctrl_c_cancellation};
+use paho_mqtt::{Message, QOS_2};
+use prost::Message as _;
 use tokio::select;
 use tokio_stream::StreamExt as _;
 use tracing::Level;
@@ -29,8 +31,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let chariott = GrpcChariott::connect().await?;
 
-    let client = MqttMessaging::connect(vin.clone()).await?;
-    let mut messages = client.receive(format!("c2d/{vin}")).await?;
+    let mut messages = MqttMessaging::connect(format!("{}-receiver", vin.clone()))
+        .await?
+        .receive(format!("c2d/{vin}"))
+        .await?;
+
+    let sender = MqttMessaging::connect(format!("{}-sender", vin.clone())).await?;
 
     let cancellation_token = ctrl_c_cancellation();
 
@@ -39,7 +45,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
             message = messages.next() => {
                 if let Some(message) = message {
                     // TODO: avoid backpressure issues.
-                    handle_message(&mut chariott.clone(), message.payload()).await?;
+                    let response = fulfill(&mut chariott.clone(), message.payload()).await?;
+                    let mut buffer = vec![];
+                    response.encode(&mut buffer)?;
+                    sender.send(Message::new(format!("responses/{vin}"), buffer, QOS_2)).await?;
                 }
                 else {
                     break;

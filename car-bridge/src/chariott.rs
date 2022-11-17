@@ -6,7 +6,7 @@ use chariott_proto::runtime::{FulfillRequest, FulfillResponse};
 use prost::Message;
 
 // Fulfills a message against Chariott.
-pub async fn handle_message(
+pub async fn fulfill(
     chariott: &mut impl ChariottCommunication,
     message: &[u8],
 ) -> Result<FulfillResponse, Error> {
