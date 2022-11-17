@@ -16,7 +16,7 @@ use tokio::{
     sync::mpsc::{self, Sender},
 };
 use tokio_stream::StreamExt as _;
-use tracing::{error, Level};
+use tracing::{error, warn, Level};
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
 
 mod messaging;
@@ -49,13 +49,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let (response_sender, mut response_receiver) = mpsc::channel(PUBLISH_BUFFER);
 
-    spawn(async move {
-        while let Some((topic, message)) = response_receiver.recv().await {
-            if let Err(e) = client.publish(topic, message).await {
-                error!("Error when publishing message: '{:?}'.", e);
+    {
+        let cancellation_token = cancellation_token.child_token();
+        spawn(async move {
+            loop {
+                select! {
+                    message = response_receiver.recv() => {
+                        let Some((topic, message)) = message else {
+                            warn!("Response receiver stopped, no more messages will be published.");
+                            break;
+                        };
+
+                        if let Err(e) = client.publish(topic, message).await {
+                            error!("Error when publishing message: '{:?}'.", e);
+                        }
+                    }
+                    _ = cancellation_token.cancelled() => {
+                        break;
+                    }
+                }
             }
-        }
-    });
+        });
+    }
 
     loop {
         select! {
