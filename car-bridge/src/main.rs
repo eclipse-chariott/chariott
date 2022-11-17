@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-use std::{env, error::Error};
+use std::error::Error;
 
 use car_bridge::{
     chariott::fulfill,
-    messaging::{Subscriber, MqttMessaging, Publisher},
+    messaging::{MqttMessaging, Publisher, Subscriber},
 };
-use chariott_common::{chariott_api::GrpcChariott, shutdown::ctrl_c_cancellation};
+use chariott_common::{chariott_api::GrpcChariott, config::env, shutdown::ctrl_c_cancellation};
 use paho_mqtt::{MessageBuilder, Properties, PropertyCode, QOS_2};
 use prost::Message as _;
 use tokio::select;
@@ -27,7 +27,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .finish()
         .init();
 
-    let vin = env::var(VIN_ENV_NAME).unwrap_or_else(|_| DEFAULT_VIN.to_owned());
+    let vin = env::<String>(VIN_ENV_NAME);
+    let vin = vin.as_deref().unwrap_or(DEFAULT_VIN);
 
     let chariott = GrpcChariott::connect().await?;
 
