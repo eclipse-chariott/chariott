@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668530209408,
+  "lastUpdate": 1668676417419,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -1679,6 +1679,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 252514694,
             "range": "± 440465",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dariuszparys@users.noreply.github.com",
+            "name": "Dariusz Parys",
+            "username": "dariuszparys"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8e2c46ff7c87ec2156d97b6c2317f89c865a8e1a",
+          "message": "Remove Alex recommends GH workflow (#48)",
+          "timestamp": "2022-11-17T10:07:56+01:00",
+          "tree_id": "42a96aabd7fdbf9c309d6597f0258c2c230dc447",
+          "url": "https://github.com/eclipse/chariott/commit/8e2c46ff7c87ec2156d97b6c2317f89c865a8e1a"
+        },
+        "date": 1668676415034,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 533742,
+            "range": "± 33929",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3166897,
+            "range": "± 142947",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 29662993,
+            "range": "± 495570",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 5216909,
+            "range": "± 131224",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 31297483,
+            "range": "± 491113",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 295849615,
+            "range": "± 3188193",
             "unit": "ns/iter"
           }
         ]
