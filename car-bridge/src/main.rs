@@ -16,7 +16,7 @@ use tokio::{
     sync::mpsc::{self, Sender},
 };
 use tokio_stream::StreamExt as _;
-use tracing::{error, warn, Level};
+use tracing::{debug, error, warn, Level};
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
 
 mod messaging;
@@ -44,12 +44,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let cancellation_token = ctrl_c_cancellation();
 
-    // Detach sending the responses from handling the messages to avoid
-    // backpressure.
-
     let (response_sender, mut response_receiver) = mpsc::channel(PUBLISH_BUFFER);
 
-    {
+    let publish_handle = {
+        // Detach sending the responses from handling the messages to avoid
+        // backpressure and disconnect the client gracefully.
+
         let cancellation_token = cancellation_token.child_token();
         spawn(async move {
             loop {
@@ -65,12 +65,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                     }
                     _ = cancellation_token.cancelled() => {
+                        debug!("Shutting down the publisher loop.");
                         break;
                     }
                 }
             }
-        });
-    }
+        })
+    };
 
     loop {
         select! {
@@ -87,10 +88,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 });
             }
             _ = cancellation_token.cancelled() => {
+                debug!("Shutting down the subscriber loop.");
                 break;
             }
         }
     }
+
+    publish_handle.await?;
 
     Ok(())
 }
