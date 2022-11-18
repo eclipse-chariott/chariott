@@ -79,10 +79,10 @@ scenarios that are supported by Chariott. It can be found
 
 The current source is developed and tested under WSL2/Linux running Ubuntu 20.04
 on AMD64 architecture. It is not tested against any other configurations. You
-might experience missing support for other platforms, please feel free to
+might experience missing support for other platforms, but please feel free to
 contribute to close the gaps.
 
-### Devcontainer
+### Dev Container
 
 For development and running the examples, we recommend using the
 [Devcontainer](https://code.visualstudio.com/docs/remote/containers) template
@@ -91,7 +91,7 @@ Devcontainer, refer to the `devcontainer.json` for a list of the plugins/tools
 we use.
 
 > Note: If you use Devcontainers and you are running on Windows, make sure to check out the
-> repository on the WSL2 file system in your target distribution you're using.
+> repository on the WSL2 file system in the target distribution you're using.
 
 ### Build all binaries and run tests
 
@@ -102,9 +102,11 @@ cargo test --workspace
 
 ### Using Podman instead of Docker
 
-If you want to use podman you have to enable podman in Visual Studio Code like
-described [here](https://code.visualstudio.com/remote/advancedcontainers/docker-options#_podman)
-and update the `.devcontainer/devcontainer.json` file with the following additions:
+If you want to use Podman you have to [enable Podman in Visual Studio
+Code][vscode-podman] and update the `.devcontainer/devcontainer.json` file
+with the following additions:
+
+  [vscode-podman]: https://code.visualstudio.com/remote/advancedcontainers/docker-options#_podman
 
 ```Dockerfile
   "runArgs": [
