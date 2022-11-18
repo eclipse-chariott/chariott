@@ -108,20 +108,21 @@ with the following additions:
 
   [vscode-podman]: https://code.visualstudio.com/remote/advancedcontainers/docker-options#_podman
 
-```Dockerfile
+```jsonc
+{
+  // ...
   "runArgs": [
     "--cap-add=SYS_PTRACE",
     "--security-opt",
     "seccomp=unconfined",
     "--userns=keep-id"
   ],
-
-  ...
-
+  // ...
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,Z",
   "workspaceFolder": "/workspace",
-  "containerUser": "vscode"
-```
+  "containerUser": "vscode",
+  // ...
+}
 
 > **NOTE**: Feel free to use another workspace folder name.
 
