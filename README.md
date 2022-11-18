@@ -77,7 +77,7 @@ scenarios that are supported by Chariott. It can be found
 
 ### Important Note
 
-The current source is developed and tested under WSL2 / Linux running Ubuntu 20.04
+The current source is developed and tested under WSL2/Linux running Ubuntu 20.04
 on AMD64 architecture. It is not tested against any other configurations. You
 might experience missing support for other platforms, please feel free to
 contribute to close the gaps.
