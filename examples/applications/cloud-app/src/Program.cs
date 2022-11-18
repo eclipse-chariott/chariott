@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.ComponentModel.Design;
 using System.IO;
 using System.Text.Json;
 using System.Text.RegularExpressions;
