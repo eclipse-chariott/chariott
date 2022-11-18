@@ -25,4 +25,8 @@ jobs:
         with:
           global-json-file: examples/applications/dog-mode-ui/global.json
 
-      - run: dotnet build examples/applications/dog-mode-ui
+      - name: Build Dog Mode UI Web Application
+        run: dotnet build examples/applications/dog-mode-ui
+
+      - name: Car Bridge Cloud App
+        run: dotnet build examples/applications/cloud-app
