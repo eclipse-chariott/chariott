@@ -5,8 +5,8 @@
 - [How to develop with Chariott](#how-to-develop-with-chariott)
   - [Terminology](#terminology)
   - [Concept of Intents](#concept-of-intents)
+- [Requirements](#requirements)
 - [Getting started](#getting-started)
-  - [Important Note](#important-note)
   - [Dev Container](#dev-container)
   - [Build all binaries and run tests](#build-all-binaries-and-run-tests)
   - [Using Podman instead of Docker](#using-podman-instead-of-docker)
@@ -73,14 +73,14 @@ There is a separate document that describes the example applications and
 scenarios that are supported by Chariott. It can be found
 [here](./examples/applications/README.md).
 
-## Getting started
-
-### Important Note
+## Requirements
 
 The current source is developed and tested under WSL2/Linux running Ubuntu 20.04
 on AMD64 architecture. It is not tested against any other configurations. You
 might experience missing support for other platforms, but please feel free to
 contribute to close the gaps.
+
+## Getting started
 
 ### Dev Container
 
