@@ -2,9 +2,10 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using MQTTnet;
@@ -32,39 +33,57 @@ try
         return Task.CompletedTask;
     };
 
-    while (Console.ReadLine() is { } line)
+    var quit = false;
+    while (!quit && Console.ReadLine() is { } rawLine)
     {
-        if (!TryParse(line, out var command, out var error))
-        {
-            Console.WriteLine(error);
-            continue;
-        }
+        const string help = """
+            ping
+            subscribe TOPIC
+            publish TOPIC PAYLOAD
+            help | ?
+            quit
+            """;
 
-        switch (command)
+        switch (rawLine.Trim())
         {
-            case PingCommand:
+            case "ping":
             {
                 await mqttClient.PingAsync(CancellationToken.None);
                 Console.WriteLine("Pong!");
                 break;
             }
-            case SubscribeCommand { Topic: var topic }:
+            case "help" or "?":
+            {
+                Console.WriteLine(help);
+                break;
+            }
+            case "quit":
+            {
+                quit = true;
+                break;
+            }
+            case var line when Regex.Match(line, @"^subscribe\s+([^\s]+)$") is { Success: true, Groups: [ _, { Value: var st } ] }:
             {
                 var options =
                     mqttFactory.CreateSubscribeOptionsBuilder()
-                               .WithTopicFilter(f => f.WithTopic(topic))
+                               .WithTopicFilter(f => f.WithTopic(st))
                                .Build();
                 await mqttClient.SubscribeAsync(options, CancellationToken.None);
                 break;
             }
-            case PublishCommand { Topic: var topic, Message: var payload }:
+            case var line when Regex.Match(line, @"^publish\s+([^\s]+)\s+(.+)$") is { Success: true, Groups: [ _, { Value: var pt }, { Value: var payload } ] }:
             {
                 var message =
                     new MqttApplicationMessageBuilder()
-                               .WithTopic(topic)
-                               .WithPayload(payload)
-                               .Build();
+                        .WithTopic(pt)
+                        .WithPayload(payload)
+                        .Build();
                 await mqttClient.PublishAsync(message, CancellationToken.None);
+                break;
+            }
+            default:
+            {
+                Console.Error.WriteLine($"Invalid command! Try one of the following:{Environment.NewLine}{help}");
                 break;
             }
         }
@@ -78,116 +97,6 @@ catch (Exception ex)
 {
     Console.Error.WriteLine(ex);
     return 1;
-}
-
-static bool TryParse(string input,
-                     [NotNullWhen(true)] out Command? command,
-                     [MaybeNullWhen(true)] out string error)
-{
-    error = null;
-    command = null;
-
-    var scanner = new Scanner(input);
-    var commandWord = scanner.ReadWordOrDefault();
-    scanner.SkipWhitespace();
-
-    switch (commandWord)
-    {
-        case "ping":
-        {
-            command = new PingCommand();
-            break;
-        }
-        case "publish":
-        {
-            if (!scanner.TryReadWord(out var topic))
-            {
-                error = "Missing publishing topic!";
-                return false;
-            }
-
-            scanner.SkipWhitespace();
-            if (scanner.ReadAll().TrimEnd() is not { IsEmpty: false } message)
-            {
-                error = "Missing publishing message!";
-                return false;
-            }
-
-            command = new PublishCommand(topic.ToString(), message.ToString());
-            Console.Error.WriteLine($"Published to \"{topic}\": {message}");
-            break;
-        }
-        case "subscribe":
-        {
-            if (!scanner.TryReadWord(out var topic))
-            {
-                error = "Missing subscription topic!";
-                return false;
-            }
-            command = new SubscribeCommand(topic.ToString());
-            Console.Error.WriteLine($"Subscribed to \"{topic}\".");
-            break;
-        }
-        default:
-        {
-            error = "Invalid command!";
-            return false;
-        }
-    }
-
-    scanner.SkipWhitespace();
-    if (scanner.ReadAll() is { IsEmpty: false } rest)
-    {
-        error = $"Unexpected input for command: {rest}";
-        return false;
-    }
-
-    return true;
-}
-
-abstract record Command;
-sealed record PingCommand : Command;
-sealed record PublishCommand(string Topic, string Message) : Command;
-sealed record SubscribeCommand(string Topic) : Command;
-
-ref struct Scanner
-{
-    ReadOnlySpan<char> _input;
-
-    public Scanner(ReadOnlySpan<char> input) => _input = input;
-
-    public ReadOnlySpan<char> ReadAll()
-    {
-        var result = _input;
-        _input = default;
-        return result;
-    }
-
-    public void SkipWhitespace() =>
-        _input = _input.TrimStart();
-
-    public ReadOnlySpan<char> ReadWordOrDefault() =>
-        TryReadWord(out var word) ? word : default;
-
-    public bool TryReadWord(out ReadOnlySpan<char> value) =>
-        TryReadUntil(ch => !char.IsWhiteSpace(ch), out value);
-
-    public bool TryReadUntil(Func<char, bool> predicate, out ReadOnlySpan<char> value)
-    {
-        var i = 0;
-        while (i < _input.Length && predicate(_input[i]))
-            i++;
-
-        if (i is 0)
-        {
-            value = default;
-            return false;
-        }
-
-        value = _input[..i];
-        _input = _input[i..];
-        return true;
-    }
 }
 
 static class ObjectExtensions
