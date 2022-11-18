@@ -39,7 +39,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let chariott = GrpcChariott::connect().await?;
 
-    let mut client = MqttMessaging::connect(format!("{}", vin)).await?;
+    let mut client = MqttMessaging::connect(vin.to_owned()).await?;
     let mut messages = client.subscribe(format!("c2d/{vin}")).await?;
 
     let cancellation_token = ctrl_c_cancellation();
