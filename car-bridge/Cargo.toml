@@ -10,6 +10,7 @@ async-stream = { workspace = true }
 async-trait = { workspace = true }
 chariott-common = { workspace = true }
 chariott-proto = { workspace = true }
+examples-common = { workspace = true }
 futures = { workspace = true }
 paho-mqtt = "0.11"
 prost = { workspace = true }

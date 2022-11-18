@@ -13,7 +13,7 @@ chariott-common = { workspace = true }
 chariott-proto = { workspace = true }
 ess = { path = "../../../ess/" }
 keyvalue = { path = "../../../keyvalue/" }
-examples-common = { path = "../../common/" }
+examples-common = { workspace = true }
 futures = { workspace = true }
 lazy_static = { workspace = true }
 regex = { workspace = true }

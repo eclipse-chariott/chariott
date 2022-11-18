@@ -1,16 +1,23 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+use std::sync::{Arc, Mutex};
+
 use chariott_common::{
     chariott_api::{ChariottCommunication, GrpcChariott},
     config::env,
     error::Error,
     shutdown::ctrl_c_cancellation,
 };
-use chariott_proto::{common::IntentEnum, runtime::FulfillRequest};
+use chariott_proto::{
+    common::{FulfillmentEnum, FulfillmentMessage, IntentEnum, SubscribeFulfillment},
+    runtime::{FulfillRequest, FulfillResponse},
+};
+use examples_common::chariott::api::{Chariott as _, ChariottExt as _};
 use messaging::{MqttMessaging, Publisher, Subscriber};
-use paho_mqtt::{Message as MqttMessage, MessageBuilder, Properties, PropertyCode, QOS_2};
+use paho_mqtt::{Message as MqttMessage, MessageBuilder, Properties, PropertyCode, QOS_1, QOS_2};
 use prost::Message;
+use streaming::{Action, Streaming, Subscription};
 use tokio::{
     select, spawn,
     sync::mpsc::{self, Sender},
@@ -20,6 +27,7 @@ use tracing::{debug, error, warn, Level};
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
 
 mod messaging;
+mod streaming;
 
 const VIN_ENV_NAME: &str = "VIN";
 const DEFAULT_VIN: &str = "1";
@@ -38,6 +46,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let vin = vin.as_deref().unwrap_or(DEFAULT_VIN);
 
     let chariott = GrpcChariott::connect().await?;
+    let streaming = Arc::new(Mutex::new(Streaming::new()));
 
     let mut client = MqttMessaging::connect(vin.to_owned()).await?;
     let mut messages = client.subscribe(format!("c2d/{vin}")).await?;
@@ -82,9 +91,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 let mut chariott = chariott.clone();
                 let response_sender = response_sender.clone();
+                let streaming = Arc::clone(&streaming);
 
                 spawn(async move {
-                    handle_message(&mut chariott, response_sender, message).await;
+                    handle_message(&mut chariott, response_sender, streaming, message).await;
                 });
             }
             _ = cancellation_token.cancelled() => {
@@ -102,11 +112,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 async fn handle_message(
     chariott: &mut impl ChariottCommunication,
     response_sender: Sender<(String, MessageBuilder)>,
+    streaming: Arc<Mutex<Streaming>>,
     message: MqttMessage,
 ) {
     async fn inner(
         chariott: &mut impl ChariottCommunication,
         response_sender: Sender<(String, MessageBuilder)>,
+        streaming: Arc<Mutex<Streaming>>,
         message: MqttMessage,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let correlation_data = message
@@ -128,7 +140,77 @@ async fn handle_message(
 
         let response = match intent_enum {
             IntentEnum::Discover(_) => Err(Error::new("Discover is not supported.")),
-            IntentEnum::Subscribe(_) => todo!(),
+            IntentEnum::Subscribe(subscribe_intent) => {
+                const SUBSCRIBER_ID_PROPERTY: &str = "SubscriberId";
+
+                let subscriber_id =
+                    message.properties().find_user_property(SUBSCRIBER_ID_PROPERTY).ok_or_else(
+                        || Error::new(format!("Subscribe intents must define the '{SUBSCRIBER_ID_PROPERTY}' user property.")),
+                    )?;
+
+                let mut actions = vec![];
+
+                {
+                    let mut streaming = streaming.lock().unwrap();
+
+                    for source in subscribe_intent.sources {
+                        actions.push(streaming.subscribe(
+                            fulfill_request.namespace.clone(),
+                            Subscription::new(source, subscriber_id.clone()),
+                        ));
+                    }
+                }
+
+                // TODO: handle errors - roll back subscription state.
+
+                for action in actions.into_iter().flatten() {
+                    match action {
+                        Action::Listen => {
+                            let mut stream =
+                                chariott.listen(fulfill_request.namespace.clone(), vec![]).await?;
+
+                            {
+                                let response_sender = response_sender.clone();
+                                let channel_id = subscribe_intent.channel_id.clone();
+
+                                // TODO: channel management.
+                                spawn(async move {
+                                    while let Some(_) = stream.next().await {
+                                        // TODO: use correct payload.
+                                        if let Err(e) = response_sender
+                                            .send((
+                                                channel_id.clone(),
+                                                MessageBuilder::new().payload(vec![]).qos(QOS_1),
+                                            ))
+                                            .await
+                                        {
+                                            // TODO: handle better.
+                                            error!("Failed to publish event for '{channel_id}': '{e:?}'.");
+                                        }
+
+                                        warn!("Stream for channel '{channel_id}' broke.");
+                                    }
+                                });
+                            }
+                        }
+                        Action::Subscribe(source) => {
+                            chariott
+                                .subscribe(
+                                    fulfill_request.namespace.clone(),
+                                    subscribe_intent.channel_id.clone(),
+                                    vec![source.into()],
+                                )
+                                .await?;
+                        }
+                    }
+                }
+
+                Ok(FulfillResponse {
+                    fulfillment: Some(FulfillmentMessage {
+                        fulfillment: Some(FulfillmentEnum::Subscribe(SubscribeFulfillment {})),
+                    }),
+                })
+            }
             _ => chariott
                 .fulfill(fulfill_request.namespace, intent_enum)
                 .await
@@ -149,7 +231,7 @@ async fn handle_message(
         Ok(())
     }
 
-    if let Err(e) = inner(chariott, response_sender, message).await {
+    if let Err(e) = inner(chariott, response_sender, streaming, message).await {
         error!("Error when handling message: '{e:?}'.");
     }
 }

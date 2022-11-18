@@ -53,6 +53,7 @@ async-stream = "0.3"
 async-trait = "0.1"
 chariott-common = { path = "./common/" }
 chariott-proto = { path = "./proto.rs/" }
+examples-common = { path = "./examples/common/" }
 futures = { version = "0.3" }
 lazy_static = "1.4.0"
 prost = "0.11"
@@ -77,7 +78,7 @@ tonic-build = { workspace = true }
 [dev-dependencies]
 anyhow = { workspace = true }
 async-trait = { workspace = true }
-examples-common = { path = "./examples/common" }
+examples-common = { workspace = true }
 futures = { workspace = true }
 tokio-util = { workspace = true }
 uuid = { workspace = true }
