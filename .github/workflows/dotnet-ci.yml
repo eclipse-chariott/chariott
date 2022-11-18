@@ -9,6 +9,7 @@ on:
       - main
     paths:
       - 'examples/applications/dog-mode-ui/**'
+      - 'examples/applications/cloud-app/**'
       - '.github/workflows/dotnet-ci.yml'
 
 concurrency:
@@ -28,4 +29,8 @@ jobs:
 
       - run: dotnet --info
 
-      - run: dotnet build examples/applications/dog-mode-ui
+      - name: Build Dog Mode UI Web Application
+        run: dotnet build examples/applications/dog-mode-ui
+
+      - name: Car Bridge Cloud App
+        run: dotnet build examples/applications/cloud-app
