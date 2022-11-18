@@ -22,7 +22,7 @@ pub trait Subscriber {
     type Message;
     type Topic;
 
-    /// Subscribe to a message from publisher.
+    /// Subscribe to a topic.
     async fn subscribe(
         &mut self,
         topic: String,
