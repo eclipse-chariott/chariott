@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-use std::sync::Arc;
-
 use chariott_common::{
     chariott_api::{ChariottCommunication, GrpcChariott},
     config::env,
@@ -13,15 +11,19 @@ use chariott_proto::{common::IntentEnum, runtime::FulfillRequest};
 use messaging::{MqttMessaging, Publisher, Subscriber};
 use paho_mqtt::{Message as MqttMessage, MessageBuilder, Properties, PropertyCode, QOS_2};
 use prost::Message;
-use tokio::{select, spawn};
+use tokio::{
+    select, spawn,
+    sync::mpsc::{self, Sender},
+};
 use tokio_stream::StreamExt as _;
-use tracing::{error, Level};
+use tracing::{error, warn, Level};
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
 
 mod messaging;
 
 const VIN_ENV_NAME: &str = "VIN";
 const DEFAULT_VIN: &str = "1";
+const PUBLISH_BUFFER: usize = 50;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -37,11 +39,38 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let chariott = GrpcChariott::connect().await?;
 
-    let mut client = MqttMessaging::connect(vin.to_string()).await?;
+    let mut client = MqttMessaging::connect(format!("{}", vin)).await?;
     let mut messages = client.subscribe(format!("c2d/{vin}")).await?;
 
-    let client = Arc::new(client);
     let cancellation_token = ctrl_c_cancellation();
+
+    // Detach sending the responses from handling the messages to avoid
+    // backpressure.
+
+    let (response_sender, mut response_receiver) = mpsc::channel(PUBLISH_BUFFER);
+
+    {
+        let cancellation_token = cancellation_token.child_token();
+        spawn(async move {
+            loop {
+                select! {
+                    message = response_receiver.recv() => {
+                        let Some((topic, message)) = message else {
+                            warn!("Response receiver stopped, no more messages will be published.");
+                            break;
+                        };
+
+                        if let Err(e) = client.publish(topic, message).await {
+                            error!("Error when publishing message: '{:?}'.", e);
+                        }
+                    }
+                    _ = cancellation_token.cancelled() => {
+                        break;
+                    }
+                }
+            }
+        });
+    }
 
     loop {
         select! {
@@ -51,13 +80,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 };
 
                 let mut chariott = chariott.clone();
-                let client = Arc::clone(&client);
-
-                // Detach sending the responses from handling the messages to avoid
-                // backpressure.
+                let response_sender = response_sender.clone();
 
                 spawn(async move {
-                    handle_message(&mut chariott, &client, message).await;
+                    handle_message(&mut chariott, response_sender, message).await;
                 });
             }
             _ = cancellation_token.cancelled() => {
@@ -71,12 +97,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn handle_message(
     chariott: &mut impl ChariottCommunication,
-    messaging_client: &Arc<MqttMessaging>,
+    response_sender: Sender<(String, MessageBuilder)>,
     message: MqttMessage,
 ) {
     async fn inner(
         chariott: &mut impl ChariottCommunication,
-        messaging_client: &Arc<MqttMessaging>,
+        response_sender: Sender<(String, MessageBuilder)>,
         message: MqttMessage,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let correlation_data = message
@@ -112,14 +138,14 @@ async fn handle_message(
         properties.push_binary(PropertyCode::CorrelationData, correlation_data)?;
         properties.push_string(PropertyCode::ContentType, "chariott.runtime.v1.FulfillResponse")?;
 
-        messaging_client
-            .publish(response_topic, MessageBuilder::new().payload(buffer).qos(QOS_2))
+        response_sender
+            .send((response_topic, MessageBuilder::new().payload(buffer).qos(QOS_2)))
             .await?;
 
         Ok(())
     }
 
-    if let Err(e) = inner(chariott, messaging_client, message).await {
+    if let Err(e) = inner(chariott, response_sender, message).await {
         error!("Error when handling message: '{e:?}'.");
     }
 }
