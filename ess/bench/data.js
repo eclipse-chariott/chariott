@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668703632461,
+  "lastUpdate": 1668761369511,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -1799,6 +1799,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 301667595,
             "range": "± 8073104",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "code@raboof.com",
+            "name": "Atif Aziz",
+            "username": "atifaziz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "76745e817d1335ab09342c30567e97da94724298",
+          "message": "Fix CI workflow to install .NET 6 (#54)",
+          "timestamp": "2022-11-18T09:44:40+01:00",
+          "tree_id": "04d6bf3cf139fc7f4a991ccc62ab90bfeec2b396",
+          "url": "https://github.com/eclipse/chariott/commit/76745e817d1335ab09342c30567e97da94724298"
+        },
+        "date": 1668761368674,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 397409,
+            "range": "± 6091",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2625093,
+            "range": "± 9849",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 25289484,
+            "range": "± 130079",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 3624506,
+            "range": "± 65381",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 25929333,
+            "range": "± 66226",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 251127708,
+            "range": "± 212237",
             "unit": "ns/iter"
           }
         ]
