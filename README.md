@@ -7,7 +7,7 @@
   - [Concept of Intents](#concept-of-intents)
 - [Getting started](#getting-started)
   - [Important Note](#important-note)
-  - [Devcontainer](#devcontainer)
+  - [Dev Container](#dev-container)
   - [Build all binaries and run tests](#build-all-binaries-and-run-tests)
   - [Using Podman instead of Docker](#using-podman-instead-of-docker)
 - [How to run the examples and interact with Chariott](#how-to-run-the-examples-and-interact-with-chariott)
@@ -123,6 +123,7 @@ with the following additions:
   "containerUser": "vscode",
   // ...
 }
+```
 
 > **NOTE**: Feel free to use another workspace folder name.
 
