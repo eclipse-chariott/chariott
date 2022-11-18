@@ -23,7 +23,10 @@ jobs:
 
       - uses: actions/setup-dotnet@v2
         with:
+          dotnet-version: 6.0.403
           global-json-file: examples/applications/dog-mode-ui/global.json
+
+      - run: dotnet --info
 
       - name: Build Dog Mode UI Web Application
         run: dotnet build examples/applications/dog-mode-ui
