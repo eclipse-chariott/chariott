@@ -8,7 +8,7 @@ In its current state, it represents a simple scaffolding of the application.
 1. Start an [Eclipse Mosquitto] broker.
 
 2. Start this application using:
-   
+
        dotnet run --project src
 
 Once the application is running, you can issue the following commands:
