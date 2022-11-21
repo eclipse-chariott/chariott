@@ -57,11 +57,11 @@ static async Task<int> Main(ProgramArguments args)
         while (!quit && Console.ReadLine() is { } line)
         {
             FulfillRequest? request = null;
-            switch (Prompt.CreateParser().Parse(CommandLineStringSplitter.Instance.Split(line)))
+            switch (PromptArguments.CreateParser().Parse(CommandLineStringSplitter.Instance.Split(line)))
             {
-                case IArgumentsResult<Prompt> { Arguments: var prompt }:
+                case IArgumentsResult<PromptArguments> { Arguments: var promptArgs }:
                 {
-                    switch (prompt)
+                    switch (promptArgs)
                     {
                         case { CmdQuit: true } or { CmdExit: true }:
                         {
@@ -70,7 +70,7 @@ static async Task<int> Main(ProgramArguments args)
                         }
                         case { CmdHelp: true }:
                         {
-                            Prompt.PrintUsage(Console.Out);
+                            PromptArguments.PrintUsage(Console.Out);
                             break;
                         }
                         case { CmdPing: true }:
@@ -155,7 +155,7 @@ static async Task<int> Main(ProgramArguments args)
                 case IInputErrorResult:
                 {
                     Console.Error.WriteLine("Invalid usage. Try one of the following:");
-                    Prompt.PrintUsage(Console.Error);
+                    PromptArguments.PrintUsage(Console.Error);
                     break;
                 }
             }
@@ -362,7 +362,7 @@ sealed class ChariottRpcSession : IDisposable
 }
 
 [DocoptArguments]
-partial class Prompt
+partial class PromptArguments
 {
     const string Help = """
     Usage:
