@@ -23,166 +23,171 @@ using static MoreLinq.Extensions.RepeatExtension;
 using static MoreLinq.Extensions.EvaluateExtension;
 using System.CommandLine.Parsing;
 
-try
+return await ProgramArguments.ParseToMain(args, Main);
+
+static async Task<int> Main(ProgramArguments args)
 {
-    var mqttFactory = new MqttFactory();
-
-    using var mqttClient = mqttFactory.CreateMqttClient();
-
-    var mqttClientOptions =
-        new MqttClientOptionsBuilder()
-            .WithTcpServer(args is [var server, ..] ? server : "localhost")
-            .WithProtocolVersion(MqttProtocolVersion.V500)
-            .Build();
-
-    await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
-    Console.Error.WriteLine("The MQTT client is connected.");
-
-    var correlations = MoreEnumerable.Return(() => Guid.NewGuid().ToByteArray())
-                                     .Repeat()
-                                     .Evaluate();
-
-    var rpcSession = await
-        ChariottRpcSession.CreateAsync(mqttFactory, mqttClient,
-                                       new Vin("1"), correlations,
-                                       CancellationToken.None);
-
-    var jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
-
-    var quit = false;
-    while (!quit && Console.ReadLine() is { } line)
+    try
     {
-        FulfillRequest? request = null;
-        switch (Prompt.CreateParser().Parse(CommandLineStringSplitter.Instance.Split(line)))
+        var mqttFactory = new MqttFactory();
+
+        using var mqttClient = mqttFactory.CreateMqttClient();
+
+        var mqttClientOptions =
+            new MqttClientOptionsBuilder()
+                .WithTcpServer(args.OptBroker)
+                .WithProtocolVersion(MqttProtocolVersion.V500)
+                .Build();
+
+        await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
+        Console.Error.WriteLine("The MQTT client is connected.");
+
+        var correlations = MoreEnumerable.Return(() => Guid.NewGuid().ToByteArray())
+                                         .Repeat()
+                                         .Evaluate();
+
+        var rpcSession = await
+            ChariottRpcSession.CreateAsync(mqttFactory, mqttClient,
+                                           new Vin(args.OptVin), correlations,
+                                           CancellationToken.None);
+
+        var jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
+
+        var quit = false;
+        while (!quit && Console.ReadLine() is { } line)
         {
-            case IArgumentsResult<Prompt> { Arguments: var prompt }:
+            FulfillRequest? request = null;
+            switch (Prompt.CreateParser().Parse(CommandLineStringSplitter.Instance.Split(line)))
             {
-                switch (prompt)
+                case IArgumentsResult<Prompt> { Arguments: var prompt }:
                 {
-                    case { CmdQuit: true } or { CmdExit: true }:
+                    switch (prompt)
                     {
-                        quit = true;
-                        break;
-                    }
-                    case { CmdHelp: true }:
-                    {
-                        Prompt.PrintUsage(Console.Out);
-                        break;
-                    }
-                    case { CmdPing: true }:
-                    {
-                        await mqttClient.PingAsync();
-                        Console.WriteLine("Pong!");
-                        break;
-                    }
-                    case { CmdGet: true, CmdVin: true }:
-                    {
-                        Console.WriteLine(rpcSession.Vin);
-                        break;
-                    }
-                    case { CmdSet: true, CmdVin: true, ArgVin: var vin }:
-                    {
-                        Debug.Assert(vin is not null);
-
-                        var oldVin = rpcSession.Vin;
-                        if (await rpcSession.ChangeVinAsync(new(vin), CancellationToken.None))
-                            Console.Error.WriteLine($"Okay (old = {oldVin}).");
-                        break;
-                    }
-                    case { CmdShow: true, CmdTopics: true }:
-                    {
-                        Console.WriteLine($"req {rpcSession.RequestTopic}");
-                        Console.WriteLine($"rsp {rpcSession.ResponseTopic}");
-                        break;
-                    }
-                    case { CmdInspect: true, ArgNamespace: var ns, ArgQuery: var query }:
-                    {
-                        Debug.Assert(ns is not null);
-
-                        request = FulfillRequest(ns, fi => fi.Inspect = new InspectIntent
+                        case { CmdQuit: true } or { CmdExit: true }:
                         {
-                            Query = query
-                        });
-                        break;
-                    }
-                    case { CmdRead: true, ArgNamespace: var ns, ArgKey: var key }:
-                    {
-                        Debug.Assert(ns is not null);
-
-                        request = FulfillRequest(ns, fi => fi.Read = new ReadIntent
+                            quit = true;
+                            break;
+                        }
+                        case { CmdHelp: true }:
                         {
-                            Key = key
-                        });
-                        break;
-                    }
-                    case { CmdWrite: true, ArgNamespace: var ns, ArgKey: var key, ArgValue: var value }:
-                    {
-                        Debug.Assert(ns is not null);
-                        Debug.Assert(value is not null);
-
-                        request = FulfillRequest(ns, fi => fi.Write = new WriteIntent
+                            Prompt.PrintUsage(Console.Out);
+                            break;
+                        }
+                        case { CmdPing: true }:
                         {
-                            Key = key,
-                            Value = ParseValue(value)
-                        });
-                        break;
-                    }
-                    case { CmdInvoke: true, ArgNamespace: var ns, ArgCommand: var cmd, ArgArg: var cmdArgs }:
-                    {
-                        Debug.Assert(ns is not null);
-                        Debug.Assert(cmdArgs is not null);
-
-                        request = FulfillRequest(ns, fi =>
+                            await mqttClient.PingAsync();
+                            Console.WriteLine("Pong!");
+                            break;
+                        }
+                        case { CmdGet: true, CmdVin: true }:
                         {
-                            var invokeIntent = new InvokeIntent { Command = cmd };
-                            invokeIntent.Args.AddRange(from arg in cmdArgs select ParseValue(arg));
-                            fi.Invoke = invokeIntent;
-                        });
-                        break;
+                            Console.WriteLine(rpcSession.Vin);
+                            break;
+                        }
+                        case { CmdSet: true, CmdVin: true, ArgVin: var vin }:
+                        {
+                            Debug.Assert(vin is not null);
+
+                            var oldVin = rpcSession.Vin;
+                            if (await rpcSession.ChangeVinAsync(new(vin), CancellationToken.None))
+                                Console.Error.WriteLine($"Okay (old = {oldVin}).");
+                            break;
+                        }
+                        case { CmdShow: true, CmdTopics: true }:
+                        {
+                            Console.WriteLine($"req {rpcSession.RequestTopic}");
+                            Console.WriteLine($"rsp {rpcSession.ResponseTopic}");
+                            break;
+                        }
+                        case { CmdInspect: true, ArgNamespace: var ns, ArgQuery: var query }:
+                        {
+                            Debug.Assert(ns is not null);
+
+                            request = FulfillRequest(ns, fi => fi.Inspect = new InspectIntent
+                            {
+                                Query = query
+                            });
+                            break;
+                        }
+                        case { CmdRead: true, ArgNamespace: var ns, ArgKey: var key }:
+                        {
+                            Debug.Assert(ns is not null);
+
+                            request = FulfillRequest(ns, fi => fi.Read = new ReadIntent
+                            {
+                                Key = key
+                            });
+                            break;
+                        }
+                        case { CmdWrite: true, ArgNamespace: var ns, ArgKey: var key, ArgValue: var value }:
+                        {
+                            Debug.Assert(ns is not null);
+                            Debug.Assert(value is not null);
+
+                            request = FulfillRequest(ns, fi => fi.Write = new WriteIntent
+                            {
+                                Key = key,
+                                Value = ParseValue(value)
+                            });
+                            break;
+                        }
+                        case { CmdInvoke: true, ArgNamespace: var ns, ArgCommand: var cmd, ArgArg: var cmdArgs }:
+                        {
+                            Debug.Assert(ns is not null);
+                            Debug.Assert(cmdArgs is not null);
+
+                            request = FulfillRequest(ns, fi =>
+                            {
+                                var invokeIntent = new InvokeIntent { Command = cmd };
+                                invokeIntent.Args.AddRange(from arg in cmdArgs select ParseValue(arg));
+                                fi.Invoke = invokeIntent;
+                            });
+                            break;
+                        }
+                        default:
+                        {
+                            Console.Error.WriteLine("Sorry, but this has not yet been implemented.");
+                            break;
+                        }
                     }
-                    default:
-                    {
-                        Console.Error.WriteLine("Sorry, but this has not yet been implemented.");
-                        break;
-                    }
+                    break;
                 }
-                break;
+                case IInputErrorResult:
+                {
+                    Console.Error.WriteLine("Invalid usage. Try one of the following:");
+                    Prompt.PrintUsage(Console.Error);
+                    break;
+                }
             }
-            case IInputErrorResult:
+
+            if (request is { } someRequest)
             {
-                Console.Error.WriteLine("Invalid usage. Try one of the following:");
-                Prompt.PrintUsage(Console.Error);
-                break;
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                try
+                {
+                    var response = await rpcSession.ExecuteAsync(someRequest, cts.Token);
+                    using var sw = new StringWriter();
+                    JsonFormatter.Default.Format(response, sw);
+                    var json = sw.ToString();
+                    json = JsonSerializer.Serialize(JsonSerializer.Deserialize<JsonElement>(json), jsonSerializerOptions);
+                    Console.WriteLine(json);
+                }
+                catch (OperationCanceledException ex)
+                {
+                    Console.Error.WriteLine(ex.Message);
+                }
             }
         }
 
-        if (request is { } someRequest)
-        {
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            try
-            {
-                var response = await rpcSession.ExecuteAsync(someRequest, cts.Token);
-                using var sw = new StringWriter();
-                JsonFormatter.Default.Format(response, sw);
-                var json = sw.ToString();
-                json = JsonSerializer.Serialize(JsonSerializer.Deserialize<JsonElement>(json), jsonSerializerOptions);
-                Console.WriteLine(json);
-            }
-            catch (OperationCanceledException ex)
-            {
-                Console.Error.WriteLine(ex.Message);
-            }
-        }
+        await mqttClient.DisconnectAsync(mqttFactory.CreateClientDisconnectOptionsBuilder().Build(), CancellationToken.None);
+
+        return 0;
     }
-
-    await mqttClient.DisconnectAsync(mqttFactory.CreateClientDisconnectOptionsBuilder().Build(), CancellationToken.None);
-
-    return 0;
-}
-catch (Exception ex)
-{
-    Console.Error.WriteLine(ex);
-    return 1;
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine(ex);
+        return 1;
+    }
 }
 
 static Value ParseValue(string input)
@@ -381,6 +386,39 @@ partial class Prompt
         e.MoveNext();
         while (e.MoveNext())
             writer.WriteLine(e.Current[6..]);
+    }
+}
+
+[DocoptArguments]
+partial class ProgramArguments
+{
+    const string Help = """
+        Car Bridge Cloud Application
+
+        Usage:
+            $ [--broker=<host>] [--vin=<vin>]
+            $ (-h | --help)
+            $ --version
+
+        Options:
+            -h --help        Show this screen.
+            --version        Show version.
+            --broker=<host>  MQTT broker address [default: localhost].
+            --vin=<vin>      VIN umber [default: 1]
+        """;
+
+    public static Task<int> ParseToMain(string[] args, Func<ProgramArguments, Task<int>> main)
+    {
+        return CreateParser().Parse(args)
+                             .Match(main,
+                                    result => Print(Console.Out, result.Help),
+                                    result => Print(Console.Error, result.Usage, 1));
+
+        static Task<int> Print(TextWriter writer, string text, int exitCode = 0)
+        {
+            writer.WriteLine(text.Replace("$", Path.GetFileName(Environment.ProcessPath)));
+            return Task.FromResult(exitCode);
+        }
     }
 }
 
