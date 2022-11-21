@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668761369511,
+  "lastUpdate": 1669034272108,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -1859,6 +1859,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 251127708,
             "range": "± 212237",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dariuszparys@users.noreply.github.com",
+            "name": "Dariusz Parys",
+            "username": "dariuszparys"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6d2e9db2303b3d8b88ed62ec0aa8ce92026c160e",
+          "message": "Docs/update readme for podman (#45)\n\n* docs: update dev container usage\r\n\r\n- Clarifying the usage of dev containers in the current release\r\nlimited to WSL2 and Linux systems\r\n- Add section on how to use podman with dev containers in Chariott\r\n\r\n* docs: update block quote\r\n\r\n* docs: update readme\r\n\r\nAdded important note section to clarify the current support of\r\nWSL2 / linux with Ubuntu 20.04 on AMD64 architectures.\r\n\r\n* Update README.md\r\n\r\nCo-authored-by: Atif Aziz <code@raboof.com>\r\n\r\n* Apply suggestions from code review\r\n\r\nCo-authored-by: Atif Aziz <code@raboof.com>\r\n\r\n* Update README.md\r\n\r\nCo-authored-by: Atif Aziz <code@raboof.com>\r\n\r\n* docs: integrate PR feedback\r\n\r\nfixed also markdownlint issues\r\n\r\n* docs: moved requirements section\r\n\r\nCo-authored-by: Atif Aziz <code@raboof.com>",
+          "timestamp": "2022-11-21T13:16:36+01:00",
+          "tree_id": "66ccc9d1c674634822b8d18d0a5d54d194f6e4c9",
+          "url": "https://github.com/eclipse/chariott/commit/6d2e9db2303b3d8b88ed62ec0aa8ce92026c160e"
+        },
+        "date": 1669034271522,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 398674,
+            "range": "± 15141",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2684971,
+            "range": "± 10907",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 25377059,
+            "range": "± 43152",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 3850805,
+            "range": "± 31368",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 26153728,
+            "range": "± 71322",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 253016153,
+            "range": "± 1130346",
             "unit": "ns/iter"
           }
         ]
