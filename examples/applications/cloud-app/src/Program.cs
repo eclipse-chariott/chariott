@@ -37,12 +37,6 @@ try
     await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
     Console.Error.WriteLine("The MQTT client is connected.");
 
-    mqttClient.ApplicationMessageReceivedAsync += args =>
-    {
-        args.Dump();
-        return Task.CompletedTask;
-    };
-
     var correlations = MoreEnumerable.Return(() => Guid.NewGuid().ToByteArray()).Repeat().Evaluate();
 
     var rpc = new ChariottRpc(mqttClient, correlations)
@@ -270,7 +264,7 @@ sealed class ChariottRpc : IDisposable
                         .WithCorrelationData(id)
                         .WithResponseTopic(responseTopic)
                         .Build();
-                await client.PublishAsync(message.Dump(), cancellationToken);
+                await client.PublishAsync(message, cancellationToken);
                 return await taskCompletionSource.Task.WaitAsync(cancellationToken);
             }
             finally
