@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668762011131,
+  "lastUpdate": 1669034634612,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -2328,6 +2328,84 @@ window.BENCHMARK_DATA = {
             "value": 6557,
             "unit": "Bytes",
             "range": "p95=6770"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 7,
+            "unit": "Millisecond",
+            "range": "p95=12"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dariuszparys@users.noreply.github.com",
+            "name": "Dariusz Parys",
+            "username": "dariuszparys"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6d2e9db2303b3d8b88ed62ec0aa8ce92026c160e",
+          "message": "Docs/update readme for podman (#45)\n\n* docs: update dev container usage\r\n\r\n- Clarifying the usage of dev containers in the current release\r\nlimited to WSL2 and Linux systems\r\n- Add section on how to use podman with dev containers in Chariott\r\n\r\n* docs: update block quote\r\n\r\n* docs: update readme\r\n\r\nAdded important note section to clarify the current support of\r\nWSL2 / linux with Ubuntu 20.04 on AMD64 architectures.\r\n\r\n* Update README.md\r\n\r\nCo-authored-by: Atif Aziz <code@raboof.com>\r\n\r\n* Apply suggestions from code review\r\n\r\nCo-authored-by: Atif Aziz <code@raboof.com>\r\n\r\n* Update README.md\r\n\r\nCo-authored-by: Atif Aziz <code@raboof.com>\r\n\r\n* docs: integrate PR feedback\r\n\r\nfixed also markdownlint issues\r\n\r\n* docs: moved requirements section\r\n\r\nCo-authored-by: Atif Aziz <code@raboof.com>",
+          "timestamp": "2022-11-21T13:16:36+01:00",
+          "tree_id": "66ccc9d1c674634822b8d18d0a5d54d194f6e4c9",
+          "url": "https://github.com/eclipse/chariott/commit/6d2e9db2303b3d8b88ed62ec0aa8ce92026c160e"
+        },
+        "date": 1669034633080,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1188",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "3",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 38,
+            "unit": "Percent",
+            "range": "p95=39"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6782,
+            "unit": "Bytes",
+            "range": "p95=6787"
           },
           {
             "name": "Invoke Throughput",
