@@ -21,7 +21,6 @@ using MQTTnet.Formatter;
 using MoreEnumerable = MoreLinq.MoreEnumerable;
 using static MoreLinq.Extensions.RepeatExtension;
 using static MoreLinq.Extensions.EvaluateExtension;
-using System.Text;
 
 try
 {
