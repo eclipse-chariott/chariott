@@ -21,6 +21,7 @@ using MQTTnet.Formatter;
 using MoreEnumerable = MoreLinq.MoreEnumerable;
 using static MoreLinq.Extensions.RepeatExtension;
 using static MoreLinq.Extensions.EvaluateExtension;
+using System.CommandLine.Parsing;
 
 try
 {
@@ -52,7 +53,7 @@ try
     while (!quit && Console.ReadLine() is { } line)
     {
         FulfillRequest? request = null;
-        switch (Prompt.CreateParser().Parse(line.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)))
+        switch (Prompt.CreateParser().Parse(CommandLineStringSplitter.Instance.Split(line)))
         {
             case IArgumentsResult<Prompt> { Arguments: var prompt }:
             {
