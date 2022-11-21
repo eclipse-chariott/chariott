@@ -21,6 +21,7 @@ using MQTTnet.Formatter;
 using MoreEnumerable = MoreLinq.MoreEnumerable;
 using static MoreLinq.Extensions.RepeatExtension;
 using static MoreLinq.Extensions.EvaluateExtension;
+using System.Text;
 
 try
 {
@@ -188,16 +189,16 @@ static Value ParseValue(string input)
 {
     input = input.Trim();
 
-    if (Regex.Match(input, @"^(true|false)+$") is { Success: true, Value: var flag })
+    if (Regex.Match(input, @"^(?:true|false)$") is { Success: true, Value: var flag })
         return new Value { Bool = flag == "true" };
 
-    if (Regex.Match(input, @"[0-9]") is { Success: true, Value: var n32 })
+    if (Regex.Match(input, @"^[0-9]+$") is { Success: true, Value: var n32 })
         return new Value { Int32 = int.Parse(n32, CultureInfo.InvariantCulture) };
 
-    if (Regex.Match(input, @"^[0-9]+(?=L)$") is { Success: true, Value: var n64 })
+    if (Regex.Match(input, @"^[0-9]+(?=L$)") is { Success: true, Value: var n64 })
         return new Value { Int64 = long.Parse(n64, CultureInfo.InvariantCulture) };
 
-    if (Regex.Match(input, @"^[0-9]*.[0-9]+[fF]$") is { Success: true, Value: var f32 })
+    if (Regex.Match(input, @"^[0-9]*.[0-9]+(?=[fF]$)") is { Success: true, Value: var f32 })
         return new Value { Float32 = float.Parse(f32, CultureInfo.InvariantCulture) };
 
     if (Regex.Match(input, @"^[0-9]*.[0-9]+$") is { Success: true, Value: var f64 })
