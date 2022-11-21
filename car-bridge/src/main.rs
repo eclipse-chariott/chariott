@@ -143,7 +143,10 @@ async fn handle_message(
         properties.push_string(PropertyCode::ContentType, "chariott.runtime.v1.FulfillResponse")?;
 
         response_sender
-            .send((response_topic, MessageBuilder::new().payload(buffer).qos(QOS_2)))
+            .send((
+                response_topic,
+                MessageBuilder::new().properties(properties).payload(buffer).qos(QOS_2),
+            ))
             .await?;
 
         Ok(())
