@@ -37,7 +37,9 @@ try
     await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
     Console.Error.WriteLine("The MQTT client is connected.");
 
-    var correlations = MoreEnumerable.Return(() => Guid.NewGuid().ToByteArray()).Repeat().Evaluate();
+    var correlations = MoreEnumerable.Return(() => Guid.NewGuid().ToByteArray())
+                                     .Repeat()
+                                     .Evaluate();
 
     var rpcSession = await
         ChariottRpcSession.CreateAsync(mqttFactory, mqttClient,
