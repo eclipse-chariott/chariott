@@ -39,17 +39,10 @@ try
 
     var correlations = MoreEnumerable.Return(() => Guid.NewGuid().ToByteArray()).Repeat().Evaluate();
 
-    var rpc = new ChariottRpc(mqttClient, correlations)
-    {
-        RequestTopic = "c2d/1",
-        ResponseTopic = "c2d/1/rsvp",
-    };
-
-    var options =
-        mqttFactory.CreateSubscribeOptionsBuilder()
-                   .WithTopicFilter(f => f.WithTopic(rpc.ResponseTopic))
-                   .Build();
-    await mqttClient.SubscribeAsync(options, CancellationToken.None);
+    var rpcSession = await
+        ChariottRpcSession.CreateAsync(mqttFactory, mqttClient,
+                                       new Vin("1"), correlations,
+                                       CancellationToken.None);
 
     var jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
 
@@ -77,6 +70,26 @@ try
                     {
                         await mqttClient.PingAsync();
                         Console.WriteLine("Pong!");
+                        break;
+                    }
+                    case { CmdGet: true, CmdVin: true }:
+                    {
+                        Console.WriteLine(rpcSession.Vin);
+                        break;
+                    }
+                    case { CmdSet: true, CmdVin: true, ArgVin: var vin }:
+                    {
+                        Debug.Assert(vin is not null);
+
+                        var oldVin = rpcSession.Vin;
+                        if (await rpcSession.ChangeVinAsync(new(vin), CancellationToken.None))
+                            Console.Error.WriteLine($"Okay (old = {oldVin}).");
+                        break;
+                    }
+                    case { CmdShow: true, CmdTopics: true }:
+                    {
+                        Console.WriteLine($"req {rpcSession.RequestTopic}");
+                        Console.WriteLine($"rsp {rpcSession.ResponseTopic}");
                         break;
                     }
                     case { CmdInspect: true, ArgNamespace: var ns, ArgQuery: var query }:
@@ -145,7 +158,7 @@ try
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             try
             {
-                var response = await rpc.RpcAsync(someRequest, cts.Token);
+                var response = await rpcSession.ExecuteAsync(someRequest, cts.Token);
                 using var sw = new StringWriter();
                 JsonFormatter.Default.Format(response, sw);
                 var json = sw.ToString();
@@ -203,36 +216,97 @@ static FulfillRequest FulfillRequest(string ns, Action<Intent> intentInitializer
     return request;
 }
 
-sealed class ChariottRpc : IDisposable
+readonly record struct Vin(string Value)
 {
+    public override string ToString() => Value;
+}
+
+sealed class ChariottRpcSession : IDisposable
+{
+    readonly MqttFactory _factory;
     readonly IMqttClient _client;
     readonly IEnumerator<byte[]> _correlation;
+    string? _cachedRequestTopic;
+    string? _cachedResponseTopic;
+    Vin _vin;
 
-    public ChariottRpc(IMqttClient client, IEnumerable<byte[]> correlations)
+    public static async Task<ChariottRpcSession>
+        CreateAsync(MqttFactory factory, IMqttClient client, Vin vin,
+                    IEnumerable<byte[]> correlations,
+                    CancellationToken cancellationToken)
     {
+        var session = new ChariottRpcSession(factory, client, vin, correlations);
+        await session.SubscribeAsync(cancellationToken);
+        return session;
+    }
+
+    ChariottRpcSession(MqttFactory factory, IMqttClient client, Vin vin, IEnumerable<byte[]> correlations)
+    {
+        _factory = factory;
         _client = client;
+        Vin = vin;
         _correlation = correlations.GetEnumerator();
     }
 
-    public required string RequestTopic { get; init; }
-    public required string ResponseTopic { get; init; }
+    public Vin Vin
+    {
+        get => _vin;
+
+        private set
+        {
+            _vin = value;
+            _cachedRequestTopic = _cachedResponseTopic = null;
+        }
+    }
+
+    public string RequestTopic => _cachedRequestTopic ??= $"c2d/{Vin}";
+    public string ResponseTopic => _cachedResponseTopic ??= $"c2d/{Vin}/rsvp";
 
     public void Dispose() => _correlation.Dispose();
 
-    public Task<FulfillResponse> RpcAsync(FulfillRequest request, CancellationToken cancellationToken) =>
-        RpcAsync(_client, request, _correlation, RequestTopic, ResponseTopic, cancellationToken);
+    public async Task<bool> ChangeVinAsync(Vin newValue, CancellationToken cancellationToken)
+    {
+        if (Vin == newValue)
+            return false;
 
-    static Task<FulfillResponse> RpcAsync(IMqttClient client,
-                                          FulfillRequest request,
-                                          IEnumerator<byte[]> correlation,
-                                          string requestTopic, string responseTopic,
-                                          CancellationToken cancellationToken)
+        await UnsubscribeAsync(cancellationToken);
+        Vin = newValue;
+        await SubscribeAsync(cancellationToken);
+        return true;
+    }
+
+    async Task SubscribeAsync(CancellationToken cancellationToken)
+    {
+        var options =
+            _factory.CreateSubscribeOptionsBuilder()
+                    .WithTopicFilter(ResponseTopic)
+                    .Build();
+        await _client.SubscribeAsync(options, cancellationToken);
+    }
+
+    async Task UnsubscribeAsync(CancellationToken cancellationToken)
+    {
+        var options =
+            _factory.CreateUnsubscribeOptionsBuilder()
+                    .WithTopicFilter(ResponseTopic)
+                    .Build();
+        await _client.UnsubscribeAsync(options, cancellationToken);
+    }
+
+    public Task<FulfillResponse> ExecuteAsync(FulfillRequest request, CancellationToken cancellationToken) =>
+        ExecuteAsync(_client, request, _correlation, RequestTopic, ResponseTopic, cancellationToken);
+
+    static Task<FulfillResponse> ExecuteAsync(IMqttClient client,
+                                              FulfillRequest request,
+                                              IEnumerator<byte[]> correlation,
+                                              string requestTopic, string responseTopic,
+                                              CancellationToken cancellationToken)
     {
         return !correlation.MoveNext()
              ? throw new InvalidOperationException()
-             : Rpc(correlation.Current);
+             : Async(correlation.Current);
 
-        async Task<FulfillResponse> Rpc(byte[] id)
+        async Task<FulfillResponse> Async(byte[] id)
         {
             var taskCompletionSource = new TaskCompletionSource<FulfillResponse>();
 
@@ -285,11 +359,14 @@ partial class Prompt
     const string Help = """
     Usage:
         $ ping
+        $ set vin <vin>
+        $ get vin
         $ inspect <namespace> <query>
         $ read <namespace> <key>
         $ write <namespace> <key> <value>
         $ invoke <namespace> <command> [<arg>...]
         $ subscribe <namespace> <source>...
+        $ show topics
         $ show (req | request | rsp | response)
         $ (quit | exit)
         $ help
