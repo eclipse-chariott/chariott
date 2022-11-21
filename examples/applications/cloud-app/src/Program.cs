@@ -251,10 +251,12 @@ sealed class ChariottRpc : IDisposable
                 {
                     taskCompletionSource.TrySetException(ex);
                 }
+
                 return Task.CompletedTask;
             }
 
             client.ApplicationMessageReceivedAsync += OnApplicationMessageReceivedAsync;
+
             try
             {
                 var message =
@@ -264,7 +266,9 @@ sealed class ChariottRpc : IDisposable
                         .WithCorrelationData(id)
                         .WithResponseTopic(responseTopic)
                         .Build();
+
                 await client.PublishAsync(message, cancellationToken);
+
                 return await taskCompletionSource.Task.WaitAsync(cancellationToken);
             }
             finally
