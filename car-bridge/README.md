@@ -6,6 +6,10 @@ To run the Car Bridge:
 
 1. Start an [Eclipse Mosquitto](https://mosquitto.org/) broker.
 
-2. Start the Car Bridge using:
+2. Start Chariott using:
 
-       cargo run -p car-bridge
+        cargo run -p chariott
+
+3. Start the Car Bridge using:
+
+        cargo run -p car-bridge

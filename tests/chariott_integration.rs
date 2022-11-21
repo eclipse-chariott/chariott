@@ -10,6 +10,7 @@ use chariott::registry::{
 };
 use chariott::streaming::StreamingEss;
 use chariott::{chariott_grpc::ChariottServer, registry::Registry, IntentBroker};
+use chariott_common::chariott_api::ChariottCommunication;
 use chariott_common::error::{Error, ResultExt as _};
 use chariott_common::shutdown::RouterExt as _;
 use chariott_proto::{
@@ -18,10 +19,7 @@ use chariott_proto::{
     streaming::channel_service_server::ChannelServiceServer,
 };
 use common::get_uuid;
-use examples_common::chariott::{
-    api::{Chariott, ChariottCommunication},
-    value::Value,
-};
+use examples_common::chariott::{api::Chariott, value::Value};
 use provider::Provider;
 use tokio::task::spawn;
 use tokio_util::sync::CancellationToken;

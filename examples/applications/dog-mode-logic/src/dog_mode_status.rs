@@ -3,10 +3,11 @@
 
 use anyhow::{anyhow, Error};
 use async_stream::try_stream;
+use chariott_common::chariott_api::GrpcChariott;
 use chariott_proto::common::Blob;
 use examples_common::{
     chariott::{
-        api::{Chariott, ChariottExt as _, GrpcChariott},
+        api::{Chariott, ChariottExt as _},
         value::Value,
     },
     examples::proto::detection::{DetectRequest, DetectResponse},

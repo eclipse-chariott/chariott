@@ -7,9 +7,10 @@ use std::{
 };
 
 use anyhow::{anyhow, Error};
+use chariott_common::chariott_api::GrpcChariott;
 use dog_mode_status::stream_dog_mode_status;
 use examples_common::chariott::{
-    api::{Chariott, ChariottExt as _, GrpcChariott},
+    api::{Chariott, ChariottExt as _},
     value::Value,
 };
 use tokio::{select, time::sleep_until};

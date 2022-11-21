@@ -16,6 +16,9 @@
 //! ```
 //!
 
+/// Chariott API abstractions
+pub mod chariott_api;
+
 /// Generic error handling
 pub mod error;
 

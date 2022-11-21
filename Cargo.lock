@@ -404,8 +404,14 @@ checksum = "c1db59621ec70f09c5e9b597b220c7a2b43611f4710dc03ceb8748637775692c"
 name = "car-bridge"
 version = "0.1.0"
 dependencies = [
+ "async-channel",
+ "async-stream",
+ "async-trait",
  "chariott-common",
+ "chariott-proto",
+ "futures",
  "paho-mqtt",
+ "prost",
  "tokio",
  "tokio-stream",
  "tracing",
