@@ -19,6 +19,7 @@ type Topic = String;
 /// Identifies a subscription source (a.k.a. key or event ID).
 type Source = String;
 
+#[derive(Clone)]
 pub enum Action {
     /// Open a connection a provider's streaming endpoint.
     Listen(Namespace),
@@ -42,14 +43,34 @@ impl Streaming {
         Self { sources_by_namespace: HashMap::new(), links: HashSet::new(), routes: HashSet::new() }
     }
 
-    pub fn subscribe(&mut self, namespace: Namespace, source: Source, topic: Topic) -> Vec<Action> {
-        let mut actions = vec![];
+    pub fn commit(&mut self, action: Action) {
+        match action {
+            Action::Listen(namespace) => {
+                self.sources_by_namespace.insert(namespace.clone(), HashSet::new());
+            }
+            Action::Subscribe(namespace, source) => {
+                if let Some(sources) = self.sources_by_namespace.get_mut(&namespace) {
+                    sources.insert(source.clone());
+                };
+            }
+            Action::Link(namespace, topic) => {
+                self.links.insert((namespace, topic));
+            }
+            Action::Route(namespace, topic, source) => {
+                self.routes.insert((namespace, topic, source));
+            }
+        };
+    }
 
+    pub fn prepare_subscribe(
+        &mut self,
+        namespace: Namespace,
+        source: Source,
+        topic: Topic,
+    ) -> Option<Action> {
         // Check if listening
         if !self.sources_by_namespace.contains_key(&namespace) {
-            self.sources_by_namespace.insert(namespace.clone(), HashSet::new());
-
-            actions.push(Action::Listen(namespace.clone()));
+            return Some(Action::Listen(namespace.clone()));
         }
 
         // Check if subscribed
@@ -59,30 +80,24 @@ impl Streaming {
             .and_then(|sources| sources.get(&source))
             .is_none()
         {
-            if let Some(sources) = self.sources_by_namespace.get_mut(&namespace) {
-                sources.insert(source.clone());
-            };
-
-            actions.push(Action::Subscribe(namespace.clone(), source.clone()));
+            return Some(Action::Subscribe(namespace.clone(), source.clone()));
         }
 
         // Check if linked
         let link = (namespace.clone(), topic.clone());
         if !self.links.contains(&link) {
-            self.links.insert(link);
-
-            actions.push(Action::Link(namespace.clone(), topic.clone()));
+            let (namespace, topic) = link;
+            return Some(Action::Link(namespace, topic));
         }
 
         // Check if routed
-        let route = (namespace.clone(), topic.clone(), source.clone());
+        let route = (namespace, topic, source);
         if !self.routes.contains(&route) {
-            self.routes.insert(route);
-
-            actions.push(Action::Route(namespace, topic, source));
+            let (namespace, topic, source) = route;
+            return Some(Action::Route(namespace, topic, source));
         }
 
-        actions
+        None
     }
 }
 

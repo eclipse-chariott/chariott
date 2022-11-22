@@ -150,38 +150,31 @@ async fn handle_message(
         let response = match intent_enum {
             IntentEnum::Discover(_) => Err(Error::new("Discover is not supported.")),
             IntentEnum::Subscribe(subscribe_intent) => {
-                let mut actions = vec![];
+                for source in subscribe_intent.sources {
+                    // Hold the lock over the entire action handling, to avoid
+                    // race conditions (e.g. two applications with respect to
+                    // listening, and especially failing operations).
 
-                {
                     let mut streaming = streaming.lock().await;
 
-                    for source in subscribe_intent.sources {
-                        actions.push(streaming.subscribe(
-                            namespace.clone(),
-                            source,
-                            subscribe_intent.channel_id.clone(),
-                        ));
-                    }
-                }
+                    let Some(action) = streaming.prepare_subscribe(
+                        namespace.clone(),
+                        source,
+                        subscribe_intent.channel_id.clone(),
+                    ) else {
+                        continue;
+                    };
 
-                // TODO: handle errors - roll back subscription state.
-                // TODO: how can we run all of this in parallel?
+                    let mut provider_events = provider_events.lock().await;
 
-                for action in actions.into_iter().flatten() {
-                    let provider_events = Arc::clone(&provider_events);
-
-                    match action {
+                    match action.clone() {
                         Action::Listen(namespace) => {
                             provider_events
-                                .lock()
-                                .await
                                 .register_event_provider(chariott, namespace.clone())
                                 .await?;
                         }
                         Action::Subscribe(namespace, source) => {
                             let channel_id = provider_events
-                                .lock()
-                                .await
                                 .get_event_provider_mut(&namespace)
                                 .unwrap()
                                 .channel_id()
@@ -193,8 +186,6 @@ async fn handle_message(
                         }
                         Action::Link(namespace, topic) => {
                             let mut stream = provider_events
-                                .lock()
-                                .await
                                 .get_event_provider(&namespace)
                                 .unwrap()
                                 .link(topic.clone());
@@ -228,16 +219,16 @@ async fn handle_message(
                         }
                         Action::Route(namespace, topic, source) => {
                             let subscription = provider_events
-                                .lock()
-                                .await
                                 .get_event_provider(&namespace)
                                 .unwrap()
                                 .route(topic, source)
-                                .map_err(|_| Error::new("Not reading events."))?;
+                                .expect("Prior to routing there we must have set up a link between a namespace and a topic.");
 
                             spawn(subscription.serve(|e, _| e));
                         }
                     }
+
+                    streaming.commit(action);
                 }
 
                 Ok(FulfillResponse {
