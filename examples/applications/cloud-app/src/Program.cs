@@ -444,7 +444,7 @@ readonly record struct Timeout(TimeSpan Duration);
 
 static class Extensions
 {
-    public static string ToJsonEncoding(this IMessage message, JsonSerializerOptions jsonSerializerOptions = null)
+    public static string ToJsonEncoding(this IMessage message, JsonSerializerOptions? jsonSerializerOptions = null)
     {
         using var sw = new StringWriter();
         JsonFormatter.Default.Format(message, sw);
