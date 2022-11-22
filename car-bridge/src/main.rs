@@ -157,78 +157,76 @@ async fn handle_message(
 
                     let mut streaming = streaming.lock().await;
 
-                    let Some(action) = streaming.prepare_subscribe(
+                    while let Some(action) = streaming.next_subscribe_action(
                         namespace.clone(),
-                        source,
+                        source.clone(),
                         subscribe_intent.channel_id.clone(),
-                    ) else {
-                        continue;
-                    };
+                    ) {
+                        let mut provider_events = provider_events.lock().await;
 
-                    let mut provider_events = provider_events.lock().await;
+                        match action.clone() {
+                            Action::Listen(namespace) => {
+                                provider_events
+                                    .register_event_provider(chariott, namespace)
+                                    .await?;
+                            }
+                            Action::Subscribe(namespace, source) => {
+                                let channel_id = provider_events
+                                    .get_event_provider_mut(&namespace)
+                                    .unwrap()
+                                    .channel_id()
+                                    .to_owned();
 
-                    match action.clone() {
-                        Action::Listen(namespace) => {
-                            provider_events
-                                .register_event_provider(chariott, namespace)
-                                .await?;
-                        }
-                        Action::Subscribe(namespace, source) => {
-                            let channel_id = provider_events
-                                .get_event_provider_mut(&namespace)
-                                .unwrap()
-                                .channel_id()
-                                .to_owned();
+                                chariott
+                                    .subscribe(namespace, channel_id, vec![source.into()])
+                                    .await?;
+                            }
+                            Action::Link(namespace, topic) => {
+                                let mut stream = provider_events
+                                    .get_event_provider(&namespace)
+                                    .unwrap()
+                                    .link(topic.clone());
 
-                            chariott
-                                .subscribe(namespace, channel_id, vec![source.into()])
-                                .await?;
-                        }
-                        Action::Link(namespace, topic) => {
-                            let mut stream = provider_events
-                                .get_event_provider(&namespace)
-                                .unwrap()
-                                .link(topic.clone());
+                                let response_sender = response_sender.clone();
 
-                            let response_sender = response_sender.clone();
+                                spawn(async move {
+                                    while let Some(e) = stream.next().await {
+                                        let mut buffer = vec![];
 
-                            spawn(async move {
-                                while let Some(e) = stream.next().await {
-                                    let mut buffer = vec![];
+                                        if let Err(err) = e.encode(&mut buffer) {
+                                            warn!("Failed to encode event: '{err:?}'.");
+                                        }
 
-                                    if let Err(err) = e.encode(&mut buffer) {
-                                        warn!("Failed to encode event: '{err:?}'.");
+                                        if let Err(err) = response_sender
+                                            .send((
+                                                topic.clone(),
+                                                MessageBuilder::new().payload(buffer).qos(QOS_1),
+                                            ))
+                                            .await
+                                        {
+                                            // TODO: handle better.
+                                            error!(
+                                                "Failed to publish event to topic '{topic}': '{err:?}'."
+                                            );
+                                        }
                                     }
 
-                                    if let Err(err) = response_sender
-                                        .send((
-                                            topic.clone(),
-                                            MessageBuilder::new().payload(buffer).qos(QOS_1),
-                                        ))
-                                        .await
-                                    {
-                                        // TODO: handle better.
-                                        error!(
-                                            "Failed to publish event to topic '{topic}': '{err:?}'."
-                                        );
-                                    }
-                                }
+                                    warn!("Stream for topic '{topic}' broke.");
+                                });
+                            }
+                            Action::Route(namespace, topic, source) => {
+                                let subscription = provider_events
+                                    .get_event_provider(&namespace)
+                                    .unwrap()
+                                    .route(topic, source)
+                                    .expect("Prior to routing there we must have set up a link between a namespace and a topic.");
 
-                                warn!("Stream for topic '{topic}' broke.");
-                            });
+                                spawn(subscription.serve(|e, _| e));
+                            }
                         }
-                        Action::Route(namespace, topic, source) => {
-                            let subscription = provider_events
-                                .get_event_provider(&namespace)
-                                .unwrap()
-                                .route(topic, source)
-                                .expect("Prior to routing there we must have set up a link between a namespace and a topic.");
 
-                            spawn(subscription.serve(|e, _| e));
-                        }
+                        streaming.commit(action);
                     }
-
-                    streaming.commit(action);
                 }
 
                 Ok(FulfillResponse {

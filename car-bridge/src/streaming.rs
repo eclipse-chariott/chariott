@@ -62,7 +62,7 @@ impl Streaming {
         };
     }
 
-    pub fn prepare_subscribe(
+    pub fn next_subscribe_action(
         &mut self,
         namespace: Namespace,
         source: Source,
