@@ -326,6 +326,7 @@ where
     }
 }
 
+#[derive(Clone)]
 pub struct Event {
     pub id: Box<str>,
     pub data: Value,

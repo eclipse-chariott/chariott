@@ -17,7 +17,7 @@ use examples_common::chariott::api::{Chariott as _, ChariottExt as _};
 use messaging::{MqttMessaging, Publisher, Subscriber};
 use paho_mqtt::{Message as MqttMessage, MessageBuilder, Properties, PropertyCode, QOS_1, QOS_2};
 use prost::Message;
-use streaming::{Action, Streaming, Subscription};
+use streaming::{Action, Streaming, SubscriptionRegistry};
 use tokio::{
     select, spawn,
     sync::mpsc::{self, Sender},
@@ -47,6 +47,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let chariott = GrpcChariott::connect().await?;
     let streaming = Arc::new(Mutex::new(Streaming::new()));
+    let ess_registry = Arc::new(Mutex::new(SubscriptionRegistry::new()));
 
     let mut client = MqttMessaging::connect(vin.to_owned()).await?;
     let mut messages = client.subscribe(format!("c2d/{vin}")).await?;
@@ -92,9 +93,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let mut chariott = chariott.clone();
                 let response_sender = response_sender.clone();
                 let streaming = Arc::clone(&streaming);
+                let ess_registry = Arc::clone(&ess_registry);
 
                 spawn(async move {
-                    handle_message(&mut chariott, response_sender, streaming, message).await;
+                    handle_message(&mut chariott, response_sender, streaming, ess_registry, message).await;
                 });
             }
             _ = cancellation_token.cancelled() => {
@@ -113,12 +115,14 @@ async fn handle_message(
     chariott: &mut impl ChariottCommunication,
     response_sender: Sender<(String, MessageBuilder)>,
     streaming: Arc<Mutex<Streaming>>,
+    ess_registry: Arc<Mutex<SubscriptionRegistry>>,
     message: MqttMessage,
 ) {
     async fn inner(
         chariott: &mut impl ChariottCommunication,
         response_sender: Sender<(String, MessageBuilder)>,
         streaming: Arc<Mutex<Streaming>>,
+        ess_registry: Arc<Mutex<SubscriptionRegistry>>,
         message: MqttMessage,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let correlation_data = message
@@ -133,6 +137,8 @@ async fn handle_message(
 
         let fulfill_request: FulfillRequest = Message::decode(message.payload())?;
 
+        let namespace = fulfill_request.namespace;
+
         let intent_enum = fulfill_request
             .intent
             .and_then(|intent| intent.intent)
@@ -141,13 +147,6 @@ async fn handle_message(
         let response = match intent_enum {
             IntentEnum::Discover(_) => Err(Error::new("Discover is not supported.")),
             IntentEnum::Subscribe(subscribe_intent) => {
-                const SUBSCRIBER_ID_PROPERTY: &str = "SubscriberId";
-
-                let subscriber_id =
-                    message.properties().find_user_property(SUBSCRIBER_ID_PROPERTY).ok_or_else(
-                        || Error::new(format!("Subscribe intents must define the '{SUBSCRIBER_ID_PROPERTY}' user property.")),
-                    )?;
-
                 let mut actions = vec![];
 
                 {
@@ -155,8 +154,9 @@ async fn handle_message(
 
                     for source in subscribe_intent.sources {
                         actions.push(streaming.subscribe(
-                            fulfill_request.namespace.clone(),
-                            Subscription::new(source, subscriber_id.clone()),
+                            namespace.clone(),
+                            source,
+                            subscribe_intent.channel_id.clone(),
                         ));
                     }
                 }
@@ -164,43 +164,88 @@ async fn handle_message(
                 // TODO: handle errors - roll back subscription state.
 
                 for action in actions.into_iter().flatten() {
+                    let ess_registry = Arc::clone(&ess_registry);
+
                     match action {
-                        Action::Listen => {
-                            let mut stream =
-                                chariott.listen(fulfill_request.namespace.clone(), vec![]).await?;
+                        Action::Listen(namespace) => {
+                            // open the stream with the provider
+                            let mut stream = chariott.listen(namespace.clone(), vec![]).await?;
+
+                            ess_registry
+                                .lock()
+                                .unwrap()
+                                .set_channel_id(namespace.clone(), "".to_owned());
 
                             {
-                                let response_sender = response_sender.clone();
-                                let channel_id = subscribe_intent.channel_id.clone();
+                                let namespace = namespace.clone();
 
-                                // TODO: channel management.
                                 spawn(async move {
-                                    while let Some(_) = stream.next().await {
-                                        // TODO: use correct payload.
-                                        if let Err(e) = response_sender
-                                            .send((
-                                                channel_id.clone(),
-                                                MessageBuilder::new().payload(vec![]).qos(QOS_1),
-                                            ))
-                                            .await
-                                        {
-                                            // TODO: handle better.
-                                            error!("Failed to publish event for '{channel_id}': '{e:?}'.");
-                                        }
+                                    while let Some(event) = stream.next().await {
+                                        let event = event.unwrap();
 
-                                        warn!("Stream for channel '{channel_id}' broke.");
+                                        ess_registry
+                                            .lock()
+                                            .unwrap()
+                                            .publish(namespace.as_str(), &event.id.clone(), event)
+                                            .unwrap();
                                     }
+
+                                    warn!("Stream for channel '{namespace}' broke.");
                                 });
                             }
                         }
-                        Action::Subscribe(source) => {
+                        Action::Subscribe(namespace, source) => {
+                            let channel_id = ess_registry
+                                .lock()
+                                .unwrap()
+                                .channel_id(&namespace)
+                                .unwrap()
+                                .to_owned();
+
                             chariott
                                 .subscribe(
-                                    fulfill_request.namespace.clone(),
-                                    subscribe_intent.channel_id.clone(),
-                                    vec![source.into()],
+                                    namespace.clone(),
+                                    channel_id.clone(),
+                                    vec![source.as_str().into()],
                                 )
                                 .await?;
+
+                            let subscription = ess_registry
+                                .lock()
+                                .unwrap()
+                                .subscribe(namespace.clone(), source, channel_id)
+                                .unwrap();
+
+                            spawn(subscription.serve(|event, _| event));
+                        }
+                        Action::Link(namespace, topic) => {
+                            let (_, mut topic_stream) = ess_registry
+                                .lock()
+                                .unwrap()
+                                .ess(&namespace)
+                                .read_events(topic.clone());
+
+                            let response_sender = response_sender.clone();
+
+                            spawn(async move {
+                                while let Some(_) = topic_stream.next().await {
+                                    // TODO: send real data
+                                    if let Err(e) = response_sender
+                                        .send((
+                                            topic.clone(),
+                                            MessageBuilder::new().payload(vec![]).qos(QOS_1),
+                                        ))
+                                        .await
+                                    {
+                                        // TODO: handle better.
+                                        error!(
+                                            "Failed to publish event to topic '{topic}': '{e:?}'."
+                                        );
+                                    }
+                                }
+
+                                warn!("Stream for topic '{topic}' broke.");
+                            });
                         }
                     }
                 }
@@ -211,10 +256,7 @@ async fn handle_message(
                     }),
                 })
             }
-            _ => chariott
-                .fulfill(fulfill_request.namespace, intent_enum)
-                .await
-                .map(|r| r.into_inner()),
+            _ => chariott.fulfill(namespace, intent_enum).await.map(|r| r.into_inner()),
         }?;
 
         let mut buffer = vec![];
@@ -231,7 +273,7 @@ async fn handle_message(
         Ok(())
     }
 
-    if let Err(e) = inner(chariott, response_sender, streaming, message).await {
+    if let Err(e) = inner(chariott, response_sender, streaming, ess_registry, message).await {
         error!("Error when handling message: '{e:?}'.");
     }
 }
