@@ -22,11 +22,14 @@ using MoreEnumerable = MoreLinq.MoreEnumerable;
 using static MoreLinq.Extensions.RepeatExtension;
 using static MoreLinq.Extensions.EvaluateExtension;
 using System.CommandLine.Parsing;
+using Chariott.Streaming.V1;
 
 return await ProgramArguments.ParseToMain(args, Main);
 
 static async Task<int> Main(ProgramArguments args)
 {
+    var jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
+
     try
     {
         var mqttFactory = new MqttFactory();
@@ -58,8 +61,47 @@ static async Task<int> Main(ProgramArguments args)
             return mqttClient.SubscribeAsync(options, cancellationToken);
         });
 
-        var jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
+        var binName = Path.GetFileNameWithoutExtension(Environment.ProcessPath);
 
+        var eventsChannelId = string.Join("/", Environment.MachineName,
+                                               binName,
+                                               Environment.ProcessId,
+                                               "events");
+
+        const string eventsFileExtension = ".cjson"; // https://en.wikipedia.org/wiki/JSON_streaming#Concatenated_JSON
+        var eventFilesDirPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), $".{binName}", "events" + eventsFileExtension);
+
+        var oldDate = DateTime.Today.AddDays(-30);
+        var oldEventsFiles =
+            from f in new DirectoryInfo(eventFilesDirPath).EnumerateFiles("*" + eventsFileExtension, new EnumerationOptions())
+            where f.CreationTime.Date < oldDate
+            select f;
+
+        foreach (var file in oldEventsFiles)
+            file.Delete();
+
+        var eventsFilePath = Path.Join(eventFilesDirPath, eventsChannelId.Replace('/', '='));
+
+        mqttClient.ApplicationMessageReceivedAsync += async args =>
+        {
+            if (args.ApplicationMessage.Topic != eventsChannelId)
+                return;
+
+            var @event = Event.Parser.ParseFrom(args.ApplicationMessage.Payload);
+            var json = @event.ToJsonEncoding() + Environment.NewLine;
+            await File.AppendAllTextAsync(eventsFilePath, json);
+        };
+
+        await timeout.ApplyAsync(cancellationToken =>
+        {
+            var options =
+                mqttFactory.CreateSubscribeOptionsBuilder()
+                           .WithTopicFilter(eventsChannelId)
+                           .Build();
+            return mqttClient.SubscribeAsync(options, cancellationToken);
+        });
+
+        var isFirstSubscription = true;
         var session = new Session { Vin = new(args.OptVin) };
 
         var quit = false;
@@ -141,6 +183,25 @@ static async Task<int> Main(ProgramArguments args)
                             });
                             break;
                         }
+                        case { CmdSubscribe: true, ArgNamespace: var ns, ArgSource: var sources }:
+                        {
+                            Debug.Assert(ns is not null);
+
+                            request = FulfillRequest(ns, fi =>
+                            {
+                                var subscribeIntent = new SubscribeIntent { ChannelId = eventsChannelId };
+                                subscribeIntent.Sources.AddRange(sources);
+                                fi.Subscribe = subscribeIntent;
+                            });
+
+                            if (isFirstSubscription)
+                            {
+                                Console.Error.WriteLine($"The events channel identifier is: {eventsChannelId}");
+                                Console.Error.WriteLine(eventsFilePath);
+                                isFirstSubscription = false;
+                            }
+                            break;
+                        }
                         default:
                         {
                             Console.Error.WriteLine("Sorry, but this has not yet been implemented.");
@@ -164,11 +225,7 @@ static async Task<int> Main(ProgramArguments args)
                     var response = await timeout.ApplyAsync(cancellationToken =>
                         rpcClient.ExecuteAsync(session.Vin, someRequest, cancellationToken));
 
-                    using var sw = new StringWriter();
-                    JsonFormatter.Default.Format(response, sw);
-                    var json = sw.ToString();
-                    json = JsonSerializer.Serialize(JsonSerializer.Deserialize<JsonElement>(json), jsonSerializerOptions);
-                    Console.WriteLine(json);
+                    Console.WriteLine(response.ToJsonEncoding(jsonSerializerOptions));
                 }
                 catch (OperationCanceledException ex)
                 {
@@ -386,6 +443,14 @@ readonly record struct Timeout(TimeSpan Duration);
 
 static class Extensions
 {
+    public static string ToJsonEncoding(this IMessage message, JsonSerializerOptions jsonSerializerOptions = null)
+    {
+        using var sw = new StringWriter();
+        JsonFormatter.Default.Format(message, sw);
+        var json = sw.ToString();
+        return JsonSerializer.Serialize(JsonSerializer.Deserialize<JsonElement>(json), jsonSerializerOptions);
+    }
+
     public static Task ApplyAsync(this Timeout timeout, Func<CancellationToken, Task> function) =>
         timeout.ApplyAsync(async cancellationToken =>
         {
