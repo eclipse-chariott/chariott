@@ -35,11 +35,10 @@ static async Task<int> Main(ProgramArguments args)
 
     try
     {
-        var mqttFactory = new MqttFactory();
-
-        using var mqttClient = mqttFactory.CreateMqttClient();
-
         var timeout = new Timeout(TimeSpan.FromSeconds(int.Parse(args.OptTimeout, NumberStyles.None, CultureInfo.InvariantCulture)));
+
+        var mqttFactory = new MqttFactory();
+        using var mqttClient = mqttFactory.CreateMqttClient();
 
         await timeout.ApplyAsync(cancellationToken =>
         {
