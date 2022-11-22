@@ -467,8 +467,8 @@ partial class ProgramArguments
         Options:
             -h --help        Show this screen.
             --broker=<host>  MQTT broker address [default: localhost].
-            --vin=<vin>      VIN umber [default: 1]
-            --timeout=<sec>  Timeout in seconds [default: 5]
+            --vin=<vin>      VIN umber [default: 1].
+            --timeout=<sec>  Timeout in seconds [default: 5].
             --pretty-events  Pretty print events JSON.
         """;
 
