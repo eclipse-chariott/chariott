@@ -46,12 +46,17 @@ static async Task<int> Main(ProgramArguments args)
                                          .Repeat()
                                          .Evaluate();
 
-        var rpcSession = await
-            ChariottRpcSession.CreateAsync(mqttFactory, mqttClient,
-                                           new Vin(args.OptVin), correlations,
-                                           CancellationToken.None);
+        var rpcClient = new ChariottRpcClient(mqttFactory, mqttClient, correlations);
+
+        var options =
+            mqttFactory.CreateSubscribeOptionsBuilder()
+                       .WithTopicFilter(ChariottRpcClient.ResponseWildcardTopic)
+                       .Build();
+        await mqttClient.SubscribeAsync(options, CancellationToken.None);
 
         var jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
+
+        var session = new Session { Vin = new(args.OptVin) };
 
         var quit = false;
         while (!quit && Console.ReadLine() is { } line)
@@ -81,22 +86,20 @@ static async Task<int> Main(ProgramArguments args)
                         }
                         case { CmdGet: true, CmdVin: true }:
                         {
-                            Console.WriteLine(rpcSession.Vin);
+                            Console.WriteLine(session.Vin);
                             break;
                         }
                         case { CmdSet: true, CmdVin: true, ArgVin: var vin }:
                         {
                             Debug.Assert(vin is not null);
-
-                            var oldVin = rpcSession.Vin;
-                            if (await rpcSession.ChangeVinAsync(new(vin), CancellationToken.None))
-                                Console.Error.WriteLine($"Okay (old = {oldVin}).");
+                            session = session with { Vin = new(vin) };
                             break;
                         }
                         case { CmdShow: true, CmdTopics: true }:
                         {
-                            Console.WriteLine($"req {rpcSession.RequestTopic}");
-                            Console.WriteLine($"rsp {rpcSession.ResponseTopic}");
+                            var topics = ChariottRpcClient.GetTopics(session.Vin);
+                            Console.WriteLine($"req {topics.Request}");
+                            Console.WriteLine($"rsp {topics.Response}");
                             break;
                         }
                         case { CmdInspect: true, ArgNamespace: var ns, ArgQuery: var query }:
@@ -165,7 +168,7 @@ static async Task<int> Main(ProgramArguments args)
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
                 try
                 {
-                    var response = await rpcSession.ExecuteAsync(someRequest, cts.Token);
+                    var response = await rpcClient.ExecuteAsync(session.Vin, someRequest, cts.Token);
                     using var sw = new StringWriter();
                     JsonFormatter.Default.Format(response, sw);
                     var json = sw.ToString();
@@ -224,90 +227,47 @@ static FulfillRequest FulfillRequest(string ns, Action<Intent> intentInitializer
     return request;
 }
 
+record Session
+{
+    public required Vin Vin { get; init; }
+}
+
 readonly record struct Vin(string Value)
 {
     public override string ToString() => Value;
 }
 
-sealed class ChariottRpcSession : IDisposable
+readonly record struct RpcTopicPair(string Request, string Response);
+
+sealed class ChariottRpcClient : IDisposable
 {
     readonly MqttFactory _factory;
     readonly IMqttClient _client;
     readonly IEnumerator<byte[]> _correlation;
-    string? _cachedRequestTopic;
-    string? _cachedResponseTopic;
-    Vin _vin;
 
-    public static async Task<ChariottRpcSession>
-        CreateAsync(MqttFactory factory, IMqttClient client, Vin vin,
-                    IEnumerable<byte[]> correlations,
-                    CancellationToken cancellationToken)
-    {
-        var session = new ChariottRpcSession(factory, client, vin, correlations);
-        await session.SubscribeAsync(cancellationToken);
-        return session;
-    }
+    public const string ResponseWildcardTopic = "c2d/+/rsvp";
 
-    ChariottRpcSession(MqttFactory factory, IMqttClient client, Vin vin, IEnumerable<byte[]> correlations)
+    public ChariottRpcClient(MqttFactory factory, IMqttClient client, IEnumerable<byte[]> correlations)
     {
         _factory = factory;
         _client = client;
-        Vin = vin;
         _correlation = correlations.GetEnumerator();
     }
 
-    public Vin Vin
-    {
-        get => _vin;
-
-        private set
-        {
-            _vin = value;
-            _cachedRequestTopic = _cachedResponseTopic = null;
-        }
-    }
-
-    public string RequestTopic => _cachedRequestTopic ??= $"c2d/{Vin}";
-    public string ResponseTopic => _cachedResponseTopic ??= $"c2d/{Vin}/rsvp";
-
     public void Dispose() => _correlation.Dispose();
 
-    public async Task<bool> ChangeVinAsync(Vin newValue, CancellationToken cancellationToken)
-    {
-        if (Vin == newValue)
-            return false;
+    public static RpcTopicPair GetTopics(Vin vin) => new($"c2d/{vin}", $"c2d/{vin}/rsvp");
 
-        await UnsubscribeAsync(cancellationToken);
-        Vin = newValue;
-        await SubscribeAsync(cancellationToken);
-        return true;
-    }
+    public Task<FulfillResponse> ExecuteAsync(Vin vin, FulfillRequest request,
+                                              CancellationToken cancellationToken) =>
+        ExecuteAsync(_factory, _client, request, _correlation, GetTopics(vin),
+                     cancellationToken);
 
-    async Task SubscribeAsync(CancellationToken cancellationToken)
-    {
-        var options =
-            _factory.CreateSubscribeOptionsBuilder()
-                    .WithTopicFilter(ResponseTopic)
-                    .Build();
-        await _client.SubscribeAsync(options, cancellationToken);
-    }
-
-    async Task UnsubscribeAsync(CancellationToken cancellationToken)
-    {
-        var options =
-            _factory.CreateUnsubscribeOptionsBuilder()
-                    .WithTopicFilter(ResponseTopic)
-                    .Build();
-        await _client.UnsubscribeAsync(options, cancellationToken);
-    }
-
-    public Task<FulfillResponse> ExecuteAsync(FulfillRequest request, CancellationToken cancellationToken) =>
-        ExecuteAsync(_client, request, _correlation, RequestTopic, ResponseTopic, cancellationToken);
-
-    static Task<FulfillResponse> ExecuteAsync(IMqttClient client,
+    static Task<FulfillResponse> ExecuteAsync(MqttFactory factory,
+                                              IMqttClient client,
                                               FulfillRequest request,
                                               IEnumerator<byte[]> correlation,
-                                              string requestTopic, string responseTopic,
+                                              RpcTopicPair topics,
                                               CancellationToken cancellationToken)
     {
         return !correlation.MoveNext()
@@ -342,12 +302,12 @@ sealed class ChariottRpcSession : IDisposable
             try
             {
                 var message =
-                    new MqttApplicationMessageBuilder()
-                        .WithTopic(requestTopic)
-                        .WithPayload(request.ToByteArray())
-                        .WithCorrelationData(id)
-                        .WithResponseTopic(responseTopic)
-                        .Build();
+                    factory.CreateApplicationMessageBuilder()
+                           .WithTopic(topics.Request)
+                           .WithPayload(request.ToByteArray())
+                           .WithCorrelationData(id)
+                           .WithResponseTopic(topics.Response)
+                           .Build();
 
                 await client.PublishAsync(message, cancellationToken);
 
