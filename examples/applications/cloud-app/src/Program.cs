@@ -106,20 +106,14 @@ static async Task<int> Main(ProgramArguments args)
                         {
                             Debug.Assert(ns is not null);
 
-                            request = FulfillRequest(ns, fi => fi.Inspect = new InspectIntent
-                            {
-                                Query = query
-                            });
+                            request = FulfillRequest(ns, fi => fi.Inspect = new() { Query = query });
                             break;
                         }
                         case { CmdRead: true, ArgNamespace: var ns, ArgKey: var key }:
                         {
                             Debug.Assert(ns is not null);
 
-                            request = FulfillRequest(ns, fi => fi.Read = new ReadIntent
-                            {
-                                Key = key
-                            });
+                            request = FulfillRequest(ns, fi => fi.Read = new() { Key = key });
                             break;
                         }
                         case { CmdWrite: true, ArgNamespace: var ns, ArgKey: var key, ArgValue: var value }:
@@ -127,11 +121,7 @@ static async Task<int> Main(ProgramArguments args)
                             Debug.Assert(ns is not null);
                             Debug.Assert(value is not null);
 
-                            request = FulfillRequest(ns, fi => fi.Write = new WriteIntent
-                            {
-                                Key = key,
-                                Value = ParseValue(value)
-                            });
+                            request = FulfillRequest(ns, fi => fi.Write = new() { Key = key,  Value = ParseValue(value) });
                             break;
                         }
                         case { CmdInvoke: true, ArgNamespace: var ns, ArgCommand: var cmd, ArgArg: var cmdArgs }:
@@ -198,21 +188,21 @@ static Value ParseValue(string input)
     input = input.Trim();
 
     if (Regex.Match(input, @"^(?:true|false)$") is { Success: true, Value: var flag })
-        return new Value { Bool = flag == "true" };
+        return new() { Bool = flag == "true" };
 
     if (Regex.Match(input, @"^[0-9]+$") is { Success: true, Value: var n32 })
-        return new Value { Int32 = int.Parse(n32, CultureInfo.InvariantCulture) };
+        return new() { Int32 = int.Parse(n32, CultureInfo.InvariantCulture) };
 
     if (Regex.Match(input, @"^[0-9]+(?=L$)") is { Success: true, Value: var n64 })
-        return new Value { Int64 = long.Parse(n64, CultureInfo.InvariantCulture) };
+        return new() { Int64 = long.Parse(n64, CultureInfo.InvariantCulture) };
 
     if (Regex.Match(input, @"^[0-9]*.[0-9]+(?=[fF]$)") is { Success: true, Value: var f32 })
-        return new Value { Float32 = float.Parse(f32, CultureInfo.InvariantCulture) };
+        return new() { Float32 = float.Parse(f32, CultureInfo.InvariantCulture) };
 
     if (Regex.Match(input, @"^[0-9]*.[0-9]+$") is { Success: true, Value: var f64 })
-        return new Value { Float64 = double.Parse(f64, CultureInfo.InvariantCulture) };
+        return new() { Float64 = double.Parse(f64, CultureInfo.InvariantCulture) };
 
-    return new Value { String = input };
+    return new() { String = input };
 }
 
 static FulfillRequest FulfillRequest(string ns, Action<Intent> intentInitializer)
