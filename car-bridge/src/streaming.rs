@@ -67,7 +67,7 @@ impl SubscriptionState {
 
     /// Calculates the next action to take based on the current subscription
     /// state.
-    pub fn next_subscribe_action(
+    pub fn next_action(
         &mut self,
         namespace: Namespace,
         source: Source,

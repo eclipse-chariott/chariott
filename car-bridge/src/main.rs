@@ -155,9 +155,9 @@ async fn handle_message(
                     // race conditions (e.g. two applications with respect to
                     // listening, and especially failing operations).
 
-                    let mut streaming = subscription_state.lock().await;
+                    let mut subscription_state = subscription_state.lock().await;
 
-                    while let Some(action) = streaming.next_subscribe_action(
+                    while let Some(action) = subscription_state.next_action(
                         namespace.clone(),
                         source.clone(),
                         subscribe_intent.channel_id.clone(),
@@ -225,7 +225,7 @@ async fn handle_message(
                             }
                         }
 
-                        streaming.commit(action);
+                        subscription_state.commit(action);
                     }
                 }
 
