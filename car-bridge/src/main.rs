@@ -21,7 +21,7 @@ use tokio::{
     sync::mpsc::{self, Sender},
 };
 use tokio_stream::StreamExt as _;
-use tracing::{debug, error, warn, Level};
+use tracing::{debug, warn, Level};
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
 
 mod messaging;
