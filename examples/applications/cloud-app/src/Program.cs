@@ -282,8 +282,8 @@ sealed class ChariottRpcClient : IDisposable
             {
                 try
                 {
-                    if (args.ApplicationMessage.CorrelationData is { } correlationData
-                        && id.SequenceEqual(correlationData))
+                    if (args.ApplicationMessage is { Topic: { } topic, CorrelationData: { } correlationData }
+                        && topic == topics.Response && id.SequenceEqual(correlationData))
                     {
                         var response = FulfillResponse.Parser.ParseFrom(args.ApplicationMessage.Payload);
                         taskCompletionSource.TrySetResult(response);
