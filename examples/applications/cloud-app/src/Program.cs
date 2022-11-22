@@ -33,22 +33,30 @@ static async Task<int> Main(ProgramArguments args)
 
         using var mqttClient = mqttFactory.CreateMqttClient();
 
-        var mqttClientOptions =
-            mqttFactory.CreateClientOptionsBuilder()
-                       .WithTcpServer(args.OptBroker)
-                       .WithProtocolVersion(MqttProtocolVersion.V500)
-                       .Build();
+        var timeout = new Timeout(TimeSpan.FromSeconds(int.Parse(args.OptTimeout, NumberStyles.None, CultureInfo.InvariantCulture)));
 
-        await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
+        await timeout.ApplyAsync(cancellationToken =>
+        {
+            var options =
+                mqttFactory.CreateClientOptionsBuilder()
+                           .WithTcpServer(args.OptBroker)
+                           .WithProtocolVersion(MqttProtocolVersion.V500)
+                           .Build();
+            return mqttClient.ConnectAsync(options, cancellationToken);
+        });
+
         Console.Error.WriteLine("The MQTT client is connected.");
 
         var rpcClient = new ChariottRpcClient(mqttFactory, mqttClient);
 
-        var options =
-            mqttFactory.CreateSubscribeOptionsBuilder()
-                       .WithTopicFilter(ChariottRpcClient.ResponseWildcardTopic)
-                       .Build();
-        await mqttClient.SubscribeAsync(options, CancellationToken.None);
+        await timeout.ApplyAsync(cancellationToken =>
+        {
+            var options =
+                mqttFactory.CreateSubscribeOptionsBuilder()
+                           .WithTopicFilter(ChariottRpcClient.ResponseWildcardTopic)
+                           .Build();
+            return mqttClient.SubscribeAsync(options, cancellationToken);
+        });
 
         var jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
 
@@ -76,7 +84,7 @@ static async Task<int> Main(ProgramArguments args)
                         }
                         case { CmdPing: true }:
                         {
-                            await mqttClient.PingAsync();
+                            await timeout.ApplyAsync(mqttClient.PingAsync);
                             Console.WriteLine("Pong!");
                             break;
                         }
@@ -151,10 +159,11 @@ static async Task<int> Main(ProgramArguments args)
 
             if (request is { } someRequest)
             {
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
                 try
                 {
-                    var response = await rpcClient.ExecuteAsync(session.Vin, someRequest, cts.Token);
+                    var response = await timeout.ApplyAsync(cancellationToken =>
+                        rpcClient.ExecuteAsync(session.Vin, someRequest, cancellationToken));
+
                     using var sw = new StringWriter();
                     JsonFormatter.Default.Format(response, sw);
                     var json = sw.ToString();
@@ -168,7 +177,8 @@ static async Task<int> Main(ProgramArguments args)
             }
         }
 
-        await mqttClient.DisconnectAsync(mqttFactory.CreateClientDisconnectOptionsBuilder().Build(), CancellationToken.None);
+        await timeout.ApplyAsync(cancellationToken =>
+            mqttClient.DisconnectAsync(mqttFactory.CreateClientDisconnectOptionsBuilder().Build(), cancellationToken));
 
         return 0;
     }
@@ -345,7 +355,7 @@ partial class ProgramArguments
         Car Bridge Cloud Application
 
         Usage:
-            $ [--broker=<host>] [--vin=<vin>]
+            $ [--broker=<host>] [--vin=<vin>] [--timeout=<sec>]
             $ (-h | --help)
             $ --version
 
@@ -354,6 +364,7 @@ partial class ProgramArguments
             --version        Show version.
             --broker=<host>  MQTT broker address [default: localhost].
             --vin=<vin>      VIN umber [default: 1]
+            --timeout=<sec>  Timeout in seconds [default: 5]
         """;
 
     public static Task<int> ParseToMain(string[] args, Func<ProgramArguments, Task<int>> main)
@@ -371,8 +382,25 @@ partial class ProgramArguments
     }
 }
 
+readonly record struct Timeout(TimeSpan Duration);
+
 static class Extensions
 {
+    public static Task ApplyAsync(this Timeout timeout, Func<CancellationToken, Task> function) =>
+        timeout.ApplyAsync(async cancellationToken =>
+        {
+            await function(cancellationToken);
+            return 0;
+        });
+
+    public static async Task<T> ApplyAsync<T>(this Timeout timeout, Func<CancellationToken, Task<T>> function)
+    {
+        using var cts = timeout is { Duration: var delay } && delay >= TimeSpan.Zero
+            ? new CancellationTokenSource(delay)
+            : null;
+        return await function(cts?.Token ?? CancellationToken.None);
+    }
+
     public static T Dump<T>(this T value, TextWriter? output = null)
     {
         var json = JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented = true });
