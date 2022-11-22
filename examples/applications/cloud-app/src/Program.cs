@@ -69,7 +69,8 @@ static async Task<int> Main(ProgramArguments args)
                                                "events");
 
         const string eventsFileExtension = ".cjson"; // https://en.wikipedia.org/wiki/JSON_streaming#Concatenated_JSON
-        var eventFilesDirPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), $".{binName}", "events" + eventsFileExtension);
+        var eventFilesDirPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), $".{binName}", "events");
+        Directory.CreateDirectory(eventFilesDirPath);
 
         var oldDate = DateTime.Today.AddDays(-30);
         var oldEventsFiles =
