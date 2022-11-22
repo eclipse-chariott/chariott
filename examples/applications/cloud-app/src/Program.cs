@@ -3,28 +3,28 @@
 
 using System;
 using System.Collections.Generic;
+using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Chariott.Common.V1;
 using Chariott.Runtime.V1;
+using Chariott.Streaming.V1;
 using DocoptNet;
 using Google.Protobuf;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Formatter;
-using MoreEnumerable = MoreLinq.MoreEnumerable;
-using static MoreLinq.Extensions.RepeatExtension;
-using static MoreLinq.Extensions.EvaluateExtension;
-using System.CommandLine.Parsing;
-using System.Text;
-using Chariott.Streaming.V1;
 using MQTTnet.Protocol;
+using static MoreLinq.Extensions.EvaluateExtension;
+using static MoreLinq.Extensions.RepeatExtension;
+using MoreEnumerable = MoreLinq.MoreEnumerable;
 
 return await ProgramArguments.ParseToMain(args, Main);
 
