@@ -22,6 +22,7 @@ using MoreEnumerable = MoreLinq.MoreEnumerable;
 using static MoreLinq.Extensions.RepeatExtension;
 using static MoreLinq.Extensions.EvaluateExtension;
 using System.CommandLine.Parsing;
+using System.Text;
 using Chariott.Streaming.V1;
 using MQTTnet.Protocol;
 
@@ -83,6 +84,8 @@ static async Task<int> Main(ProgramArguments args)
             file.Delete();
 
         var eventsFilePath = Path.Join(eventFilesDirPath, eventsChannelId.Replace('/', '=') + eventsFileExtension);
+        var eventsFileReadPosition = 0L;
+        var eventsFileLock = new SemaphoreSlim(1);
 
         mqttClient.ApplicationMessageReceivedAsync += async args =>
         {
@@ -91,7 +94,15 @@ static async Task<int> Main(ProgramArguments args)
 
             var @event = Event.Parser.ParseFrom(args.ApplicationMessage.Payload);
             var json = @event.ToJsonEncoding(jsonSerializerOptions) + Environment.NewLine;
-            await File.AppendAllTextAsync(eventsFilePath, json);
+            await eventsFileLock.WaitAsync();
+            try
+            {
+                await File.AppendAllTextAsync(eventsFilePath, json);
+            }
+            finally
+            {
+                eventsFileLock.Release();
+            }
         };
 
         await timeout.ApplyAsync(cancellationToken =>
@@ -148,6 +159,37 @@ static async Task<int> Main(ProgramArguments args)
                             var topics = ChariottRpcClient.GetTopics(session.Vin);
                             Console.WriteLine($"req {topics.Request}");
                             Console.WriteLine($"rsp {topics.Response}");
+                            break;
+                        }
+                        case { CmdShow: true, CmdNew: true, CmdEvents: true }:
+                        {
+                            if (!File.Exists(eventsFilePath))
+                            {
+                                Console.Error.WriteLine("No events so far! Did you forget to subscribe?");
+                                break;
+                            }
+
+                            try
+                            {
+                                await eventsFileLock.WaitAsync(TimeSpan.FromSeconds(5));
+                                try
+                                {
+                                    await using var stream = File.OpenRead(eventsFilePath);
+                                    stream.Position = eventsFileReadPosition;
+                                    using var reader = new StreamReader(stream, Encoding.UTF8);
+                                    while (await reader.ReadLineAsync() is { } fileLine)
+                                        Console.WriteLine(fileLine);
+                                    eventsFileReadPosition = stream.Position;
+                                }
+                                finally
+                                {
+                                    eventsFileLock.Release();
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.Error.WriteLine(ex);
+                            }
                             break;
                         }
                         case { CmdInspect: true, ArgNamespace: var ns, ArgQuery: var query }:
@@ -394,6 +436,7 @@ partial class PromptArguments
         $ invoke <namespace> <command> [<arg>...]
         $ subscribe <namespace> <source>...
         $ show topics
+        $ show new events
         $ show (req | request | rsp | response)
         $ (quit | exit)
         $ help
