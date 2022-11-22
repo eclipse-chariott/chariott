@@ -32,13 +32,13 @@ pub enum Action {
 }
 
 /// Tracks the active subscriptions for each target.
-pub struct Streaming {
+pub struct SubscriptionState {
     sources_by_namespace: HashMap<Namespace, HashSet<Source>>,
     links: HashSet<(Namespace, Topic)>,
     routes: HashSet<(Namespace, Topic, Source)>,
 }
 
-impl Streaming {
+impl SubscriptionState {
     pub fn new() -> Self {
         Self { sources_by_namespace: HashMap::new(), links: HashSet::new(), routes: HashSet::new() }
     }
