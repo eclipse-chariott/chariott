@@ -109,11 +109,11 @@ impl SubscriptionState {
 type Ess = EventSubSystem<Topic, Source, Event, Event>;
 
 /// Tracks `EventProvider` instances by namespace.
-pub struct ProviderEvents {
-    event_provider_by_namespace: HashMap<Namespace, EventProvider>,
+pub struct ProviderRegistry {
+    event_provider_by_namespace: HashMap<Namespace, Provider>,
 }
 
-impl ProviderEvents {
+impl ProviderRegistry {
     pub fn new() -> Self {
         Self { event_provider_by_namespace: HashMap::new() }
     }
@@ -124,18 +124,18 @@ impl ProviderEvents {
         namespace: Namespace,
     ) -> Result<(), Error> {
         if let Entry::Vacant(e) = self.event_provider_by_namespace.entry(namespace.clone()) {
-            let event_provider = EventProvider::listen(chariott, namespace).await?;
+            let event_provider = Provider::listen(chariott, namespace).await?;
             e.insert(event_provider);
         }
 
         Ok(())
     }
 
-    pub fn get_event_provider(&self, namespace: &Namespace) -> Option<&EventProvider> {
+    pub fn get_event_provider(&self, namespace: &Namespace) -> Option<&Provider> {
         self.event_provider_by_namespace.get(namespace)
     }
 
-    pub fn get_event_provider_mut(&mut self, namespace: &Namespace) -> Option<&mut EventProvider> {
+    pub fn get_event_provider_mut(&mut self, namespace: &Namespace) -> Option<&mut Provider> {
         self.event_provider_by_namespace.get_mut(namespace)
     }
 }
@@ -143,12 +143,12 @@ impl ProviderEvents {
 /// Represents events coming from a given provider, identified by its namespace.
 /// The components allows distributing events coming from the provider to
 /// multiple consumers.
-pub struct EventProvider {
+pub struct Provider {
     channel_id: String,
     ess: Arc<Ess>,
 }
 
-impl EventProvider {
+impl Provider {
     /// Create a new instance by starting to listen to events coming from a
     /// provider.
     pub async fn listen(

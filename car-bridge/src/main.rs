@@ -17,7 +17,7 @@ use examples_common::chariott::api::Chariott;
 use messaging::{MqttMessaging, Publisher, Subscriber};
 use paho_mqtt::{Message as MqttMessage, MessageBuilder, Properties, PropertyCode, QOS_1, QOS_2};
 use prost::Message;
-use streaming::{Action, ProviderEvents, SubscriptionState};
+use streaming::{Action, ProviderRegistry, SubscriptionState};
 use tokio::{
     select, spawn,
     sync::{
@@ -50,7 +50,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let chariott = GrpcChariott::connect().await?;
     let subscription_state = Arc::new(Mutex::new(SubscriptionState::new()));
-    let provider_events = Arc::new(Mutex::new(ProviderEvents::new()));
+    let provider_registry = Arc::new(Mutex::new(ProviderRegistry::new()));
 
     let mut client = MqttMessaging::connect(vin.to_owned()).await?;
     let mut messages = client.subscribe(format!("c2d/{vin}")).await?;
@@ -96,10 +96,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let mut chariott = chariott.clone();
                 let response_sender = response_sender.clone();
                 let subscription_state = Arc::clone(&subscription_state);
-                let provider_events = Arc::clone(&provider_events);
+                let provider_registry = Arc::clone(&provider_registry);
 
                 spawn(async move {
-                    handle_message(&mut chariott, response_sender, subscription_state, provider_events, message).await;
+                    handle_message(&mut chariott, response_sender, subscription_state, provider_registry, message).await;
                 });
             }
             _ = cancellation_token.cancelled() => {
@@ -118,14 +118,14 @@ async fn handle_message(
     chariott: &mut impl ChariottCommunication,
     response_sender: Sender<(String, MessageBuilder)>,
     subscription_state: Arc<Mutex<SubscriptionState>>,
-    provider_events: Arc<Mutex<ProviderEvents>>,
+    provider_registry: Arc<Mutex<ProviderRegistry>>,
     message: MqttMessage,
 ) {
     async fn inner(
         chariott: &mut impl ChariottCommunication,
         response_sender: Sender<(String, MessageBuilder)>,
         subscription_state: Arc<Mutex<SubscriptionState>>,
-        provider_events: Arc<Mutex<ProviderEvents>>,
+        provider_registry: Arc<Mutex<ProviderRegistry>>,
         message: MqttMessage,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let correlation_data = message
@@ -162,7 +162,7 @@ async fn handle_message(
                         source.clone(),
                         subscribe_intent.channel_id.clone(),
                     ) {
-                        let mut provider_events = provider_events.lock().await;
+                        let mut provider_events = provider_registry.lock().await;
 
                         match action.clone() {
                             Action::Listen(namespace) => {
@@ -253,7 +253,7 @@ async fn handle_message(
     }
 
     if let Err(e) =
-        inner(chariott, response_sender, subscription_state, provider_events, message).await
+        inner(chariott, response_sender, subscription_state, provider_registry, message).await
     {
         error!("Error when handling message: '{e:?}'.");
     }
