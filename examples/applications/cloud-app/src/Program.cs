@@ -23,6 +23,7 @@ using static MoreLinq.Extensions.RepeatExtension;
 using static MoreLinq.Extensions.EvaluateExtension;
 using System.CommandLine.Parsing;
 using Chariott.Streaming.V1;
+using MQTTnet.Protocol;
 
 return await ProgramArguments.ParseToMain(args, Main);
 
@@ -364,6 +365,7 @@ sealed class ChariottRpcClient : IDisposable
                            .WithPayload(request.ToByteArray())
                            .WithCorrelationData(id.ToByteArray())
                            .WithResponseTopic(topics.Response)
+                           .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                            .Build();
 
                 await client.PublishAsync(message, cancellationToken);
