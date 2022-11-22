@@ -437,7 +437,6 @@ partial class PromptArguments
         $ subscribe <namespace> <source>...
         $ show topics
         $ show new events
-        $ show (req | request | rsp | response)
         $ (quit | exit)
         $ help
     """;
