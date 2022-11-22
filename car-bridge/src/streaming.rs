@@ -6,7 +6,7 @@ use std::{
 use chariott_common::{chariott_api::ChariottCommunication, error::Error};
 use chariott_proto::streaming::Event;
 use ess::{EventSubSystem, NotReadingEvents, Subscription as EssSubscription};
-use examples_common::chariott::api::{Chariott, ChariottCommunicationExt as _};
+use examples_common::chariott::api::ChariottCommunicationExt as _;
 use futures::Stream;
 use tokio::spawn;
 use tokio_stream::StreamExt as _;
@@ -121,7 +121,6 @@ impl ProviderEvents {
 
 pub struct EventProvider {
     channel_id: String,
-    namespace: Namespace,
     ess: Arc<Ess>,
 }
 
@@ -151,7 +150,7 @@ impl EventProvider {
             });
         }
 
-        Ok(Self { namespace, ess, channel_id })
+        Ok(Self { ess, channel_id })
     }
 
     pub fn link(&self, topic: Topic) -> impl Stream<Item = Event> {
@@ -168,13 +167,7 @@ impl EventProvider {
         Ok(subscriptions.into_iter().next().unwrap())
     }
 
-    pub async fn subscribe(
-        &mut self,
-        chariott: &mut impl Chariott,
-        source: String,
-    ) -> Result<(), Error> {
-        chariott
-            .subscribe(self.namespace.clone(), self.channel_id.clone(), vec![source.into()])
-            .await
+    pub fn channel_id(&self) -> &str {
+        &self.channel_id
     }
 }

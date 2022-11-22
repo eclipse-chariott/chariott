@@ -13,6 +13,7 @@ use chariott_proto::{
     common::{FulfillmentEnum, FulfillmentMessage, IntentEnum, SubscribeFulfillment},
     runtime::{FulfillRequest, FulfillResponse},
 };
+use examples_common::chariott::api::Chariott;
 use messaging::{MqttMessaging, Publisher, Subscriber};
 use paho_mqtt::{Message as MqttMessage, MessageBuilder, Properties, PropertyCode, QOS_1, QOS_2};
 use prost::Message;
@@ -178,12 +179,16 @@ async fn handle_message(
                                 .await?;
                         }
                         Action::Subscribe(namespace, source) => {
-                            provider_events
+                            let channel_id = provider_events
                                 .lock()
                                 .await
                                 .get_event_provider_mut(&namespace)
                                 .unwrap()
-                                .subscribe(chariott, source)
+                                .channel_id()
+                                .to_owned();
+
+                            chariott
+                                .subscribe(namespace.clone(), channel_id, vec![source.into()])
                                 .await?;
                         }
                         Action::Link(namespace, topic) => {
