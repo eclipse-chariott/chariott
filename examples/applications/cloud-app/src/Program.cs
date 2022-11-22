@@ -87,17 +87,19 @@ static async Task<int> Main(ProgramArguments args)
         var eventsFileReadPosition = 0L;
         var eventsFileLock = new SemaphoreSlim(1);
 
+        var prettyPrintEventsJson = args.OptPrettyEvents;
+
         mqttClient.ApplicationMessageReceivedAsync += async args =>
         {
             if (args.ApplicationMessage.Topic != eventsChannelId)
                 return;
 
             var @event = Event.Parser.ParseFrom(args.ApplicationMessage.Payload);
-            var json = @event.ToJsonEncoding(jsonSerializerOptions) + Environment.NewLine;
+            var json = @event.ToJsonEncoding(prettyPrintEventsJson ? jsonSerializerOptions : null);
             await eventsFileLock.WaitAsync();
             try
             {
-                await File.AppendAllTextAsync(eventsFilePath, json);
+                await File.AppendAllTextAsync(eventsFilePath, json + Environment.NewLine);
             }
             finally
             {
@@ -457,7 +459,7 @@ partial class ProgramArguments
         Car Bridge Cloud Application
 
         Usage:
-            $ [--broker=<host>] [--vin=<vin>] [--timeout=<sec>]
+            $ [--broker=<host>] [--vin=<vin>] [--timeout=<sec>] [--pretty-events]
             $ (-h | --help)
             $ --version
 
@@ -467,6 +469,7 @@ partial class ProgramArguments
             --broker=<host>  MQTT broker address [default: localhost].
             --vin=<vin>      VIN umber [default: 1]
             --timeout=<sec>  Timeout in seconds [default: 5]
+            --pretty-events  Pretty print events JSON.
         """;
 
     public static Task<int> ParseToMain(string[] args, Func<ProgramArguments, Task<int>> main)
