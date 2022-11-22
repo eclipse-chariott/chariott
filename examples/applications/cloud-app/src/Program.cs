@@ -516,12 +516,4 @@ static class Extensions
             : null;
         return await function(cts?.Token ?? CancellationToken.None);
     }
-
-    public static T Dump<T>(this T value, TextWriter? output = null)
-    {
-        var json = JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented = true });
-        output ??= Console.Error;
-        output.WriteLine($"[{value?.GetType().Name}]:{Environment.NewLine}{json}");
-        return value;
-    }
 }
