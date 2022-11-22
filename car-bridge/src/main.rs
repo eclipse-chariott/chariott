@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+use std::sync::Arc;
+
 use chariott_common::{
     chariott_api::{ChariottCommunication, GrpcChariott},
     config::env,
@@ -52,6 +54,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let cancellation_token = cancellation_token.child_token();
         spawn(async move {
+            let client = Arc::new(client);
+
             loop {
                 select! {
                     message = response_receiver.recv() => {
@@ -60,8 +64,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             break;
                         };
 
-                        if let Err(e) = client.publish(topic, message).await {
-                            error!("Error when publishing message: '{:?}'.", e);
+                        {
+                            let client = Arc::clone(&client);
+
+                            spawn(async move {
+                                if let Err(e) = client.publish(topic, message).await {
+                                    error!("Error when publishing message: '{:?}'.", e);
+                                }
+                            });
                         }
                     }
                     _ = cancellation_token.cancelled() => {
@@ -140,7 +150,10 @@ async fn handle_message(
 
         let mut properties = Properties::new();
         properties.push_binary(PropertyCode::CorrelationData, correlation_data)?;
-        properties.push_string(PropertyCode::ContentType, "chariott.runtime.v1.FulfillResponse")?;
+        properties.push_string(
+            PropertyCode::ContentType,
+            "application/x-proto+chariott.common.v1.FulfillResponse",
+        )?;
 
         response_sender
             .send((
