@@ -81,7 +81,7 @@ static async Task<int> Main(ProgramArguments args)
         foreach (var file in oldEventsFiles)
             file.Delete();
 
-        var eventsFilePath = Path.Join(eventFilesDirPath, eventsChannelId.Replace('/', '='));
+        var eventsFilePath = Path.Join(eventFilesDirPath, eventsChannelId.Replace('/', '=') + eventsFileExtension);
 
         mqttClient.ApplicationMessageReceivedAsync += async args =>
         {
