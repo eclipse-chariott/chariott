@@ -86,7 +86,7 @@ impl Streaming {
     }
 }
 
-type Ess = EventSubSystem<Topic, String, Event, Event>;
+type Ess = EventSubSystem<Topic, Source, Event, Event>;
 
 pub struct ProviderEvents {
     event_provider_by_namespace: HashMap<Namespace, EventProvider>,
@@ -163,7 +163,7 @@ impl EventProvider {
         &self,
         topic: Topic,
         source: Source,
-    ) -> Result<EssSubscription<Topic, String, Event, Event>, NotReadingEvents> {
+    ) -> Result<EssSubscription<Topic, Source, Event, Event>, NotReadingEvents> {
         let subscriptions = self.ess.register_subscriptions(topic, vec![source])?;
         Ok(subscriptions.into_iter().next().unwrap())
     }
