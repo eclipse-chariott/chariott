@@ -26,272 +26,272 @@ using static MoreLinq.Extensions.EvaluateExtension;
 using static MoreLinq.Extensions.RepeatExtension;
 using MoreEnumerable = MoreLinq.MoreEnumerable;
 
-return await ProgramArguments.ParseToMain(args, Main);
+try
+{
+    return await ProgramArguments.ParseToMain(args, Main);
+}
+catch (Exception ex)
+{
+    Console.Error.WriteLine(ex);
+    return 1;
+}
 
 static async Task<int> Main(ProgramArguments args)
 {
     var jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
     var utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
 
-    try
+    var timeout = new Timeout(TimeSpan.FromSeconds(int.Parse(args.OptTimeout, NumberStyles.None, CultureInfo.InvariantCulture)));
+
+    var mqttFactory = new MqttFactory();
+    using var mqttClient = mqttFactory.CreateMqttClient();
+
+    await timeout.ApplyAsync(cancellationToken =>
     {
-        var timeout = new Timeout(TimeSpan.FromSeconds(int.Parse(args.OptTimeout, NumberStyles.None, CultureInfo.InvariantCulture)));
+        var options =
+            mqttFactory.CreateClientOptionsBuilder()
+                       .WithTcpServer(args.OptBroker)
+                       .WithProtocolVersion(MqttProtocolVersion.V500)
+                       .Build();
+        return mqttClient.ConnectAsync(options, cancellationToken);
+    });
 
-        var mqttFactory = new MqttFactory();
-        using var mqttClient = mqttFactory.CreateMqttClient();
+    Console.Error.WriteLine("The MQTT client is connected.");
 
-        await timeout.ApplyAsync(cancellationToken =>
+    var rpcClient = new ChariottRpcClient(mqttFactory, mqttClient);
+
+    await timeout.ApplyAsync(cancellationToken =>
+    {
+        var options =
+            mqttFactory.CreateSubscribeOptionsBuilder()
+                       .WithTopicFilter(ChariottRpcClient.ResponseWildcardTopic)
+                       .Build();
+        return mqttClient.SubscribeAsync(options, cancellationToken);
+    });
+
+    var binName = Path.GetFileNameWithoutExtension(Environment.ProcessPath);
+
+    var eventsChannelId = string.Join("/", Environment.MachineName,
+                                           binName,
+                                           Environment.ProcessId,
+                                           "events");
+
+    const string eventsFileExtension = ".cjson"; // https://en.wikipedia.org/wiki/JSON_streaming#Concatenated_JSON
+    var eventFilesDirPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), $".{binName}", "events");
+    Directory.CreateDirectory(eventFilesDirPath);
+
+    var oldDate = DateTime.Today.AddDays(-30);
+    var oldEventsFiles =
+        from f in new DirectoryInfo(eventFilesDirPath).EnumerateFiles("*" + eventsFileExtension, new EnumerationOptions())
+        where f.CreationTime.Date < oldDate
+        select f;
+
+    foreach (var file in oldEventsFiles)
+        file.Delete();
+
+    var eventsFilePath = Path.Join(eventFilesDirPath, eventsChannelId.Replace('/', '=') + eventsFileExtension);
+    var eventsFileReadPosition = 0L;
+    var eventsFileLock = new SemaphoreSlim(1);
+
+    var prettyPrintEventsJson = args.OptPrettyEvents;
+
+    mqttClient.ApplicationMessageReceivedAsync += async args =>
+    {
+        if (args.ApplicationMessage.Topic != eventsChannelId)
+            return;
+
+        var @event = Event.Parser.ParseFrom(args.ApplicationMessage.Payload);
+        var json = @event.ToJsonEncoding(prettyPrintEventsJson ? jsonSerializerOptions : null);
+        await eventsFileLock.WaitAsync();
+        try
         {
-            var options =
-                mqttFactory.CreateClientOptionsBuilder()
-                           .WithTcpServer(args.OptBroker)
-                           .WithProtocolVersion(MqttProtocolVersion.V500)
-                           .Build();
-            return mqttClient.ConnectAsync(options, cancellationToken);
-        });
-
-        Console.Error.WriteLine("The MQTT client is connected.");
-
-        var rpcClient = new ChariottRpcClient(mqttFactory, mqttClient);
-
-        await timeout.ApplyAsync(cancellationToken =>
+            await using var stream = File.Open(eventsFilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
+            await using var writer = new StreamWriter(stream, utf8);
+            await writer.WriteLineAsync(json);
+        }
+        finally
         {
-            var options =
-                mqttFactory.CreateSubscribeOptionsBuilder()
-                           .WithTopicFilter(ChariottRpcClient.ResponseWildcardTopic)
-                           .Build();
-            return mqttClient.SubscribeAsync(options, cancellationToken);
-        });
+            eventsFileLock.Release();
+        }
+    };
 
-        var binName = Path.GetFileNameWithoutExtension(Environment.ProcessPath);
+    await timeout.ApplyAsync(cancellationToken =>
+    {
+        var options =
+            mqttFactory.CreateSubscribeOptionsBuilder()
+                       .WithTopicFilter(eventsChannelId)
+                       .Build();
+        return mqttClient.SubscribeAsync(options, cancellationToken);
+    });
 
-        var eventsChannelId = string.Join("/", Environment.MachineName,
-                                               binName,
-                                               Environment.ProcessId,
-                                               "events");
+    var isFirstSubscription = true;
+    var session = new Session { Vin = new(args.OptVin) };
 
-        const string eventsFileExtension = ".cjson"; // https://en.wikipedia.org/wiki/JSON_streaming#Concatenated_JSON
-        var eventFilesDirPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), $".{binName}", "events");
-        Directory.CreateDirectory(eventFilesDirPath);
-
-        var oldDate = DateTime.Today.AddDays(-30);
-        var oldEventsFiles =
-            from f in new DirectoryInfo(eventFilesDirPath).EnumerateFiles("*" + eventsFileExtension, new EnumerationOptions())
-            where f.CreationTime.Date < oldDate
-            select f;
-
-        foreach (var file in oldEventsFiles)
-            file.Delete();
-
-        var eventsFilePath = Path.Join(eventFilesDirPath, eventsChannelId.Replace('/', '=') + eventsFileExtension);
-        var eventsFileReadPosition = 0L;
-        var eventsFileLock = new SemaphoreSlim(1);
-
-        var prettyPrintEventsJson = args.OptPrettyEvents;
-
-        mqttClient.ApplicationMessageReceivedAsync += async args =>
+    var quit = false;
+    while (!quit && Console.ReadLine() is { } line)
+    {
+        FulfillRequest? request = null;
+        switch (PromptArguments.CreateParser().Parse(CommandLineStringSplitter.Instance.Split(line)))
         {
-            if (args.ApplicationMessage.Topic != eventsChannelId)
-                return;
-
-            var @event = Event.Parser.ParseFrom(args.ApplicationMessage.Payload);
-            var json = @event.ToJsonEncoding(prettyPrintEventsJson ? jsonSerializerOptions : null);
-            await eventsFileLock.WaitAsync();
-            try
+            case IArgumentsResult<PromptArguments> { Arguments: var promptArgs }:
             {
-                await using var stream = File.Open(eventsFilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
-                await using var writer = new StreamWriter(stream, utf8);
-                await writer.WriteLineAsync(json);
-            }
-            finally
-            {
-                eventsFileLock.Release();
-            }
-        };
-
-        await timeout.ApplyAsync(cancellationToken =>
-        {
-            var options =
-                mqttFactory.CreateSubscribeOptionsBuilder()
-                           .WithTopicFilter(eventsChannelId)
-                           .Build();
-            return mqttClient.SubscribeAsync(options, cancellationToken);
-        });
-
-        var isFirstSubscription = true;
-        var session = new Session { Vin = new(args.OptVin) };
-
-        var quit = false;
-        while (!quit && Console.ReadLine() is { } line)
-        {
-            FulfillRequest? request = null;
-            switch (PromptArguments.CreateParser().Parse(CommandLineStringSplitter.Instance.Split(line)))
-            {
-                case IArgumentsResult<PromptArguments> { Arguments: var promptArgs }:
+                switch (promptArgs)
                 {
-                    switch (promptArgs)
+                    case { CmdQuit: true } or { CmdExit: true }:
                     {
-                        case { CmdQuit: true } or { CmdExit: true }:
+                        quit = true;
+                        break;
+                    }
+                    case { CmdHelp: true }:
+                    {
+                        PromptArguments.PrintUsage(Console.Out);
+                        break;
+                    }
+                    case { CmdPing: true }:
+                    {
+                        await timeout.ApplyAsync(mqttClient.PingAsync);
+                        Console.WriteLine("Pong!");
+                        break;
+                    }
+                    case { CmdGet: true, CmdVin: true }:
+                    {
+                        Console.WriteLine(session.Vin);
+                        break;
+                    }
+                    case { CmdSet: true, CmdVin: true, ArgVin: var vin }:
+                    {
+                        Debug.Assert(vin is not null);
+                        session = session with { Vin = new(vin) };
+                        break;
+                    }
+                    case { CmdShow: true, CmdTopics: true }:
+                    {
+                        var topics = ChariottRpcClient.GetTopics(session.Vin);
+                        Console.WriteLine($"req {topics.Request}");
+                        Console.WriteLine($"rsp {topics.Response}");
+                        break;
+                    }
+                    case { CmdShow: true, CmdNew: true, CmdEvents: true }:
+                    {
+                        if (!File.Exists(eventsFilePath))
                         {
-                            quit = true;
+                            Console.Error.WriteLine("No events so far! Did you forget to subscribe?");
                             break;
                         }
-                        case { CmdHelp: true }:
-                        {
-                            PromptArguments.PrintUsage(Console.Out);
-                            break;
-                        }
-                        case { CmdPing: true }:
-                        {
-                            await timeout.ApplyAsync(mqttClient.PingAsync);
-                            Console.WriteLine("Pong!");
-                            break;
-                        }
-                        case { CmdGet: true, CmdVin: true }:
-                        {
-                            Console.WriteLine(session.Vin);
-                            break;
-                        }
-                        case { CmdSet: true, CmdVin: true, ArgVin: var vin }:
-                        {
-                            Debug.Assert(vin is not null);
-                            session = session with { Vin = new(vin) };
-                            break;
-                        }
-                        case { CmdShow: true, CmdTopics: true }:
-                        {
-                            var topics = ChariottRpcClient.GetTopics(session.Vin);
-                            Console.WriteLine($"req {topics.Request}");
-                            Console.WriteLine($"rsp {topics.Response}");
-                            break;
-                        }
-                        case { CmdShow: true, CmdNew: true, CmdEvents: true }:
-                        {
-                            if (!File.Exists(eventsFilePath))
-                            {
-                                Console.Error.WriteLine("No events so far! Did you forget to subscribe?");
-                                break;
-                            }
 
+                        try
+                        {
+                            await eventsFileLock.WaitAsync(TimeSpan.FromSeconds(5));
                             try
                             {
-                                await eventsFileLock.WaitAsync(TimeSpan.FromSeconds(5));
-                                try
-                                {
-                                    await using var stream = File.OpenRead(eventsFilePath);
-                                    stream.Position = eventsFileReadPosition;
-                                    using var reader = new StreamReader(stream, utf8);
-                                    while (await reader.ReadLineAsync() is { } fileLine)
-                                        Console.WriteLine(fileLine);
-                                    eventsFileReadPosition = stream.Position;
-                                }
-                                finally
-                                {
-                                    eventsFileLock.Release();
-                                }
+                                await using var stream = File.OpenRead(eventsFilePath);
+                                stream.Position = eventsFileReadPosition;
+                                using var reader = new StreamReader(stream, utf8);
+                                while (await reader.ReadLineAsync() is { } fileLine)
+                                    Console.WriteLine(fileLine);
+                                eventsFileReadPosition = stream.Position;
                             }
-                            catch (Exception ex)
+                            finally
                             {
-                                Console.Error.WriteLine(ex);
+                                eventsFileLock.Release();
                             }
-                            break;
                         }
-                        case { CmdInspect: true, ArgNamespace: var ns, ArgQuery: var query }:
+                        catch (Exception ex)
                         {
-                            Debug.Assert(ns is not null);
-
-                            request = FulfillRequest(ns, fi => fi.Inspect = new() { Query = query });
-                            break;
+                            Console.Error.WriteLine(ex);
                         }
-                        case { CmdRead: true, ArgNamespace: var ns, ArgKey: var key }:
-                        {
-                            Debug.Assert(ns is not null);
-
-                            request = FulfillRequest(ns, fi => fi.Read = new() { Key = key });
-                            break;
-                        }
-                        case { CmdWrite: true, ArgNamespace: var ns, ArgKey: var key, ArgValue: var value }:
-                        {
-                            Debug.Assert(ns is not null);
-                            Debug.Assert(value is not null);
-
-                            request = FulfillRequest(ns, fi => fi.Write = new() { Key = key,  Value = ParseValue(value) });
-                            break;
-                        }
-                        case { CmdInvoke: true, ArgNamespace: var ns, ArgCommand: var cmd, ArgArg: var cmdArgs }:
-                        {
-                            Debug.Assert(ns is not null);
-                            Debug.Assert(cmdArgs is not null);
-
-                            request = FulfillRequest(ns, fi =>
-                            {
-                                var invokeIntent = new InvokeIntent { Command = cmd };
-                                invokeIntent.Args.AddRange(from arg in cmdArgs select ParseValue(arg));
-                                fi.Invoke = invokeIntent;
-                            });
-                            break;
-                        }
-                        case { CmdSubscribe: true, ArgNamespace: var ns, ArgSource: var sources }:
-                        {
-                            Debug.Assert(ns is not null);
-
-                            request = FulfillRequest(ns, fi =>
-                            {
-                                var subscribeIntent = new SubscribeIntent { ChannelId = eventsChannelId };
-                                subscribeIntent.Sources.AddRange(sources);
-                                fi.Subscribe = subscribeIntent;
-                            });
-
-                            if (isFirstSubscription)
-                            {
-                                Console.Error.WriteLine($"The events channel identifier is: {eventsChannelId}");
-                                Console.Error.WriteLine(eventsFilePath);
-                                isFirstSubscription = false;
-                            }
-                            break;
-                        }
-                        default:
-                        {
-                            Console.Error.WriteLine("Sorry, but this has not yet been implemented.");
-                            break;
-                        }
+                        break;
                     }
-                    break;
+                    case { CmdInspect: true, ArgNamespace: var ns, ArgQuery: var query }:
+                    {
+                        Debug.Assert(ns is not null);
+
+                        request = FulfillRequest(ns, fi => fi.Inspect = new() { Query = query });
+                        break;
+                    }
+                    case { CmdRead: true, ArgNamespace: var ns, ArgKey: var key }:
+                    {
+                        Debug.Assert(ns is not null);
+
+                        request = FulfillRequest(ns, fi => fi.Read = new() { Key = key });
+                        break;
+                    }
+                    case { CmdWrite: true, ArgNamespace: var ns, ArgKey: var key, ArgValue: var value }:
+                    {
+                        Debug.Assert(ns is not null);
+                        Debug.Assert(value is not null);
+
+                        request = FulfillRequest(ns, fi => fi.Write = new() { Key = key,  Value = ParseValue(value) });
+                        break;
+                    }
+                    case { CmdInvoke: true, ArgNamespace: var ns, ArgCommand: var cmd, ArgArg: var cmdArgs }:
+                    {
+                        Debug.Assert(ns is not null);
+                        Debug.Assert(cmdArgs is not null);
+
+                        request = FulfillRequest(ns, fi =>
+                        {
+                            var invokeIntent = new InvokeIntent { Command = cmd };
+                            invokeIntent.Args.AddRange(from arg in cmdArgs select ParseValue(arg));
+                            fi.Invoke = invokeIntent;
+                        });
+                        break;
+                    }
+                    case { CmdSubscribe: true, ArgNamespace: var ns, ArgSource: var sources }:
+                    {
+                        Debug.Assert(ns is not null);
+
+                        request = FulfillRequest(ns, fi =>
+                        {
+                            var subscribeIntent = new SubscribeIntent { ChannelId = eventsChannelId };
+                            subscribeIntent.Sources.AddRange(sources);
+                            fi.Subscribe = subscribeIntent;
+                        });
+
+                        if (isFirstSubscription)
+                        {
+                            Console.Error.WriteLine($"The events channel identifier is: {eventsChannelId}");
+                            Console.Error.WriteLine(eventsFilePath);
+                            isFirstSubscription = false;
+                        }
+                        break;
+                    }
+                    default:
+                    {
+                        Console.Error.WriteLine("Sorry, but this has not yet been implemented.");
+                        break;
+                    }
                 }
-                case IInputErrorResult:
-                {
-                    Console.Error.WriteLine("Invalid usage. Try one of the following:");
-                    PromptArguments.PrintUsage(Console.Error);
-                    break;
-                }
+                break;
             }
-
-            if (request is { } someRequest)
+            case IInputErrorResult:
             {
-                try
-                {
-                    var response = await timeout.ApplyAsync(cancellationToken =>
-                        rpcClient.ExecuteAsync(session.Vin, someRequest, cancellationToken));
-
-                    Console.WriteLine(response.ToJsonEncoding(jsonSerializerOptions));
-                }
-                catch (OperationCanceledException ex)
-                {
-                    Console.Error.WriteLine(ex.Message);
-                }
+                Console.Error.WriteLine("Invalid usage. Try one of the following:");
+                PromptArguments.PrintUsage(Console.Error);
+                break;
             }
         }
 
-        await timeout.ApplyAsync(cancellationToken =>
-            mqttClient.DisconnectAsync(mqttFactory.CreateClientDisconnectOptionsBuilder().Build(), cancellationToken));
+        if (request is { } someRequest)
+        {
+            try
+            {
+                var response = await timeout.ApplyAsync(cancellationToken =>
+                    rpcClient.ExecuteAsync(session.Vin, someRequest, cancellationToken));
 
-        return 0;
+                Console.WriteLine(response.ToJsonEncoding(jsonSerializerOptions));
+            }
+            catch (OperationCanceledException ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+            }
+        }
     }
-    catch (Exception ex)
-    {
-        Console.Error.WriteLine(ex);
-        return 1;
-    }
+
+    await timeout.ApplyAsync(cancellationToken =>
+        mqttClient.DisconnectAsync(mqttFactory.CreateClientDisconnectOptionsBuilder().Build(), cancellationToken));
+
+    return 0;
 }
 
 static Value ParseValue(string input)
