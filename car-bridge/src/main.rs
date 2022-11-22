@@ -131,7 +131,6 @@ async fn handle_message(
         let response = match intent_enum {
             IntentEnum::Discover(_) => Err(Error::new("Discover is not supported.")),
             IntentEnum::Subscribe(_) => todo!(),
-            IntentEnum::Inspect(_) => Err(Error::new("Something went wrong.")),
             _ => chariott
                 .fulfill(fulfill_request.namespace, intent_enum)
                 .await
