@@ -170,7 +170,7 @@ async fn handle_message(
                     match action.clone() {
                         Action::Listen(namespace) => {
                             provider_events
-                                .register_event_provider(chariott, namespace.clone())
+                                .register_event_provider(chariott, namespace)
                                 .await?;
                         }
                         Action::Subscribe(namespace, source) => {
@@ -181,7 +181,7 @@ async fn handle_message(
                                 .to_owned();
 
                             chariott
-                                .subscribe(namespace.clone(), channel_id, vec![source.into()])
+                                .subscribe(namespace, channel_id, vec![source.into()])
                                 .await?;
                         }
                         Action::Link(namespace, topic) => {
