@@ -462,7 +462,7 @@ partial class ProgramArguments
 
         Usage:
             $ [--broker=<host>] [--vin=<vin>] [--timeout=<sec>] [--pretty-events]
-            $ (-h | --help)
+            $ -h | --help
 
         Options:
             -h --help        Show this screen.
