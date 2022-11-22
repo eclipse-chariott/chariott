@@ -281,7 +281,7 @@ static async Task<int> Main(ProgramArguments args)
 
                 Console.WriteLine(response.ToJsonEncoding(jsonSerializerOptions));
             }
-            catch (OperationCanceledException ex)
+            catch (Exception ex) when (ex is OperationCanceledException or ChariottRpcException)
             {
                 Console.Error.WriteLine(ex.Message);
             }
@@ -386,11 +386,27 @@ sealed class ChariottRpcClient : IDisposable
             {
                 try
                 {
-                    if (args.ApplicationMessage is { Topic: { } topic, CorrelationData: { } correlationData }
+                    var message = args.ApplicationMessage;
+                    if (message is { Topic: { } topic, CorrelationData: { } correlationData }
                         && topic == topics.Response && id == new Guid(correlationData))
                     {
-                        var response = FulfillResponse.Parser.ParseFrom(args.ApplicationMessage.Payload);
-                        taskCompletionSource.TrySetResult(response);
+                        var error = message.UserProperties.FirstOrDefault(p => p.Name is "error");
+                        if (error is { Value: not "0" and not "" })
+                        {
+                            var err =
+                                message.PayloadFormatIndicator == MqttPayloadFormatIndicator.CharacterData
+                                ? Encoding.UTF8.GetString(message.Payload)
+                                : Value.Parser.ParseFrom(message.Payload) is { String: var str }
+                                ? str
+                                : "RPC failed due to an unknown error.";
+
+                            taskCompletionSource.TrySetException(new ChariottRpcException(err));
+                        }
+                        else
+                        {
+                            var response = FulfillResponse.Parser.ParseFrom(message.Payload);
+                            taskCompletionSource.TrySetResult(response);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -424,6 +440,13 @@ sealed class ChariottRpcClient : IDisposable
             }
         }
     }
+}
+
+public class ChariottRpcException : Exception
+{
+    public ChariottRpcException() { }
+    public ChariottRpcException(string? message) : base(message) { }
+    public ChariottRpcException(string? message, Exception? inner) : base(message, inner) { }
 }
 
 [DocoptArguments]
