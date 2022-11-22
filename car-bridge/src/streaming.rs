@@ -4,11 +4,12 @@ use std::{
 };
 
 use chariott_common::{chariott_api::ChariottCommunication, error::Error};
+use chariott_proto::streaming::Event;
 use ess::{EventSubSystem, NotReadingEvents, Subscription as EssSubscription};
-use examples_common::chariott::api::{Chariott, ChariottExt as _, Event};
+use examples_common::chariott::api::{Chariott, ChariottCommunicationExt as _};
 use futures::Stream;
 use tokio::spawn;
-use tokio_stream::StreamExt;
+use tokio_stream::StreamExt as _;
 use tracing::warn;
 
 /// Identifies a namespace
@@ -129,7 +130,7 @@ impl EventProvider {
         chariott: &mut impl ChariottCommunication,
         namespace: Namespace,
     ) -> Result<Self, Error> {
-        let mut stream = chariott.listen(namespace.clone(), vec![]).await?;
+        let (mut stream, channel_id) = chariott.open(namespace.clone()).await?;
 
         let ess = Arc::new(Ess::new());
 
@@ -143,15 +144,14 @@ impl EventProvider {
             spawn(async move {
                 while let Some(event) = stream.next().await {
                     let event = event.unwrap();
-                    ess.publish(event.id.clone().as_ref(), event);
+                    ess.publish(event.source.clone().as_str(), event);
                 }
 
                 warn!("Stream for channel '{namespace}' broke.");
             });
         }
 
-        // TODO: set the channel ID
-        Ok(Self { namespace, ess, channel_id: "asdf".to_owned() })
+        Ok(Self { namespace, ess, channel_id })
     }
 
     pub fn link(&self, topic: Topic) -> impl Stream<Item = Event> {
@@ -174,11 +174,7 @@ impl EventProvider {
         source: String,
     ) -> Result<(), Error> {
         chariott
-            .subscribe(
-                self.namespace.clone(),
-                self.channel_id.clone(),
-                vec![source.as_str().into()],
-            )
+            .subscribe(self.namespace.clone(), self.channel_id.clone(), vec![source.into()])
             .await
     }
 }

@@ -197,18 +197,23 @@ async fn handle_message(
                             let response_sender = response_sender.clone();
 
                             spawn(async move {
-                                while stream.next().await.is_some() {
-                                    // TODO: send real data
-                                    if let Err(e) = response_sender
+                                while let Some(e) = stream.next().await {
+                                    let mut buffer = vec![];
+
+                                    if let Err(err) = e.encode(&mut buffer) {
+                                        warn!("Failed to encode event: '{err:?}'.");
+                                    }
+
+                                    if let Err(err) = response_sender
                                         .send((
                                             topic.clone(),
-                                            MessageBuilder::new().payload(vec![]).qos(QOS_1),
+                                            MessageBuilder::new().payload(buffer).qos(QOS_1),
                                         ))
                                         .await
                                     {
                                         // TODO: handle better.
                                         error!(
-                                            "Failed to publish event to topic '{topic}': '{e:?}'."
+                                            "Failed to publish event to topic '{topic}': '{err:?}'."
                                         );
                                     }
                                 }
