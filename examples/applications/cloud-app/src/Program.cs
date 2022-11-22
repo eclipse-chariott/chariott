@@ -89,7 +89,7 @@ static async Task<int> Main(ProgramArguments args)
                 return;
 
             var @event = Event.Parser.ParseFrom(args.ApplicationMessage.Payload);
-            var json = @event.ToJsonEncoding() + Environment.NewLine;
+            var json = @event.ToJsonEncoding(jsonSerializerOptions) + Environment.NewLine;
             await File.AppendAllTextAsync(eventsFilePath, json);
         };
 
