@@ -1,8 +1,15 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{hash_map::Entry, HashMap, HashSet},
+    sync::Arc,
+};
 
-use chariott_common::error::Error;
+use chariott_common::{chariott_api::ChariottCommunication, error::Error};
 use ess::{EventSubSystem, NotReadingEvents, Subscription as EssSubscription};
-use examples_common::chariott::api::Event;
+use examples_common::chariott::api::{Chariott, ChariottExt as _, Event};
+use futures::Stream;
+use tokio::spawn;
+use tokio_stream::StreamExt;
+use tracing::warn;
 
 /// Identifies a namespace
 type Namespace = String;
@@ -12,107 +19,166 @@ type Topic = String;
 type Source = String;
 
 pub enum Action {
+    /// Open a connection a provider's streaming endpoint.
     Listen(Namespace),
+    /// Subscribe to a certain type of event from a provider.
     Subscribe(Namespace, Source),
+    /// Link a provider to a topic.
     Link(Namespace, Topic),
+    /// Subscribe to an event for a topic link.
+    Route(Namespace, Topic, Source),
 }
 
 /// Tracks the active subscriptions for each target.
 pub struct Streaming {
     sources_by_namespace: HashMap<Namespace, HashSet<Source>>,
     links: HashSet<(Namespace, Topic)>,
+    routes: HashSet<(Namespace, Topic, Source)>,
 }
 
 impl Streaming {
     pub fn new() -> Self {
-        Self { sources_by_namespace: HashMap::new(), links: HashSet::new() }
+        Self { sources_by_namespace: HashMap::new(), links: HashSet::new(), routes: HashSet::new() }
     }
 
     pub fn subscribe(&mut self, namespace: Namespace, source: Source, topic: Topic) -> Vec<Action> {
-        let is_listening = self.sources_by_namespace.contains_key(&namespace);
+        let mut actions = vec![];
 
-        let is_subscribed = self
+        // Check if listening
+        if !self.sources_by_namespace.contains_key(&namespace) {
+            self.sources_by_namespace.insert(namespace.clone(), HashSet::new());
+
+            actions.push(Action::Listen(namespace.clone()));
+        }
+
+        // Check if subscribed
+        if self
             .sources_by_namespace
             .get(&namespace)
             .and_then(|sources| sources.get(&source))
-            .is_some();
+            .is_none()
+        {
+            if let Some(sources) = self.sources_by_namespace.get_mut(&namespace) {
+                sources.insert(source.clone());
+            };
 
-        let link = (namespace.clone(), topic.clone());
-        let is_linked = self.links.contains(&link);
-
-        match (is_listening, is_subscribed, is_linked) {
-            (false, _, _) => {
-                self.sources_by_namespace
-                    .insert(namespace.clone(), HashSet::from([source.clone()]));
-
-                self.links.insert(link);
-
-                vec![
-                    Action::Listen(namespace.clone()),
-                    Action::Subscribe(namespace.clone(), source),
-                    Action::Link(namespace, topic),
-                ]
-            }
-            (true, false, false) => {
-                if let Some(sources) = self.sources_by_namespace.get_mut(&namespace) {
-                    sources.insert(source.clone());
-                };
-
-                self.links.insert(link);
-
-                vec![Action::Subscribe(namespace.clone(), source), Action::Link(namespace, topic)]
-            }
-            (true, true, false) => {
-                self.links.insert(link);
-
-                vec![Action::Link(namespace, topic)]
-            }
-            _ => vec![],
+            actions.push(Action::Subscribe(namespace.clone(), source.clone()));
         }
+
+        // Check if linked
+        let link = (namespace.clone(), topic.clone());
+        if !self.links.contains(&link) {
+            self.links.insert(link);
+
+            actions.push(Action::Link(namespace.clone(), topic.clone()));
+        }
+
+        // Check if routed
+        let route = (namespace.clone(), topic.clone(), source.clone());
+        if !self.routes.contains(&route) {
+            self.routes.insert(route);
+
+            actions.push(Action::Route(namespace, topic, source));
+        }
+
+        actions
     }
 }
 
-type Ess = EventSubSystem<String, String, Event, Event>;
+type Ess = EventSubSystem<Topic, String, Event, Event>;
 
-pub struct SubscriptionRegistry {
-    ess_by_namespace: HashMap<Namespace, Ess>,
-    // channel ID be namspace
-    channel_id_by_namespace: HashMap<Namespace, String>,
+pub struct ProviderEvents {
+    event_provider_by_namespace: HashMap<Namespace, EventProvider>,
 }
 
-impl SubscriptionRegistry {
+impl ProviderEvents {
     pub fn new() -> Self {
-        Self { ess_by_namespace: HashMap::new(), channel_id_by_namespace: HashMap::new() }
+        Self { event_provider_by_namespace: HashMap::new() }
     }
 
-    pub fn set_channel_id(&mut self, namespace: Namespace, channel_id: String) {
-        self.channel_id_by_namespace.insert(namespace, channel_id);
-    }
-
-    pub fn channel_id(&mut self, namespace: &Namespace) -> Option<&String> {
-        self.channel_id_by_namespace.get(namespace)
-    }
-
-    pub fn ess(&self, namespace: &str) -> &Ess {
-        self.ess_by_namespace.get(namespace).unwrap()
-    }
-
-    pub fn subscribe(
+    pub async fn register_event_provider(
         &mut self,
+        chariott: &mut impl ChariottCommunication,
         namespace: Namespace,
-        source: String,
-        client_id: String,
-    ) -> Result<EssSubscription<String, String, Event, Event>, NotReadingEvents> {
-        let ess = self.ess_by_namespace.entry(namespace).or_insert_with(|| EventSubSystem::new());
-        let subscriptions = ess.register_subscriptions(client_id, vec![source])?;
+    ) -> Result<(), Error> {
+        if let Entry::Vacant(e) = self.event_provider_by_namespace.entry(namespace.clone()) {
+            let event_provider = EventProvider::listen(chariott, namespace).await?;
+            e.insert(event_provider);
+        }
+
+        Ok(())
+    }
+
+    pub fn get_event_provider(&self, namespace: &Namespace) -> Option<&EventProvider> {
+        self.event_provider_by_namespace.get(namespace)
+    }
+
+    pub fn get_event_provider_mut(&mut self, namespace: &Namespace) -> Option<&mut EventProvider> {
+        self.event_provider_by_namespace.get_mut(namespace)
+    }
+}
+
+pub struct EventProvider {
+    channel_id: String,
+    namespace: Namespace,
+    ess: Arc<Ess>,
+}
+
+impl EventProvider {
+    pub async fn listen(
+        chariott: &mut impl ChariottCommunication,
+        namespace: Namespace,
+    ) -> Result<Self, Error> {
+        let mut stream = chariott.listen(namespace.clone(), vec![]).await?;
+
+        let ess = Arc::new(Ess::new());
+
+        {
+            // Publish all subscribed values from a provider
+            // into its ESS.
+
+            let namespace = namespace.clone();
+            let ess = Arc::clone(&ess);
+
+            spawn(async move {
+                while let Some(event) = stream.next().await {
+                    let event = event.unwrap();
+                    ess.publish(event.id.clone().as_ref(), event);
+                }
+
+                warn!("Stream for channel '{namespace}' broke.");
+            });
+        }
+
+        // TODO: set the channel ID
+        Ok(Self { namespace, ess, channel_id: "asdf".to_owned() })
+    }
+
+    pub fn link(&self, topic: Topic) -> impl Stream<Item = Event> {
+        let (_, topic_stream) = self.ess.read_events(topic);
+        topic_stream
+    }
+
+    pub fn route(
+        &self,
+        topic: Topic,
+        source: Source,
+    ) -> Result<EssSubscription<Topic, String, Event, Event>, NotReadingEvents> {
+        let subscriptions = self.ess.register_subscriptions(topic, vec![source])?;
         Ok(subscriptions.into_iter().next().unwrap())
     }
 
-    pub fn publish(&self, namespace: &str, source: &str, payload: Event) -> Result<(), Error> {
-        let ess = self.ess_by_namespace.get(namespace).ok_or_else(|| {
-            Error::new(format!("Could not find an ESS for namespace '{namespace}'."))
-        })?;
-        ess.publish(source, payload);
-        Ok(())
+    pub async fn subscribe(
+        &mut self,
+        chariott: &mut impl Chariott,
+        source: String,
+    ) -> Result<(), Error> {
+        chariott
+            .subscribe(
+                self.namespace.clone(),
+                self.channel_id.clone(),
+                vec![source.as_str().into()],
+            )
+            .await
     }
 }

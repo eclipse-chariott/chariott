@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 use chariott_common::{
     chariott_api::{ChariottCommunication, GrpcChariott},
@@ -13,14 +13,16 @@ use chariott_proto::{
     common::{FulfillmentEnum, FulfillmentMessage, IntentEnum, SubscribeFulfillment},
     runtime::{FulfillRequest, FulfillResponse},
 };
-use examples_common::chariott::api::{Chariott as _, ChariottExt as _};
 use messaging::{MqttMessaging, Publisher, Subscriber};
 use paho_mqtt::{Message as MqttMessage, MessageBuilder, Properties, PropertyCode, QOS_1, QOS_2};
 use prost::Message;
-use streaming::{Action, Streaming, SubscriptionRegistry};
+use streaming::{Action, ProviderEvents, Streaming};
 use tokio::{
     select, spawn,
-    sync::mpsc::{self, Sender},
+    sync::{
+        mpsc::{self, Sender},
+        Mutex,
+    },
 };
 use tokio_stream::StreamExt as _;
 use tracing::{debug, error, warn, Level};
@@ -47,7 +49,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let chariott = GrpcChariott::connect().await?;
     let streaming = Arc::new(Mutex::new(Streaming::new()));
-    let ess_registry = Arc::new(Mutex::new(SubscriptionRegistry::new()));
+    let provider_events = Arc::new(Mutex::new(ProviderEvents::new()));
 
     let mut client = MqttMessaging::connect(vin.to_owned()).await?;
     let mut messages = client.subscribe(format!("c2d/{vin}")).await?;
@@ -93,10 +95,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let mut chariott = chariott.clone();
                 let response_sender = response_sender.clone();
                 let streaming = Arc::clone(&streaming);
-                let ess_registry = Arc::clone(&ess_registry);
+                let provider_events = Arc::clone(&provider_events);
 
                 spawn(async move {
-                    handle_message(&mut chariott, response_sender, streaming, ess_registry, message).await;
+                    handle_message(&mut chariott, response_sender, streaming, provider_events, message).await;
                 });
             }
             _ = cancellation_token.cancelled() => {
@@ -115,14 +117,14 @@ async fn handle_message(
     chariott: &mut impl ChariottCommunication,
     response_sender: Sender<(String, MessageBuilder)>,
     streaming: Arc<Mutex<Streaming>>,
-    ess_registry: Arc<Mutex<SubscriptionRegistry>>,
+    provider_events: Arc<Mutex<ProviderEvents>>,
     message: MqttMessage,
 ) {
     async fn inner(
         chariott: &mut impl ChariottCommunication,
         response_sender: Sender<(String, MessageBuilder)>,
         streaming: Arc<Mutex<Streaming>>,
-        ess_registry: Arc<Mutex<SubscriptionRegistry>>,
+        provider_events: Arc<Mutex<ProviderEvents>>,
         message: MqttMessage,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let correlation_data = message
@@ -150,7 +152,7 @@ async fn handle_message(
                 let mut actions = vec![];
 
                 {
-                    let mut streaming = streaming.lock().unwrap();
+                    let mut streaming = streaming.lock().await;
 
                     for source in subscribe_intent.sources {
                         actions.push(streaming.subscribe(
@@ -162,73 +164,40 @@ async fn handle_message(
                 }
 
                 // TODO: handle errors - roll back subscription state.
+                // TODO: how can we run all of this in parallel?
 
                 for action in actions.into_iter().flatten() {
-                    let ess_registry = Arc::clone(&ess_registry);
+                    let provider_events = Arc::clone(&provider_events);
 
                     match action {
                         Action::Listen(namespace) => {
-                            // open the stream with the provider
-                            let mut stream = chariott.listen(namespace.clone(), vec![]).await?;
-
-                            ess_registry
+                            provider_events
                                 .lock()
-                                .unwrap()
-                                .set_channel_id(namespace.clone(), "".to_owned());
-
-                            {
-                                let namespace = namespace.clone();
-
-                                spawn(async move {
-                                    while let Some(event) = stream.next().await {
-                                        let event = event.unwrap();
-
-                                        ess_registry
-                                            .lock()
-                                            .unwrap()
-                                            .publish(namespace.as_str(), &event.id.clone(), event)
-                                            .unwrap();
-                                    }
-
-                                    warn!("Stream for channel '{namespace}' broke.");
-                                });
-                            }
+                                .await
+                                .register_event_provider(chariott, namespace.clone())
+                                .await?;
                         }
                         Action::Subscribe(namespace, source) => {
-                            let channel_id = ess_registry
+                            provider_events
                                 .lock()
+                                .await
+                                .get_event_provider_mut(&namespace)
                                 .unwrap()
-                                .channel_id(&namespace)
-                                .unwrap()
-                                .to_owned();
-
-                            chariott
-                                .subscribe(
-                                    namespace.clone(),
-                                    channel_id.clone(),
-                                    vec![source.as_str().into()],
-                                )
+                                .subscribe(chariott, source)
                                 .await?;
-
-                            let subscription = ess_registry
-                                .lock()
-                                .unwrap()
-                                .subscribe(namespace.clone(), source, channel_id)
-                                .unwrap();
-
-                            spawn(subscription.serve(|event, _| event));
                         }
                         Action::Link(namespace, topic) => {
-                            let (_, mut topic_stream) = ess_registry
+                            let mut stream = provider_events
                                 .lock()
+                                .await
+                                .get_event_provider(&namespace)
                                 .unwrap()
-                                .ess(&namespace)
-                                .read_events(topic.clone());
+                                .link(topic.clone());
 
                             let response_sender = response_sender.clone();
 
                             spawn(async move {
-                                while let Some(_) = topic_stream.next().await {
+                                while stream.next().await.is_some() {
                                     // TODO: send real data
                                     if let Err(e) = response_sender
                                         .send((
@@ -246,6 +215,17 @@ async fn handle_message(
 
                                 warn!("Stream for topic '{topic}' broke.");
                             });
+                        }
+                        Action::Route(namespace, topic, source) => {
+                            let subscription = provider_events
+                                .lock()
+                                .await
+                                .get_event_provider(&namespace)
+                                .unwrap()
+                                .route(topic, source)
+                                .map_err(|_| Error::new("Not reading events."))?;
+
+                            spawn(subscription.serve(|e, _| e));
                         }
                     }
                 }
@@ -273,7 +253,7 @@ async fn handle_message(
         Ok(())
     }
 
-    if let Err(e) = inner(chariott, response_sender, streaming, ess_registry, message).await {
+    if let Err(e) = inner(chariott, response_sender, streaming, provider_events, message).await {
         error!("Error when handling message: '{e:?}'.");
     }
 }
