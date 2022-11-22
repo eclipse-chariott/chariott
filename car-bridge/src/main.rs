@@ -9,7 +9,10 @@ use chariott_common::{
     error::Error,
     shutdown::ctrl_c_cancellation,
 };
-use chariott_proto::{common::IntentEnum, runtime::FulfillRequest};
+use chariott_proto::{
+    common::{IntentEnum, ValueEnum, ValueMessage},
+    runtime::FulfillRequest,
+};
 use messaging::{MqttMessaging, Publisher, Subscriber};
 use paho_mqtt::{Message as MqttMessage, MessageBuilder, Properties, PropertyCode, QOS_2};
 use prost::Message;
@@ -114,21 +117,10 @@ async fn handle_message(
     response_sender: Sender<(String, MessageBuilder)>,
     message: MqttMessage,
 ) {
-    async fn inner(
+    async fn get_response(
         chariott: &mut impl ChariottCommunication,
-        response_sender: Sender<(String, MessageBuilder)>,
-        message: MqttMessage,
-    ) -> Result<(), Box<dyn std::error::Error>> {
-        let correlation_data = message
-            .properties()
-            .get_binary(PropertyCode::CorrelationData)
-            .ok_or_else(|| Error::new("No correlation data found on message."))?;
-
-        let response_topic = message
-            .properties()
-            .get_string(PropertyCode::ResponseTopic)
-            .ok_or_else(|| Error::new("No correlation data found on message."))?;
-
+        message: &MqttMessage,
+    ) -> Result<Response, Box<dyn std::error::Error>> {
         let fulfill_request: FulfillRequest = Message::decode(message.payload())?;
 
         let intent_enum = fulfill_request
@@ -145,27 +137,101 @@ async fn handle_message(
                 .map(|r| r.into_inner()),
         }?;
 
-        let mut buffer = vec![];
-        response.encode(&mut buffer)?;
+        let mut payload = vec![];
+        response.encode(&mut payload)?;
 
-        let mut properties = Properties::new();
-        properties.push_binary(PropertyCode::CorrelationData, correlation_data)?;
-        properties.push_string(
-            PropertyCode::ContentType,
-            "application/x-proto+chariott.common.v1.FulfillResponse",
-        )?;
-
-        response_sender
-            .send((
-                response_topic,
-                MessageBuilder::new().properties(properties).payload(buffer).qos(QOS_2),
-            ))
-            .await?;
-
-        Ok(())
+        Ok(Response {
+            payload,
+            content_type: "application/x-proto+chariott.common.v1.FulfillResponse",
+            is_error: false,
+        })
     }
 
-    if let Err(e) = inner(chariott, response_sender, message).await {
-        error!("Error when handling message: '{e:?}'.");
+    let correlation_information = match message.get_correlation_information() {
+        Ok(cm) => cm,
+        Err(error) => {
+            debug!("Error when getting correlation information from message: '{error:?}'.");
+            return;
+        }
+    };
+
+    let response = match get_response(chariott, &message).await {
+        Ok(message) => message,
+        Err(error) => {
+            debug!("Error when handling message: '{error:?}'.");
+
+            let message = ValueMessage { value: Some(ValueEnum::String(format!("{error:?}"))) };
+
+            let mut payload = vec![];
+            if let Err(err) = message.encode(&mut payload) {
+                debug!("Failed to encode error response: '{err}'.");
+            }
+
+            Response {
+                payload,
+                content_type: "application/x-proto+chariott.common.v1.Value",
+                is_error: true,
+            }
+        }
+    };
+
+    let mut properties = Properties::new();
+
+    properties.push_string(PropertyCode::ContentType, response.content_type).unwrap();
+
+    properties
+        .push_string_pair(
+            PropertyCode::UserProperty,
+            "error",
+            match response.is_error {
+                true => "1",
+                false => "0",
+            },
+        )
+        .unwrap();
+
+    properties
+        .push_binary(PropertyCode::CorrelationData, correlation_information.correlation_data)
+        .unwrap();
+
+    if let Err(err) = response_sender
+        .send((
+            correlation_information.response_topic,
+            MessageBuilder::new().payload(response.payload).properties(properties).qos(QOS_2),
+        ))
+        .await
+    {
+        debug!("Failed to send message: '{err:?}'.");
+    }
+}
+
+struct Response {
+    payload: Vec<u8>,
+    content_type: &'static str,
+    is_error: bool,
+}
+
+struct CorrelationInformation {
+    correlation_data: Vec<u8>,
+    response_topic: String,
+}
+
+trait MqttExt {
+    fn get_correlation_information(&self) -> Result<CorrelationInformation, Error>;
+}
+
+impl MqttExt for MqttMessage {
+    fn get_correlation_information(&self) -> Result<CorrelationInformation, Error> {
+        let correlation_data = self
+            .properties()
+            .get_binary(PropertyCode::CorrelationData)
+            .ok_or_else(|| Error::new("No correlation data found on message."))?;
+
+        let response_topic = self
+            .properties()
+            .get_string(PropertyCode::ResponseTopic)
+            .ok_or_else(|| Error::new("No response topic found on message."))?;
+
+        Ok(CorrelationInformation { correlation_data, response_topic })
     }
 }
