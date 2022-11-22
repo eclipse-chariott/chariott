@@ -463,11 +463,9 @@ partial class ProgramArguments
         Usage:
             $ [--broker=<host>] [--vin=<vin>] [--timeout=<sec>] [--pretty-events]
             $ (-h | --help)
-            $ --version
 
         Options:
             -h --help        Show this screen.
-            --version        Show version.
             --broker=<host>  MQTT broker address [default: localhost].
             --vin=<vin>      VIN umber [default: 1]
             --timeout=<sec>  Timeout in seconds [default: 5]
