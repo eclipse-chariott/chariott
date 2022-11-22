@@ -31,6 +31,7 @@ return await ProgramArguments.ParseToMain(args, Main);
 static async Task<int> Main(ProgramArguments args)
 {
     var jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
+    var utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
 
     try
     {
@@ -99,7 +100,9 @@ static async Task<int> Main(ProgramArguments args)
             await eventsFileLock.WaitAsync();
             try
             {
-                await File.AppendAllTextAsync(eventsFilePath, json + Environment.NewLine);
+                await using var stream = File.Open(eventsFilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
+                await using var writer = new StreamWriter(stream, utf8);
+                await writer.WriteLineAsync(json);
             }
             finally
             {
@@ -178,7 +181,7 @@ static async Task<int> Main(ProgramArguments args)
                                 {
                                     await using var stream = File.OpenRead(eventsFilePath);
                                     stream.Position = eventsFileReadPosition;
-                                    using var reader = new StreamReader(stream, Encoding.UTF8);
+                                    using var reader = new StreamReader(stream, utf8);
                                     while (await reader.ReadLineAsync() is { } fileLine)
                                         Console.WriteLine(fileLine);
                                     eventsFileReadPosition = stream.Position;
