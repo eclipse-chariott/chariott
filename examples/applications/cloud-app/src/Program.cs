@@ -34,10 +34,10 @@ static async Task<int> Main(ProgramArguments args)
         using var mqttClient = mqttFactory.CreateMqttClient();
 
         var mqttClientOptions =
-            new MqttClientOptionsBuilder()
-                .WithTcpServer(args.OptBroker)
-                .WithProtocolVersion(MqttProtocolVersion.V500)
-                .Build();
+            mqttFactory.CreateClientOptionsBuilder()
+                       .WithTcpServer(args.OptBroker)
+                       .WithProtocolVersion(MqttProtocolVersion.V500)
+                       .Build();
 
         await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
         Console.Error.WriteLine("The MQTT client is connected.");
