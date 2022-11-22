@@ -191,9 +191,12 @@ async fn handle_message(
         )
         .unwrap();
 
-    properties
+    if let Err(err) = properties
         .push_binary(PropertyCode::CorrelationData, correlation_information.correlation_data)
-        .unwrap();
+    {
+        debug!("Could not set correlation data in properties: '{err}'.");
+        return;
+    }
 
     if let Err(err) = response_sender
         .send((
