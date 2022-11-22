@@ -31,7 +31,9 @@ pub enum Action {
     Route(Namespace, Topic, Source),
 }
 
-/// Tracks the active subscriptions for each target.
+/// Tracks the active subscriptions for each namespace and allows calculating
+/// which steps to take to support streaming intents from a certain provider to
+/// a topic based on the current state.
 pub struct SubscriptionState {
     sources_by_namespace: HashMap<Namespace, HashSet<Source>>,
     links: HashSet<(Namespace, Topic)>,
@@ -43,6 +45,7 @@ impl SubscriptionState {
         Self { sources_by_namespace: HashMap::new(), links: HashSet::new(), routes: HashSet::new() }
     }
 
+    /// Commits an action in case it was executed successfully.
     pub fn commit(&mut self, action: Action) {
         match action {
             Action::Listen(namespace) => {
@@ -62,6 +65,8 @@ impl SubscriptionState {
         };
     }
 
+    /// Calculates the next action to take based on the current subscription
+    /// state.
     pub fn next_subscribe_action(
         &mut self,
         namespace: Namespace,
@@ -103,6 +108,7 @@ impl SubscriptionState {
 
 type Ess = EventSubSystem<Topic, Source, Event, Event>;
 
+/// Tracks `EventProvider` instances by namespace.
 pub struct ProviderEvents {
     event_provider_by_namespace: HashMap<Namespace, EventProvider>,
 }
@@ -134,12 +140,17 @@ impl ProviderEvents {
     }
 }
 
+/// Represents events coming from a given provider, identified by its namespace.
+/// The components allows distributing events coming from the provider to
+/// multiple consumers.
 pub struct EventProvider {
     channel_id: String,
     ess: Arc<Ess>,
 }
 
 impl EventProvider {
+    /// Create a new instance by starting to listen to events coming from a
+    /// provider.
     pub async fn listen(
         chariott: &mut impl ChariottCommunication,
         namespace: Namespace,
@@ -168,11 +179,16 @@ impl EventProvider {
         Ok(Self { ess, channel_id })
     }
 
+    /// Links a certain topic to events coming from this provider. By calling
+    /// `route`, all events with a given identifier are routed to that topic.
     pub fn link(&self, topic: Topic) -> impl Stream<Item = Event> {
         let (_, topic_stream) = self.ess.read_events(topic);
         topic_stream
     }
 
+    /// Routes a certain event from this provider to a topic. This returns a
+    /// subscription that can be served to establish the route. Depends on a
+    /// `link` to be present.
     pub fn route(
         &self,
         topic: Topic,
@@ -182,6 +198,8 @@ impl EventProvider {
         Ok(subscriptions.into_iter().next().unwrap())
     }
 
+    /// Gets the channel ID for the gRPC connection between the provider and
+    /// this component.
     pub fn channel_id(&self) -> &str {
         &self.channel_id
     }
