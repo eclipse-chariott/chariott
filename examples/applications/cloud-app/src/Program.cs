@@ -42,11 +42,7 @@ static async Task<int> Main(ProgramArguments args)
         await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
         Console.Error.WriteLine("The MQTT client is connected.");
 
-        var correlations = MoreEnumerable.Return(() => Guid.NewGuid().ToByteArray())
-                                         .Repeat()
-                                         .Evaluate();
-
-        var rpcClient = new ChariottRpcClient(mqttFactory, mqttClient, correlations);
+        var rpcClient = new ChariottRpcClient(mqttFactory, mqttClient);
 
         var options =
             mqttFactory.CreateSubscribeOptionsBuilder()
@@ -233,11 +229,14 @@ sealed class ChariottRpcClient : IDisposable
 {
     readonly MqttFactory _factory;
     readonly IMqttClient _client;
-    readonly IEnumerator<byte[]> _correlation;
+    readonly IEnumerator<Guid> _correlation;
 
     public const string ResponseWildcardTopic = "c2d/+/rsvp";
 
-    public ChariottRpcClient(MqttFactory factory, IMqttClient client, IEnumerable<byte[]> correlations)
+    public ChariottRpcClient(MqttFactory factory, IMqttClient client) :
+        this(factory, client, MoreEnumerable.Return(Guid.NewGuid).Repeat().Evaluate()) { }
+
+    public ChariottRpcClient(MqttFactory factory, IMqttClient client, IEnumerable<Guid> correlations)
     {
         _factory = factory;
         _client = client;
@@ -256,7 +255,7 @@ sealed class ChariottRpcClient : IDisposable
     static Task<FulfillResponse> ExecuteAsync(MqttFactory factory,
                                               IMqttClient client,
                                               FulfillRequest request,
-                                              IEnumerator<byte[]> correlation,
+                                              IEnumerator<Guid> correlation,
                                               RpcTopicPair topics,
                                               CancellationToken cancellationToken)
     {
@@ -264,7 +263,7 @@ sealed class ChariottRpcClient : IDisposable
              ? throw new InvalidOperationException()
              : Async(correlation.Current);
 
-        async Task<FulfillResponse> Async(byte[] id)
+        async Task<FulfillResponse> Async(Guid id)
         {
             var taskCompletionSource = new TaskCompletionSource<FulfillResponse>();
 
@@ -273,7 +272,7 @@ sealed class ChariottRpcClient : IDisposable
                 try
                 {
                     if (args.ApplicationMessage is { Topic: { } topic, CorrelationData: { } correlationData }
-                        && topic == topics.Response && id.SequenceEqual(correlationData))
+                        && topic == topics.Response && id == new Guid(correlationData))
                     {
                         var response = FulfillResponse.Parser.ParseFrom(args.ApplicationMessage.Payload);
                         taskCompletionSource.TrySetResult(response);
@@ -295,7 +294,7 @@ sealed class ChariottRpcClient : IDisposable
                     factory.CreateApplicationMessageBuilder()
                            .WithTopic(topics.Request)
                            .WithPayload(request.ToByteArray())
-                           .WithCorrelationData(id)
+                           .WithCorrelationData(id.ToByteArray())
                            .WithResponseTopic(topics.Response)
                            .Build();
 
