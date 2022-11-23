@@ -6,7 +6,7 @@ use std::sync::Arc;
 use chariott_common::{
     chariott_api::{ChariottCommunication, GrpcChariott},
     config::env,
-    error::Error,
+    error::{Error, ResultExt as _},
     shutdown::ctrl_c_cancellation,
 };
 use chariott_proto::{
@@ -16,10 +16,9 @@ use chariott_proto::{
     },
     runtime::{FulfillRequest, FulfillResponse},
 };
-use examples_common::chariott::api::Chariott as _;
 use messaging::{MqttMessaging, Publisher, Subscriber};
-use paho_mqtt::{Message as MqttMessage, MessageBuilder, Properties, PropertyCode, QOS_1, QOS_2};
-use prost::Message;
+use paho_mqtt::{Message as MqttMessage, MessageBuilder, Properties, PropertyCode, QOS_2};
+use prost::Message as ProtoMessage;
 use streaming::{Action, ProviderRegistry, SubscriptionState};
 use tokio::{
     select, spawn,
@@ -29,7 +28,7 @@ use tokio::{
     },
 };
 use tokio_stream::StreamExt as _;
-use tracing::{debug, error, warn, Level};
+use tracing::{debug, warn, Level};
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
 
 mod messaging;
@@ -105,7 +104,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 };
 
                 let mut chariott = chariott.clone();
-                let response_sender = response_sender.clone();
+                let response_sender = ResponseSender(response_sender.clone());
                 let subscription_state = Arc::clone(&subscription_state);
                 let provider_registry = Arc::clone(&provider_registry);
 
@@ -127,19 +126,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn handle_message(
     chariott: &mut impl ChariottCommunication,
-    response_sender: Sender<(String, MessageBuilder)>,
+    response_sender: ResponseSender,
     subscription_state: Arc<Mutex<SubscriptionState>>,
     provider_registry: Arc<Mutex<ProviderRegistry>>,
     message: MqttMessage,
 ) {
     async fn get_response(
         chariott: &mut impl ChariottCommunication,
-        response_sender: &Sender<(String, MessageBuilder)>,
+        response_sender: &ResponseSender,
         subscription_state: &Arc<Mutex<SubscriptionState>>,
         provider_registry: &Arc<Mutex<ProviderRegistry>>,
         message: &MqttMessage,
-    ) -> Result<Response, Box<dyn std::error::Error>> {
-        let fulfill_request: FulfillRequest = Message::decode(message.payload())?;
+        correlation_information: CorrelationInformation,
+    ) -> Result<Message, Box<dyn std::error::Error>> {
+        let fulfill_request: FulfillRequest = ProtoMessage::decode(message.payload())?;
 
         let namespace = fulfill_request.namespace;
 
@@ -172,57 +172,24 @@ async fn handle_message(
                                     .await?;
                             }
                             Action::Subscribe(namespace, source) => {
-                                let channel_id = provider_events
+                                provider_events
                                     .get_event_provider_mut(&namespace)
-                                    .unwrap()
-                                    .channel_id()
-                                    .to_owned();
-
-                                chariott
-                                    .subscribe(namespace, channel_id, vec![source.into()])
+                                    .expect("Prior to subscribing we must have established listening.")
+                                    .subscribe(chariott, source.into())
                                     .await?;
                             }
                             Action::Link(namespace, topic) => {
-                                let mut stream = provider_events
+                                provider_events
                                     .get_event_provider(&namespace)
-                                    .unwrap()
-                                    .link(topic.clone());
-
-                                let response_sender = response_sender.clone();
-
-                                spawn(async move {
-                                    while let Some(e) = stream.next().await {
-                                        let mut buffer = vec![];
-
-                                        if let Err(err) = e.encode(&mut buffer) {
-                                            warn!("Failed to encode event: '{err:?}'.");
-                                        }
-
-                                        if let Err(err) = response_sender
-                                            .send((
-                                                topic.clone(),
-                                                MessageBuilder::new().payload(buffer).qos(QOS_1),
-                                            ))
-                                            .await
-                                        {
-                                            // TODO: handle better.
-                                            error!(
-                                                "Failed to publish event to topic '{topic}': '{err:?}'."
-                                            );
-                                        }
-                                    }
-
-                                    warn!("Stream for topic '{topic}' broke.");
-                                });
+                                    .expect("Prior to linking we must have established listening.")
+                                    .link(topic.clone(), response_sender.clone());
                             }
                             Action::Route(namespace, topic, source) => {
-                                let subscription = provider_events
+                                provider_events
                                     .get_event_provider(&namespace)
-                                    .unwrap()
+                                    .expect("Prior to routing we must have established listening.")
                                     .route(topic, source)
-                                    .expect("Prior to routing there we must have set up a link between a namespace and a topic.");
-
-                                spawn(subscription.serve(|e, _| e));
+                                    .expect("Prior to routing there we must have established linking.");
                             }
                         }
 
@@ -242,11 +209,14 @@ async fn handle_message(
         let mut payload = vec![];
         response.encode(&mut payload)?;
 
-        Ok(Response {
+        Ok(Message::SuccessResponse(
             payload,
-            content_type: "application/x-proto+chariott.common.v1.FulfillResponse",
-            is_error: false,
-        })
+            Metadata {
+                content_type: "application/x-proto+chariott.common.v1.FulfillResponse",
+                qos: QOS_2,
+            },
+            correlation_information,
+        ))
     }
 
     let correlation_information = match message.get_correlation_information() {
@@ -263,6 +233,7 @@ async fn handle_message(
         &subscription_state,
         &provider_registry,
         &message,
+        correlation_information.clone(),
     )
     .await
     {
@@ -270,61 +241,122 @@ async fn handle_message(
         Err(error) => {
             debug!("Error when handling message: '{error:?}'.");
 
-            let message = ValueMessage { value: Some(ValueEnum::String(format!("{error:?}"))) };
-
-            let mut payload = vec![];
-            if let Err(err) = message.encode(&mut payload) {
-                debug!("Failed to encode error response: '{err}'.");
-            }
-
-            Response {
-                payload,
-                content_type: "application/x-proto+chariott.common.v1.Value",
-                is_error: true,
-            }
+            Message::ErrorResponse(
+                format!("{error:?}"),
+                Metadata {
+                    content_type: "application/x-proto+chariott.common.v1.Value",
+                    qos: QOS_2,
+                },
+                correlation_information,
+            )
         }
     };
 
-    let mut properties = Properties::new();
+    // TODO: set correlation information.
 
-    properties.push_string(PropertyCode::ContentType, response.content_type).unwrap();
+    response_sender.send(response).await;
+}
 
-    properties
-        .push_string_pair(
-            PropertyCode::UserProperty,
-            "error",
-            match response.is_error {
-                true => "1",
-                false => "0",
-            },
-        )
-        .unwrap();
+#[derive(Clone)]
+pub struct ResponseSender(Sender<(String, MessageBuilder)>);
 
-    if let Err(err) = properties
-        .push_binary(PropertyCode::CorrelationData, correlation_information.correlation_data)
-    {
-        debug!("Could not set correlation data in properties: '{err}'.");
-        return;
-    }
+impl ResponseSender {
+    /// Queues a message to be published.
+    pub async fn send(&self, message: Message) {
+        async fn inner(
+            response_sender: &Sender<(String, MessageBuilder)>,
+            response: Message,
+        ) -> Result<(), Error> {
+            let message = response.try_into_message()?;
+            response_sender
+                .send(message)
+                .await
+                .map_err(|e| Error::new(format!("Error when sending message to channel: '{e:?}'.")))
+        }
 
-    if let Err(err) = response_sender
-        .send((
-            correlation_information.response_topic,
-            MessageBuilder::new().payload(response.payload).properties(properties).qos(QOS_2),
-        ))
-        .await
-    {
-        debug!("Failed to send message: '{err:?}'.");
+        let Self(response_sender) = self;
+        if let Err(err) = inner(response_sender, message).await {
+            debug!("Failed to send message: '{err:?}'.");
+        }
     }
 }
 
-struct Response {
-    payload: Vec<u8>,
+type Topic = String;
+
+pub enum Message {
+    Default(Vec<u8>, Topic, Metadata),
+    SuccessResponse(Vec<u8>, Metadata, CorrelationInformation),
+    ErrorResponse(String, Metadata, CorrelationInformation),
+}
+
+impl Message {
+    fn try_into_message(self) -> Result<(Topic, MessageBuilder), Error> {
+        fn get_properties(
+            metadata: Metadata,
+            is_error: bool,
+            correlation_data: Option<Vec<u8>>,
+        ) -> Result<Properties, Error> {
+            let mut properties = Properties::new();
+
+            properties
+                .push_string(PropertyCode::ContentType, metadata.content_type)
+                .map_err_with("Could not set content type property.")?;
+
+            properties
+                .push_string_pair(
+                    PropertyCode::UserProperty,
+                    "error",
+                    match is_error {
+                        true => "1",
+                        false => "0",
+                    },
+                )
+                .map_err_with("Could not set user-defined error property.")?;
+
+            if let Some(correlation_data) = correlation_data {
+                properties
+                    .push_binary(PropertyCode::CorrelationData, correlation_data)
+                    .map_err_with("Could not set correlation data in properties.")?;
+            }
+
+            Ok(properties)
+        }
+
+        let (payload, qos, topic, properties) = match self {
+            Message::SuccessResponse(payload, metadata, correlation_information) => (
+                payload,
+                metadata.qos,
+                correlation_information.response_topic,
+                get_properties(metadata, false, Some(correlation_information.correlation_data))?,
+            ),
+            Message::ErrorResponse(message, metadata, correlation_information) => {
+                let mut payload = vec![];
+                let message = ValueMessage { value: Some(ValueEnum::String(message)) };
+                message.encode(&mut payload).map_err_with("Failed to encode error response.")?;
+
+                (
+                    payload,
+                    metadata.qos,
+                    correlation_information.response_topic,
+                    get_properties(metadata, true, Some(correlation_information.correlation_data))?,
+                )
+            }
+            Message::Default(payload, topic, metadata) => {
+                (payload, metadata.qos, topic, get_properties(metadata, true, None)?)
+            }
+        };
+
+        Ok((topic, MessageBuilder::new().payload(payload).properties(properties).qos(qos)))
+    }
+}
+
+pub struct Metadata {
     content_type: &'static str,
-    is_error: bool,
+    qos: i32,
 }
 
-struct CorrelationInformation {
+#[derive(Clone)]
+pub struct CorrelationInformation {
     correlation_data: Vec<u8>,
     response_topic: String,
 }

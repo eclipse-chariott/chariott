@@ -5,12 +5,15 @@ use std::{
 
 use chariott_common::{chariott_api::ChariottCommunication, error::Error};
 use chariott_proto::streaming::Event;
-use ess::{EventSubSystem, NotReadingEvents, Subscription as EssSubscription};
-use examples_common::chariott::api::ChariottCommunicationExt as _;
-use futures::Stream;
+use ess::{EventSubSystem, NotReadingEvents};
+use examples_common::chariott::api::{Chariott, ChariottCommunicationExt as _};
+use paho_mqtt::QOS_1;
+use prost::Message as _;
 use tokio::spawn;
 use tokio_stream::StreamExt as _;
-use tracing::warn;
+use tracing::{debug, warn};
+
+use crate::{Message, Metadata, ResponseSender};
 
 /// Identifies a namespace
 type Namespace = String;
@@ -146,6 +149,7 @@ impl ProviderRegistry {
 /// multiple consumers.
 pub struct Provider {
     channel_id: String,
+    namespace: Namespace,
     ess: Arc<Ess>,
 }
 
@@ -177,31 +181,55 @@ impl Provider {
             });
         }
 
-        Ok(Self { ess, channel_id })
+        Ok(Self { ess, namespace, channel_id })
     }
 
     /// Links a certain topic to events coming from this provider. By calling
     /// `route`, all events with a given identifier are routed to that topic.
-    pub fn link(&self, topic: Topic) -> impl Stream<Item = Event> {
-        let (_, topic_stream) = self.ess.read_events(topic);
-        topic_stream
+    pub fn link(&self, topic: Topic, response_sender: ResponseSender) {
+        let (_, mut topic_stream) = self.ess.read_events(topic.clone());
+
+        spawn(async move {
+            while let Some(e) = topic_stream.next().await {
+                let mut buffer = vec![];
+
+                if let Err(err) = e.encode(&mut buffer) {
+                    debug!("Failed to encode event: '{err:?}'.");
+                }
+
+                response_sender
+                    .send(Message::Default(
+                        buffer,
+                        topic.clone(),
+                        Metadata {
+                            content_type: "application/x-proto+chariott.streaming.v1.Event",
+                            qos: QOS_1,
+                        },
+                    ))
+                    .await;
+            }
+
+            warn!("Stream for topic '{topic}' broke.");
+        });
     }
 
     /// Routes a certain event from this provider to a topic. This returns a
     /// subscription that can be served to establish the route. Depends on a
     /// `link` to be present.
-    pub fn route(
-        &self,
-        topic: Topic,
-        source: Source,
-    ) -> Result<EssSubscription<Topic, Source, Event, Event>, NotReadingEvents> {
+    pub fn route(&self, topic: Topic, source: Source) -> Result<(), NotReadingEvents> {
         let subscriptions = self.ess.register_subscriptions(topic, vec![source])?;
-        Ok(subscriptions.into_iter().next().unwrap())
+        spawn(subscriptions.into_iter().next().unwrap().serve(|e, _| e));
+        Ok(())
     }
 
-    /// Gets the channel ID for the gRPC connection between the provider and
-    /// this component.
-    pub fn channel_id(&self) -> &str {
-        &self.channel_id
+    /// Subscribes to a certain kind of event from the provider.
+    pub async fn subscribe(
+        &self,
+        chariott: &mut impl ChariottCommunication,
+        source: Source,
+    ) -> Result<(), Error> {
+        chariott
+            .subscribe(self.namespace.clone(), self.channel_id.clone(), vec![source.into()])
+            .await
     }
 }
