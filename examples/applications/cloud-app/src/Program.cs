@@ -129,7 +129,7 @@ static async Task<int> Main(ProgramArguments args)
     var quit = false;
     var isOutputRedirected = Console.IsOutputRedirected;
 
-    string? Prompt()
+    async Task<string?> PromptAsync()
     {
         int eventCount;
         lock (newEventCountLock)
@@ -140,10 +140,11 @@ static async Task<int> Main(ProgramArguments args)
         if (!isOutputRedirected)
             Console.Write("> ");
 
-        return Console.ReadLine();
+        return await Task.Factory.StartNew(Console.ReadLine, TaskCreationOptions.DenyChildAttach
+                                                           | TaskCreationOptions.LongRunning);
     }
 
-    while (!quit && Prompt() is { } line)
+    while (!quit && await PromptAsync() is { } line)
     {
         if (line.AsSpan().TrimEnd().Length is 0)
             continue;

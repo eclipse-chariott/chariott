@@ -60,7 +60,7 @@ sealed class ChariottRpcClient : IDisposable
 
         async Task<FulfillResponse> Async(Guid id)
         {
-            var taskCompletionSource = new TaskCompletionSource<FulfillResponse>();
+            var taskCompletionSource = new TaskCompletionSource<FulfillResponse>(TaskCreationOptions.RunContinuationsAsynchronously);
 
             Task OnApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs args)
             {
