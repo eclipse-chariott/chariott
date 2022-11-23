@@ -121,8 +121,20 @@ static async Task<int> Main(ProgramArguments args)
     var session = new Session { Vin = new(args.OptVin) };
 
     var quit = false;
-    while (!quit && Console.ReadLine() is { } line)
+    var isOutputRedirected = Console.IsOutputRedirected;
+
+    string? Prompt()
     {
+        if (!isOutputRedirected)
+            Console.Write("> ");
+        return Console.ReadLine();
+    }
+
+    while (!quit && Prompt() is { } line)
+    {
+        if (line.AsSpan().TrimEnd().Length is 0)
+            continue;
+
         FulfillRequest? request = null;
         switch (PromptArguments.CreateParser().Parse(CommandLineStringSplitter.Instance.Split(line)))
         {
