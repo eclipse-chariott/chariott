@@ -161,8 +161,9 @@ static async Task<int> Main(ProgramArguments args)
                     case { CmdShow: true, CmdTopics: true }:
                     {
                         var topics = ChariottRpcClient.GetTopics(session.Vin);
-                        Console.WriteLine($"req {topics.Request}");
-                        Console.WriteLine($"rsp {topics.Response}");
+                        Console.WriteLine($"request: {topics.Request}");
+                        Console.WriteLine($"response: {topics.Response}");
+                        Console.WriteLine($"events: {eventsTopic}");
                         break;
                     }
                     case { CmdShow: true, CmdNew: true, CmdEvents: true }:
