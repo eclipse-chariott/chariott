@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -281,9 +282,13 @@ static async Task<int> Main(ProgramArguments args)
 
                 Console.WriteLine(response.ToJsonEncoding(jsonSerializerOptions));
             }
-            catch (Exception ex) when (ex is OperationCanceledException or ChariottRpcException)
+            catch (OperationCanceledException ex)
             {
                 Console.Error.WriteLine(ex.Message);
+            }
+            catch (ChariottRpcException ex)
+            {
+                Console.Error.WriteLine(ex.Detail ?? ex.Message);
             }
         }
     }
@@ -393,19 +398,29 @@ sealed class ChariottRpcClient : IDisposable
                         var error = message.UserProperties.FirstOrDefault(p => p.Name is "error");
                         if (error is { Value: not "0" and not "" })
                         {
-                            var err =
-                                message.PayloadFormatIndicator == MqttPayloadFormatIndicator.CharacterData
+                            var detail
+                                = message.PayloadFormatIndicator == MqttPayloadFormatIndicator.CharacterData
                                 ? Encoding.UTF8.GetString(message.Payload)
-                                : Value.Parser.ParseFrom(message.Payload) is { String: var str }
-                                ? str
-                                : "RPC failed due to an unknown error.";
+                                : MediaTypeHeaderValue.TryParse(message.ContentType, out var contentType)
+                                  && "application/x-proto+chariott.common.v1.Value".Equals(contentType.MediaType, StringComparison.OrdinalIgnoreCase)
+                                ? Value.Parser.ParseFrom(message.Payload) switch
+                                  {
+                                      { String: var str } => str,
+                                      var val => val.ToJsonEncoding()
+                                  }
+                                : null;
 
-                            taskCompletionSource.TrySetException(new ChariottRpcException(err));
+                            taskCompletionSource.TrySetException(new ChariottRpcException(null, detail));
                         }
-                        else
+                        else if (MediaTypeHeaderValue.TryParse(message.ContentType, out var contentType)
+                                 && "application/x-proto+chariott.common.v1.FulfillResponse".Equals(contentType.MediaType, StringComparison.OrdinalIgnoreCase))
                         {
                             var response = FulfillResponse.Parser.ParseFrom(message.Payload);
                             taskCompletionSource.TrySetResult(response);
+                        }
+                        else
+                        {
+                            throw new ChariottRpcException("Unexpected response to remote procedure call.");
                         }
                     }
                 }
@@ -444,9 +459,16 @@ sealed class ChariottRpcClient : IDisposable
 
 public class ChariottRpcException : Exception
 {
-    public ChariottRpcException() { }
-    public ChariottRpcException(string? message) : base(message) { }
-    public ChariottRpcException(string? message, Exception? inner) : base(message, inner) { }
+    public ChariottRpcException() : this(null, null, null) { }
+    public ChariottRpcException(string? message) : this(message, null, null) { }
+    public ChariottRpcException(string? message, string? detail) : this(message, detail, null) { }
+    public ChariottRpcException(string? message, Exception? inner) : this(message, null, inner) { }
+
+    public ChariottRpcException(string? message, string? detail, Exception? inner) :
+        base(message ?? "Remote procedure call failed.", inner) =>
+        Detail = detail;
+
+    public string? Detail { get; }
 }
 
 [DocoptArguments]
