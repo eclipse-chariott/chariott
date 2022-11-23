@@ -196,7 +196,7 @@ Prints the commands and their usage.
 
 ### Specifying Values
 
-Some commands like [`write`](#write) and [`invoke`](#invoke) allow your
+Some commands like [`write`](#write) and [`invoke`](#invoke) allow you to
 specify _values_. Car Bridge Cloud Application supports the following literal
 syntax different types of values:
 
