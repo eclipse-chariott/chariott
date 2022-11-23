@@ -102,7 +102,7 @@ events arriving in near real-time.
 
     inspect <namespace> <query>
 
-Requests Chariott (via the Car Bridge) to fulfill the *inspect* intent by an
+Requests Chariott (via the Car Bridge) to fulfill the _inspect_ intent by an
 in-car application.
 
 Example:
@@ -115,7 +115,7 @@ Example:
 
     read <namespace> <key>
 
-Requests Chariott (via the Car Bridge) to fulfill the *read* intent by an
+Requests Chariott (via the Car Bridge) to fulfill the _read_ intent by an
 in-car application.
 
 Examples:
@@ -128,7 +128,7 @@ Examples:
 
     write <namespace> <key> <value>
 
-Requests Chariott (via the Car Bridge) to fulfill the *write* intent by an
+Requests Chariott (via the Car Bridge) to fulfill the _write_ intent by an
 in-car application.
 
 Examples:
@@ -142,7 +142,7 @@ different types of literals for `<value>`.
 
     invoke <namespace> <command> [<arg>...]
 
-Requests Chariott (via the Car Bridge) to fulfill the *invoke* intent by an
+Requests Chariott (via the Car Bridge) to fulfill the _invoke_ intent by an
 in-car application. Multiple arguments (`<arg>...`) for a command are
 space-separated. To include space in a, for example, a string argument, use
 double-quotes, as in `"foo bar baz"`.
@@ -158,7 +158,7 @@ different types of literals for arguments (`<arg>`).
 
     subscribe <namespace> <source>...
 
-Requests Chariott (via the Car Bridge) to fulfill the *invoke* intent by an
+Requests Chariott (via the Car Bridge) to fulfill the _invoke_ intent by an
 in-car application. Multiple sources (`<source>...`) are space-separated.
 
 To see the events, use the `show new events` command.
