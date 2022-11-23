@@ -94,12 +94,20 @@ static async Task<int> Main(ProgramArguments args)
 
     mqttClient.ApplicationMessageReceivedAsync += async args =>
     {
+        Console.Error.WriteLine("Program: " + args.ApplicationMessage.Topic);
+
         if (args.ApplicationMessage.Topic != eventsTopic)
             return;
 
         var @event = Event.Parser.ParseFrom(args.ApplicationMessage.Payload);
         var json = @event.ToJsonEncoding(prettyPrintEventsJson ? jsonSerializerOptions : null);
-        await eventsFileLock.WaitAsync();
+
+        if (!await eventsFileLock.WaitAsync(TimeSpan.FromSeconds(5)))
+        {
+            Console.Error.WriteLine("Warning! An event was lost due to time-out waiting for recording.");
+            return;
+        }
+
         try
         {
             await using var stream = File.Open(eventsFilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
@@ -206,7 +214,9 @@ static async Task<int> Main(ProgramArguments args)
 
                         try
                         {
-                            await eventsFileLock.WaitAsync(TimeSpan.FromSeconds(5));
+                            if (!await eventsFileLock.WaitAsync(TimeSpan.FromSeconds(5)))
+                                throw new TimeoutException();
+
                             try
                             {
                                 await using var stream = File.OpenRead(eventsFilePath);
