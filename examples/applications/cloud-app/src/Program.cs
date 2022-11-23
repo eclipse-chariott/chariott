@@ -368,21 +368,21 @@ readonly record struct Vin(string Value)
 partial class PromptArguments
 {
     const string Help = """
-    Usage:
-        $ ping
-        $ set vin <vin>
-        $ get vin
-        $ get events.file
-        $ inspect <namespace> <query>
-        $ read <namespace> <key>
-        $ write <namespace> <key> <value>
-        $ invoke <namespace> <command> [<arg>...]
-        $ subscribe <namespace> <source>...
-        $ show topics
-        $ show new events
-        $ (quit | exit)
-        $ help
-    """;
+        Usage:
+            $ ping
+            $ set vin <vin>
+            $ get vin
+            $ get events.file
+            $ inspect <namespace> <query>
+            $ read <namespace> <key>
+            $ write <namespace> <key> <value>
+            $ invoke <namespace> <command> [<arg>...]
+            $ subscribe <namespace> <source>...
+            $ show topics
+            $ show new events
+            $ (quit | exit)
+            $ help
+        """;
 
     public static void PrintUsage(TextWriter writer)
     {
