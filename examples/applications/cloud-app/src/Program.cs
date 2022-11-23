@@ -2,30 +2,23 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Collections.Generic;
 using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using CarBridgeCloudApp;
 using Chariott.Common.V1;
 using Chariott.Runtime.V1;
 using Chariott.Streaming.V1;
 using DocoptNet;
-using Google.Protobuf;
 using MQTTnet;
-using MQTTnet.Client;
 using MQTTnet.Formatter;
-using MQTTnet.Protocol;
-using static MoreLinq.Extensions.EvaluateExtension;
-using static MoreLinq.Extensions.RepeatExtension;
-using MoreEnumerable = MoreLinq.MoreEnumerable;
 
 try
 {
@@ -345,134 +338,6 @@ readonly record struct Vin(string Value)
     public override string ToString() => Value;
 }
 
-readonly record struct RpcTopicPair(string Request, string Response);
-
-sealed class ChariottRpcClient : IDisposable
-{
-    readonly MqttFactory _factory;
-    readonly IMqttClient _client;
-    readonly IEnumerator<Guid> _correlation;
-
-    public const string ResponseWildcardTopic = "c2d/+/rsvp";
-
-    public ChariottRpcClient(MqttFactory factory, IMqttClient client) :
-        this(factory, client, MoreEnumerable.Return(Guid.NewGuid).Repeat().Evaluate()) { }
-
-    public ChariottRpcClient(MqttFactory factory, IMqttClient client, IEnumerable<Guid> correlations)
-    {
-        _factory = factory;
-        _client = client;
-        _correlation = correlations.GetEnumerator();
-    }
-
-    public void Dispose() => _correlation.Dispose();
-
-    public static RpcTopicPair GetTopics(Vin vin) => new($"c2d/{vin}", $"c2d/{vin}/rsvp");
-
-    public Task<FulfillResponse> ExecuteAsync(Vin vin, FulfillRequest request,
-                                              CancellationToken cancellationToken) =>
-        ExecuteAsync(_factory, _client, request, _correlation, GetTopics(vin),
-                     cancellationToken);
-
-    static Task<FulfillResponse> ExecuteAsync(MqttFactory factory,
-                                              IMqttClient client,
-                                              FulfillRequest request,
-                                              IEnumerator<Guid> correlation,
-                                              RpcTopicPair topics,
-                                              CancellationToken cancellationToken)
-    {
-        return !correlation.MoveNext()
-             ? throw new InvalidOperationException()
-             : Async(correlation.Current);
-
-        async Task<FulfillResponse> Async(Guid id)
-        {
-            var taskCompletionSource = new TaskCompletionSource<FulfillResponse>();
-
-            Task OnApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs args)
-            {
-                try
-                {
-                    var message = args.ApplicationMessage;
-                    if (message is { Topic: { } topic, CorrelationData: { } correlationData }
-                        && topic == topics.Response && id == new Guid(correlationData))
-                    {
-                        var error = message.UserProperties.FirstOrDefault(p => p.Name is "error");
-                        if (error is { Value: not "0" and not "" })
-                        {
-                            var detail
-                                = message.PayloadFormatIndicator == MqttPayloadFormatIndicator.CharacterData
-                                ? Encoding.UTF8.GetString(message.Payload)
-                                : MediaTypeHeaderValue.TryParse(message.ContentType, out var contentType)
-                                  && "application/x-proto+chariott.common.v1.Value".Equals(contentType.MediaType, StringComparison.OrdinalIgnoreCase)
-                                ? Value.Parser.ParseFrom(message.Payload) switch
-                                  {
-                                      { String: var str } => str,
-                                      var val => val.ToJsonEncoding()
-                                  }
-                                : null;
-
-                            taskCompletionSource.TrySetException(new ChariottRpcException(null, detail));
-                        }
-                        else if (MediaTypeHeaderValue.TryParse(message.ContentType, out var contentType)
-                                 && "application/x-proto+chariott.common.v1.FulfillResponse".Equals(contentType.MediaType, StringComparison.OrdinalIgnoreCase))
-                        {
-                            var response = FulfillResponse.Parser.ParseFrom(message.Payload);
-                            taskCompletionSource.TrySetResult(response);
-                        }
-                        else
-                        {
-                            throw new ChariottRpcException("Unexpected response to remote procedure call.");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    taskCompletionSource.TrySetException(ex);
-                }
-
-                return Task.CompletedTask;
-            }
-
-            client.ApplicationMessageReceivedAsync += OnApplicationMessageReceivedAsync;
-
-            try
-            {
-                var message =
-                    factory.CreateApplicationMessageBuilder()
-                           .WithTopic(topics.Request)
-                           .WithPayload(request.ToByteArray())
-                           .WithCorrelationData(id.ToByteArray())
-                           .WithResponseTopic(topics.Response)
-                           .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
-                           .Build();
-
-                await client.PublishAsync(message, cancellationToken);
-
-                return await taskCompletionSource.Task.WaitAsync(cancellationToken);
-            }
-            finally
-            {
-                client.ApplicationMessageReceivedAsync -= OnApplicationMessageReceivedAsync;
-            }
-        }
-    }
-}
-
-public class ChariottRpcException : Exception
-{
-    public ChariottRpcException() : this(null, null, null) { }
-    public ChariottRpcException(string? message) : this(message, null, null) { }
-    public ChariottRpcException(string? message, string? detail) : this(message, detail, null) { }
-    public ChariottRpcException(string? message, Exception? inner) : this(message, null, inner) { }
-
-    public ChariottRpcException(string? message, string? detail, Exception? inner) :
-        base(message ?? "Remote procedure call failed.", inner) =>
-        Detail = detail;
-
-    public string? Detail { get; }
-}
-
 [DocoptArguments]
 partial class PromptArguments
 {
@@ -531,31 +396,5 @@ partial class ProgramArguments
             writer.WriteLine(text.Replace("$", Path.GetFileName(Environment.ProcessPath)));
             return Task.FromResult(exitCode);
         }
-    }
-}
-
-static class Extensions
-{
-    public static string ToJsonEncoding(this IMessage message, JsonSerializerOptions? jsonSerializerOptions = null)
-    {
-        using var sw = new StringWriter();
-        JsonFormatter.Default.Format(message, sw);
-        var json = sw.ToString();
-        return JsonSerializer.Serialize(JsonSerializer.Deserialize<JsonElement>(json), jsonSerializerOptions);
-    }
-
-    public static Task ApplyAsync(this Timeout timeout, Func<CancellationToken, Task> function) =>
-        timeout.ApplyAsync(async cancellationToken =>
-        {
-            await function(cancellationToken);
-            return 0;
-        });
-
-    public static async Task<T> ApplyAsync<T>(this Timeout timeout, Func<CancellationToken, Task<T>> function)
-    {
-        using var cts = timeout is { Duration: var delay } && delay >= TimeSpan.Zero
-            ? new CancellationTokenSource(delay)
-            : null;
-        return await function(cts?.Token ?? CancellationToken.None);
     }
 }
