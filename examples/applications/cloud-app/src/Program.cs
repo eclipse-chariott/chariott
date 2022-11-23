@@ -89,6 +89,9 @@ static async Task<int> Main(ProgramArguments args)
 
     var prettyPrintEventsJson = args.OptPrettyEvents;
 
+    var newEventCountLock = new object();
+    var newEventCount = 0;
+
     mqttClient.ApplicationMessageReceivedAsync += async args =>
     {
         if (args.ApplicationMessage.Topic != eventsTopic)
@@ -102,6 +105,9 @@ static async Task<int> Main(ProgramArguments args)
             await using var stream = File.Open(eventsFilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
             await using var writer = new StreamWriter(stream, utf8);
             await writer.WriteLineAsync(json);
+
+            lock (newEventCountLock)
+                newEventCount++;
         }
         finally
         {
@@ -125,8 +131,15 @@ static async Task<int> Main(ProgramArguments args)
 
     string? Prompt()
     {
+        int eventCount;
+        lock (newEventCountLock)
+            eventCount = newEventCount;
+        if (eventCount > 0)
+            Console.Error.WriteLine($"There are new events ({eventCount}). Use \"show new events\" to see them.");
+
         if (!isOutputRedirected)
             Console.Write("> ");
+
         return Console.ReadLine();
     }
 
@@ -201,6 +214,9 @@ static async Task<int> Main(ProgramArguments args)
                                 while (await reader.ReadLineAsync() is { } fileLine)
                                     Console.WriteLine(fileLine);
                                 eventsFileReadPosition = stream.Position;
+
+                                lock (newEventCountLock)
+                                    newEventCount = 0;
                             }
                             finally
                             {
