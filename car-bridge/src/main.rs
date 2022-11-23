@@ -17,7 +17,7 @@ use chariott_proto::{
     runtime::{FulfillRequest, FulfillResponse},
 };
 use messaging::{MqttMessaging, Publisher, Subscriber};
-use paho_mqtt::{Message as MqttMessage, MessageBuilder, Properties, PropertyCode, QOS_2};
+use paho_mqtt::{Message as MqttMessage, MessageBuilder, Properties, PropertyCode, QOS_1, QOS_2};
 use prost::Message as ProtoMessage;
 use streaming::{Action, ProviderRegistry, SubscriptionState};
 use tokio::{
@@ -244,14 +244,7 @@ async fn handle_message(
         let mut payload = vec![];
         response.encode(&mut payload)?;
 
-        Ok(Message::SuccessResponse(
-            payload,
-            Metadata {
-                content_type: "application/x-proto+chariott.common.v1.FulfillResponse",
-                qos: QOS_2,
-            },
-            request.correlation_information,
-        ))
+        Ok(Message::SuccessResponse(payload, request.correlation_information))
     }
 
     let request = match Request::try_from_message(message) {
@@ -277,14 +270,7 @@ async fn handle_message(
         Err(error) => {
             debug!("Error when handling message: '{error:?}'.");
 
-            Message::ErrorResponse(
-                format!("{error:?}"),
-                Metadata {
-                    content_type: "application/x-proto+chariott.common.v1.Value",
-                    qos: QOS_2,
-                },
-                correlation_information,
-            )
+            Message::ErrorResponse(format!("{error:?}"), correlation_information)
         }
     };
 
@@ -318,22 +304,22 @@ impl ResponseSender {
 type Topic = String;
 
 pub enum Message {
-    Default(Vec<u8>, Topic, Metadata),
-    SuccessResponse(Vec<u8>, Metadata, CorrelationInformation),
-    ErrorResponse(String, Metadata, CorrelationInformation),
+    Event(Vec<u8>, Topic),
+    SuccessResponse(Vec<u8>, CorrelationInformation),
+    ErrorResponse(String, CorrelationInformation),
 }
 
 impl Message {
     fn try_into_message(self) -> Result<(Topic, MessageBuilder), Error> {
         fn get_properties(
-            metadata: Metadata,
+            content_type: &str,
             is_error: bool,
             correlation_data: Option<Vec<u8>>,
         ) -> Result<Properties, Error> {
             let mut properties = Properties::new();
 
             properties
-                .push_string(PropertyCode::ContentType, metadata.content_type)
+                .push_string(PropertyCode::ContentType, content_type)
                 .map_err_with("Could not set content type property.")?;
 
             properties
@@ -357,36 +343,42 @@ impl Message {
         }
 
         let (payload, qos, topic, properties) = match self {
-            Message::SuccessResponse(payload, metadata, correlation_information) => (
+            Message::SuccessResponse(payload, correlation_information) => (
                 payload,
-                metadata.qos,
+                QOS_2,
                 correlation_information.response_topic,
-                get_properties(metadata, false, Some(correlation_information.correlation_data))?,
+                get_properties(
+                    "application/x-proto+chariott.common.v1.FulfillResponse",
+                    false,
+                    Some(correlation_information.correlation_data),
+                )?,
             ),
-            Message::ErrorResponse(message, metadata, correlation_information) => {
+            Message::ErrorResponse(message, correlation_information) => {
                 let mut payload = vec![];
                 let message = ValueMessage { value: Some(ValueEnum::String(message)) };
                 message.encode(&mut payload).map_err_with("Failed to encode error response.")?;
 
                 (
                     payload,
-                    metadata.qos,
+                    QOS_2,
                     correlation_information.response_topic,
-                    get_properties(metadata, true, Some(correlation_information.correlation_data))?,
+                    get_properties(
+                        "application/x-proto+chariott.common.v1.Value",
+                        true,
+                        Some(correlation_information.correlation_data),
+                    )?,
                 )
             }
-            Message::Default(payload, topic, metadata) => {
-                (payload, metadata.qos, topic, get_properties(metadata, true, None)?)
-            }
+            Message::Event(payload, topic) => (
+                payload,
+                QOS_1,
+                topic,
+                get_properties("application/x-proto+chariott.streaming.v1.Event", false, None)?,
+            ),
         };
 
         Ok((topic, MessageBuilder::new().payload(payload).properties(properties).qos(qos)))
     }
-}
-
-pub struct Metadata {
-    content_type: &'static str,
-    qos: i32,
 }
 
 #[derive(Clone)]

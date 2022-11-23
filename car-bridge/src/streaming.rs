@@ -7,13 +7,12 @@ use chariott_common::{chariott_api::ChariottCommunication, error::Error};
 use chariott_proto::streaming::Event;
 use ess::{EventSubSystem, NotReadingEvents};
 use examples_common::chariott::api::{Chariott, ChariottCommunicationExt as _};
-use paho_mqtt::QOS_1;
 use prost::Message as _;
 use tokio::spawn;
 use tokio_stream::StreamExt as _;
 use tracing::{debug, warn};
 
-use crate::{Message, Metadata, ResponseSender};
+use crate::{Message, ResponseSender};
 
 /// Identifies a namespace
 type Namespace = String;
@@ -197,16 +196,7 @@ impl Provider {
                     debug!("Failed to encode event: '{err:?}'.");
                 }
 
-                response_sender
-                    .send(Message::Default(
-                        buffer,
-                        topic.clone(),
-                        Metadata {
-                            content_type: "application/x-proto+chariott.streaming.v1.Event",
-                            qos: QOS_1,
-                        },
-                    ))
-                    .await;
+                response_sender.send(Message::Event(buffer, topic.clone())).await;
             }
 
             warn!("Stream for topic '{topic}' broke.");
