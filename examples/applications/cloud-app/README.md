@@ -95,7 +95,8 @@ Prints the session VIN.
     get events.file
 
 Prints the full path to the file where events from subscriptions are being
-recorded.
+recorded. This can be useful to run a `tail -f` against the file and monitor
+events arriving in near real-time.
 
 ### `inspect`
 
