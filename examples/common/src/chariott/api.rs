@@ -25,7 +25,7 @@ use chariott_proto::{
         WriteFulfillment, WriteIntent,
     },
     runtime::FulfillResponse,
-    streaming::{channel_service_client::ChannelServiceClient, OpenRequest, Event as EventMessage},
+    streaming::{channel_service_client::ChannelServiceClient, Event as EventMessage, OpenRequest},
 };
 use futures::{stream::BoxStream, StreamExt};
 use tonic::{Request, Response, Status};

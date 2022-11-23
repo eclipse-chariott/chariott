@@ -51,11 +51,11 @@ impl SubscriptionState {
     pub fn commit(&mut self, action: Action) {
         match action {
             Action::Listen(namespace) => {
-                self.sources_by_namespace.insert(namespace.clone(), HashSet::new());
+                self.sources_by_namespace.insert(namespace, HashSet::new());
             }
             Action::Subscribe(namespace, source) => {
                 if let Some(sources) = self.sources_by_namespace.get_mut(&namespace) {
-                    sources.insert(source.clone());
+                    sources.insert(source);
                 };
             }
             Action::Link(namespace, topic) => {
@@ -77,7 +77,7 @@ impl SubscriptionState {
     ) -> Option<Action> {
         // Check if listening
         if !self.sources_by_namespace.contains_key(&namespace) {
-            return Some(Action::Listen(namespace.clone()));
+            return Some(Action::Listen(namespace));
         }
 
         // Check if subscribed
@@ -87,7 +87,7 @@ impl SubscriptionState {
             .and_then(|sources| sources.get(&source))
             .is_none()
         {
-            return Some(Action::Subscribe(namespace.clone(), source.clone()));
+            return Some(Action::Subscribe(namespace, source));
         }
 
         // Check if linked

@@ -205,7 +205,7 @@ async fn handle_message(
                                     .expect(
                                         "Prior to subscribing we must have established listening.",
                                     )
-                                    .subscribe(chariott, source.into())
+                                    .subscribe(chariott, source)
                                     .await?;
                             }
                             Action::Link(namespace, topic) => {
@@ -269,7 +269,6 @@ async fn handle_message(
         Ok(message) => message,
         Err(error) => {
             debug!("Error when handling message: '{error:?}'.");
-
             Message::ErrorResponse(format!("{error:?}"), correlation_information)
         }
     };
