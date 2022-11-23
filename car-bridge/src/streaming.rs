@@ -89,13 +89,14 @@ impl SubscriptionState {
         }
 
         // Check if linked
-        let link = (namespace.clone(), topic.clone());
+        let link = (namespace, topic);
         if !self.links.contains(&link) {
             let (namespace, topic) = link;
             return Some(Action::Link(namespace, topic));
         }
 
         // Check if routed
+        let (namespace, topic) = link;
         let route = (namespace, topic, source);
         if !self.routes.contains(&route) {
             let (namespace, topic, source) = route;
