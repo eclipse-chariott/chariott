@@ -312,7 +312,7 @@ static Value ParseValue(string input)
     if (Regex.Match(input, @"^[0-9]*.[0-9]+$") is { Success: true, Value: var f64 })
         return new() { Float64 = double.Parse(f64, CultureInfo.InvariantCulture) };
 
-    return new() { String = input };
+    return new() { String = input is ['\'', .., '\''] ? input[1..^1] : input };
 }
 
 static FulfillRequest FulfillRequest(string ns, Action<Intent> intentInitializer)
