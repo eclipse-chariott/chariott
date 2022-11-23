@@ -130,14 +130,16 @@ struct Request {
     correlation_information: CorrelationInformation,
 }
 
-impl Request {
-    pub fn try_from_message(message: MqttMessage) -> Result<Self, Error> {
-        let correlation_data = message
+impl TryFrom<MqttMessage> for Request {
+    type Error = Error;
+
+    fn try_from(value: MqttMessage) -> Result<Self, Self::Error> {
+        let correlation_data = value
             .properties()
             .get_binary(PropertyCode::CorrelationData)
             .ok_or_else(|| Error::new("No correlation data found on message."))?;
 
-        let response_topic = message
+        let response_topic = value
             .properties()
             .get_string(PropertyCode::ResponseTopic)
             .ok_or_else(|| Error::new("No response topic found on message."))?;
@@ -146,7 +148,7 @@ impl Request {
         // information, but do not do it because it adds little value for more
         // complexity.
 
-        let fulfill_request: FulfillRequest = ProtoMessage::decode(message.payload())
+        let fulfill_request: FulfillRequest = ProtoMessage::decode(value.payload())
             .map_err_with("Failed to decode message payload as 'FulfillRequest'.")?;
 
         let intent_enum = fulfill_request
@@ -247,7 +249,7 @@ async fn handle_message(
         Ok(Message::SuccessResponse(payload, request.correlation_information))
     }
 
-    let request = match Request::try_from_message(message) {
+    let request: Request = match message.try_into() {
         Ok(r) => r,
         Err(e) => {
             debug!("Failed to parse message: '{e:?}'.");
