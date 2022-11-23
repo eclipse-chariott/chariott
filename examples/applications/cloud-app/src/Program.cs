@@ -65,10 +65,10 @@ static async Task<int> Main(ProgramArguments args)
 
     var binName = Path.GetFileNameWithoutExtension(Environment.ProcessPath);
 
-    var eventsChannelId = string.Join("/", Environment.MachineName,
-                                           binName,
-                                           Environment.ProcessId,
-                                           "events");
+    var eventsTopic = string.Join("/", Environment.MachineName,
+                                       binName,
+                                       Environment.ProcessId,
+                                       "events");
 
     const string eventsFileExtension = ".cjson"; // https://en.wikipedia.org/wiki/JSON_streaming#Concatenated_JSON
     var eventFilesDirPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), $".{binName}", "events");
@@ -83,7 +83,7 @@ static async Task<int> Main(ProgramArguments args)
     foreach (var file in oldEventsFiles)
         file.Delete();
 
-    var eventsFilePath = Path.Join(eventFilesDirPath, eventsChannelId.Replace('/', '=') + eventsFileExtension);
+    var eventsFilePath = Path.Join(eventFilesDirPath, eventsTopic.Replace('/', '=') + eventsFileExtension);
     var eventsFileReadPosition = 0L;
     var eventsFileLock = new SemaphoreSlim(1);
 
@@ -91,7 +91,7 @@ static async Task<int> Main(ProgramArguments args)
 
     mqttClient.ApplicationMessageReceivedAsync += async args =>
     {
-        if (args.ApplicationMessage.Topic != eventsChannelId)
+        if (args.ApplicationMessage.Topic != eventsTopic)
             return;
 
         var @event = Event.Parser.ParseFrom(args.ApplicationMessage.Payload);
@@ -113,7 +113,7 @@ static async Task<int> Main(ProgramArguments args)
     {
         var options =
             mqttFactory.CreateSubscribeOptionsBuilder()
-                       .WithTopicFilter(eventsChannelId)
+                       .WithTopicFilter(eventsTopic)
                        .Build();
         return mqttClient.SubscribeAsync(options, cancellationToken);
     });
@@ -237,14 +237,14 @@ static async Task<int> Main(ProgramArguments args)
 
                         request = FulfillRequest(ns, fi =>
                         {
-                            var subscribeIntent = new SubscribeIntent { ChannelId = eventsChannelId };
+                            var subscribeIntent = new SubscribeIntent { ChannelId = eventsTopic };
                             subscribeIntent.Sources.AddRange(sources);
                             fi.Subscribe = subscribeIntent;
                         });
 
                         if (isFirstSubscription)
                         {
-                            Console.Error.WriteLine($"The events channel identifier is: {eventsChannelId}");
+                            Console.Error.WriteLine($"The events channel identifier is: {eventsTopic}");
                             Console.Error.WriteLine(eventsFilePath);
                             isFirstSubscription = false;
                         }
