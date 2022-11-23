@@ -322,8 +322,8 @@ static Value ParseValue(string input)
 {
     input = input.Trim();
 
-    if (Regex.Match(input, @"^(?:true|false)$") is { Success: true, Value: var flag })
-        return new() { Bool = flag == "true" };
+    if (input is var @bool and ("true" or "false"))
+        return new() { Bool = @bool is "true" };
 
     if (Regex.Match(input, @"^[0-9]+$") is { Success: true, Value: var n32 })
         return new() { Int32 = int.Parse(n32, CultureInfo.InvariantCulture) };
