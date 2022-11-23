@@ -34,8 +34,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install protobuf-compiler
-        run: sudo apt-get install -y protobuf-compiler
+      - name: Install dependencies
+        run: sudo apt-get install -y protobuf-compiler libssl-dev build-essential cmake
       - name: Install stable toolchain
         run: |
           rustup show
@@ -64,8 +64,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install protobuf-compiler
-        run: sudo apt-get install -y protobuf-compiler
+      - name: Install dependencies
+        run: sudo apt-get install -y protobuf-compiler libssl-dev build-essential cmake
       - name: Install stable toolchain
         run: rustup show
       - name: Cache Dependencies
