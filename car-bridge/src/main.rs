@@ -124,6 +124,44 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+struct Request {
+    intent_enum: IntentEnum,
+    namespace: String,
+    correlation_information: CorrelationInformation,
+}
+
+impl Request {
+    pub fn try_from_message(message: MqttMessage) -> Result<Self, Error> {
+        let correlation_data = message
+            .properties()
+            .get_binary(PropertyCode::CorrelationData)
+            .ok_or_else(|| Error::new("No correlation data found on message."))?;
+
+        let response_topic = message
+            .properties()
+            .get_string(PropertyCode::ResponseTopic)
+            .ok_or_else(|| Error::new("No response topic found on message."))?;
+
+        // We could propagate errors following here as we now the response
+        // information, but do not do it because it adds little value for more
+        // complexity.
+
+        let fulfill_request: FulfillRequest = ProtoMessage::decode(message.payload())
+            .map_err_with("Failed to decode message payload as 'FulfillRequest'.")?;
+
+        let intent_enum = fulfill_request
+            .intent
+            .and_then(|intent| intent.intent)
+            .ok_or_else(|| Error::new("Message does not contain an intent."))?;
+
+        Ok(Self {
+            intent_enum,
+            namespace: fulfill_request.namespace,
+            correlation_information: CorrelationInformation { correlation_data, response_topic },
+        })
+    }
+}
+
 async fn handle_message(
     chariott: &mut impl ChariottCommunication,
     response_sender: ResponseSender,
@@ -136,19 +174,9 @@ async fn handle_message(
         response_sender: &ResponseSender,
         subscription_state: &Arc<Mutex<SubscriptionState>>,
         provider_registry: &Arc<Mutex<ProviderRegistry>>,
-        message: &MqttMessage,
-        correlation_information: CorrelationInformation,
+        request: Request,
     ) -> Result<Message, Box<dyn std::error::Error>> {
-        let fulfill_request: FulfillRequest = ProtoMessage::decode(message.payload())?;
-
-        let namespace = fulfill_request.namespace;
-
-        let intent_enum = fulfill_request
-            .intent
-            .and_then(|intent| intent.intent)
-            .ok_or_else(|| Error::new("Message does not contain an intent."))?;
-
-        let response = match intent_enum {
+        let response = match request.intent_enum {
             IntentEnum::Discover(_) => Err(Error::new("Discover is not supported.")),
             IntentEnum::Subscribe(subscribe_intent) => {
                 for source in subscribe_intent.sources {
@@ -159,7 +187,7 @@ async fn handle_message(
                     let mut subscription_state = subscription_state.lock().await;
 
                     while let Some(action) = subscription_state.next_action(
-                        namespace.clone(),
+                        request.namespace.clone(),
                         source.clone(),
                         subscribe_intent.channel_id.clone(),
                     ) {
@@ -174,7 +202,9 @@ async fn handle_message(
                             Action::Subscribe(namespace, source) => {
                                 provider_events
                                     .get_event_provider_mut(&namespace)
-                                    .expect("Prior to subscribing we must have established listening.")
+                                    .expect(
+                                        "Prior to subscribing we must have established listening.",
+                                    )
                                     .subscribe(chariott, source.into())
                                     .await?;
                             }
@@ -189,7 +219,9 @@ async fn handle_message(
                                     .get_event_provider(&namespace)
                                     .expect("Prior to routing we must have established listening.")
                                     .route(topic, source)
-                                    .expect("Prior to routing there we must have established linking.");
+                                    .expect(
+                                        "Prior to routing there we must have established linking.",
+                                    );
                             }
                         }
 
@@ -203,7 +235,10 @@ async fn handle_message(
                     }),
                 })
             }
-            _ => chariott.fulfill(namespace, intent_enum).await.map(|r| r.into_inner()),
+            _ => chariott
+                .fulfill(request.namespace, request.intent_enum)
+                .await
+                .map(|r| r.into_inner()),
         }?;
 
         let mut payload = vec![];
@@ -215,25 +250,26 @@ async fn handle_message(
                 content_type: "application/x-proto+chariott.common.v1.FulfillResponse",
                 qos: QOS_2,
             },
-            correlation_information,
+            request.correlation_information,
         ))
     }
 
-    let correlation_information = match message.get_correlation_information() {
-        Ok(cm) => cm,
-        Err(error) => {
-            debug!("Error when getting correlation information from message: '{error:?}'.");
+    let request = match Request::try_from_message(message) {
+        Ok(r) => r,
+        Err(e) => {
+            debug!("Failed to parse message: '{e:?}'.");
             return;
         }
     };
+
+    let correlation_information = request.correlation_information.clone();
 
     let response = match get_response(
         chariott,
         &response_sender,
         &subscription_state,
         &provider_registry,
-        &message,
-        correlation_information.clone(),
+        request,
     )
     .await
     {
@@ -251,8 +287,6 @@ async fn handle_message(
             )
         }
     };
-
-    // TODO: set correlation information.
 
     response_sender.send(response).await;
 }
@@ -359,24 +393,4 @@ pub struct Metadata {
 pub struct CorrelationInformation {
     correlation_data: Vec<u8>,
     response_topic: String,
-}
-
-trait MqttExt {
-    fn get_correlation_information(&self) -> Result<CorrelationInformation, Error>;
-}
-
-impl MqttExt for MqttMessage {
-    fn get_correlation_information(&self) -> Result<CorrelationInformation, Error> {
-        let correlation_data = self
-            .properties()
-            .get_binary(PropertyCode::CorrelationData)
-            .ok_or_else(|| Error::new("No correlation data found on message."))?;
-
-        let response_topic = self
-            .properties()
-            .get_string(PropertyCode::ResponseTopic)
-            .ok_or_else(|| Error::new("No response topic found on message."))?;
-
-        Ok(CorrelationInformation { correlation_data, response_topic })
-    }
 }
