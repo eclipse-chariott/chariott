@@ -333,6 +333,8 @@ static FulfillRequest FulfillRequest(string ns, Action<Intent> intentInitializer
     return request;
 }
 
+readonly record struct Timeout(TimeSpan Duration);
+
 record Session
 {
     public required Vin Vin { get; init; }
@@ -531,8 +533,6 @@ partial class ProgramArguments
         }
     }
 }
-
-readonly record struct Timeout(TimeSpan Duration);
 
 static class Extensions
 {
