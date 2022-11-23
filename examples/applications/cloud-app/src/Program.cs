@@ -118,7 +118,6 @@ static async Task<int> Main(ProgramArguments args)
         return mqttClient.SubscribeAsync(options, cancellationToken);
     });
 
-    var isFirstSubscription = true;
     var session = new Session { Vin = new(args.OptVin) };
 
     var quit = false;
@@ -156,6 +155,11 @@ static async Task<int> Main(ProgramArguments args)
                     {
                         Debug.Assert(vin is not null);
                         session = session with { Vin = new(vin) };
+                        break;
+                    }
+                    case { CmdGet: true, CmdEventsDotFile: true }:
+                    {
+                        Console.WriteLine(eventsFilePath);
                         break;
                     }
                     case { CmdShow: true, CmdTopics: true }:
@@ -242,13 +246,6 @@ static async Task<int> Main(ProgramArguments args)
                             subscribeIntent.Sources.AddRange(sources);
                             fi.Subscribe = subscribeIntent;
                         });
-
-                        if (isFirstSubscription)
-                        {
-                            Console.Error.WriteLine($"The events channel identifier is: {eventsTopic}");
-                            Console.Error.WriteLine(eventsFilePath);
-                            isFirstSubscription = false;
-                        }
                         break;
                     }
                     default:
@@ -347,6 +344,7 @@ partial class PromptArguments
         $ ping
         $ set vin <vin>
         $ get vin
+        $ get events.file
         $ inspect <namespace> <query>
         $ read <namespace> <key>
         $ write <namespace> <key> <value>

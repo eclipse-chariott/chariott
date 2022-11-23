@@ -44,6 +44,7 @@ be used to drive interactivity with the Car Bridge and in-car applications:
     ping
     set vin <vin>
     get vin
+    get events.file
     inspect <namespace> <query>
     read <namespace> <key>
     write <namespace> <key> <value>
@@ -88,6 +89,13 @@ launching the application.
     print vin
 
 Prints the session VIN.
+
+### `get events.file`
+
+    get events.file
+
+Prints the full path to the file where events from subscriptions are being
+recorded.
 
 ### `inspect`
 
