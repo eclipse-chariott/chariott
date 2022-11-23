@@ -6,7 +6,7 @@ license = "MIT"
 
 [dependencies]
 chariott-common = { workspace = true }
-paho-mqtt = "0.11"
+paho-mqtt = { version = "0.11", features = ["build_bindgen", "bundled", "ssl"] }
 tokio = { workspace = true, features = ["rt-multi-thread"] }
 tokio-stream = { workspace = true }
 tracing = { workspace = true }
