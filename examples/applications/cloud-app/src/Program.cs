@@ -241,6 +241,15 @@ static async Task<int> Main(ProgramArguments args)
                         }
                         break;
                     }
+                    case { CmdShow: true, CmdValue: true, ArgValue: var valueText }:
+                    {
+                        Debug.Assert(valueText is not null);
+
+                        Console.WriteLine(TryParseValue(valueText, out var kind, out var value)
+                                          ? $"{kind}: {value}"
+                                          : "ERROR");
+                        break;
+                    }
                     case { CmdInspect: true, ArgNamespace: var ns, ArgQuery: var query }:
                     {
                         Debug.Assert(ns is not null);
@@ -260,7 +269,7 @@ static async Task<int> Main(ProgramArguments args)
                         Debug.Assert(ns is not null);
                         Debug.Assert(valueText is not null);
 
-                        if (TryParseValue(valueText, out var value))
+                        if (TryParseValue(valueText, out _, out var value))
                             request = FulfillRequest(ns, fi => fi.Write = new() { Key = key, Value = value });
                         else
                             Console.Error.WriteLine($"Invalid value: {valueText}");
@@ -272,7 +281,7 @@ static async Task<int> Main(ProgramArguments args)
                         Debug.Assert(cmdArgs is not null);
 
                         var argValuePairs =
-                            cmdArgs.Select(arg => TryParseValue(arg, out var v) ? (Arg: arg, Value: v) : (arg, null))
+                            cmdArgs.Select(arg => TryParseValue(arg, out _, out var v) ? (Arg: arg, Value: v) : (arg, null))
                                    .ToList();
 
                         if (argValuePairs.All(av => av is (_, not null)))
@@ -344,38 +353,41 @@ static async Task<int> Main(ProgramArguments args)
     return 0;
 }
 
-static bool TryParseValue(string input, [NotNullWhen(true)] out Value? value)
+static bool TryParseValue(string input,
+                          [NotNullWhen(true)] out Value.ValueOneofCase? kind,
+                          [NotNullWhen(true)] out Value? value)
 {
     input = input.Trim();
+    kind = default;
     value = null;
 
     if (input is var @bool and ("true" or "false"))
     {
-        value = new() { Bool = @bool is "true" };
+        (kind, value) = (Value.ValueOneofCase.Bool, new() { Bool = @bool is "true" });
     }
     else if (Regex.Match(input, @"^(?:\\-|\+)?[0-9]+$") is { Success: true, Value: var n32s })
     {
         if (int.TryParse(n32s.AsSpan().TrimStart('\\'), NumberStyles.Integer, CultureInfo.InvariantCulture, out var n32))
-            value = new() { Int32 = n32 };
+            (kind, value) = (Value.ValueOneofCase.Int32, new() { Int32 = n32 });
     }
     else if (Regex.Match(input, @"^(?:\\-|\+)?[0-9]+(?=L$)") is { Success: true, Value: var n64s })
     {
         if (long.TryParse(n64s.AsSpan().TrimStart('\\'), NumberStyles.Integer, CultureInfo.InvariantCulture, out var n64))
-            value = new() { Int64 = n64 };
+            (kind, value) = (Value.ValueOneofCase.Int64, new() { Int64 = n64 });
     }
     else if (Regex.Match(input, @"^(?:\\-|\+)?[0-9]*.[0-9]+(?=[fF]$)") is { Success: true, Value: var f32s })
     {
         if (float.TryParse(f32s.AsSpan().TrimStart('\\'), NumberStyles.Float, CultureInfo.InvariantCulture, out var f32))
-            value = new() { Float32 = f32 };
+            (kind, value) = (Value.ValueOneofCase.Float32, new() { Float32 = f32 });
     }
     else if (Regex.Match(input, @"^(?:\\-|\+)?[0-9]*.[0-9]+$") is { Success: true, Value: var f64s })
     {
         if (double.TryParse(f64s.AsSpan().TrimStart('\\'), NumberStyles.Float, CultureInfo.InvariantCulture, out var f64))
-            value = new() { Float64 = f64 };
+            (kind, value) = (Value.ValueOneofCase.Float64, new() { Float64 = f64 });
     }
     else
     {
-        value = new() { String = input is ['\'', .., '\''] ? input[1..^1] : input };
+        (kind, value) = (Value.ValueOneofCase.String, new() { String = input is ['\'', .., '\''] ? input[1..^1] : input });
     }
 
     return value is not null;
@@ -421,6 +433,7 @@ partial class PromptArguments
             $ subscribe <namespace> <source>...
             $ show topics
             $ show new events
+            $ show value <value>
             $ (quit | exit)
             $ help
         """;

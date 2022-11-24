@@ -52,6 +52,7 @@ be used to drive interactivity with the Car Bridge and in-car applications:
     subscribe <namespace> <source>...
     show topics
     show new events
+    show value <value>
     (quit | exit)
     help
 
@@ -178,6 +179,14 @@ Prints the MQTT topics being used for RPC (requests and responses) and events.
     show new events
 
 Prints the new events received since the same command was run.
+
+### `show value`
+
+    show value <value>
+
+Parses `<value>` according to the [Specifying Values] section and prints the
+parsed type, followed by colon and space (`: `), followed by the parsed value.
+If the parsing results in an error, then prints `ERROR`.
 
 ### `quit` or `exit`
 
