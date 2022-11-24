@@ -353,24 +353,24 @@ static bool TryParseValue(string input, [NotNullWhen(true)] out Value? value)
     {
         value = new() { Bool = @bool is "true" };
     }
-    else if (Regex.Match(input, @"^[0-9]+$") is { Success: true, Value: var n32s })
+    else if (Regex.Match(input, @"^(?:\\-|\+)?[0-9]+$") is { Success: true, Value: var n32s })
     {
-        if (int.TryParse(n32s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var n32))
+        if (int.TryParse(n32s.AsSpan().TrimStart('\\'), NumberStyles.Integer, CultureInfo.InvariantCulture, out var n32))
             value = new() { Int32 = n32 };
     }
-    else if (Regex.Match(input, @"^[0-9]+(?=L$)") is { Success: true, Value: var n64s })
+    else if (Regex.Match(input, @"^(?:\\-|\+)?[0-9]+(?=L$)") is { Success: true, Value: var n64s })
     {
-        if (long.TryParse(n64s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var n64))
+        if (long.TryParse(n64s.AsSpan().TrimStart('\\'), NumberStyles.Integer, CultureInfo.InvariantCulture, out var n64))
             value = new() { Int64 = n64 };
     }
-    else if (Regex.Match(input, @"^[0-9]*.[0-9]+(?=[fF]$)") is { Success: true, Value: var f32s })
+    else if (Regex.Match(input, @"^(?:\\-|\+)?[0-9]*.[0-9]+(?=[fF]$)") is { Success: true, Value: var f32s })
     {
-        if (float.TryParse(f32s, NumberStyles.Float, CultureInfo.InvariantCulture, out var f32))
+        if (float.TryParse(f32s.AsSpan().TrimStart('\\'), NumberStyles.Float, CultureInfo.InvariantCulture, out var f32))
             value = new() { Float32 = f32 };
     }
-    else if (Regex.Match(input, @"^[0-9]*.[0-9]+$") is { Success: true, Value: var f64s })
+    else if (Regex.Match(input, @"^(?:\\-|\+)?[0-9]*.[0-9]+$") is { Success: true, Value: var f64s })
     {
-        if (double.TryParse(f64s, NumberStyles.Float, CultureInfo.InvariantCulture, out var f64))
+        if (double.TryParse(f64s.AsSpan().TrimStart('\\'), NumberStyles.Float, CultureInfo.InvariantCulture, out var f64))
             value = new() { Float64 = f64 };
     }
     else
