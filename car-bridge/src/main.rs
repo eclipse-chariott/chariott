@@ -122,46 +122,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-struct Request {
-    intent_enum: IntentEnum,
-    namespace: String,
-    correlation_information: CorrelationInformation,
-}
-
-impl TryFrom<MqttMessage> for Request {
-    type Error = Error;
-
-    fn try_from(value: MqttMessage) -> Result<Self, Self::Error> {
-        let correlation_data = value
-            .properties()
-            .get_binary(PropertyCode::CorrelationData)
-            .ok_or_else(|| Error::new("No correlation data found on message."))?;
-
-        let response_topic = value
-            .properties()
-            .get_string(PropertyCode::ResponseTopic)
-            .ok_or_else(|| Error::new("No response topic found on message."))?;
-
-        // We could propagate errors following here as we now the response
-        // information, but do not do it because it adds little value for more
-        // complexity.
-
-        let fulfill_request: FulfillRequest = ProtoMessage::decode(value.payload())
-            .map_err_with("Failed to decode message payload as 'FulfillRequest'.")?;
-
-        let intent_enum = fulfill_request
-            .intent
-            .and_then(|intent| intent.intent)
-            .ok_or_else(|| Error::new("Message does not contain an intent."))?;
-
-        Ok(Self {
-            intent_enum,
-            namespace: fulfill_request.namespace,
-            correlation_information: CorrelationInformation { correlation_data, response_topic },
-        })
-    }
-}
-
 async fn handle_message(
     chariott: &mut impl ChariottCommunication,
     response_sender: ResponseSender,
@@ -274,6 +234,46 @@ async fn handle_message(
     };
 
     response_sender.send(response).await;
+}
+
+struct Request {
+    intent_enum: IntentEnum,
+    namespace: String,
+    correlation_information: CorrelationInformation,
+}
+
+impl TryFrom<MqttMessage> for Request {
+    type Error = Error;
+
+    fn try_from(value: MqttMessage) -> Result<Self, Self::Error> {
+        let correlation_data = value
+            .properties()
+            .get_binary(PropertyCode::CorrelationData)
+            .ok_or_else(|| Error::new("No correlation data found on message."))?;
+
+        let response_topic = value
+            .properties()
+            .get_string(PropertyCode::ResponseTopic)
+            .ok_or_else(|| Error::new("No response topic found on message."))?;
+
+        // We could propagate errors following here as we now the response
+        // information, but do not do it because it adds little value for more
+        // complexity.
+
+        let fulfill_request: FulfillRequest = ProtoMessage::decode(value.payload())
+            .map_err_with("Failed to decode message payload as 'FulfillRequest'.")?;
+
+        let intent_enum = fulfill_request
+            .intent
+            .and_then(|intent| intent.intent)
+            .ok_or_else(|| Error::new("Message does not contain an intent."))?;
+
+        Ok(Self {
+            intent_enum,
+            namespace: fulfill_request.namespace,
+            correlation_information: CorrelationInformation { correlation_data, response_topic },
+        })
+    }
 }
 
 #[derive(Clone)]
