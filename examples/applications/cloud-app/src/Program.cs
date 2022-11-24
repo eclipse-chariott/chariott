@@ -95,8 +95,6 @@ static async Task<int> Main(ProgramArguments args)
 
     mqttClient.ApplicationMessageReceivedAsync += async args =>
     {
-        Console.Error.WriteLine("Program: " + args.ApplicationMessage.Topic);
-
         if (args.ApplicationMessage.Topic != eventsTopic)
             return;
 
