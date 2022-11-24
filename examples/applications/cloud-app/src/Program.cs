@@ -4,6 +4,7 @@
 using System;
 using System.CommandLine.Parsing;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -254,12 +255,15 @@ static async Task<int> Main(ProgramArguments args)
                         request = FulfillRequest(ns, fi => fi.Read = new() { Key = key });
                         break;
                     }
-                    case { CmdWrite: true, ArgNamespace: var ns, ArgKey: var key, ArgValue: var value }:
+                    case { CmdWrite: true, ArgNamespace: var ns, ArgKey: var key, ArgValue: var valueText }:
                     {
                         Debug.Assert(ns is not null);
-                        Debug.Assert(value is not null);
+                        Debug.Assert(valueText is not null);
 
-                        request = FulfillRequest(ns, fi => fi.Write = new() { Key = key,  Value = ParseValue(value) });
+                        if (TryParseValue(valueText, out var value))
+                            request = FulfillRequest(ns, fi => fi.Write = new() { Key = key, Value = value });
+                        else
+                            Console.Error.WriteLine($"Invalid value: {valueText}");
                         break;
                     }
                     case { CmdInvoke: true, ArgNamespace: var ns, ArgCommand: var cmd, ArgArg: var cmdArgs }:
@@ -267,12 +271,23 @@ static async Task<int> Main(ProgramArguments args)
                         Debug.Assert(ns is not null);
                         Debug.Assert(cmdArgs is not null);
 
-                        request = FulfillRequest(ns, fi =>
+                        var argValuePairs =
+                            cmdArgs.Select(arg => TryParseValue(arg, out var v) ? (Arg: arg, Value: v) : (arg, null))
+                                   .ToList();
+
+                        if (argValuePairs.All(av => av is (_, not null)))
                         {
-                            var invokeIntent = new InvokeIntent { Command = cmd };
-                            invokeIntent.Args.AddRange(from arg in cmdArgs select ParseValue(arg));
-                            fi.Invoke = invokeIntent;
-                        });
+                            request = FulfillRequest(ns, fi =>
+                            {
+                                var invokeIntent = new InvokeIntent { Command = cmd };
+                                invokeIntent.Args.AddRange(from av in argValuePairs select av.Value);
+                                fi.Invoke = invokeIntent;
+                            });
+                        }
+                        else
+                        {
+                            Console.Error.WriteLine($"Invalid value: {argValuePairs.First(v => v.Value is null).Arg}");
+                        }
                         break;
                     }
                     case { CmdSubscribe: true, ArgNamespace: var ns, ArgSource: var sources }:
@@ -329,26 +344,41 @@ static async Task<int> Main(ProgramArguments args)
     return 0;
 }
 
-static Value ParseValue(string input)
+static bool TryParseValue(string input, [NotNullWhen(true)] out Value? value)
 {
     input = input.Trim();
+    value = null;
 
     if (input is var @bool and ("true" or "false"))
-        return new() { Bool = @bool is "true" };
+    {
+        value = new() { Bool = @bool is "true" };
+    }
+    else if (Regex.Match(input, @"^[0-9]+$") is { Success: true, Value: var n32s })
+    {
+        if (int.TryParse(n32s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var n32))
+            value = new() { Int32 = n32 };
+    }
+    else if (Regex.Match(input, @"^[0-9]+(?=L$)") is { Success: true, Value: var n64s })
+    {
+        if (long.TryParse(n64s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var n64))
+            value = new() { Int64 = n64 };
+    }
+    else if (Regex.Match(input, @"^[0-9]*.[0-9]+(?=[fF]$)") is { Success: true, Value: var f32s })
+    {
+        if (float.TryParse(f32s, NumberStyles.Float, CultureInfo.InvariantCulture, out var f32))
+            value = new() { Float32 = f32 };
+    }
+    else if (Regex.Match(input, @"^[0-9]*.[0-9]+$") is { Success: true, Value: var f64s })
+    {
+        if (double.TryParse(f64s, NumberStyles.Float, CultureInfo.InvariantCulture, out var f64))
+            value = new() { Float64 = f64 };
+    }
+    else
+    {
+        value = new() { String = input is ['\'', .., '\''] ? input[1..^1] : input };
+    }
 
-    if (Regex.Match(input, @"^[0-9]+$") is { Success: true, Value: var n32 })
-        return new() { Int32 = int.Parse(n32, CultureInfo.InvariantCulture) };
-
-    if (Regex.Match(input, @"^[0-9]+(?=L$)") is { Success: true, Value: var n64 })
-        return new() { Int64 = long.Parse(n64, CultureInfo.InvariantCulture) };
-
-    if (Regex.Match(input, @"^[0-9]*.[0-9]+(?=[fF]$)") is { Success: true, Value: var f32 })
-        return new() { Float32 = float.Parse(f32, CultureInfo.InvariantCulture) };
-
-    if (Regex.Match(input, @"^[0-9]*.[0-9]+$") is { Success: true, Value: var f64 })
-        return new() { Float64 = double.Parse(f64, CultureInfo.InvariantCulture) };
-
-    return new() { String = input is ['\'', .., '\''] ? input[1..^1] : input };
+    return value is not null;
 }
 
 static FulfillRequest FulfillRequest(string ns, Action<Intent> intentInitializer)
