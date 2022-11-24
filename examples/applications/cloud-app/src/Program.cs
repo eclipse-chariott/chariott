@@ -307,6 +307,9 @@ static async Task<int> Main(ProgramArguments args)
                             subscribeIntent.Sources.AddRange(sources);
                             fi.Subscribe = subscribeIntent;
                         });
+
+                        File.Open(eventsFilePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite)
+                            .Close();
                         break;
                     }
                     default:
