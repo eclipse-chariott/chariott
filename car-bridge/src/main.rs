@@ -179,10 +179,7 @@ async fn handle_message(
         .push_string_pair(
             PropertyCode::UserProperty,
             "error",
-            match response.is_error {
-                true => "1",
-                false => "0",
-            },
+            if response.is_error { "1" } else { "0" },
         )
         .unwrap();
 
