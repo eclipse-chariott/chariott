@@ -173,15 +173,19 @@ async fn handle_message(
 
     let mut properties = Properties::new();
 
-    properties.push_string(PropertyCode::ContentType, response.content_type).unwrap();
+    if let Err(err) = properties.push_string(PropertyCode::ContentType, response.content_type) {
+        debug!("Could not set content type in properties: '{err}'.");
+        return;
+    }
 
-    properties
-        .push_string_pair(
-            PropertyCode::UserProperty,
-            "error",
-            if response.is_error { "1" } else { "0" },
-        )
-        .unwrap();
+    if let Err(err) = properties.push_string_pair(
+        PropertyCode::UserProperty,
+        "error",
+        if response.is_error { "1" } else { "0" },
+    ) {
+        debug!("Could not set error user property: '{err}'.");
+        return;
+    }
 
     if let Err(err) = properties
         .push_binary(PropertyCode::CorrelationData, correlation_information.correlation_data)
