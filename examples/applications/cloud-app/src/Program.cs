@@ -361,9 +361,13 @@ static bool TryParseValue(string input,
     kind = default;
     value = null;
 
-    if (input is var @bool and ("true" or "false"))
+    if (input is "true")
     {
-        (kind, value) = (Value.ValueOneofCase.Bool, new() { Bool = @bool is "true" });
+        (kind, value) = (Value.ValueOneofCase.Bool, new() { Bool = true });
+    }
+    else if (input is "false")
+    {
+        (kind, value) = (Value.ValueOneofCase.Bool, new() { Bool = false });
     }
     else if (Regex.Match(input, @"^(?:\\-|\+)?[0-9]+$") is { Success: true, Value: var n32s })
     {
