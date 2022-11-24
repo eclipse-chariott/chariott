@@ -213,10 +213,8 @@ struct CorrelationInformation {
 }
 
 trait MqttExt {
-    fn get_correlation_information(&self) -> Result<CorrelationInformation, Error>;
-}
+    fn properties(&self) -> &Properties;
 
-impl MqttExt for MqttMessage {
     fn get_correlation_information(&self) -> Result<CorrelationInformation, Error> {
         let correlation_data = self
             .properties()
@@ -229,5 +227,11 @@ impl MqttExt for MqttMessage {
             .ok_or_else(|| Error::new("No response topic found on message."))?;
 
         Ok(CorrelationInformation { correlation_data, response_topic })
+    }
+}
+
+impl MqttExt for MqttMessage {
+    fn properties(&self) -> &Properties {
+        self.properties()
     }
 }
