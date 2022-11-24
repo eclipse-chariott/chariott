@@ -7,7 +7,7 @@
     "args": {
       // Use the VARIANT arg to pick a Debian OS version: bullseye (buster breaks rust-analyzer extension #508)
       // Use bullseye when on local on arm64/Apple Silicon.
-      "DOTNET_VERSION": "6.0.301",
+      "DOTNET_VERSION": "7.0.100",
       "VARIANT": "bullseye"
     },
     "context": ".."
