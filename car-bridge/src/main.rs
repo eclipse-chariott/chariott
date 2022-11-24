@@ -115,10 +115,15 @@ async fn handle_message(
     response_sender: Sender<(String, MessageBuilder)>,
     message: MqttMessage,
 ) {
-    async fn get_response(
-        chariott: &mut impl ChariottCommunication,
-        message: &MqttMessage,
-    ) -> Result<Response, Box<dyn std::error::Error>> {
+    let correlation_information = match message.get_correlation_information() {
+        Ok(cm) => cm,
+        Err(error) => {
+            debug!("Error when getting correlation information from message: '{error:?}'.");
+            return;
+        }
+    };
+
+    let response: Result<_, Box<dyn std::error::Error + Send + Sync>> = async {
         let fulfill_request: FulfillRequest = Message::decode(message.payload())?;
 
         let intent_enum = fulfill_request
@@ -144,16 +149,9 @@ async fn handle_message(
             is_error: false,
         })
     }
+    .await;
 
-    let correlation_information = match message.get_correlation_information() {
-        Ok(cm) => cm,
-        Err(error) => {
-            debug!("Error when getting correlation information from message: '{error:?}'.");
-            return;
-        }
-    };
-
-    let response = match get_response(chariott, &message).await {
+    let response = match response {
         Ok(message) => message,
         Err(error) => {
             debug!("Error when handling message: '{error:?}'.");
