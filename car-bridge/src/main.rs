@@ -67,15 +67,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             break;
                         };
 
-                        {
-                            let client = Arc::clone(&client);
+                        let client = Arc::clone(&client);
 
-                            spawn(async move {
-                                if let Err(e) = client.publish(topic, message).await {
-                                    debug!("Error when publishing message: '{:?}'.", e);
-                                }
-                            });
-                        }
+                        spawn(async move {
+                            if let Err(e) = client.publish(topic, message).await {
+                                debug!("Error when publishing message: '{:?}'.", e);
+                            }
+                        });
                     }
                     _ = cancellation_token.cancelled() => {
                         debug!("Shutting down the publisher loop.");
