@@ -116,7 +116,7 @@ impl Subscriber for MqttMessaging {
     async fn subscribe<'a>(
         &'a mut self,
         topic: String,
-    ) -> Result<BoxStream<'static, Self::Message>, Error> {
+    ) -> Result<BoxStream<'static, Self::Message>, Self::Error> {
         // TODO: By broadcasting the events on the underlying `Receiver` and
         // filtering the broadcasted events by their topic name, we can support
         // multiple subscriptions. Since this is currently not needed, we do not
@@ -163,7 +163,7 @@ impl Publisher for MqttMessaging {
     type Error = Error;
 
     /// Publish a message to an MQTT broker.
-    async fn publish(&self, topic: Self::Topic, message: Self::Message) -> Result<(), Error> {
+    async fn publish(&self, topic: Self::Topic, message: Self::Message) -> Result<(), Self::Error> {
         self.client
             .publish(message.topic(topic).finalize())
             .await
