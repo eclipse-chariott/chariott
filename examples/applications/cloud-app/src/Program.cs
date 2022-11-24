@@ -86,7 +86,7 @@ static async Task<int> Main(ProgramArguments args)
 
     var eventsFilePath = Path.Join(eventFilesDirPath, eventsTopic.Replace('/', '=') + eventsFileExtension);
     var eventsFileReadPosition = 0L;
-    var eventsFileLock = new SemaphoreSlim(1);
+    using var eventsFileLock = new SemaphoreSlim(1);
 
     var prettyPrintEventsJson = args.OptPrettyEvents;
 
