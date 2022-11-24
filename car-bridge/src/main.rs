@@ -256,9 +256,9 @@ impl TryFrom<MqttMessage> for Request {
             .get_string(PropertyCode::ResponseTopic)
             .ok_or_else(|| Error::new("No response topic found on message."))?;
 
-        // We could propagate errors following here as we now the response
+        // We could return the following errors as we know the correlation
         // information, but do not do it because it adds little value for more
-        // complexity.
+        // complexity. If the request is invalid, we do not process it.
 
         let fulfill_request: FulfillRequest = ProtoMessage::decode(value.payload())
             .map_err_with("Failed to decode message payload as 'FulfillRequest'.")?;

@@ -18,7 +18,7 @@ use crate::{Message, ResponseSender};
 type Namespace = String;
 /// Identifies a topic
 type Topic = String;
-/// Identifies a subscription source (a.k.a. key or event ID).
+/// Identifies a subscription source (a.k.a. _key_).
 type Source = String;
 
 #[derive(Clone)]
@@ -29,7 +29,7 @@ pub enum Action {
     Subscribe(Namespace, Source),
     /// Link a provider to a topic.
     Link(Namespace, Topic),
-    /// Subscribe to an event for a topic link.
+    /// Route an event for a topic link.
     Route(Namespace, Topic, Source),
 }
 
@@ -67,20 +67,19 @@ impl SubscriptionState {
         };
     }
 
-    /// Calculates the next action to take based on the current subscription
-    /// state.
+    /// Calculates the next action based on the current subscription state.
     pub fn next_action(
         &self,
         namespace: Namespace,
         source: Source,
         topic: Topic,
     ) -> Option<Action> {
-        // Check if listening
+        // Listening
         if !self.sources_by_namespace.contains_key(&namespace) {
             return Some(Action::Listen(namespace));
         }
 
-        // Check if subscribed
+        // Subscribed
         if self
             .sources_by_namespace
             .get(&namespace)
@@ -90,14 +89,14 @@ impl SubscriptionState {
             return Some(Action::Subscribe(namespace, source));
         }
 
-        // Check if linked
+        // Linked
         let link = (namespace, topic);
         if !self.links.contains(&link) {
             let (namespace, topic) = link;
             return Some(Action::Link(namespace, topic));
         }
 
-        // Check if routed
+        // Routed
         let (namespace, topic) = link;
         let route = (namespace, topic, source);
         if !self.routes.contains(&route) {
@@ -143,9 +142,8 @@ impl ProviderRegistry {
     }
 }
 
-/// Represents events coming from a given provider, identified by its namespace.
-/// The components allows distributing events coming from the provider to
-/// multiple consumers.
+/// Represents events originating from a provider. This type allows distributing
+/// events coming from the provider to multiple consumers.
 pub struct Provider {
     channel_id: String,
     namespace: Namespace,
@@ -153,8 +151,7 @@ pub struct Provider {
 }
 
 impl Provider {
-    /// Create a new instance by starting to listen to events coming from a
-    /// provider.
+    /// Listen to events originating from a provider.
     pub async fn listen(
         chariott: &mut impl ChariottCommunication,
         namespace: Namespace,
@@ -183,8 +180,8 @@ impl Provider {
         Ok(Self { ess, namespace, channel_id })
     }
 
-    /// Links a certain topic to events coming from this provider. By calling
-    /// `route`, all events with a given identifier are routed to that topic.
+    /// Links a topic to events coming from a provider. Prerequisite for routing
+    /// events.
     pub fn link(&self, topic: Topic, response_sender: ResponseSender) {
         let (_, mut topic_stream) = self.ess.read_events(topic.clone());
 
@@ -203,16 +200,15 @@ impl Provider {
         });
     }
 
-    /// Routes a certain event from this provider to a topic. This returns a
-    /// subscription that can be served to establish the route. Depends on a
-    /// `link` to be present.
+    /// Routes a type of event from this provider to a topic. Depends on the
+    /// topic to have a `link` to the provider.
     pub fn route(&self, topic: Topic, source: Source) -> Result<(), NotReadingEvents> {
         let subscriptions = self.ess.register_subscriptions(topic, vec![source])?;
         spawn(subscriptions.into_iter().next().unwrap().serve(|e, _| e));
         Ok(())
     }
 
-    /// Subscribes to a certain kind of event from the provider.
+    /// Subscribes to a source on the provider.
     pub async fn subscribe(
         &self,
         chariott: &mut impl ChariottCommunication,
