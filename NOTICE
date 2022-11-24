@@ -5875,6 +5875,7 @@ SOFTWARE.
 
 - [anes]( https://github.com/zrzka/anes-rs ) 0.1.6
 - [chariott-common]( https://crates.io/crates/chariott-common ) 0.1.0
+- [chariott-proto]( https://crates.io/crates/chariott-proto ) 0.1.0
 - [cloud-object-detection-app]( https://crates.io/crates/cloud-object-detection-app ) 0.1.0
 - [crunchy]( https://crates.io/crates/crunchy ) 0.2.2
 - [dog-mode-logic-app]( https://crates.io/crates/dog-mode-logic-app ) 0.1.0
