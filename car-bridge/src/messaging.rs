@@ -21,21 +21,23 @@ use tracing::info;
 pub trait Subscriber {
     type Message;
     type Topic;
+    type Error;
 
     /// Subscribe to a topic.
     async fn subscribe(
         &mut self,
-        topic: String,
-    ) -> Result<BoxStream<'static, Self::Message>, Error>;
+        topic: Self::Topic,
+    ) -> Result<BoxStream<'static, Self::Message>, Self::Error>;
 }
 
 #[async_trait]
 pub trait Publisher {
     type Message;
     type Topic;
+    type Error;
 
-    /// Publishes a message.
-    async fn publish(&self, topic: Self::Topic, message: Self::Message) -> Result<(), Error>;
+    /// Publish a message.
+    async fn publish(&self, topic: Self::Topic, message: Self::Message) -> Result<(), Self::Error>;
 }
 
 pub struct MqttMessaging {
@@ -106,6 +108,7 @@ impl MqttMessaging {
 impl Subscriber for MqttMessaging {
     type Message = Message;
     type Topic = String;
+    type Error = Error;
 
     /// Subscribes to a topic on the MQTT broker. Currently, this can only be
     /// invoked once on `MqttMessaging`, due to the structure of the underlying
@@ -157,6 +160,7 @@ impl Subscriber for MqttMessaging {
 impl Publisher for MqttMessaging {
     type Message = MessageBuilder;
     type Topic = String;
+    type Error = Error;
 
     /// Publish a message to an MQTT broker.
     async fn publish(&self, topic: Self::Topic, message: Self::Message) -> Result<(), Error> {
