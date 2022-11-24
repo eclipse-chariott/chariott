@@ -7,8 +7,9 @@
 ARG VARIANT="bullseye"
 FROM mcr.microsoft.com/vscode/devcontainers/rust:0-${VARIANT}
 
+# `libssl-dev`, `build-essential` and `clang` are required for Paho MQTT
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends git-lfs cmake protobuf-compiler libprotobuf-dev
+    && apt-get -y install --no-install-recommends git-lfs cmake protobuf-compiler libprotobuf-dev libssl-dev build-essential clang
 
 RUN mkdir /usr/bin/grpcurl.d \
     && curl -sSL https://github.com/fullstorydev/grpcurl/releases/download/v1.8.7/grpcurl_1.8.7_linux_x86_64.tar.gz | tar -xvz --directory /usr/bin/grpcurl.d \
