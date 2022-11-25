@@ -252,19 +252,16 @@ pub struct ResponseSender(Sender<(String, MessageBuilder)>);
 impl ResponseSender {
     /// Queues a message to be published.
     pub async fn send(&self, message: Message) {
-        async fn inner(
-            response_sender: &Sender<(String, MessageBuilder)>,
-            response: Message,
-        ) -> Result<(), Error> {
-            let message = response.try_into_message()?;
-            response_sender
+        let response = async {
+            let message = message.try_into_message()?;
+
+            self.0
                 .send(message)
                 .await
                 .map_err(|e| Error::new(format!("Error when sending message to channel: '{e:?}'.")))
-        }
+        };
 
-        let Self(response_sender) = self;
-        if let Err(err) = inner(response_sender, message).await {
+        if let Err(err) = response.await {
             debug!("Failed to send message: '{err:?}'.");
         }
     }
@@ -295,10 +292,7 @@ impl Message {
                 .push_string_pair(
                     PropertyCode::UserProperty,
                     "error",
-                    match is_error {
-                        true => "1",
-                        false => "0",
-                    },
+                    if is_error { "1" } else { "0" },
                 )
                 .map_err_with("Could not set user-defined error property.")?;
 
