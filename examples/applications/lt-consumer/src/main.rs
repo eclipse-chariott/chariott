@@ -3,14 +3,11 @@
 
 use bollard::{container::StatsOptions, Docker};
 use chariott_common::{
+    chariott_api::GrpcChariott,
     config::env,
     error::{Error, ResultExt},
 };
-use examples_common::chariott::{
-    self,
-    api::{Chariott, GrpcChariott},
-    value::Value,
-};
+use examples_common::chariott::{self, api::Chariott, value::Value};
 use futures_util::stream::StreamExt;
 use metrics_util::Summary;
 use serde::Serialize;
