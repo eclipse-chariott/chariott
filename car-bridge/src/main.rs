@@ -61,43 +61,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut client = MqttMessaging::connect(broker_url, vin.to_owned()).await?;
     let mut messages = client.subscribe(format!("c2d/{vin}")).await?;
+    let client = Arc::new(client);
 
+    // TODO: cancellation currently does not result in trying to drain all
+    // in-flight publishing messages.
     let cancellation_token = ctrl_c_cancellation();
 
     let (response_sender, mut response_receiver) = mpsc::channel(PUBLISH_BUFFER);
-
-    let publish_handle = {
-        // Detach sending the responses from handling the messages to avoid
-        // backpressure and disconnect the client gracefully.
-
-        let cancellation_token = cancellation_token.child_token();
-        spawn(async move {
-            let client = Arc::new(client);
-
-            loop {
-                select! {
-                    message = response_receiver.recv() => {
-                        let Some((topic, message)) = message else {
-                            warn!("Response receiver stopped, no more messages will be published.");
-                            break;
-                        };
-
-                        let client = Arc::clone(&client);
-
-                        spawn(async move {
-                            if let Err(e) = client.publish(topic, message).await {
-                                debug!("Error when publishing message: '{:?}'.", e);
-                            }
-                        });
-                    }
-                    _ = cancellation_token.cancelled() => {
-                        debug!("Shutting down the publisher loop.");
-                        break;
-                    }
-                }
-            }
-        })
-    };
+    let response_sender = ResponseSender(response_sender);
 
     loop {
         select! {
@@ -106,29 +77,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     break;
                 };
 
-                let mut chariott = chariott.clone();
-                let response_sender = ResponseSender(response_sender.clone());
-                let subscription_state = Arc::clone(&subscription_state);
-                let provider_registry = Arc::clone(&provider_registry);
+                spawn(handle_message(chariott.clone(), response_sender.clone(), Arc::clone(&subscription_state),  Arc::clone(&provider_registry), message));
+            }
+            message = response_receiver.recv() => {
+                let Some((topic, message)) = message else {
+                    warn!("Response receiver stopped, no more messages will be published.");
+                    break;
+                };
+
+                let client = Arc::clone(&client);
 
                 spawn(async move {
-                    handle_message(&mut chariott, response_sender, subscription_state, provider_registry, message).await;
+                    if let Err(e) = client.publish(topic, message).await {
+                        debug!("Error when publishing message: '{:?}'.", e);
+                    }
                 });
             }
             _ = cancellation_token.cancelled() => {
-                debug!("Shutting down the subscriber loop.");
+                debug!("Shutting down.");
                 break;
             }
         }
     }
 
-    publish_handle.await?;
+    client.disconnect().await?;
 
     Ok(())
 }
 
 async fn handle_message(
-    chariott: &mut impl ChariottCommunication,
+    mut chariott: impl ChariottCommunication,
     response_sender: ResponseSender,
     subscription_state: Arc<Mutex<SubscriptionState>>,
     provider_registry: Arc<Mutex<ProviderRegistry>>,
@@ -165,7 +143,7 @@ async fn handle_message(
                         match action.clone() {
                             Action::Listen(namespace) => {
                                 provider_events
-                                    .register_event_provider(chariott, namespace)
+                                    .register_event_provider(&mut chariott, namespace)
                                     .await?;
                             }
                             Action::Subscribe(namespace, source) => {
@@ -174,7 +152,7 @@ async fn handle_message(
                                     .expect(
                                         "Prior to subscribing we must have established listening.",
                                     )
-                                    .subscribe(chariott, source)
+                                    .subscribe(&mut chariott, source)
                                     .await?;
                             }
                             Action::Link(namespace, topic) => {

@@ -12,7 +12,8 @@ use paho_mqtt::{
     AsyncClient, ConnectOptionsBuilder, CreateOptionsBuilder, Message, MessageBuilder,
     MQTT_VERSION_5, QOS_2,
 };
-use tracing::info;
+use tokio::time::timeout;
+use tracing::{debug, info};
 use url::Url;
 
 #[async_trait]
@@ -42,13 +43,6 @@ pub struct MqttMessaging {
     client: AsyncClient,
     receiver: Receiver<Option<Message>>,
     is_subscribed: bool,
-}
-
-impl Drop for MqttMessaging {
-    fn drop(&mut self) {
-        // Best-effort disconnect.
-        _ = self.client.disconnect(None).wait();
-    }
 }
 
 impl MqttMessaging {
@@ -94,6 +88,19 @@ impl MqttMessaging {
             .map_err_with("Could not connect to MQTT broker.")?;
 
         Ok(Self { client, receiver, is_subscribed: false })
+    }
+
+    pub async fn disconnect(&self) -> Result<(), Error> {
+        const DISCONNECT_TIMEOUT: Duration = Duration::from_secs(10);
+
+        timeout(DISCONNECT_TIMEOUT, self.client.disconnect(None))
+            .await
+            .map_err(|_| Error::new("Disconnecting the client timed out."))?
+            .map_err_with("Disconnecting the client failed.")?;
+
+        debug!("Client disconnected.");
+
+        Ok(())
     }
 }
 
