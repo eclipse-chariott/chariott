@@ -89,6 +89,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
+    client.disconnect().await?;
+
     Ok(())
 }
 
