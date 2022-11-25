@@ -181,7 +181,7 @@ async fn handle_message(
                                 provider_events
                                     .get_event_provider(&namespace)
                                     .expect("Prior to linking we must have established listening.")
-                                    .link(topic.clone(), response_sender.clone());
+                                    .link(topic, response_sender.clone());
                             }
                             Action::Route(namespace, topic, source) => {
                                 provider_events
