@@ -51,43 +51,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut client = MqttMessaging::connect(broker_url, vin.to_owned()).await?;
     let mut messages = client.subscribe(format!("c2d/{vin}")).await?;
+    let client = Arc::new(client);
 
     let cancellation_token = ctrl_c_cancellation();
 
     let (response_sender, mut response_receiver) = mpsc::channel(PUBLISH_BUFFER);
-
-    let publish_handle = {
-        // Detach sending the responses from handling the messages to avoid
-        // backpressure and disconnect the client gracefully.
-
-        let cancellation_token = cancellation_token.child_token();
-        spawn(async move {
-            let client = Arc::new(client);
-
-            loop {
-                select! {
-                    message = response_receiver.recv() => {
-                        let Some((topic, message)) = message else {
-                            warn!("Response receiver stopped, no more messages will be published.");
-                            break;
-                        };
-
-                        let client = Arc::clone(&client);
-
-                        spawn(async move {
-                            if let Err(e) = client.publish(topic, message).await {
-                                debug!("Error when publishing message: '{:?}'.", e);
-                            }
-                        });
-                    }
-                    _ = cancellation_token.cancelled() => {
-                        debug!("Shutting down the publisher loop.");
-                        break;
-                    }
-                }
-            }
-        })
-    };
 
     loop {
         select! {
@@ -98,14 +66,26 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 spawn(handle_message(chariott.clone(), response_sender.clone(), message));
             }
+            message = response_receiver.recv() => {
+                let Some((topic, message)) = message else {
+                    warn!("Response receiver stopped, no more messages will be published.");
+                    break;
+                };
+
+                let client = Arc::clone(&client);
+
+                spawn(async move {
+                    if let Err(e) = client.publish(topic, message).await {
+                        debug!("Error when publishing message: '{:?}'.", e);
+                    }
+                });
+            }
             _ = cancellation_token.cancelled() => {
                 debug!("Shutting down the subscriber loop.");
                 break;
             }
         }
     }
-
-    publish_handle.await?;
 
     Ok(())
 }
