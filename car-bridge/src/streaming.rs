@@ -108,8 +108,6 @@ impl SubscriptionState {
     }
 }
 
-type Ess = EventSubSystem<Topic, Source, Event, Event>;
-
 /// Tracks `EventProvider` instances by namespace.
 pub struct ProviderRegistry {
     event_provider_by_namespace: HashMap<Namespace, Provider>,
@@ -147,7 +145,7 @@ impl ProviderRegistry {
 pub struct Provider {
     channel_id: String,
     namespace: Namespace,
-    ess: Arc<Ess>,
+    ess: Arc<EventSubSystem<Topic, Source, Event, Event>>,
 }
 
 impl Provider {
@@ -158,7 +156,7 @@ impl Provider {
     ) -> Result<Self, Error> {
         let (mut stream, channel_id) = chariott.open(namespace.clone()).await?;
 
-        let ess = Arc::new(Ess::new());
+        let ess = Arc::new(EventSubSystem::new());
 
         {
             // Publish all subscribed values from a provider
