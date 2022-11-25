@@ -53,6 +53,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut messages = client.subscribe(format!("c2d/{vin}")).await?;
     let client = Arc::new(client);
 
+    // TODO: cancellation currently does not result in trying to drain all
+    // in-flight publishing messages.
     let cancellation_token = ctrl_c_cancellation();
 
     let (response_sender, mut response_receiver) = mpsc::channel(PUBLISH_BUFFER);
@@ -81,7 +83,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 });
             }
             _ = cancellation_token.cancelled() => {
-                debug!("Shutting down the subscriber loop.");
+                debug!("Shutting down.");
                 break;
             }
         }
