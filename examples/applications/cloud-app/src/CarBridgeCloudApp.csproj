@@ -5,10 +5,24 @@
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>11</LangVersion>
     <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ProtoRoot>..\..\..\..\proto</ProtoRoot>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="docopt.net" Version="0.8.1" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.50.0" />
+    <PackageReference Include="morelinq" Version="3.3.2" />
     <PackageReference Include="MQTTnet" Version="4.1.3.436" />
+    <PackageReference Include="PolySharp" Version="1.8.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="$(ProtoRoot)\chariott\common\v1\common.proto;$(ProtoRoot)\chariott\runtime\v1\runtime.proto;$(ProtoRoot)\chariott\streaming\v1\streaming.proto" ProtoRoot="$(ProtoRoot)\" GrpcServices="Client" Link="Protos\%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>
