@@ -6,16 +6,14 @@ use std::time::Duration;
 use async_channel::Receiver;
 use async_stream::stream;
 use async_trait::async_trait;
-use chariott_common::{
-    config::env,
-    error::{Error, ResultExt as _},
-};
+use chariott_common::error::{Error, ResultExt as _};
 use futures::{stream::BoxStream, StreamExt as _};
 use paho_mqtt::{
     AsyncClient, ConnectOptionsBuilder, CreateOptionsBuilder, Message, MessageBuilder,
     MQTT_VERSION_5, QOS_2,
 };
 use tracing::info;
+use url::Url;
 
 #[async_trait]
 pub trait Subscriber {
@@ -58,13 +56,8 @@ impl MqttMessaging {
     /// If there was a persisted session before, messages may delivered before
     /// the `connect` returns. Refer to the `Subscriber` implementation for how
     /// to get access to the buffered messages.
-    pub async fn connect(client_id: String) -> Result<Self, Error> {
-        const BROKER_URL_ENV_NAME: &str = "BROKER_URL";
-        const DEFAULT_BROKER_URL: &str = "tcp://localhost:1883";
+    pub async fn connect(broker_url: Url, client_id: String) -> Result<Self, Error> {
         const MQTT_CLIENT_BUFFER_SIZE: usize = 200;
-
-        let host = env::<String>(BROKER_URL_ENV_NAME);
-        let host = host.as_deref().unwrap_or(DEFAULT_BROKER_URL);
 
         // The client ID is used in conjunction with session persistence to
         // re-establish existing subscriptions on disconnect. TODO: if the
@@ -72,12 +65,12 @@ impl MqttMessaging {
         // subscriptions.
         let client_id = format!("car-bridge-{client_id}");
 
-        info!("Connecting client '{client_id}' to MQTT broker at '{host}'.");
+        info!("Connecting client '{client_id}' to MQTT broker at '{broker_url}'.");
 
         let mut client = AsyncClient::new(
             CreateOptionsBuilder::new()
                 .mqtt_version(MQTT_VERSION_5)
-                .server_uri(host)
+                .server_uri(broker_url)
                 .client_id(client_id)
                 .finalize(),
         )

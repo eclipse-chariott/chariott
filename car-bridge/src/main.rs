@@ -23,11 +23,14 @@ use tokio::{
 use tokio_stream::StreamExt as _;
 use tracing::{debug, warn, Level};
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
+use url::Url;
 
 mod messaging;
 
 const VIN_ENV_NAME: &str = "VIN";
 const DEFAULT_VIN: &str = "1";
+const BROKER_URL_ENV_NAME: &str = "BROKER_URL";
+const DEFAULT_BROKER_URL: &str = "tcp://localhost:1883";
 const PUBLISH_BUFFER: usize = 50;
 
 #[tokio::main]
@@ -41,10 +44,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let vin = env::<String>(VIN_ENV_NAME);
     let vin = vin.as_deref().unwrap_or(DEFAULT_VIN);
+    let broker_url =
+        env::<Url>(BROKER_URL_ENV_NAME).unwrap_or_else(|| DEFAULT_BROKER_URL.try_into().unwrap());
 
     let chariott = GrpcChariott::connect().await?;
 
-    let mut client = MqttMessaging::connect(vin.to_owned()).await?;
+    let mut client = MqttMessaging::connect(broker_url, vin.to_owned()).await?;
     let mut messages = client.subscribe(format!("c2d/{vin}")).await?;
 
     let cancellation_token = ctrl_c_cancellation();
