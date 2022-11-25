@@ -30,12 +30,15 @@ use tokio::{
 use tokio_stream::StreamExt as _;
 use tracing::{debug, warn, Level};
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
+use url::Url;
 
 mod messaging;
 mod streaming;
 
 const VIN_ENV_NAME: &str = "VIN";
 const DEFAULT_VIN: &str = "1";
+const BROKER_URL_ENV_NAME: &str = "BROKER_URL";
+const DEFAULT_BROKER_URL: &str = "tcp://localhost:1883";
 const PUBLISH_BUFFER: usize = 50;
 
 #[tokio::main]
@@ -49,12 +52,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let vin = env::<String>(VIN_ENV_NAME);
     let vin = vin.as_deref().unwrap_or(DEFAULT_VIN);
+    let broker_url =
+        env::<Url>(BROKER_URL_ENV_NAME).unwrap_or_else(|| DEFAULT_BROKER_URL.try_into().unwrap());
 
     let chariott = GrpcChariott::connect().await?;
     let subscription_state = Arc::new(Mutex::new(SubscriptionState::new()));
     let provider_registry = Arc::new(Mutex::new(ProviderRegistry::new()));
 
-    let mut client = MqttMessaging::connect(vin.to_owned()).await?;
+    let mut client = MqttMessaging::connect(broker_url, vin.to_owned()).await?;
     let mut messages = client.subscribe(format!("c2d/{vin}")).await?;
 
     let cancellation_token = ctrl_c_cancellation();
@@ -129,13 +134,17 @@ async fn handle_message(
     provider_registry: Arc<Mutex<ProviderRegistry>>,
     message: MqttMessage,
 ) {
-    async fn get_response(
-        chariott: &mut impl ChariottCommunication,
-        response_sender: &ResponseSender,
-        subscription_state: &Arc<Mutex<SubscriptionState>>,
-        provider_registry: &Arc<Mutex<ProviderRegistry>>,
-        request: Request,
-    ) -> Result<Message, Box<dyn std::error::Error>> {
+    let request: Request = match message.try_into() {
+        Ok(r) => r,
+        Err(e) => {
+            debug!("Failed to parse message: '{e:?}'.");
+            return;
+        }
+    };
+
+    let correlation_information = request.correlation_information.clone();
+
+    let response: Result<_, Box<dyn std::error::Error + Send + Sync>> = async {
         let response = match request.intent_enum {
             IntentEnum::Discover(_) => Err(Error::new("Discover is not supported.")),
             IntentEnum::Subscribe(subscribe_intent) => {
@@ -206,26 +215,9 @@ async fn handle_message(
 
         Ok(Message::SuccessResponse(payload, request.correlation_information))
     }
+    .await;
 
-    let request: Request = match message.try_into() {
-        Ok(r) => r,
-        Err(e) => {
-            debug!("Failed to parse message: '{e:?}'.");
-            return;
-        }
-    };
-
-    let correlation_information = request.correlation_information.clone();
-
-    let response = match get_response(
-        chariott,
-        &response_sender,
-        &subscription_state,
-        &provider_registry,
-        request,
-    )
-    .await
-    {
+    let response = match response {
         Ok(message) => message,
         Err(error) => {
             debug!("Error when handling message: '{error:?}'.");
