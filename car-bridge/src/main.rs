@@ -96,12 +96,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     break;
                 };
 
-                let mut chariott = chariott.clone();
-                let response_sender = response_sender.clone();
-
-                spawn(async move {
-                    handle_message(&mut chariott, response_sender, message).await;
-                });
+                spawn(handle_message(chariott.clone(), response_sender.clone(), message));
             }
             _ = cancellation_token.cancelled() => {
                 debug!("Shutting down the subscriber loop.");
@@ -116,7 +111,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn handle_message(
-    chariott: &mut impl ChariottCommunication,
+    mut chariott: impl ChariottCommunication,
     response_sender: Sender<(String, MessageBuilder)>,
     message: MqttMessage,
 ) {
