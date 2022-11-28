@@ -18,7 +18,7 @@ use messaging::{MqttMessaging, Publisher, Subscriber};
 use paho_mqtt::{Message as MqttMessage, MessageBuilder, Properties, PropertyCode, QOS_2};
 use prost::Message;
 use tokio::{
-    select,
+    select, spawn,
     sync::mpsc::{self, Sender},
     time::timeout,
 };
@@ -69,7 +69,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     break;
                 };
 
-                drainage.spawn(handle_message(chariott.clone(), response_sender.clone(), message));
+                spawn(handle_message(chariott.clone(), response_sender.clone(), message));
             }
             message = response_receiver.recv() => {
                 let Some((topic, message)) = message else {
