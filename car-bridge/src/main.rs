@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-use std::{mem::swap, sync::Arc, time::Duration};
+use std::{sync::Arc, time::Duration};
 
 use chariott_common::{
     chariott_api::{ChariottCommunication, GrpcChariott},
@@ -60,14 +60,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let cancellation_token = ctrl_c_cancellation();
     let drainage = Drainage::new();
-    // Handle cancellation exactly once.
-    let mut cancellation_handled = false;
 
-    let (mut response_sender, mut response_receiver) = mpsc::channel(PUBLISH_BUFFER);
+    let (response_sender, mut response_receiver) = mpsc::channel(PUBLISH_BUFFER);
+    let mut response_sender = Some(response_sender);
 
     loop {
         select! {
-            message = messages.next(), if !cancellation_handled => {
+            message = messages.next(), if response_sender.is_some() => {
+                let response_sender = response_sender.as_ref().unwrap();
+
                 let Some(message) = message else {
                     break;
                 };
@@ -90,16 +91,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }));
             }
-            _ = cancellation_token.cancelled(), if !cancellation_handled => {
+            _ = cancellation_token.cancelled(), if response_sender.is_some() => {
                 // TODO: stop the MQTT client to consume messages.
                 debug!("Shutting down.");
-                // Swapping out the sender will ensure that the
-                // `response_receiver` gets closed as soon as all
-                // `handle_message` tasks finished executing.
+                // Setting the sender to `None` ensures that the
+                // `response_receiver` gets a notification for a closed channel
+                // as soon as all `handle_message` tasks finished executing.
                 // https://docs.rs/tokio/latest/tokio/sync/mpsc/#disconnection
-                let (mut temp_sender, _) = mpsc::channel(1);
-                swap(&mut response_sender, &mut temp_sender);
-                cancellation_handled = true;
+                response_sender = None;
             }
         }
     }
