@@ -37,6 +37,9 @@ impl Drainage {
     /// Waits for all tasks that were spawned via this drainage to finish.
     pub async fn drain(mut self) {
         drop(self.drained_sender);
+        // As soon as every sender is dropped, the channel is closed and the
+        // receiver receives a message.
+        // https://docs.rs/tokio/latest/tokio/sync/mpsc/#disconnection
         _ = self.drained_receiver.recv().await;
     }
 }
