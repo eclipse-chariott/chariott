@@ -6,7 +6,7 @@ use std::{mem::swap, sync::Arc, time::Duration};
 use chariott_common::{
     chariott_api::{ChariottCommunication, GrpcChariott},
     config::env,
-    error::{Error, ResultExt as _},
+    error::Error,
     shutdown::ctrl_c_cancellation,
 };
 use chariott_proto::{
@@ -124,8 +124,7 @@ async fn handle_message(
     };
 
     let response = async {
-        let fulfill_request: FulfillRequest =
-            Message::decode(message.payload()).map_err_with("Error when decoding payload.")?;
+        let fulfill_request: FulfillRequest = Message::decode(message.payload())?;
 
         let intent_enum = fulfill_request
             .intent
@@ -142,7 +141,7 @@ async fn handle_message(
         }?;
 
         let mut payload = vec![];
-        response.encode(&mut payload).map_err_with("Could not encode response.")?;
+        response.encode(&mut payload)?;
 
         Ok(Response {
             payload,
@@ -151,9 +150,9 @@ async fn handle_message(
         })
     };
 
-    let response: Result<_, Error> = select! {
+    let response: Result<_, Box<dyn std::error::Error + Send + Sync>> = select! {
         response = response => response,
-        _ = cancellation_token.cancelled() => Err(Error::new("Operation was cancelled."))
+        _ = cancellation_token.cancelled() => Err(Error::new("Operation was cancelled.").into())
     };
 
     let response = match response {
