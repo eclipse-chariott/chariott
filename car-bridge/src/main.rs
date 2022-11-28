@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-use std::{sync::Arc, time::Duration};
+use std::{mem::swap, sync::Arc, time::Duration};
 
 use chariott_common::{
     chariott_api::{ChariottCommunication, GrpcChariott},
@@ -61,11 +61,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cancellation_token = ctrl_c_cancellation();
     let drainage = Drainage::new();
 
-    let (response_sender, mut response_receiver) = mpsc::channel(PUBLISH_BUFFER);
+    let (mut response_sender, mut response_receiver) = mpsc::channel(PUBLISH_BUFFER);
 
     loop {
         select! {
-            message = messages.next() => {
+            message = messages.next(), if !cancellation_token.is_cancelled() => {
                 let Some(message) = message else {
                     break;
                 };
@@ -74,7 +74,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             message = response_receiver.recv() => {
                 let Some((topic, message)) = message else {
-                    warn!("Response receiver stopped, no more messages will be published.");
+                    debug!("Response receiver stopped, no more messages will be published.");
                     break;
                 };
 
@@ -88,7 +88,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             _ = cancellation_token.cancelled() => {
                 debug!("Shutting down.");
-                break;
+                // Swapping out the sender will ensure that the
+                // `response_receiver` gets closed as soon as all
+                // `handle_message` tasks finished executing.
+                // https://docs.rs/tokio/latest/tokio/sync/mpsc/#disconnection
+                let (mut temp_sender, _) = mpsc::channel(1);
+                swap(&mut response_sender, &mut temp_sender);
             }
         }
     }
