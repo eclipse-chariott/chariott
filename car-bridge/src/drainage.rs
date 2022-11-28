@@ -41,7 +41,7 @@ impl Drainage {
     pub async fn drain(mut self) {
         drop(self.drained_sender);
         // As soon as every sender is dropped, the channel is closed and the
-        // receiver receives a message. Based on:
+        // reception fails. Based on:
         // https://tokio.rs/tokio/topics/shutdown
         // https://docs.rs/tokio/latest/tokio/sync/mpsc/#disconnection
         _ = self.drained_receiver.recv().await;
