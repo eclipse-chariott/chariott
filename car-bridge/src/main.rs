@@ -60,6 +60,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let cancellation_token = ctrl_c_cancellation();
     let drainage = Drainage::new();
+    let mut shutdown_handled = false;
 
     let (mut response_sender, mut response_receiver) = mpsc::channel(PUBLISH_BUFFER);
 
@@ -86,7 +87,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }));
             }
-            _ = cancellation_token.cancelled() => {
+            _ = cancellation_token.cancelled(), if !shutdown_handled => {
                 debug!("Shutting down.");
                 // Swapping out the sender will ensure that the
                 // `response_receiver` gets closed as soon as all
@@ -94,6 +95,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 // https://docs.rs/tokio/latest/tokio/sync/mpsc/#disconnection
                 let (mut temp_sender, _) = mpsc::channel(1);
                 swap(&mut response_sender, &mut temp_sender);
+                shutdown_handled = true;
             }
         }
     }
