@@ -2,11 +2,7 @@
 // Licensed under the MIT license.
 
 use futures::Future;
-use tokio::{
-    spawn,
-    sync::mpsc::{self, Receiver, Sender},
-    task::JoinHandle,
-};
+use tokio::sync::mpsc::{self, Receiver, Sender};
 
 /// Spawn tasks on the `Drainage` to ensure that the task completed when
 /// shutting down.
@@ -21,20 +17,20 @@ impl Drainage {
         Self { drained_receiver, drained_sender }
     }
 
-    /// Spawns a task while allowing to wait for it to complete when calling
+    /// Tracks a future to allow waiting for it to complete when calling
     /// `drain`.
-    pub fn spawn<F>(&self, f: F) -> JoinHandle<F::Output>
+    pub fn track<F>(&self, f: F) -> impl Future<Output = F::Output>
     where
         F: Future + Send + 'static,
         F::Output: Send,
     {
         let sender = self.drained_sender.clone();
 
-        spawn(async move {
+        async move {
             let result = f.await;
             drop(sender);
             result
-        })
+        }
     }
 
     /// Waits for all tasks that were spawned via this drainage to finish.
@@ -53,20 +49,21 @@ mod tests {
     use std::time::Duration;
 
     use super::Drainage;
+    use tokio::spawn;
     use tokio::time::sleep;
     use tokio::time::timeout;
 
     #[tokio::test]
     async fn drain_when_task_is_active_times_out() {
         let drainage = Drainage::new();
-        _ = drainage.spawn(sleep(Duration::from_millis(500)));
+        _ = spawn(drainage.track(sleep(Duration::from_millis(500))));
         assert!(timeout(Duration::from_millis(100), drainage.drain()).await.is_err());
     }
 
     #[tokio::test]
     async fn drain_when_no_task_is_active_succeeds() {
         let drainage = Drainage::new();
-        _ = drainage.spawn(sleep(Duration::from_millis(100)));
+        _ = spawn(drainage.track(sleep(Duration::from_millis(100))));
         assert!(timeout(Duration::from_millis(500), drainage.drain()).await.is_ok());
     }
 }

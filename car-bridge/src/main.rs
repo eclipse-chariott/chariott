@@ -79,11 +79,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 let client = Arc::clone(&client);
 
-                drainage.spawn(async move {
+                spawn(drainage.track(async move {
                     if let Err(e) = client.publish(topic, message).await {
                         debug!("Error when publishing message: '{:?}'.", e);
                     }
-                });
+                }));
             }
             _ = cancellation_token.cancelled() => {
                 debug!("Shutting down.");
