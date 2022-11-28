@@ -76,6 +76,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             message = response_receiver.recv() => {
                 let Some((topic, message)) = message else {
+                    // All senders are dropped and hence the channel is closed.
+                    // This shuts down the Car Bridge.
                     debug!("Response receiver stopped, no more messages will be published.");
                     break;
                 };
