@@ -9,6 +9,7 @@ on:
       - main
       - cloud-bridge
     paths:
+      - 'car-bridge/**'
       - 'common/**'
       - 'src/**'
       - 'tests/**'
