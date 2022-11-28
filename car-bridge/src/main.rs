@@ -91,6 +91,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }));
             }
             _ = cancellation_token.cancelled(), if !cancellation_handled => {
+                // TODO: stop the MQTT client to consume messages.
                 debug!("Shutting down.");
                 // Swapping out the sender will ensure that the
                 // `response_receiver` gets closed as soon as all
