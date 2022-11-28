@@ -6,7 +6,7 @@ use std::{sync::Arc, time::Duration};
 use chariott_common::{
     chariott_api::{ChariottCommunication, GrpcChariott},
     config::env,
-    error::Error,
+    error::{Error, ResultExt as _},
     shutdown::ctrl_c_cancellation,
 };
 use chariott_proto::{
@@ -23,6 +23,7 @@ use tokio::{
     time::timeout,
 };
 use tokio_stream::StreamExt as _;
+use tokio_util::sync::CancellationToken;
 use tracing::{debug, warn, Level};
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
 use url::Url;
@@ -69,7 +70,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     break;
                 };
 
-                spawn(handle_message(chariott.clone(), response_sender.clone(), message));
+                spawn(handle_message(chariott.clone(), response_sender.clone(), message, cancellation_token.child_token()));
             }
             message = response_receiver.recv() => {
                 let Some((topic, message)) = message else {
@@ -105,6 +106,7 @@ async fn handle_message(
     mut chariott: impl ChariottCommunication,
     response_sender: Sender<(String, MessageBuilder)>,
     message: MqttMessage,
+    cancellation_token: CancellationToken,
 ) {
     let correlation_information = match message.get_correlation_information() {
         Ok(cm) => cm,
@@ -114,8 +116,9 @@ async fn handle_message(
         }
     };
 
-    let response: Result<_, Box<dyn std::error::Error + Send + Sync>> = async {
-        let fulfill_request: FulfillRequest = Message::decode(message.payload())?;
+    let response = async {
+        let fulfill_request: FulfillRequest =
+            Message::decode(message.payload()).map_err_with("Error when decoding payload.")?;
 
         let intent_enum = fulfill_request
             .intent
@@ -132,15 +135,19 @@ async fn handle_message(
         }?;
 
         let mut payload = vec![];
-        response.encode(&mut payload)?;
+        response.encode(&mut payload).map_err_with("Could not encode response.")?;
 
         Ok(Response {
             payload,
             content_type: "application/x-proto+chariott.common.v1.FulfillResponse",
             is_error: false,
         })
-    }
-    .await;
+    };
+
+    let response: Result<_, Error> = select! {
+        response = response => response,
+        _ = cancellation_token.cancelled() => Err(Error::new("Operation was cancelled."))
+    };
 
     let response = match response {
         Ok(message) => message,
