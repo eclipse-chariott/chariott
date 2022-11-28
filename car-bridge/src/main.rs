@@ -66,7 +66,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     loop {
         select! {
-            message = messages.next(), if !cancellation_token.is_cancelled() => {
+            message = messages.next(), if !shutdown_handled => {
                 let Some(message) = message else {
                     break;
                 };
