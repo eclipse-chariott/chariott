@@ -252,11 +252,14 @@ impl<T: ChariottCommunication> Chariott for T {
 
 #[async_trait::async_trait]
 pub trait ChariottExt {
+    /// Opens a streaming channel to a provider, identified by its namespace.
     async fn open<'b>(
         self,
         namespace: impl Into<Box<str>> + Send,
     ) -> Result<(BoxStream<'b, Result<EventMessage, Status>>, String), Error>;
 
+    /// Listens to a number of subscription sources from a provider, identified
+    /// by its namespace.
     async fn listen<'b>(
         self,
         namespace: impl Into<Box<str>> + Send,
