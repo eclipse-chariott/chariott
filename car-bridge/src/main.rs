@@ -66,11 +66,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     loop {
         select! {
-            message = messages.next(), if response_sender.is_some() => {
-                let response_sender = response_sender.as_ref().unwrap();
-
+            message = messages.next() => {
                 let Some(message) = message else {
                     break;
+                };
+
+                let Some(response_sender) = response_sender.as_ref() else {
+                    // TODO: stop the MQTT client to consume messages.
+                    debug!("Message will not be handled. Shutting down the Car Bridge.");
+                    continue;
                 };
 
                 spawn(handle_message(chariott.clone(), response_sender.clone(), message, cancellation_token.child_token()));
@@ -92,7 +96,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }));
             }
             _ = cancellation_token.cancelled(), if response_sender.is_some() => {
-                // TODO: stop the MQTT client to consume messages.
                 debug!("Shutting down.");
                 // Setting the sender to `None` ensures that the
                 // `response_receiver` gets a notification for a closed channel
