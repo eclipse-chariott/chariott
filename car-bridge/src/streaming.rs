@@ -9,7 +9,7 @@ use std::{
 use chariott_common::{chariott_api::ChariottCommunication, error::Error};
 use chariott_proto::streaming::Event;
 use ess::{EventSubSystem, NotReadingEvents};
-use examples_common::chariott::api::{Chariott, ChariottCommunicationExt as _};
+use examples_common::chariott::api::{Chariott, ChariottExt as _};
 use prost::Message as _;
 use tokio::spawn;
 use tokio_stream::StreamExt as _;

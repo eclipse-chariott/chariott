@@ -251,15 +251,21 @@ impl<T: ChariottCommunication> Chariott for T {
 }
 
 #[async_trait::async_trait]
-pub trait ChariottCommunicationExt {
+pub trait ChariottExt {
     async fn open<'b>(
         self,
         namespace: impl Into<Box<str>> + Send,
     ) -> Result<(BoxStream<'b, Result<EventMessage, Status>>, String), Error>;
+
+    async fn listen<'b>(
+        self,
+        namespace: impl Into<Box<str>> + Send,
+        subscription_sources: impl IntoIterator<Item = Box<str>> + Send,
+    ) -> Result<BoxStream<'b, Result<Event, Error>>, Error>;
 }
 
 #[async_trait::async_trait]
-impl<T> ChariottCommunicationExt for &mut T
+impl<T> ChariottExt for &mut T
 where
     T: ChariottCommunication + Send,
 {
@@ -308,22 +314,7 @@ where
 
         Ok((response.into_inner().boxed(), channel_id.into()))
     }
-}
 
-#[async_trait::async_trait]
-pub trait ChariottExt {
-    async fn listen<'b>(
-        self,
-        namespace: impl Into<Box<str>> + Send,
-        subscription_sources: impl IntoIterator<Item = Box<str>> + Send,
-    ) -> Result<BoxStream<'b, Result<Event, Error>>, Error>;
-}
-
-#[async_trait::async_trait]
-impl<T> ChariottExt for &mut T
-where
-    T: ChariottCommunication + Send,
-{
     async fn listen<'b>(
         self,
         namespace: impl Into<Box<str>> + Send,
