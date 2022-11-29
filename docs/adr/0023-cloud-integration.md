@@ -307,7 +307,7 @@ sequenceDiagram
         C ->> B: DiscoverResponse
         B ->> VDT: Listen
     end
-    
+
     alt is not subscribed
         B ->> C: SubscribeRequest
         C ->> VDT: SubscribeRequest
