@@ -270,8 +270,14 @@ sequenceDiagram
    streaming, it will take the flow as described in [events from the car to the
    cloud](#events-from-the-car-to-the-cloud).
 
-3. - 6. The Request is forwarded to Chariott and Chariott handles it as it would
-        any other in-car `FulfillRequest`.
+3. The Request is forwarded to Chariott and Chariott handles it as it would any
+   other in-car `FulfillRequest`.
+
+4. Same as 3.
+
+5. Same as 3.
+
+6. Same as 3.
 
 7. The Car Bridge sends the `FulfillResponse` message on the indicated response
    topic to the MQTT broker (`<response-topic>`).
@@ -337,24 +343,38 @@ sequenceDiagram
    must stay subscribed to the data as long as at least one cloud application
    requires the data.
 
-4. - 8. If the requested subscription is the first subscription to a certain
-        namespace, the Car Bridge will need to establish a channel to receive
-        the data from the source.
+4. If the requested subscription is the first subscription to a certain
+   namespace, the Car Bridge will need to establish a channel to receive the
+   data from the source.
 
-9. - 12. If the Car Bridge is not yet subscribed to the data, it must ensure
-         that it subscribes to the specified keys on the source.
+5. Same as 4.
 
-10. The Car Bridge delivers the `SubscribeResponse` as `M<SubscribeResponse>` to
+6. Same as 4.
+
+7. Same as 4.
+
+8. Same as 4.
+
+9. If the Car Bridge is not yet subscribed to the data, it must ensure that it
+   subscribes to the specified keys on the source.
+
+10. Same as 9.
+
+11. Same as 9.
+
+12. Same as 9.
+
+13. The Car Bridge delivers the `SubscribeResponse` as `M<SubscribeResponse>` to
     the MQTT broker.
 
-11. The Cloud App receives the `M<SubscribeResponse>` from the MQTT broker.
+14. The Cloud App receives the `M<SubscribeResponse>` from the MQTT broker.
 
-12. The VDT publishes an `Event`, to which the Car Bridge is subscribed to.
+15. The VDT publishes an `Event`, to which the Car Bridge is subscribed to.
 
-13. The Car Bridge wraps the `Event` in a `M<Event>` and sends it to the MQTT
+16. The Car Bridge wraps the `Event` in a `M<Event>` and sends it to the MQTT
     Broker.
 
-14. The Cloud App receives the `M<Event>` from the MQTT broker.
+17. The Cloud App receives the `M<Event>` from the MQTT broker.
 
 ### Cloud-to-device (C2D) events
 
@@ -395,23 +415,40 @@ sequenceDiagram
    "streaming intents" (`Discover`, `Subscribe`, `Unsubscribe`) to Chariott for
    a given namespace, in this case `sdv.navigation`.
 
-2. - 6. The Car App listens to events for namespace `sdv.navigation` (which
-        points to the Car Bridge).
+2. The Car App listens to events for namespace `sdv.navigation` (which points to
+   the Car Bridge).
+
+3. Same as 2.
+
+4. Same as 2.
+
+5. Same as 2.
+
+6. Same as 2.
 
 7. The Car App issues a `SubscribeRequest` to Chariott.
 
 8. Chariott routes the `SubscribeRequest` to the Car Bridge.
 
-9. - 14. The Car Bridge forwards the `SubscribeRequest` to the cloud, similar
-         to what is described for [Request/Response](#requestresponse)
-         communication. The response from the cloud is returned as a response to
-         the Car App.
+9. The Car Bridge forwards the `SubscribeRequest` to the cloud, similar to what
+   is described for [Request/Response](#requestresponse) communication. The
+   response from the cloud is returned as a response to the Car App.
 
-10. The Cloud App publishes a `M<Event>` to the MQTT broker.
+10. Same as 9.
 
-11. The Car Bridge receives the `M<Event>` from the MQTT broker.
+11. Same as 9.
 
-12. The Car App is subscribed to the Car Bridge and hence receives the `Event`.
+12. Same as 9.
+
+13. Same as 9.
+
+14. Same as 9.
+
+15. The Cloud App publishes a `M<Event>` to the MQTT broker.
+
+16. The Car Bridge receives the `M<Event>` from the MQTT broker.
+
+17. The Car App is subscribed to the Car Bridge and hence receives the `Event`.
 
 [mqtt-req-rsp]: https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901252
 [Correlation Data]: https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Correlation_Data
