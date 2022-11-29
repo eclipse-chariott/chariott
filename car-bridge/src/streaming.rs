@@ -1,0 +1,217 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
+use std::{
+    collections::{hash_map::Entry, HashMap, HashSet},
+    sync::Arc,
+};
+
+use chariott_common::{chariott_api::ChariottCommunication, error::Error};
+use chariott_proto::streaming::Event;
+use ess::{EventSubSystem, NotReadingEvents};
+use examples_common::chariott::api::{Chariott, ChariottExt as _};
+use prost::Message as _;
+use tokio::spawn;
+use tokio_stream::StreamExt as _;
+use tracing::{debug, warn};
+
+use crate::{Message, ResponseSender};
+
+type Namespace = String;
+type Topic = String;
+type SubscriptionSource = String;
+
+#[derive(Clone)]
+pub enum Action {
+    /// Open a connection a provider's streaming endpoint.
+    Listen(Namespace),
+    /// Subscribe to a certain type of event from a provider.
+    Subscribe(Namespace, SubscriptionSource),
+    /// Link a provider to a topic.
+    Link(Namespace, Topic),
+    /// Route an event for a topic link.
+    Route(Namespace, Topic, SubscriptionSource),
+}
+
+/// Tracks the active subscriptions for each namespace and allows calculating
+/// which steps to take to support streaming intents from a certain provider to
+/// a topic based on the current state.
+pub struct SubscriptionState {
+    sources_by_namespace: HashMap<Namespace, HashSet<SubscriptionSource>>,
+    links: HashSet<(Namespace, Topic)>,
+    routes: HashSet<(Namespace, Topic, SubscriptionSource)>,
+}
+
+impl SubscriptionState {
+    pub fn new() -> Self {
+        Self { sources_by_namespace: HashMap::new(), links: HashSet::new(), routes: HashSet::new() }
+    }
+
+    /// Commits an action in case it was executed successfully.
+    pub fn commit(&mut self, action: Action) {
+        match action {
+            Action::Listen(namespace) => {
+                self.sources_by_namespace.insert(namespace, HashSet::new());
+            }
+            Action::Subscribe(namespace, source) => {
+                if let Some(sources) = self.sources_by_namespace.get_mut(&namespace) {
+                    sources.insert(source);
+                };
+            }
+            Action::Link(namespace, topic) => {
+                self.links.insert((namespace, topic));
+            }
+            Action::Route(namespace, topic, source) => {
+                self.routes.insert((namespace, topic, source));
+            }
+        };
+    }
+
+    /// Calculates the next action based on the current subscription state.
+    pub fn next_action(
+        &self,
+        namespace: Namespace,
+        source: SubscriptionSource,
+        topic: Topic,
+    ) -> Option<Action> {
+        // Listening
+        if !self.sources_by_namespace.contains_key(&namespace) {
+            return Some(Action::Listen(namespace));
+        }
+
+        // Subscribed
+        if self
+            .sources_by_namespace
+            .get(&namespace)
+            .and_then(|sources| sources.get(&source))
+            .is_none()
+        {
+            return Some(Action::Subscribe(namespace, source));
+        }
+
+        // Linked
+        let link = (namespace, topic);
+        if !self.links.contains(&link) {
+            let (namespace, topic) = link;
+            return Some(Action::Link(namespace, topic));
+        }
+
+        // Routed
+        let (namespace, topic) = link;
+        let route = (namespace, topic, source);
+        if !self.routes.contains(&route) {
+            let (namespace, topic, source) = route;
+            return Some(Action::Route(namespace, topic, source));
+        }
+
+        None
+    }
+}
+
+/// Tracks `EventProvider` instances by namespace.
+pub struct ProviderRegistry {
+    event_provider_by_namespace: HashMap<Namespace, Provider>,
+}
+
+impl ProviderRegistry {
+    pub fn new() -> Self {
+        Self { event_provider_by_namespace: HashMap::new() }
+    }
+
+    pub async fn register_event_provider(
+        &mut self,
+        chariott: &mut impl ChariottCommunication,
+        namespace: Namespace,
+    ) -> Result<(), Error> {
+        if let Entry::Vacant(e) = self.event_provider_by_namespace.entry(namespace.clone()) {
+            let event_provider = Provider::listen(chariott, namespace).await?;
+            e.insert(event_provider);
+        }
+
+        Ok(())
+    }
+
+    pub fn get_event_provider(&self, namespace: &Namespace) -> Option<&Provider> {
+        self.event_provider_by_namespace.get(namespace)
+    }
+
+    pub fn get_event_provider_mut(&mut self, namespace: &Namespace) -> Option<&mut Provider> {
+        self.event_provider_by_namespace.get_mut(namespace)
+    }
+}
+
+/// Represents events originating from a provider. This type allows distributing
+/// events coming from the provider to multiple consumers.
+pub struct Provider {
+    channel_id: String,
+    namespace: Namespace,
+    ess: Arc<EventSubSystem<Topic, SubscriptionSource, Event, Event>>,
+}
+
+impl Provider {
+    /// Listen to events originating from a provider.
+    pub async fn listen(
+        chariott: &mut impl ChariottCommunication,
+        namespace: Namespace,
+    ) -> Result<Self, Error> {
+        let (mut stream, channel_id) = chariott.open(namespace.clone()).await?;
+
+        let ess = Arc::new(EventSubSystem::new());
+
+        {
+            // Publish all subscribed values from a provider
+            // into its ESS.
+
+            let namespace = namespace.clone();
+            let ess = Arc::clone(&ess);
+
+            spawn(async move {
+                while let Some(event) = stream.next().await {
+                    let event = event.unwrap();
+                    ess.publish(event.source.clone().as_str(), event);
+                }
+
+                warn!("Stream for channel '{namespace}' broke.");
+            });
+        }
+
+        Ok(Self { ess, namespace, channel_id })
+    }
+
+    /// Links a topic to events coming from a provider. Prerequisite for routing
+    /// events.
+    pub fn link(&self, topic: Topic, response_sender: ResponseSender) {
+        let (_, mut topic_stream) = self.ess.read_events(topic.clone());
+
+        spawn(async move {
+            while let Some(e) = topic_stream.next().await {
+                let mut buffer = Vec::with_capacity(e.encoded_len());
+                match e.encode(&mut buffer) {
+                    Ok(_) => response_sender.send(Message::Event(buffer, topic.clone())).await,
+                    Err(err) => debug!("Failed to encode event: '{err:?}'."),
+                };
+            }
+
+            warn!("Stream for topic '{topic}' broke.");
+        });
+    }
+
+    /// Routes a type of event from this provider to a topic. Depends on the
+    /// topic to have a `link` to the provider.
+    pub fn route(&self, topic: Topic, source: SubscriptionSource) -> Result<(), NotReadingEvents> {
+        let subscriptions = self.ess.register_subscriptions(topic, vec![source])?;
+        spawn(subscriptions.into_iter().next().unwrap().serve(|e, _| e));
+        Ok(())
+    }
+
+    /// Subscribes to a source on the provider.
+    pub async fn subscribe(
+        &self,
+        chariott: &mut impl ChariottCommunication,
+        source: SubscriptionSource,
+    ) -> Result<(), Error> {
+        chariott
+            .subscribe(self.namespace.clone(), self.channel_id.clone(), vec![source.into()])
+            .await
+    }
+}

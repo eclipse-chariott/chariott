@@ -25,10 +25,10 @@ use chariott_proto::{
         WriteFulfillment, WriteIntent,
     },
     runtime::FulfillResponse,
-    streaming::{channel_service_client::ChannelServiceClient, OpenRequest},
+    streaming::{channel_service_client::ChannelServiceClient, Event as EventMessage, OpenRequest},
 };
 use futures::{stream::BoxStream, StreamExt};
-use tonic::{Request, Response};
+use tonic::{Request, Response, Status};
 use tracing::debug;
 
 struct Fulfillment(FulfillmentEnum);
@@ -252,6 +252,14 @@ impl<T: ChariottCommunication> Chariott for T {
 
 #[async_trait::async_trait]
 pub trait ChariottExt {
+    /// Opens a streaming channel to a provider, identified by its namespace.
+    async fn open<'b>(
+        self,
+        namespace: impl Into<Box<str>> + Send,
+    ) -> Result<(BoxStream<'b, Result<EventMessage, Status>>, String), Error>;
+
+    /// Listens to a number of subscription sources from a provider, identified
+    /// by its namespace.
     async fn listen<'b>(
         self,
         namespace: impl Into<Box<str>> + Send,
@@ -262,13 +270,12 @@ pub trait ChariottExt {
 #[async_trait::async_trait]
 impl<T> ChariottExt for &mut T
 where
-    T: Chariott + Send,
+    T: ChariottCommunication + Send,
 {
-    async fn listen<'b>(
+    async fn open<'b>(
         self,
         namespace: impl Into<Box<str>> + Send,
-        subscription_sources: impl IntoIterator<Item = Box<str>> + Send,
-    ) -> Result<BoxStream<'b, Result<Event, Error>>, Error> {
+    ) -> Result<(BoxStream<'b, Result<EventMessage, Status>>, String), Error> {
         const CHANNEL_ID_HEADER_NAME: &str = "x-chariott-channel-id";
         const SDV_EVENT_STREAMING_SCHEMA_REFERENCE: &str = "chariott.streaming.v1";
         const SDV_EVENT_STREAMING_SCHEMA_KIND: &str = "grpc+proto";
@@ -308,7 +315,19 @@ where
             .ok_or_else(|| Error::new("Channel ID header not found."))?
             .into();
 
-        let result_stream = response.into_inner().map(|r| {
+        Ok((response.into_inner().boxed(), channel_id.into()))
+    }
+
+    async fn listen<'b>(
+        self,
+        namespace: impl Into<Box<str>> + Send,
+        subscription_sources: impl IntoIterator<Item = Box<str>> + Send,
+    ) -> Result<BoxStream<'b, Result<Event, Error>>, Error> {
+        let namespace = namespace.into();
+
+        let (stream, channel_id) = self.open(namespace.clone()).await?;
+
+        let result_stream = stream.map(|r| {
             r.map_err_with("Could not establish stream.").and_then(|event| {
                 event
                     .value
@@ -326,6 +345,7 @@ where
     }
 }
 
+#[derive(Clone)]
 pub struct Event {
     pub id: Box<str>,
     pub data: Value,

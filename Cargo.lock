@@ -442,6 +442,8 @@ dependencies = [
  "async-trait",
  "chariott-common",
  "chariott-proto",
+ "ess",
+ "examples-common",
  "futures",
  "paho-mqtt",
  "prost",
