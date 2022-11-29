@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use chariott_common::{
     chariott_api::{ChariottCommunication, GrpcChariott},
@@ -16,6 +16,7 @@ use chariott_proto::{
     },
     runtime::{FulfillRequest, FulfillResponse},
 };
+use drainage::Drainage;
 use messaging::{MqttMessaging, Publisher, Subscriber};
 use paho_mqtt::{Message as MqttMessage, MessageBuilder, Properties, PropertyCode, QOS_1, QOS_2};
 use prost::Message as ProtoMessage;
@@ -26,12 +27,14 @@ use tokio::{
         mpsc::{self, Sender},
         Mutex,
     },
+    time::timeout,
 };
 use tokio_stream::StreamExt as _;
 use tracing::{debug, warn, Level};
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
 use url::Url;
 
+mod drainage;
 mod messaging;
 mod streaming;
 
@@ -40,6 +43,7 @@ const DEFAULT_VIN: &str = "1";
 const BROKER_URL_ENV_NAME: &str = "BROKER_URL";
 const DEFAULT_BROKER_URL: &str = "tcp://localhost:1883";
 const PUBLISH_BUFFER: usize = 50;
+const DRAIN_TIMEOUT: Duration = Duration::from_secs(10);
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -63,9 +67,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut messages = client.subscribe(format!("c2d/{vin}")).await?;
     let client = Arc::new(client);
 
-    // TODO: cancellation currently does not result in trying to drain all
-    // in-flight publishing messages.
     let cancellation_token = ctrl_c_cancellation();
+    let drainage = Drainage::new();
 
     let (response_sender, mut response_receiver) = mpsc::channel(PUBLISH_BUFFER);
     let response_sender = ResponseSender(response_sender);
@@ -87,17 +90,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 let client = Arc::clone(&client);
 
-                spawn(async move {
+                spawn(drainage.track(async move {
                     if let Err(e) = client.publish(topic, message).await {
                         debug!("Error when publishing message: '{:?}'.", e);
                     }
-                });
+                }));
             }
             _ = cancellation_token.cancelled() => {
                 debug!("Shutting down.");
                 break;
             }
         }
+    }
+
+    if timeout(DRAIN_TIMEOUT, drainage.drain()).await.is_err() {
+        warn!("In-flight tasks could not be drained within {} seconds.", DRAIN_TIMEOUT.as_secs());
     }
 
     client.disconnect().await?;
