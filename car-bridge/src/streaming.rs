@@ -17,9 +17,7 @@ use tracing::{debug, warn};
 
 use crate::{Message, ResponseSender};
 
-/// Identifies a namespace
 type Namespace = String;
-/// Identifies a topic
 type Topic = String;
 /// Identifies a subscription source (a.k.a. _key_).
 type Source = String;
@@ -188,13 +186,11 @@ impl Provider {
 
         spawn(async move {
             while let Some(e) = topic_stream.next().await {
-                let mut buffer = vec![];
-
-                if let Err(err) = e.encode(&mut buffer) {
-                    debug!("Failed to encode event: '{err:?}'.");
-                }
-
-                response_sender.send(Message::Event(buffer, topic.clone())).await;
+                let mut buffer = Vec::with_capacity(e.encoded_len());
+                match e.encode(&mut buffer) {
+                    Ok(_) => response_sender.send(Message::Event(buffer, topic.clone())).await,
+                    Err(err) => debug!("Failed to encode event: '{err:?}'."),
+                };
             }
 
             warn!("Stream for topic '{topic}' broke.");
