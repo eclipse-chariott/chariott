@@ -17,8 +17,7 @@ impl Drainage {
         Self { drained_receiver, drained_sender }
     }
 
-    /// Tracks a future to allow waiting for it to complete when calling
-    /// `drain`.
+    /// Tracks a future to allow waiting for it to complete.
     pub fn track<F>(&self, f: F) -> impl Future<Output = F::Output>
     where
         F: Future + Send + 'static,

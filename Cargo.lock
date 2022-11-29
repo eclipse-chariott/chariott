@@ -449,6 +449,7 @@ dependencies = [
  "prost",
  "tokio",
  "tokio-stream",
+ "tokio-util",
  "tracing",
  "tracing-subscriber",
  "url",
