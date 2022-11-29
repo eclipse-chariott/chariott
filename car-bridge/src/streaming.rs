@@ -19,28 +19,27 @@ use crate::{Message, ResponseSender};
 
 type Namespace = String;
 type Topic = String;
-/// Identifies a subscription source (a.k.a. _key_).
-type Source = String;
+type SubscriptionSource = String;
 
 #[derive(Clone)]
 pub enum Action {
     /// Open a connection a provider's streaming endpoint.
     Listen(Namespace),
     /// Subscribe to a certain type of event from a provider.
-    Subscribe(Namespace, Source),
+    Subscribe(Namespace, SubscriptionSource),
     /// Link a provider to a topic.
     Link(Namespace, Topic),
     /// Route an event for a topic link.
-    Route(Namespace, Topic, Source),
+    Route(Namespace, Topic, SubscriptionSource),
 }
 
 /// Tracks the active subscriptions for each namespace and allows calculating
 /// which steps to take to support streaming intents from a certain provider to
 /// a topic based on the current state.
 pub struct SubscriptionState {
-    sources_by_namespace: HashMap<Namespace, HashSet<Source>>,
+    sources_by_namespace: HashMap<Namespace, HashSet<SubscriptionSource>>,
     links: HashSet<(Namespace, Topic)>,
-    routes: HashSet<(Namespace, Topic, Source)>,
+    routes: HashSet<(Namespace, Topic, SubscriptionSource)>,
 }
 
 impl SubscriptionState {
@@ -72,7 +71,7 @@ impl SubscriptionState {
     pub fn next_action(
         &self,
         namespace: Namespace,
-        source: Source,
+        source: SubscriptionSource,
         topic: Topic,
     ) -> Option<Action> {
         // Listening
@@ -146,7 +145,7 @@ impl ProviderRegistry {
 pub struct Provider {
     channel_id: String,
     namespace: Namespace,
-    ess: Arc<EventSubSystem<Topic, Source, Event, Event>>,
+    ess: Arc<EventSubSystem<Topic, SubscriptionSource, Event, Event>>,
 }
 
 impl Provider {
@@ -199,7 +198,7 @@ impl Provider {
 
     /// Routes a type of event from this provider to a topic. Depends on the
     /// topic to have a `link` to the provider.
-    pub fn route(&self, topic: Topic, source: Source) -> Result<(), NotReadingEvents> {
+    pub fn route(&self, topic: Topic, source: SubscriptionSource) -> Result<(), NotReadingEvents> {
         let subscriptions = self.ess.register_subscriptions(topic, vec![source])?;
         spawn(subscriptions.into_iter().next().unwrap().serve(|e, _| e));
         Ok(())
@@ -209,7 +208,7 @@ impl Provider {
     pub async fn subscribe(
         &self,
         chariott: &mut impl ChariottCommunication,
-        source: Source,
+        source: SubscriptionSource,
     ) -> Result<(), Error> {
         chariott
             .subscribe(self.namespace.clone(), self.channel_id.clone(), vec![source.into()])
