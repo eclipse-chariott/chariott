@@ -23,6 +23,7 @@ use tokio::{
     time::timeout,
 };
 use tokio_stream::StreamExt as _;
+use tokio_util::sync::CancellationToken;
 use tracing::{debug, warn, Level};
 use tracing_subscriber::{util::SubscriberInitExt as _, EnvFilter};
 use url::Url;
@@ -61,6 +62,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let drainage = Drainage::new();
 
     let (response_sender, mut response_receiver) = mpsc::channel(PUBLISH_BUFFER);
+    let mut response_sender = Some(response_sender);
 
     loop {
         select! {
@@ -69,11 +71,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     break;
                 };
 
-                spawn(handle_message(chariott.clone(), response_sender.clone(), message));
+                let Some(response_sender) = response_sender.as_ref() else {
+                    // TODO: stop the MQTT client to consume messages.
+                    debug!("Message will not be handled. Shutting down the Car Bridge.");
+                    continue;
+                };
+
+                spawn(handle_message(chariott.clone(), response_sender.clone(), message, cancellation_token.child_token()));
             }
             message = response_receiver.recv() => {
                 let Some((topic, message)) = message else {
-                    warn!("Response receiver stopped, no more messages will be published.");
+                    // All senders are dropped and hence the channel is closed.
+                    // This shuts down the Car Bridge.
+                    debug!("Response receiver stopped, no more messages will be published.");
                     break;
                 };
 
@@ -85,9 +95,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }));
             }
-            _ = cancellation_token.cancelled() => {
+            _ = cancellation_token.cancelled(), if response_sender.is_some() => {
                 debug!("Shutting down.");
-                break;
+                // Setting the sender to `None` ensures that the
+                // `response_receiver` gets a notification for a closed channel
+                // as soon as all `handle_message` tasks finished executing.
+                // https://docs.rs/tokio/latest/tokio/sync/mpsc/#disconnection
+                response_sender = None;
             }
         }
     }
@@ -105,6 +119,7 @@ async fn handle_message(
     mut chariott: impl ChariottCommunication,
     response_sender: Sender<(String, MessageBuilder)>,
     message: MqttMessage,
+    cancellation_token: CancellationToken,
 ) {
     let correlation_information = match message.get_correlation_information() {
         Ok(cm) => cm,
@@ -114,7 +129,7 @@ async fn handle_message(
         }
     };
 
-    let response: Result<_, Box<dyn std::error::Error + Send + Sync>> = async {
+    let response = async {
         let fulfill_request: FulfillRequest = Message::decode(message.payload())?;
 
         let intent_enum = fulfill_request
@@ -139,8 +154,12 @@ async fn handle_message(
             content_type: "application/x-proto+chariott.common.v1.FulfillResponse",
             is_error: false,
         })
-    }
-    .await;
+    };
+
+    let response: Result<_, Box<dyn std::error::Error + Send + Sync>> = select! {
+        response = response => response,
+        _ = cancellation_token.cancelled() => Err(Error::new("Operation was cancelled.").into())
+    };
 
     let response = match response {
         Ok(message) => message,
