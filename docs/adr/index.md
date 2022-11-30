@@ -27,6 +27,7 @@ This log lists the architectural decisions for [SDV-IVM].
 * [ADR-0020](0020-integration-and-e2e-testing.md) - Integration- and E2E Testing
 * [ADR-0021](0021-load-tests.md) - Load tests
 * [ADR-0022](0022-event-sub-system.md) - Event Sub-system (ESS)
+* [ADR-0023](0023-cloud-integration.md) - Cloud integration
 * [ADR-1](template.md) - [short title of solved problem and solution]
 
 <!-- adrlogstop -->
