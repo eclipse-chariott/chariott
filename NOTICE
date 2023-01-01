@@ -4,7 +4,7 @@ This page lists the licenses of the projects used in cargo-about.
 
 ## Overview of licenses
 
-- MIT License (156)
+- MIT License (157)
 - Apache License 2.0 (8)
 - BSD 3-Clause "New" or "Revised" License (5)
 - BSD 2-Clause "Simplified" License (1)
@@ -6067,6 +6067,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+```
+
+### MIT (MIT License)
+
+#### Used by
+
+- [typenum]( https://github.com/paholg/typenum ) 1.15.0
+
+#### License
+
+```text
+MIT OR Apache-2.0
 ```
 
 ### MIT (MIT License)
