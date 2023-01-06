@@ -2430,6 +2430,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "sample_provider_template"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chariott-common",
+ "chariott-proto",
+ "examples-common",
+ "tokio",
+ "tonic",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+]
+
+[[package]]
 name = "schannel"
 version = "0.1.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
