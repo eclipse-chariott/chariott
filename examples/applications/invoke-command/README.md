@@ -1,4 +1,4 @@
-# Key-Value Store Application
+# Invoke Command Example
 
 This is an example Chariott provider that shows how the invoke intent works.
 It shows an example of a command that takes a json string as an input.
