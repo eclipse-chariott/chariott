@@ -35,7 +35,7 @@ impl ChariottProvider {
         Ok("Successfully processed json".to_string())
     }
 
-    // Add function to execute simple command on json file.
+    // Simple function that executes on a given invoke intent.
     fn invoke(&self, intent: InvokeIntent) -> Result<InvokeFulfillment, Status> {
         let command = intent.command;
 
