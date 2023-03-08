@@ -5,6 +5,7 @@ members = [
     "examples/applications/cloud-object-detection",
     "examples/applications/dog-mode-logic",
     "examples/applications/kv-app",
+    "examples/applications/invoke-command",
     "examples/applications/local-object-detection",
     "examples/applications/lt-consumer",
     "examples/applications/lt-provider",
