@@ -25,7 +25,7 @@ async fn wain() -> Result<(), Error> {
         "sdv.invoke.controller",
         "0.0.1",
         "sdv.invoke.controller",
-        [Intent::Invoke, Intent::Discover],
+        [Intent::Discover, Intent::Invoke],
         "MASSAGE_URL",
         "http://0.0.0.0:50064",
         ExecutionLocality::Local,
