@@ -5,7 +5,7 @@
 ARG RUST_VERSION=1.65
 FROM rust:${RUST_VERSION} AS builder
 
-# Dockerfile for building Chariott base image
+# Dockerfile for building Eclipse Chariott base image
 #
 # This Dockerfile builds the packages from chariott workspace with
 # statically linked dependencies (using musl) for x86_64 architecture

@@ -1,10 +1,11 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
+# SPDX-License-Identifier: MIT
 
 ARG RUST_VERSION=1.65
 FROM rust:${RUST_VERSION} AS builder
 
-# Dockerfile for building Chariott runtime container
+# Dockerfile for building Eclipse Chariott runtime container
 #
 # This Dockerfile utilizes a two step build process. It builds Chariott with
 # statically linked dependencies (using musl) for a x86_64 architecture.

@@ -5,7 +5,7 @@
 ARG RUST_VERSION=1.65
 FROM rust:${RUST_VERSION} AS builder
 
-# Dockerfile for building SDV Chariott container for ARM64 with
+# Dockerfile for building Eclipse Chariott container for ARM64 with
 # cross-compilation.
 #
 # This Dockerfile utilizes a two step build process. It builds the with
