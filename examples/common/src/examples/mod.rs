@@ -1,5 +1,6 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+// SPDX-License-Identifier: MIT
 
 /// Modules in `examples` are not common to Chariott in general, but common to
 /// one of our examples. The sub-modules illustrate how shared code between

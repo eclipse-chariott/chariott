@@ -1,6 +1,7 @@
 #!/bin/bash
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
+# SPDX-License-Identifier: MIT
 
 # This script is used to run the container e2e tests on WSL2
 # inside of the containers. It will provision a network and

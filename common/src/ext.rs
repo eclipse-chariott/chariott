@@ -1,6 +1,7 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Portions Copyright (c) 2014 Jorge Aparicio
 // Licensed under the MIT license.
+// SPDX-License-Identifier: MIT
 
 pub trait OptionExt<T, E> {
     fn ok(self) -> Result<Option<T>, E>;

@@ -1,5 +1,6 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+// SPDX-License-Identifier: MIT
 
 // see https://github.com/hyperium/tonic/issues/1056
 // and https://github.com/tokio-rs/prost/issues/661#issuecomment-1156606409
