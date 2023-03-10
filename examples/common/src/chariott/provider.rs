@@ -1,5 +1,6 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+// SPDX-License-Identifier: MIT
 
 #[macro_export]
 macro_rules! chariott_provider_main {

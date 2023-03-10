@@ -1,5 +1,6 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+// SPDX-License-Identifier: MIT
 
 // api.rs contains code that can be considered "boilerplate" when
 // interacting with the Chariott runtime. It will most likely need to be

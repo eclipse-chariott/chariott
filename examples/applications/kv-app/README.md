@@ -1,6 +1,6 @@
 # Key-Value Store Application
 
-This is an example Chariott provider that offers the capability to read from
+This is an example provider that offers the capability to read from
 and write to an in-memory key-value store. It also supports subscribing to
 changes in the key store where the events are delivered over an opened
 channel.

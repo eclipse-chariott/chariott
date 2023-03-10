@@ -1,5 +1,6 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
+# SPDX-License-Identifier: MIT
 
 # See here for image contents: https://github.com/microsoft/vscode-dev-containers/tree/v0.231.5/containers/rust/.devcontainer/base.Dockerfile
 

@@ -1,5 +1,6 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+// SPDX-License-Identifier: MIT
 
 use chariott::chariott_grpc::ChariottServer;
 use chariott::registry::{self, Registry};

@@ -1,4 +1,4 @@
-# Project Chariott
+# Project Eclipse Chariott
 
 - [CI Status](#ci-status)
 - [What is Chariott?](#what-is-chariott)

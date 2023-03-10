@@ -1,5 +1,6 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+// SPDX-License-Identifier: MIT
 
 use anyhow::{anyhow, Error};
 use async_stream::try_stream;
