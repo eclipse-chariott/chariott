@@ -1,7 +1,8 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+// SPDX-License-Identifier: MIT
 
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 use async_trait::async_trait;
 use tonic::{Request, Response, Status};
@@ -10,14 +11,14 @@ use url::Url;
 
 use chariott_proto::{
     common::{
-        discover_fulfillment::Service, DiscoverFulfillment, FulfillmentEnum,
-        FulfillmentMessage, IntentEnum
+        discover_fulfillment::Service, DiscoverFulfillment, FulfillmentEnum, FulfillmentMessage,
+        IntentEnum,
     },
     provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
 };
 
 pub struct ChariottProvider {
-    url: Url
+    url: Url,
 }
 
 impl ChariottProvider {

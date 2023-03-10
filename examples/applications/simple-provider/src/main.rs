@@ -4,7 +4,7 @@
 
 mod chariott_provider;
 
-use std::{sync::Arc, net::SocketAddr, time::Duration};
+use std::{net::SocketAddr, sync::Arc, time::Duration};
 
 use url::Url;
 
@@ -13,9 +13,9 @@ use chariott_common::shutdown::RouterExt as _;
 use chariott_proto::{
     provider::provider_service_server::ProviderServiceServer,
     runtime::{
-        intent_registration::Intent, intent_service_registration::ExecutionLocality,
-        IntentServiceRegistration, AnnounceRequest, IntentRegistration, RegisterRequest,
-        RegistrationState, chariott_service_client::ChariottServiceClient
+        chariott_service_client::ChariottServiceClient, intent_registration::Intent,
+        intent_service_registration::ExecutionLocality, AnnounceRequest, IntentRegistration,
+        IntentServiceRegistration, RegisterRequest, RegistrationState,
     },
 };
 use examples_common::chariott;
@@ -38,14 +38,12 @@ struct RegisterParams {
 
 async fn connect_chariott_client(
     client: &mut Option<ChariottServiceClient<Channel>>,
-    chariott_url: String
+    chariott_url: String,
 ) -> Result<(), Error> {
-    *client = Some(ChariottServiceClient::connect(chariott_url).await
-        .map_err(|e| {
-            *client = None; // Set client back to None on error.
-            Error::from_error("Could not connect to client", Box::new(e))
-        })?
-    );
+    *client = Some(ChariottServiceClient::connect(chariott_url).await.map_err(|e| {
+        *client = None; // Set client back to None on error.
+        Error::from_error("Could not connect to client", Box::new(e))
+    })?);
 
     Ok(())
 }
@@ -54,7 +52,6 @@ async fn register_announce_once(
     client: &mut Option<ChariottServiceClient<Channel>>,
     reg_params: RegisterParams,
 ) -> Result<(), Error> {
-
     // If there is no client, need to attempt connection.
     if client.is_none() {
         connect_chariott_client(client, reg_params.chariott_url).await?;
@@ -67,12 +64,11 @@ async fn register_announce_once(
         locality: reg_params.locality as i32,
     });
 
-    let announce_req = AnnounceRequest {
-        service: service.clone(),
-    };
+    let announce_req = AnnounceRequest { service: service.clone() };
 
     // Allways announce to Chariott.
-    let registration_state = client.as_mut()
+    let registration_state = client
+        .as_mut()
         .expect("No client found")
         .announce(announce_req.clone())
         .await
@@ -85,17 +81,20 @@ async fn register_announce_once(
     if registration_state == RegistrationState::Announced as i32 {
         let register_req = RegisterRequest {
             service: service.clone(),
-            intents: reg_params.intents.iter().map(
-                |i| IntentRegistration {
+            intents: reg_params
+                .intents
+                .iter()
+                .map(|i| IntentRegistration {
                     intent: *i as i32,
                     namespace: reg_params.namespace.clone(),
-                }
-            ).collect(),
+                })
+                .collect(),
         };
 
         tracing::info!("Registered with Chariott runtime: {:?}", register_req);
 
-        _ = client.as_mut()
+        _ = client
+            .as_mut()
             .expect("No client found")
             .register(register_req.clone())
             .await
@@ -107,25 +106,18 @@ async fn register_announce_once(
 
 async fn register_announce_provider(
     reg_params: RegisterParams,
-    ttl_seconds: u64
+    ttl_seconds: u64,
 ) -> Result<(), Error> {
-
     // Initiate registration and announce thread.
     _ = tokio::task::spawn(async move {
         let mut client = None;
 
         // Loop that handles provider registration and announce heartbeat pattern.
         loop {
-            match register_announce_once(
-                &mut client,
-                reg_params.clone(),
-            ).await {
+            match register_announce_once(&mut client, reg_params.clone()).await {
                 Ok(_) => {},
                 Err(e) => {
-                    warn!(
-                        "Registration failed with '{:?}'. Retrying after {:?}.",
-                        e, ttl_seconds
-                    );
+                    warn!("Registration failed with '{:?}'. Retrying after {:?}.",e, ttl_seconds);
                 }
             }
 
@@ -141,13 +133,16 @@ async fn register_announce_provider(
 chariott::provider::main!(wain);
 
 async fn wain() -> Result<(), Error> {
-
     // Intitialize addresses for provider and chariott communication.
     let chariott_url = "http://0.0.0.0:4243".to_string();
     let base_provider_address = "0.0.0.0:50064".to_string();
     let provider_url_str = format!("http://{}", base_provider_address.clone());
-    let socket_address: SocketAddr = base_provider_address.clone().parse().map_err(|e| Error::from_error("error getting SocketAddr", Box::new(e)))?;
-    let provider_url: Url = Url::parse(&provider_url_str).map_err(|e| Error::from_error("error getting Url", Box::new(e)))?; 
+    let socket_address: SocketAddr = base_provider_address
+        .clone()
+        .parse()
+        .map_err(|e| Error::from_error("error getting SocketAddr", Box::new(e)))?;
+    let provider_url: Url = Url::parse(&provider_url_str)
+        .map_err(|e| Error::from_error("error getting Url", Box::new(e)))?;
 
     let register_params: RegisterParams = RegisterParams {
         name: "sdv.simple.provider".to_string(),
@@ -160,11 +155,7 @@ async fn wain() -> Result<(), Error> {
     };
 
     // Intitate provider registration and announce heartbeat.
-    register_announce_provider(
-        register_params,
-        5
-    )
-    .await?;
+    register_announce_provider(register_params, 5).await?;
 
     tracing::info!("Application listening on: {provider_url_str}");
 
