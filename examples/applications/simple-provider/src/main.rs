@@ -1,5 +1,6 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+// SPDX-License-Identifier: MIT
 
 mod chariott_provider;
 
@@ -98,7 +99,6 @@ async fn register_announce_once(
 
     Ok(())
 }
-
 
 async fn register_announce_provider(
     name: String,
