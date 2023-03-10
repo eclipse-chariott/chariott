@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1678246661711,
+  "lastUpdate": 1678471194782,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -2099,6 +2099,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 253066418,
             "range": "± 384988",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "9027586+fprezado@users.noreply.github.com",
+            "name": "fprezado",
+            "username": "fprezado"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "bc98381c4a4cda398e4bca091e7f6c556833e3ab",
+          "message": "Merge pull request #95 from ladatz/ladatz/headers\n\nUpdate License Banners according to Eclipse guidelines",
+          "timestamp": "2023-03-10T09:54:10-08:00",
+          "tree_id": "33acf006d5013d70428da762ef2cf1519991c651",
+          "url": "https://github.com/eclipse/chariott/commit/bc98381c4a4cda398e4bca091e7f6c556833e3ab"
+        },
+        "date": 1678471194201,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 523770,
+            "range": "± 49835",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3204025,
+            "range": "± 45673",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 29806685,
+            "range": "± 792554",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 5344697,
+            "range": "± 174210",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 31686290,
+            "range": "± 440564",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 299976313,
+            "range": "± 2667235",
             "unit": "ns/iter"
           }
         ]
