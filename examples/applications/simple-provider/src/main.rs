@@ -115,9 +115,9 @@ async fn register_announce_provider(
         // Loop that handles provider registration and announce heartbeat pattern.
         loop {
             match register_announce_once(&mut client, reg_params.clone()).await {
-                Ok(_) => {},
+                Ok(_) => {}
                 Err(e) => {
-                    warn!("Registration failed with '{:?}'. Retrying after {:?}.",e, ttl_seconds);
+                    warn!("Registration failed with '{:?}'. Retrying after {:?}.", e, ttl_seconds);
                 }
             }
 
