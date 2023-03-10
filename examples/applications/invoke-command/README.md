@@ -29,7 +29,7 @@ EOF
 Once the service is confirmed registered, the below command can be run to call a command
 on the provider. The command takes a json string and parses it/prints it out on the provider side.
 The 'command' parameter is used to tell the desired provider what command to run.The 'args'
-parameter is a list of arguments for the command. The args can be several types, defined 
+parameter is a list of arguments for the command. The args can be several types, defined
 in `proto\chariott\common\v1\common.proto` file under the `Value` message.
 
 ```bash

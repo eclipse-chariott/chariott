@@ -25,6 +25,17 @@ use tracing::warn;
 
 use crate::chariott_provider::ChariottProvider;
 
+#[derive(Clone)]
+struct RegisterParams {
+    name: String,
+    namespace: String,
+    version: String,
+    intents: Vec<Intent>,
+    url: String,
+    chariott_url: String,
+    locality: ExecutionLocality,
+}
+
 async fn connect_chariott_client(
     client: &mut Option<ChariottServiceClient<Channel>>,
     chariott_url: String
@@ -41,25 +52,19 @@ async fn connect_chariott_client(
 
 async fn register_announce_once(
     client: &mut Option<ChariottServiceClient<Channel>>,
-    name: String,
-    version: String,
-    namespace: String,
-    intents: Vec<Intent>,
-    url: String,
-    chariott_url: String,
-    locality: ExecutionLocality
+    reg_params: RegisterParams,
 ) -> Result<(), Error> {
 
     // If there is no client, need to attempt connection.
     if client.is_none() {
-        connect_chariott_client(client, chariott_url).await?;
+        connect_chariott_client(client, reg_params.chariott_url).await?;
     }
 
     let service = Some(IntentServiceRegistration {
-        name: name,
-        url: url,
-        version: version,
-        locality: locality as i32,
+        name: reg_params.name,
+        url: reg_params.url,
+        version: reg_params.version,
+        locality: reg_params.locality as i32,
     });
 
     let announce_req = AnnounceRequest {
@@ -74,16 +79,16 @@ async fn register_announce_once(
         .map_err(|e| Error::from_error("Error announcing to Chariott.", Box::new(e)))?
         .into_inner()
         .registration_state;
-    
+
     // Only attempt registration with Chariott if the announced state is ANNOUNCED.
     // This also handles re-registration if Chariott crashes and comes back online.
     if registration_state == RegistrationState::Announced as i32 {
         let register_req = RegisterRequest {
             service: service.clone(),
-            intents: intents.iter().map(
+            intents: reg_params.intents.iter().map(
                 |i| IntentRegistration {
                     intent: *i as i32,
-                    namespace: namespace.to_string(),
+                    namespace: reg_params.namespace.clone(),
                 }
             ).collect(),
         };
@@ -101,13 +106,7 @@ async fn register_announce_once(
 }
 
 async fn register_announce_provider(
-    name: String,
-    version: String,
-    namespace: String,
-    intents: Vec<Intent>,
-    url: String,
-    chariott_url: String,
-    locality: ExecutionLocality,
+    reg_params: RegisterParams,
     ttl_seconds: u64
 ) -> Result<(), Error> {
 
@@ -119,13 +118,7 @@ async fn register_announce_provider(
         loop {
             match register_announce_once(
                 &mut client,
-                name.clone(),
-                version.clone(),
-                namespace.clone(),
-                intents.clone(),
-                url.clone(),
-                chariott_url.clone(),
-                locality.clone()
+                reg_params.clone(),
             ).await {
                 Ok(_) => {},
                 Err(e) => {
@@ -135,7 +128,7 @@ async fn register_announce_provider(
                     );
                 }
             }
-            
+
             // Interval between announce heartbeats or connection retries.
             sleep(Duration::from_secs(ttl_seconds)).await;
         }
@@ -151,20 +144,24 @@ async fn wain() -> Result<(), Error> {
 
     // Intitialize addresses for provider and chariott communication.
     let chariott_url = "http://0.0.0.0:4243".to_string();
-    let base_provider_address = "0.0.0.0:50064";
+    let base_provider_address = "0.0.0.0:50064".to_string();
     let provider_url_str = format!("http://{}", base_provider_address.clone());
     let socket_address: SocketAddr = base_provider_address.clone().parse().map_err(|e| Error::from_error("error getting SocketAddr", Box::new(e)))?;
     let provider_url: Url = Url::parse(&provider_url_str).map_err(|e| Error::from_error("error getting Url", Box::new(e)))?; 
 
+    let register_params: RegisterParams = RegisterParams {
+        name: "sdv.simple.provider".to_string(),
+        namespace: "sdv.simple.provider".to_string(),
+        version: "0.0.1".to_string(),
+        intents: [Intent::Discover].to_vec(),
+        url: provider_url_str.clone(),
+        chariott_url,
+        locality: ExecutionLocality::Local,
+    };
+
     // Intitate provider registration and announce heartbeat.
     register_announce_provider(
-        "sdv.simple.provider".to_string(),
-        "0.0.1".to_string(),
-        "sdv.simple.provider".to_string(),
-        [Intent::Discover].to_vec(),
-        provider_url_str.clone(),
-        chariott_url,
-        ExecutionLocality::Local,
+        register_params,
         5
     )
     .await?;
