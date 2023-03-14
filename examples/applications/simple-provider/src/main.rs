@@ -48,7 +48,7 @@ async fn connect_chariott_client(
     Ok(())
 }
 
-async fn register_announce_once(
+async fn register_and_announce_once(
     client: &mut Option<ChariottServiceClient<Channel>>,
     reg_params: RegisterParams,
 ) -> Result<(), Error> {
@@ -66,7 +66,7 @@ async fn register_announce_once(
 
     let announce_req = AnnounceRequest { service: service.clone() };
 
-    // Allways announce to Chariott.
+    // Always announce to Chariott.
     let registration_state = client
         .as_mut()
         .expect("No client found")
@@ -76,7 +76,8 @@ async fn register_announce_once(
         .into_inner()
         .registration_state;
 
-    // Only attempt registration with Chariott if the announced state is ANNOUNCED.
+    // Only attempt registration with Chariott if the announced state is 'ANNOUNCED'.
+    // The 'ANNOUNCED' state means that this service is not currently registered in Chariott.
     // This also handles re-registration if Chariott crashes and comes back online.
     if registration_state == RegistrationState::Announced as i32 {
         let register_req = RegisterRequest {
@@ -104,7 +105,7 @@ async fn register_announce_once(
     Ok(())
 }
 
-async fn register_announce_provider(
+async fn register_and_announce_provider(
     reg_params: RegisterParams,
     ttl_seconds: u64,
 ) -> Result<(), Error> {
@@ -114,7 +115,7 @@ async fn register_announce_provider(
 
         // Loop that handles provider registration and announce heartbeat pattern.
         loop {
-            match register_announce_once(&mut client, reg_params.clone()).await {
+            match register_and_announce_once(&mut client, reg_params.clone()).await {
                 Ok(_) => {}
                 Err(e) => {
                     warn!("Registration failed with '{:?}'. Retrying after {:?}.", e, ttl_seconds);
@@ -155,7 +156,7 @@ async fn wain() -> Result<(), Error> {
     };
 
     // Intitate provider registration and announce heartbeat.
-    register_announce_provider(register_params, 5).await?;
+    register_and_announce_provider(register_params, 5).await?;
 
     tracing::info!("Application listening on: {provider_url_str}");
 
