@@ -1,0 +1,22 @@
+[package]
+name = "simple-provider"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[dependencies]
+async-trait = { workspace = true }
+chariott-common = { workspace = true }
+chariott-proto = { workspace = true }
+ess = { path = "../../../ess/" }
+examples-common = { path = "../../common/" }
+keyvalue = { path = "../../../keyvalue/" }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tokio-stream = { workspace = true }
+tonic = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+url = { workspace = true }
+uuid = { workspace = true }
+serde = "1.0.147"
+serde_json = "1.0.87"

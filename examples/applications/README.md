@@ -121,6 +121,10 @@ sequenceDiagram
    crashed between two announcements, it will respond with `ANNOUNCED`, in which
    case the provider should reregister using the `RegisterRequest`.
 
+See the [Simple Provider Application][simple-provider] for a self-contained example for how to implement the above pattern.
+
+[simple-provider]: ./simple-provider/README.md
+
 ### Vehicle integration
 
 This scenario illustrates how you can integrate the vehicle hardware when using

@@ -2607,6 +2607,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "simple-provider"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chariott-common",
+ "chariott-proto",
+ "ess",
+ "examples-common",
+ "keyvalue",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tokio-stream",
+ "tonic",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "uuid",
+]
+
+[[package]]
 name = "simulated-camera-app"
 version = "0.1.0"
 dependencies = [
