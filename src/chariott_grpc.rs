@@ -142,9 +142,7 @@ impl<T: Observer + Send + Sync + 'static> ChariottService for ChariottServer<T> 
         #[cfg(not(test))]
         let broker = &self.broker;
         #[cfg(test)]
-        _ = self.broker; // Suppress dead code warning when test feature is active.
-        #[cfg(test)]
-        let broker = tests::MockBroker;
+        let broker = tests::MockBroker::new(self.broker.clone());
 
         let binding =
             broker.resolve(&config).ok_or_else(|| Status::not_found("No provider found."))?;
@@ -406,6 +404,11 @@ mod tests {
 
     impl MockBroker {
         const RETURN_VALUE: i32 = 10;
+
+        pub fn new(broker: IntentBroker) -> Self {
+            _ = broker; // Suppress dead code warning when test feature is active.
+            Self
+        }
 
         pub fn resolve(&self, _: &IntentConfiguration) -> Option<RuntimeBinding<GrpcProvider>> {
             Some(RuntimeBinding::Test(TestBinding::new(
