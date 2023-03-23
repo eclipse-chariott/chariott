@@ -142,7 +142,7 @@ impl<T: Observer + Send + Sync + 'static> ChariottService for ChariottServer<T> 
         #[cfg(not(test))]
         let broker = &self.broker;
         #[cfg(test)]
-        _ = self.broker; // Suppress dead code warning when test feature is active.
+        let _ = self.broker; // Suppress dead code warning when test feature is active.
         #[cfg(test)]
         let broker = tests::MockBroker;
 
