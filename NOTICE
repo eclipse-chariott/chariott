@@ -4,7 +4,7 @@ This page lists the licenses of the projects used in cargo-about.
 
 ## Overview of licenses
 
-- MIT License (156)
+- MIT License (157)
 - Apache License 2.0 (8)
 - BSD 3-Clause "New" or "Revised" License (5)
 - BSD 2-Clause "Simplified" License (1)
@@ -5884,6 +5884,7 @@ SOFTWARE.
 - [gloo-timers]( https://github.com/rustwasm/gloo/tree/master/crates/timers ) 0.2.4
 - [half]( https://github.com/starkat99/half-rs ) 1.8.2
 - [half]( https://github.com/starkat99/half-rs ) 2.1.0
+- [invoke-command]( https://crates.io/crates/invoke-command ) 0.1.0
 - [keyvalue]( https://crates.io/crates/keyvalue ) 0.1.0
 - [kv-app]( https://crates.io/crates/kv-app ) 0.1.0
 - [local-object-detection-app]( https://crates.io/crates/local-object-detection-app ) 0.1.0
@@ -5894,6 +5895,7 @@ SOFTWARE.
 - [plotters]( https://github.com/plotters-rs/plotters ) 0.3.4
 - [plotters-backend]( https://github.com/plotters-rs/plotters ) 0.3.4
 - [plotters-svg]( https://github.com/plotters-rs/plotters.git ) 0.3.3
+- [simple-provider]( https://crates.io/crates/simple-provider ) 0.1.0
 - [simulated-camera-app]( https://crates.io/crates/simulated-camera-app ) 0.1.0
 - [test-case-macros]( https://github.com/frondeus/test-case ) 2.2.2
 - [valuable]( https://github.com/tokio-rs/valuable ) 0.1.0
@@ -6067,6 +6069,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+```
+
+### MIT (MIT License)
+
+#### Used by
+
+- [typenum]( https://github.com/paholg/typenum ) 1.15.0
+
+#### License
+
+```text
+MIT OR Apache-2.0
 ```
 
 ### MIT (MIT License)
