@@ -1,0 +1,65 @@
+@startuml
+autonumber
+skinparam sequenceMessageAlign center
+Participant "Provider" as provider
+box "Chariott"
+Participant "Service Registry" as registry
+Participant "Intent Broker" as broker
+end box
+Participant "'Consuming' Application" as consumer
+
+activate registry
+activate broker
+activate consumer
+
+consumer -> broker: FulfillRequest: DiscoverIntent, 'sdv.sample.namespace'
+broker --> consumer: ERROR: 'No provider found.'
+
+== Provider Registration ==
+activate provider
+provider->registry: AnnounceRequest
+registry --> provider: AnnounceResponse: ANNOUNCED
+provider -> registry: RegisterRequest
+
+registry -> broker: on_change: Add
+
+registry --> provider: RegisterResponse
+    loop Continuous Announce
+        provider->registry: AnnounceRequest
+        registry --> provider: AnnounceResponse: NOT_CHANGED
+    end
+
+== Service Discovery ==
+consumer -> broker: FulfillRequest: DiscoverIntent, 'sdv.sample.namespace'
+broker -> provider: FulfillRequest: DiscoverIntent
+provider --> broker: FulfillResponse: services
+broker --> consumer: FulfillResponse: services
+
+== Direct Application Communication ==
+consumer -> provider: API_A
+provider --> consumer: API_A Response
+
+== Inspection ==
+consumer -> broker: FulfillRequest: InspectIntent, 'sdv.sample.namespace', **
+broker -> provider: FulfillRequest: InspectIntent
+provider --> broker: FulfillResponse: entries
+broker --> consumer: FulfillResponse: entries
+
+
+== Intent Brokering ==
+consumer -> broker: FulfillRequest: InvokeIntent, 'sdv.sample.namespace', command1
+broker -> provider: FulfillRequest: InvokeIntent, command1
+provider --> broker: FulfillResponse
+broker --> consumer: FulfillResponse
+deactivate provider
+
+== Provider Exits ==
+registry -> broker: on_change: Remove
+consumer -> broker: FulfillRequest: DiscoverIntent, 'sdv.sample.namespace'
+broker --> consumer: ERROR: 'No provider found.'
+
+deactivate registry
+deactivate broker
+deactivate consumer
+
+@enduml

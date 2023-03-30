@@ -1,0 +1,25 @@
+@startuml
+
+left to right direction
+["Provider" Application] -down-> chariott.runtime
+["Provider" Application] - chariott.provider
+["Consuming" Application] --> chariott.runtime
+
+
+node "Chariott" as chariott {
+  [Service Registry]
+  [Intent Broker]
+  [Intent Broker]
+}
+
+chariott -up-- chariott.runtime
+chariott -up--> chariott.provider
+
+[Service Registry]
+[Intent Broker]
+
+[Service Registry] -[hidden]left-> [Intent Broker]
+["Provider" Application] -[hidden]left-> ["Consuming" Application]
+["Consuming" Application] -[hidden]down-> [Service Registry]
+
+@enduml
