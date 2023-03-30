@@ -3,7 +3,7 @@
     {
       "urls": ["https://cdn.vector.com/"],
       "headers": {
-        "Accept-Encoding": "zstd, br, gzip, deflate"
+        "Accept-Encoding": "zstd, br, gzip, deflate, pdf"
       }
     }
   ],
