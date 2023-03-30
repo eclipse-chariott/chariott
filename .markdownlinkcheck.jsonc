@@ -1,9 +1,9 @@
 {
   "httpHeaders": [
     {
-      "urls": ["https://docs.github.com/"],
+      "urls": ["https://cdn.vector.com/"],
       "headers": {
-        "Accept-Encoding": "zstd, br, gzip, deflate, pdf"
+        "Accept-Encoding": "zstd, br, gzip, deflate"
       }
     }
   ],
