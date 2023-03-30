@@ -1,12 +1,4 @@
 {
-  "httpHeaders": [
-    {
-      "urls": ["https://cdn.vector.com/"],
-      "headers": {
-        "Accept-Encoding": "zstd, br, gzip, deflate, pdf"
-      }
-    }
-  ],
   "ignorePatterns": [
     {
       "pattern": "^http://localhost"
