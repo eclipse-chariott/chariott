@@ -78,9 +78,7 @@ where:
   - Even if that's a valid use-case, the capability registry could be used to load balance
   among the different service instances. -> SOME/IP Service Discovery accounts
   for load balancing and several server instances offering the same service
-  interface. A [vector
-  presentation](https://cdn.vector.com/cms/content/events/2019/VH/VIC2019/Track_1_5_Glancing_Ethernet_communication_for_Automotive_4.pdf)
-  mentions that a client can consume multiple server instances.
+  interface.
 - The middleware does not have access to the manifests of the
   applications/providers before the discovery
 - Name resolution is resource-wise a feasible option for service discovery.
