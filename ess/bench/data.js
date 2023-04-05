@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1679611007302,
+  "lastUpdate": 1680732771384,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -2279,6 +2279,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 252637188,
             "range": "± 264025",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "9027586+fprezado@users.noreply.github.com",
+            "name": "fprezado",
+            "username": "fprezado"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "eff76df31af9459b1f7dad7da624616ee1d97595",
+          "message": "Merge pull request #112 from devkelley/devkelle/fix_ci_errors\n\nFix static code analysis and doc link errors",
+          "timestamp": "2023-04-05T18:46:43Z",
+          "tree_id": "a9172c3cd9cacb6f22760063661b6986424a670b",
+          "url": "https://github.com/eclipse/chariott/commit/eff76df31af9459b1f7dad7da624616ee1d97595"
+        },
+        "date": 1680732770399,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 395441,
+            "range": "± 43661",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2736670,
+            "range": "± 200766",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 25519809,
+            "range": "± 2410632",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 4439527,
+            "range": "± 242402",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 27107171,
+            "range": "± 1786658",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 265996693,
+            "range": "± 19758786",
             "unit": "ns/iter"
           }
         ]
