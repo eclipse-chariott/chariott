@@ -793,7 +793,3 @@ AUTOSAR interface, the following annotations are possible:
 | codeGenUnitPhysicalDimension | The physical dimension of the unit, e.g. length |
 | codeGenUnitPhysicalDimensionLengthExponent | The exponent of the physical dimension of the unit, e.g. -3 |
 | codeGenUnitPhysicalDimensionTimeExponent | The exponent of the time dimension of the unit, e.g. -3 |
-
-## Links
-
-- [Autosar AI Specification Samples](https://www.autosar.org/fileadmin/user_upload/standards/classic/21-11/AUTOSAR_MOD_AISpecificationExamples.zip)

@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 use async_trait::async_trait;
 use tonic::{Request, Response, Status};
@@ -11,14 +11,14 @@ use url::Url;
 
 use chariott_proto::{
     common::{
-        discover_fulfillment::Service, ValueMessage, value::Value, DiscoverFulfillment, FulfillmentEnum,
-        FulfillmentMessage, IntentEnum, InvokeIntent, InvokeFulfillment
+        discover_fulfillment::Service, value::Value, DiscoverFulfillment, FulfillmentEnum,
+        FulfillmentMessage, IntentEnum, InvokeFulfillment, InvokeIntent, ValueMessage,
     },
     provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
 };
 
 pub struct ChariottProvider {
-    url: Url
+    url: Url,
 }
 
 impl ChariottProvider {
@@ -28,7 +28,8 @@ impl ChariottProvider {
 
     // Simple function that parses incoming json and then prints it.
     fn parse_and_print_json(json_string: String) -> Result<String, Status> {
-        let json_val: serde_json::Value = serde_json::from_str(&json_string).map_err(|_| Status::unknown("failed to parse json."))?;
+        let json_val: serde_json::Value = serde_json::from_str(&json_string)
+            .map_err(|_| Status::unknown("failed to parse json."))?;
 
         println!("{}", json_val);
 
@@ -49,10 +50,10 @@ impl ChariottProvider {
                 };
 
                 let res = Self::parse_and_print_json(json_string).unwrap();
-                let ret = ValueMessage {value: Some(Value::String(res))};
-                Ok(InvokeFulfillment {r#return: Some(ret)})
-            },
-            _ => Err(Status::unknown(format!("No command found for {}", command)))
+                let ret = ValueMessage { value: Some(Value::String(res)) };
+                Ok(InvokeFulfillment { r#return: Some(ret) })
+            }
+            _ => Err(Status::unknown(format!("No command found for {}", command))),
         };
 
         result
