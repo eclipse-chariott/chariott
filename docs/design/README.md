@@ -15,14 +15,14 @@ Chariott itself has two main architectural components.
 - Service Registry
 - Intent Broker
 
-The service registry is used for service discovChariott Sequence Diagramery. It maintains a mapping of namespace to a list of services that are currently registered with that namespace and the metadata needed to communicate with that service.
+The service registry is used for service discovery. It maintains a mapping of namespace to a list of services that are currently registered with that namespace and the metadata needed to communicate with that service.
 
 The Intent Broker maintains a mapping of namespace and intent with the connection for the provider that can fulfill that intent request. It is used for brokering through Chariott.
 
 Applications which interact with Chariott represent two additional architectural concepts.
 
 - Applications -- represent any software component
-- Providers -- represent a software component which registers itself and its capabilities with Chariott
+- Chariott Providers -- represent a software component which registers itself and its capabilities with Chariott
 
 The phrase "consuming application" can be used to describe an application which uses Chariott to interact with another application, either through service discovery or intent brokering. It is important to note that any software component can use Chariott's service registry or intent broker to interact with another software component, including providers. In other words, an application can be both a provider and a "consuming application".
 
