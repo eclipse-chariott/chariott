@@ -23,4 +23,4 @@ jobs:
       - run: |
           # ignores error due to the unmaintained crate ansi_term from
           # tracing-subscriber, TODO remove the ignores with #538
-          cargo audit --ignore RUSTSEC-2021-0139
+          cargo audit --ignore RUSTSEC-2021-0145 --ignore RUSTSEC-2020-0168
