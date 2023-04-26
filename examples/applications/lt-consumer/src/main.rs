@@ -230,6 +230,8 @@ async fn evaluate_docker_stats(
                     number_cpus = cpu_stats.cpu_usage.percpu_usage.map(|cpu| cpu.len());
                 }
 
+                info!("Number of cpus is {number_cpus:?}");
+
                 cpu_usage_metric.lock().unwrap().add(
                     100.0 * number_cpus.unwrap() as f64 * cpu_delta as f64
                         / system_cpu_delta as f64,
