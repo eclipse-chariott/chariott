@@ -228,13 +228,8 @@ async fn evaluate_docker_stats(
 
                 if number_cpus.is_none() {
                     info!("Here!");
-                    let cpu_usage = cpu_stats.clone().cpu_usage.clone();
-                    let percpu_usage = cpu_usage.percpu_usage.clone();
-                    number_cpus = cpu_stats.clone().cpu_usage.percpu_usage.map(|cpu| cpu.len());
+                    number_cpus = cpu_stats.online_cpus;
                     info!("{number_cpus:?}");
-                    info!("cpu_stats: {cpu_stats:?}");
-                    info!("cpu_usage: {cpu_usage:?}");
-                    info!("percpu_usage: {percpu_usage:?}");
                 }
 
                 info!("Number of cpus is {number_cpus:?}");
