@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1669034634612,
+  "lastUpdate": 1682634476625,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -2406,6 +2406,84 @@ window.BENCHMARK_DATA = {
             "value": 6782,
             "unit": "Bytes",
             "range": "p95=6787"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 7,
+            "unit": "Millisecond",
+            "range": "p95=12"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105753233+devkelley@users.noreply.github.com",
+            "name": "devkelley",
+            "username": "devkelley"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4536c36e0547b136998ddd56eb60c543fb065f6a",
+          "message": "Devkelley/fix security audit (#121)\n\n* fix security audit warnings\r\n\r\n* updated comment for security audit ignore\r\n\r\n* updated metrics_util crate that removes unmaintained crate\r\n\r\n* updated docker field",
+          "timestamp": "2023-04-27T15:11:15-07:00",
+          "tree_id": "f6ea24e698e9d125d00d0124eb1afaf2040bcbdd",
+          "url": "https://github.com/eclipse/chariott/commit/4536c36e0547b136998ddd56eb60c543fb065f6a"
+        },
+        "date": 1682634475551,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 35,
+            "unit": "Percent",
+            "range": "p95=37"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6710,
+            "unit": "Bytes",
+            "range": "p95=6819"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1960",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "7",
+            "unit": "blocks"
           },
           {
             "name": "Invoke Throughput",
