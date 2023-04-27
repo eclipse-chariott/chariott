@@ -227,12 +227,8 @@ async fn evaluate_docker_stats(
                     cpu_stats.cpu_usage.total_usage - stats.precpu_stats.cpu_usage.total_usage;
 
                 if number_cpus.is_none() {
-                    info!("Here!");
                     number_cpus = cpu_stats.online_cpus;
-                    info!("{number_cpus:?}");
                 }
-
-                info!("Number of cpus is {number_cpus:?}");
 
                 cpu_usage_metric.lock().unwrap().add(
                     100.0 * number_cpus.unwrap() as f64 * cpu_delta as f64
