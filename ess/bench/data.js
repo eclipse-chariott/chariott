@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1681936604539,
+  "lastUpdate": 1682633793254,
   "repoUrl": "https://github.com/eclipse/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -2459,6 +2459,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 253297005,
             "range": "± 704293",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105753233+devkelley@users.noreply.github.com",
+            "name": "devkelley",
+            "username": "devkelley"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4536c36e0547b136998ddd56eb60c543fb065f6a",
+          "message": "Devkelley/fix security audit (#121)\n\n* fix security audit warnings\r\n\r\n* updated comment for security audit ignore\r\n\r\n* updated metrics_util crate that removes unmaintained crate\r\n\r\n* updated docker field",
+          "timestamp": "2023-04-27T15:11:15-07:00",
+          "tree_id": "f6ea24e698e9d125d00d0124eb1afaf2040bcbdd",
+          "url": "https://github.com/eclipse/chariott/commit/4536c36e0547b136998ddd56eb60c543fb065f6a"
+        },
+        "date": 1682633792274,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 420641,
+            "range": "± 48380",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3189156,
+            "range": "± 134623",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 31170591,
+            "range": "± 1573481",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 4105179,
+            "range": "± 154878",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 31075185,
+            "range": "± 1255519",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 306968247,
+            "range": "± 7498724",
             "unit": "ns/iter"
           }
         ]
