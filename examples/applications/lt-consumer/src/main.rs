@@ -227,7 +227,7 @@ async fn evaluate_docker_stats(
                     cpu_stats.cpu_usage.total_usage - stats.precpu_stats.cpu_usage.total_usage;
 
                 if number_cpus.is_none() {
-                    number_cpus = cpu_stats.cpu_usage.percpu_usage.map(|cpu| cpu.len());
+                    number_cpus = cpu_stats.online_cpus;
                 }
 
                 cpu_usage_metric.lock().unwrap().add(

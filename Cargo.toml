@@ -43,7 +43,7 @@ prost-types = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "time"] }
 tokio-util = { workspace = true }
 tonic = { workspace = true }
-tonic-reflection = "0.5"
+tonic-reflection = "0.9"
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 url = { workspace = true }
@@ -63,8 +63,8 @@ serde_json = "1.0.87"
 tokio = { version = "1.21.2", features = ["macros"] }
 tokio-util = "0.7.3"
 tokio-stream = { version = "0.1", features = ["net"] }
-tonic = "0.8"
-tonic-build = "0.8"
+tonic = "0.9"
+tonic-build = "0.9"
 tracing = { version = "0.1" }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 uuid = { version = "1.2.1", features = ["v4"] }

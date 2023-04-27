@@ -10,7 +10,7 @@ chariott-common = { workspace = true }
 examples-common = { path = "../../common/" }
 futures = { workspace = true }
 futures-util = "0.3"
-metrics-util = "0.14"
+metrics-util = "0.15"
 serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true }

@@ -21,6 +21,6 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - run: |
-          # ignores error due to the unmaintained crate ansi_term from
-          # tracing-subscriber, TODO remove the ignores with #538
-          cargo audit --ignore RUSTSEC-2021-0139
+          # ignores error due to atty unsound warning
+          # with no solution: TODO remove the ignore
+          cargo audit --ignore RUSTSEC-2021-0145
