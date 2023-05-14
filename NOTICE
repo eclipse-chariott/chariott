@@ -7275,6 +7275,7 @@ SOFTWARE.
 #### Used by
 
 - [aho-corasick]( https://github.com/BurntSushi/aho-corasick ) 0.7.20
+- [aho-corasick]( https://github.com/BurntSushi/aho-corasick ) 1.0.1
 - [byteorder]( https://github.com/BurntSushi/byteorder ) 1.4.3
 - [memchr]( https://github.com/BurntSushi/memchr ) 2.5.0
 - [regex-automata]( https://github.com/BurntSushi/regex-automata ) 0.1.10
