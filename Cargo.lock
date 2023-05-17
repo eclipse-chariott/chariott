@@ -614,18 +614,18 @@ dependencies = [
 
 [[package]]
 name = "crc"
-version = "2.1.0"
+version = "3.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "49fc9a695bca7f35f5f4c15cddc84415f66a74ea78eef08e90c5024f2b540e23"
+checksum = "86ec7a15cbe22e59248fc7eadb1907dab5ba09372595da4d73dd805ed4417dfe"
 dependencies = [
  "crc-catalog",
 ]
 
 [[package]]
 name = "crc-catalog"
-version = "1.1.1"
+version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ccaeedb56da03b09f598226e25e80088cb4cd25f316e6e4df7d695f0feeb1403"
+checksum = "9cace84e55f07e7301bae1c519df89cdad8cc3cd868413d3fdbdeca9ff3db484"
 
 [[package]]
 name = "crc32fast"
@@ -2842,13 +2842,13 @@ dependencies = [
 
 [[package]]
 name = "tensorflow"
-version = "0.19.1"
+version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "813259d8b797c862effd4fb000d9ce9bdcbaa02c2d8cfcd94ec7dc742842daa7"
+checksum = "02ff67d684b1b950bbd81344261e1f0e0a974863015b8baaccc45ee9ec485237"
 dependencies = [
  "byteorder",
  "crc",
- "half 1.8.2",
+ "half 2.2.1",
  "libc",
  "num-complex",
  "protobuf",
@@ -2870,9 +2870,9 @@ dependencies = [
 
 [[package]]
 name = "tensorflow-sys"
-version = "0.22.1"
+version = "0.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba8ac1e8d3e408e14b49e7164cda710c6c992eaa76750b126ad3c5225eb18cfd"
+checksum = "552a85dd2dc13b3cafdabfe7363d20e1b8e9c49f5d36703075a47be4adfc98e6"
 dependencies = [
  "curl",
  "flate2",
