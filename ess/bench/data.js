@@ -1,6 +1,6 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1683139896180,
-  "repoUrl": "https://github.com/eclipse/chariott",
+  "lastUpdate": 1684345637335,
+  "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
       {
@@ -2579,6 +2579,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 267521031,
             "range": "± 1552488",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "57e3a550da19e0442dc7effdf13c728326e9bdc5",
+          "message": "Merge pull request #125 from eclipse-chariott/fix/notice-file-update-1684026968\n\nchore: Notice file change",
+          "timestamp": "2023-05-17T13:41:38-04:00",
+          "tree_id": "33dfcc5a086a5bd7328752ca44bcfab5caa8049e",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/57e3a550da19e0442dc7effdf13c728326e9bdc5"
+        },
+        "date": 1684345636103,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 504656,
+            "range": "± 27157",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3317023,
+            "range": "± 99598",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 30831450,
+            "range": "± 725707",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 4953792,
+            "range": "± 65237",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 32869513,
+            "range": "± 279268",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 312491416,
+            "range": "± 7114524",
             "unit": "ns/iter"
           }
         ]
