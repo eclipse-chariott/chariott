@@ -7,11 +7,16 @@
   - [Concept of Intents](#concept-of-intents)
 - [Requirements](#requirements)
 - [Getting started](#getting-started)
-  - [Dev Container](#dev-container)
-  - [Build all binaries and run tests](#build-all-binaries-and-run-tests)
-  - [Using Podman instead of Docker](#using-podman-instead-of-docker)
+  - [Using Dev Container](#dev-container)
+    - [Build all binaries and run tests](#build-all-binaries-and-run-tests)
+    - [Using Podman instead of Docker](#using-podman-instead-of-docker)
+  - [Without Dev Container](#without-dev-container)
+    - [Install Build Dependencies](#install-build-dependencies)
+    - [Build all binaries and run tests natively](#build-all-binaries-and-run-tests-natively)
+    - [Build and run Chariott only](#build-and-run-chariott-only)
 - [How to run the examples and interact with Chariott](#how-to-run-the-examples-and-interact-with-chariott)
 - [How to run the dog mode demo](#how-to-run-the-dog-mode-demo)
+- [Development requirements](#development-requirements)
 - [Trademarks](#trademarks)
 
 ## CI Status
@@ -24,11 +29,7 @@
 
 ## What is Chariott?
 
-Chariott is a [gRPC](https://grpc.io) service that provides a common interface for interacting with applications.
-Applications communicate between each other through Chariott. Chariott provides the necessary services to enable
-application lifecycle management and communication between applications. This is done by having applications register
-an _intent_ which Chariott will then _fulfil_ by brokering the communication with the appropriate application to
-fulfil that intent. Applications which fulfil these intents are known as _providers_. More information on Chariott design with diagrams can be found [here](./docs/design/README.md).
+Chariott is a [gRPC](https://grpc.io) service that provides a common interface for interacting with applications. It facilitates Service Discovery for applications to advertise their capabilities by registering themselves with Chariott's service registry. Other applications that need to consume resources and capabilities can Discover services through Chariott's service registry. In the current version of Chariott, applications can also communicate with each other through Chariott. This is done by having applications register an _intent_ which Chariott will then _fulfill_ by brokering the communication with the appropriate application to fulfill that intent. Applications which fulfill these intents are known as _providers_. More information on Chariott's current design with diagrams can be found [here](./docs/design/README.md).
 
 ## How to develop with Chariott
 
@@ -41,8 +42,10 @@ any language.
 
 | Term | Description |
 | --- | --- |
-| Application | As application we describe a client that is interacting with Chariott to lookup providers and interact with them through Chariott using intents |
-| Provider | A provider is also an application and in addition registers namespaces with intents that it supports to the Chariott endpoints that other applications can use through Chariott |
+| Application | An application is defined as any software component. |
+| Provider | A provider is also an application that in addition registers its capabilities with Chariott's service registry for other applications to consume. |
+| Consuming Application | A consuming application is a client application that interacts with Chariott to look up capability providers and interact with them through Chariott or directly. |
+>Note: "provider" or "consuming application" are just roles for an application. Specifically, an application can be both a Chariott "provider" and "consuming application". 
 
 ### Concept of Intents
 
@@ -86,21 +89,23 @@ contribute to close the gaps.
 
 For development and running the examples, we recommend using the
 [Devcontainer](https://code.visualstudio.com/docs/remote/containers) template
-provided at `.devcontainer/devcontainer.json`. If you decide not to use the
-Devcontainer, refer to the `devcontainer.json` for a list of the plugins/tools
-we use.
+provided at `.devcontainer/devcontainer.json`.
+[These](https://code.visualstudio.com/docs/devcontainers/containers#_system-requirements)
+are the system requirements (including the default requirement of docker) for using devcontainers.
+If you decide not to use the Devcontainer, refer to the `devcontainer.json` and the Dockerfile
+`.devcontainer/Dockerfile` for a list of the plugins and tools we use.
 
 > Note: If you use Devcontainers and you are running on Windows, make sure to check out the
 > repository on the WSL2 file system in the target distribution you're using.
 
-### Build all binaries and run tests
+#### Build all binaries and run tests
 
 ```bash
 cargo build --workspace
 cargo test --workspace
 ```
 
-### Using Podman instead of Docker
+#### Using Podman instead of Docker
 
 If you want to use Podman you have to [enable Podman in Visual Studio
 Code][vscode-podman] and update the `.devcontainer/devcontainer.json` file
@@ -127,6 +132,26 @@ with the following additions:
 
 > **NOTE**: Feel free to use another workspace folder name.
 
+### Without dev container
+
+#### Install Build Dependencies
+As stated above, the `devcontainer.json` and the Dockerfile
+`.devcontainer/Dockerfile` contain a list of the plugins/tools we use for Chariott. 
+Below we have listed the steps to get started, but refer to those files if there are any discrepancies.
+- Install [rust](https://rustup.rs/#)
+- Install [cmake](https://cmake.org/install/)
+- Install [protobuf-compiler](https://grpc.io/docs/protoc-installation/)
+
+#### Build all binaries and run tests natively
+```bash
+cargo build 
+cargo test
+```
+#### Build and run Chariott only
+```bash
+cargo build -p chariott
+```
+
 ## How to run the examples and interact with Chariott
 
 As Chariott's out of the box communication protocol is gRPC, the interaction with the
@@ -141,6 +166,9 @@ This walkthrough is described in the [examples kv-app README](examples/applicati
 ## How to run the dog mode demo
 
 To run the dog mode demo, please refer to the [dog mode demo](./examples/applications/README.md).
+
+## Development requirements
+If you are setting up your environment for development and want to contribute to the Chariott repository, [Git LFS](https://git-lfs.com/) is also required. Be sure to run `git lfs install` after you have installed it.
 
 ## Trademarks
 
