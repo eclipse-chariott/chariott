@@ -1,0 +1,15 @@
+name: Build Artifacts
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        repository: 'dihadley_microsoft/chariott'
+    - name: Install protobuf-compiler
+      run: sudo apt-get install -y protobuf-compiler
+    - name: Build
+      run: cargo build --release
