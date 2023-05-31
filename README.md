@@ -154,7 +154,7 @@ cargo test
 #### Build and run Chariott only
 
 ```bash
-cargo build -p chariott
+cargo run -p chariott
 ```
 
 ## How to run the examples and interact with Chariott
