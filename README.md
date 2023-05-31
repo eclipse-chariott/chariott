@@ -135,6 +135,7 @@ with the following additions:
 ### Without dev container
 
 #### Install Build Dependencies
+
 As stated above, the `devcontainer.json` and the Dockerfile
 `.devcontainer/Dockerfile` contain a list of the plugins/tools we use for Chariott.
 Below we have listed the steps to get started, but refer to those files if there are any discrepancies.
