@@ -45,7 +45,7 @@ any language.
 | Application | An application is defined as any software component. |
 | Provider | A provider is also an application that in addition registers its capabilities with Chariott's service registry for other applications to consume. |
 | Consuming Application | A consuming application is a client application that interacts with Chariott to look up capability providers and interact with them through Chariott or directly. |
->Note: "provider" or "consuming application" are just roles for an application. Specifically, an application can be both a Chariott "provider" and "consuming application". 
+>Note: "provider" or "consuming application" are just roles for an application. Specifically, an application can be both a Chariott "provider" and "consuming application".
 
 ### Concept of Intents
 
@@ -136,18 +136,22 @@ with the following additions:
 
 #### Install Build Dependencies
 As stated above, the `devcontainer.json` and the Dockerfile
-`.devcontainer/Dockerfile` contain a list of the plugins/tools we use for Chariott. 
+`.devcontainer/Dockerfile` contain a list of the plugins/tools we use for Chariott.
 Below we have listed the steps to get started, but refer to those files if there are any discrepancies.
+
 - Install [rust](https://rustup.rs/#)
 - Install [cmake](https://cmake.org/install/)
 - Install [protobuf-compiler](https://grpc.io/docs/protoc-installation/)
 
 #### Build all binaries and run tests natively
+
 ```bash
-cargo build 
+cargo build
 cargo test
 ```
+
 #### Build and run Chariott only
+
 ```bash
 cargo build -p chariott
 ```
@@ -168,6 +172,7 @@ This walkthrough is described in the [examples kv-app README](examples/applicati
 To run the dog mode demo, please refer to the [dog mode demo](./examples/applications/README.md).
 
 ## Development requirements
+
 If you are setting up your environment for development and want to contribute to the Chariott repository, [Git LFS](https://git-lfs.com/) is also required. Be sure to run `git lfs install` after you have installed it.
 
 ## Trademarks
