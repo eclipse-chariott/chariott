@@ -15,6 +15,4 @@ Please join our [developer mailing list](https://accounts.eclipse.org/mailing-li
 
 ## Code of Conduct
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+This project has adopted the [Eclipse Foundation Community Code of Conduct](https://raw.githubusercontent.com/eclipse/.github/master/CODE_OF_CONDUCT.md).
