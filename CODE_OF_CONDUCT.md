@@ -1,9 +1,3 @@
-# Microsoft Open Source Code of Conduct
+# Eclipse Foundation Community Code of Conduct
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-
-Resources:
-
-- [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/)
-- [Microsoft Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)
-- Contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with questions or concerns
+This project has adopted the [Eclipse Foundation Community Code of Conduct](https://raw.githubusercontent.com/eclipse/.github/master/CODE_OF_CONDUCT.md).
