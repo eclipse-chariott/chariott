@@ -6,7 +6,7 @@
 //!
 //! This provider has one service, the hello_world service, which has one
 //! method that returns a message containing "Hello, " followed by the string
-//! provided in the request. The provider registers itself with Chariott. 
+//! provided in the request. The provider registers itself with Chariott.
 
 // Tells cargo to warn if a doc comment is missing and should be provided.
 #![warn(missing_docs)]
@@ -17,13 +17,13 @@ use proto_servicediscovery::hello_world::v1::hello_world_server::HelloWorldServe
 use std::net::SocketAddr;
 use url::Url;
 
-use proto_servicediscovery::chariott_registry::v1::{RegisterRequest, ServiceMetadata};
 use proto_servicediscovery::chariott_registry::v1::registry_client::RegistryClient;
-use tonic::{Request};
-use tonic::transport::{Server};
-use tracing::{info};
-use tracing_subscriber::EnvFilter;
+use proto_servicediscovery::chariott_registry::v1::{RegisterRequest, ServiceMetadata};
+use tonic::transport::Server;
+use tonic::Request;
+use tracing::info;
 use tracing_subscriber::util::SubscriberInitExt;
+use tracing_subscriber::EnvFilter;
 
 mod hello_world_impl;
 
@@ -44,11 +44,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .finish();
 
     collector.init();
-    
+
     // Intitialize addresses for provider and chariott communication.
     let provider_url_str = format!("http://{}", HELLO_WORLD_ENDPOINT);
     let socket_address: SocketAddr = HELLO_WORLD_ENDPOINT
-        .clone()
         .parse()
         .map_err(|e| Error::from_error("error getting SocketAddr", Box::new(e)))?;
     let _provider_url: Url = Url::parse(&provider_url_str)
@@ -60,14 +59,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         version: "1.0.0.0".to_string(),
         uri: provider_url_str.clone(),
         communication_kind: String::from("grpc+proto"),
-        communication_reference: String::from("hello_world_service.v1.proto")
+        communication_reference: String::from("hello_world_service.v1.proto"),
     };
 
     let mut registry_client = RegistryClient::connect(CHARIOTT_SERVICE_REGISTRY_URL).await?;
 
-    let register_request = Request::new(RegisterRequest {
-        service: Some(service_metadata)
-    });
+    let register_request = Request::new(RegisterRequest { service: Some(service_metadata) });
     registry_client.register(register_request).await?.into_inner();
     info!("Hello World Service registered as a Chariott provider");
 
@@ -78,5 +75,4 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .serve(socket_address)
         .await?;
     Ok(())
-
 }

@@ -20,22 +20,20 @@ impl HelloWorld for HelloWorldImpl {
     /// Says Hello, followed by the input string
     /// This function returns a message which says Hello, followed by the string
     /// provided in a [`HelloRequest`]. Returns a [`HelloResponse`]
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `request` - A [`HelloRequest`] wrapped by a [`tonic::Request`].
     async fn say_hello(
         &self,
         request: Request<HelloRequest>,
     ) -> Result<Response<HelloResponse>, Status> {
         let request_inner = request.into_inner();
-        let name = request_inner.name.clone();
+        let name = request_inner.name;
         let message = format!("Hello, {name}");
-        let hello_response = HelloResponse {
-            message: message.clone()
-        };
+        let hello_response = HelloResponse { message: message.clone() };
         info!("Sent message: {message}");
-    
+
         Ok(Response::new(hello_response))
     }
 }

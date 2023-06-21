@@ -12,7 +12,7 @@ use proto_servicediscovery::chariott_registry::v1::registry_server::Registry;
 use proto_servicediscovery::chariott_registry::v1::{
     DiscoverByNamespaceRequest, DiscoverByNamespaceResponse, DiscoverServiceRequest,
     DiscoverServiceResponse, InspectRequest, InspectResponse, RegisterRequest, RegisterResponse,
-    RegistrationStatus, ServiceMetadata, UnregisterRequest, UnregisterResponse
+    RegistrationStatus, ServiceMetadata, UnregisterRequest, UnregisterResponse,
 };
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -92,7 +92,7 @@ impl Registry for RegistryImpl {
         let service_identifiers = ServiceIdentifiers {
             namespace: request_inner.namespace,
             name: request_inner.name,
-            version: request_inner.version
+            version: request_inner.version,
         };
         info!("Received an unregister request for: {:?}", service_identifiers);
 
@@ -102,16 +102,22 @@ impl Registry for RegistryImpl {
                 self.registry_map.write();
             match lock.remove(&service_identifiers) {
                 Some(removed_service) => {
-                    info!("Successfully removed service entry in Chariott service registry: {:?}", removed_service);
+                    info!(
+                        "Successfully removed service entry in Chariott service registry: {:?}",
+                        removed_service
+                    );
                 }
                 None => {
-                    let not_found_message = format!("Unable to remove service from registry: {:?}", service_identifiers);
+                    let not_found_message = format!(
+                        "Unable to remove service from registry: {:?}",
+                        service_identifiers
+                    );
                     warn!(not_found_message); //namespace: {0}, name: {1}, version: {2}")
                     return Err(Status::not_found(not_found_message));
                 }
             };
         }
-        Ok(Response::new(UnregisterResponse{}))
+        Ok(Response::new(UnregisterResponse {}))
     }
 
     /// Discovers a list of services based on the namespace, or logical grouping of services.
@@ -166,7 +172,7 @@ impl Registry for RegistryImpl {
         let service_identifiers = ServiceIdentifiers {
             namespace: request_inner.namespace.clone(),
             name: request_inner.name.clone(),
-            version: request_inner.version.clone(),
+            version: request_inner.version,
         };
 
         // This block controls the lifetime of the lock.
@@ -217,14 +223,13 @@ impl Registry for RegistryImpl {
 /// Identifiers for a given service.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ServiceIdentifiers {
-    /// namespace represents a logical grouping of services 
+    /// namespace represents a logical grouping of services
     namespace: String,
     /// the service name (without the namespace)
     name: String,
     /// the version of the service
     version: String,
 }
-
 
 #[cfg(test)]
 mod registry_impl_test {
@@ -255,7 +260,7 @@ mod registry_impl_test {
         };
 
         let registry_map = Arc::new(RwLock::new(HashMap::new()));
-        let registry_impl = RegistryImpl { registry_map: registry_map };
+        let registry_impl = RegistryImpl { registry_map };
         let request = tonic::Request::new(RegisterRequest { service: Some(service1.clone()) });
         let result = registry_impl.register(request).await;
         assert!(result.is_ok(), "register result is not okay: {result:?}");
@@ -292,7 +297,7 @@ mod registry_impl_test {
             assert_eq!(updated_service_result.unwrap().uri, String::from("localhost:1001"));
         }
     }
-    
+
     #[tokio::test]
     async fn unregister_test() {
         let registry_map = Arc::new(RwLock::new(HashMap::new()));
@@ -318,7 +323,7 @@ mod registry_impl_test {
             lock.insert(service_identifiers1.clone(), service1.clone());
         }
 
-        let registry_impl = RegistryImpl { registry_map: registry_map };
+        let registry_impl = RegistryImpl { registry_map };
 
         // Unregister Service
         let request = tonic::Request::new(UnregisterRequest {
@@ -335,10 +340,13 @@ mod registry_impl_test {
             name: service_identifiers1.name.clone(),
             version: service_identifiers1.version.clone(),
         });
-        let not_found_status = Status::not_found(format!("Unable to remove service from registry: {:?}", service_identifiers1));
+        let not_found_status = Status::not_found(format!(
+            "Unable to remove service from registry: {:?}",
+            service_identifiers1
+        ));
         let result = registry_impl.unregister(request2).await.err().unwrap();
         assert_eq!(result.code(), not_found_status.code());
-        assert_eq!(result.message(), not_found_status.message());        
+        assert_eq!(result.message(), not_found_status.message());
     }
 
     #[tokio::test]
@@ -366,7 +374,7 @@ mod registry_impl_test {
             lock.insert(service_identifiers1.clone(), service1.clone());
         }
 
-        let registry_impl = RegistryImpl { registry_map: registry_map };
+        let registry_impl = RegistryImpl { registry_map };
 
         // Discover Service
         let request = tonic::Request::new(DiscoverServiceRequest {
@@ -377,7 +385,7 @@ mod registry_impl_test {
         let result = registry_impl.discover_service(request).await;
         assert!(result.is_ok(), "DiscoverService result is not okay: {result:?}");
         assert_eq!(result.unwrap().into_inner().service, Some(service1.clone()));
-        
+
         // Discover by namespace
         let request_namespace = tonic::Request::new(DiscoverByNamespaceRequest {
             namespace: service_identifiers1.namespace.clone(),
@@ -429,15 +437,21 @@ mod registry_impl_test {
             lock.insert(service_identifiers2.clone(), service2.clone());
         }
 
-        let registry_impl = RegistryImpl { registry_map: registry_map };
+        let registry_impl = RegistryImpl { registry_map };
 
-        // Test that inspect returns the two services 
+        // Test that inspect returns the two services
         let request = tonic::Request::new(InspectRequest {});
         let result = registry_impl.inspect(request).await;
         assert!(result.is_ok(), "Inspect result is not okay: {result:?}");
-        let result_services = result.unwrap().into_inner().services.clone();
+        let result_services = result.unwrap().into_inner().services;
         assert_eq!(result_services.len(), 2);
-        assert!(result_services.contains(&service1), "Service1 not present in the inspect response");
-        assert!(result_services.contains(&service2), "Service2 not present in the inspect response");
+        assert!(
+            result_services.contains(&service1),
+            "Service1 not present in the inspect response"
+        );
+        assert!(
+            result_services.contains(&service2),
+            "Service2 not present in the inspect response"
+        );
     }
 }

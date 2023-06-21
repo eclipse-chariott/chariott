@@ -19,7 +19,7 @@ service Registry {
 
   // Discover, or retrieve the metadata for a single service given its fully qualified name
   rpc DiscoverService(DiscoverServiceRequest) returns (DiscoverServiceResponse) {}
-  
+
   // Discover a list of services given their namespace
   rpc DiscoverByNamespace(DiscoverByNamespaceRequest) returns (DiscoverByNamespaceResponse) {}
 
@@ -39,7 +39,7 @@ message ServiceMetadata {
 
 // Status of a registration operation
 enum RegistrationStatus {
-  // An entry did not exist in the service registry for this 
+  // An entry did not exist in the service registry for this
   NEWLY_REGISTERED = 0;
   // An entry already existed in the service registry and it has now been updated (overwritten)
   UPDATED = 1;
