@@ -1,0 +1,18 @@
+[package]
+name = "service_discovery"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+prost = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tonic = { workspace = true }
+tracing = { version = "0.1" }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+parking_lot = { workspace = true }
+proto-servicediscovery = { path = "../proto_build/"}
+
+[build-dependencies]
+tonic-build = { workspace = true }

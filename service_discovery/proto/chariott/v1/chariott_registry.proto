@@ -1,0 +1,98 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+// SPDX-License-Identifier: MIT
+
+syntax = "proto3";
+package chariott_registry;
+
+// Service Registry definition
+//
+// The protobuf definitions for Chariott's service registry
+
+// The entry point for the Registry gRPC Service.
+service Registry {
+  // Register, or add a service to the registry
+  rpc Register(RegisterRequest) returns (RegisterResponse) {}
+
+  // Unregister, or remove a service from the registry
+  rpc Unregister(UnregisterRequest) returns (UnregisterResponse) {}
+
+  // Discover, or retrieve the metadata for a single service given its fully qualified name
+  rpc DiscoverService(DiscoverServiceRequest) returns (DiscoverServiceResponse) {}
+  
+  // Discover a list of services given their namespace
+  rpc DiscoverByNamespace(DiscoverByNamespaceRequest) returns (DiscoverByNamespaceResponse) {}
+
+  // Inspect, or retrieve all contents of the service registry
+  rpc Inspect(InspectRequest) returns (InspectResponse) {}
+}
+
+// Represenation of a service including all of its metadata that the registry stores
+message ServiceMetadata {
+  string namespace = 1;
+  string name = 2;
+  string version = 3;
+  string uri = 4;
+  string communication_kind = 5;
+  string communication_reference = 6;
+}
+
+// Status of a registration operation
+enum RegistrationStatus {
+  // An entry did not exist in the service registry for this 
+  NEWLY_REGISTERED = 0;
+  // An entry already existed in the service registry and it has now been updated (overwritten)
+  UPDATED = 1;
+}
+
+// Request used to register a service, including all of its metadata
+message RegisterRequest {
+  ServiceMetadata service = 1;
+}
+
+// Response from `Register` which shows the status of the register operation
+message RegisterResponse {
+  RegistrationStatus registration_status = 1;
+}
+
+// Request used to unregister a service
+message UnregisterRequest {
+  string namespace = 1;
+  string name = 2;
+  string version = 3;
+}
+
+// Response from `Unregister`
+message UnregisterResponse {
+}
+
+// Request to retrieve the metadata for a service given its service identifiers
+message DiscoverServiceRequest {
+  string namespace = 1;
+  string name = 2;
+  string version = 3;
+}
+
+// Response including the single service's metadata
+message DiscoverServiceResponse {
+  ServiceMetadata service = 1;
+}
+
+// Request to retrieve the metadata for a list of services given their namespace
+message DiscoverByNamespaceRequest {
+  string namespace = 1;
+}
+
+// Repsonse with all services registered for this namespace
+message DiscoverByNamespaceResponse {
+  repeated ServiceMetadata services = 1;
+}
+
+// Request to inspect the registry, or retrieve all registered services
+message InspectRequest {
+}
+
+// Response with a list of all registered services
+message InspectResponse {
+    repeated ServiceMetadata services = 1;
+}

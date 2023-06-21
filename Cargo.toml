@@ -15,7 +15,9 @@ members = [
     "examples/common",
     "keyvalue",
     "proto.rs",
-    "registry"
+    "service_discovery/core",
+    "service_discovery/samples/simple-discovery/consumer",
+    "service_discovery/samples/simple-discovery/provider"
 ]
 
 exclude = []

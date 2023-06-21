@@ -1,0 +1,29 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+// SPDX-License-Identifier: MIT
+
+// Hello World Service sample definition
+//
+// The protobuf definitions for the Hello World service sample
+
+syntax = "proto3";
+package hello_world;
+
+// The service entry point to the Hello World service. This simple service only has one method to 
+// show the basic flow of applications calling one another
+service HelloWorld {
+    // Method which just logs and returns a message "Hello, {input string}" when it is called
+    rpc SayHello(HelloRequest) returns (HelloResponse);    
+}
+
+// Representation of a request with the "name" or string that you would like to say hello to
+message HelloRequest {
+  // The name, or string that will be returned as part of the hello message
+  string name = 1;
+}
+
+// Representation of a response which includes "Hello, " the name provided in the request
+message HelloResponse {
+  // The message that is returned: "Hello, " the name provided in the request
+  string message = 1;
+}

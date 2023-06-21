@@ -588,6 +588,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "245097e9a4535ee1e3e3931fcfcd55a796a44c643e8596ff6566d68f09b87bbc"
 
 [[package]]
+name = "consumer"
+version = "0.1.0"
+dependencies = [
+ "chariott-common",
+ "proto-servicediscovery",
+ "tokio",
+ "tonic",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "core-foundation"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2291,7 +2303,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "proto-registry"
+name = "proto-servicediscovery"
 version = "0.1.0"
 dependencies = [
  "prost",
@@ -2305,6 +2317,19 @@ name = "protobuf"
 version = "2.27.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf7e6d18738ecd0902d30d1ad232c9125985a3422929b16c65517b38adc14f96"
+
+[[package]]
+name = "provider"
+version = "0.1.0"
+dependencies = [
+ "chariott-common",
+ "proto-servicediscovery",
+ "tokio",
+ "tonic",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+]
 
 [[package]]
 name = "qoi"
@@ -2476,20 +2501,6 @@ name = "regex-syntax"
 version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "436b050e76ed2903236f032a59761c1eb99e1b0aead2c257922771dab1fc8c78"
-
-[[package]]
-name = "registry"
-version = "0.1.0"
-dependencies = [
- "parking_lot",
- "prost",
- "proto-registry",
- "tokio",
- "tonic",
- "tonic-build",
- "tracing",
- "tracing-subscriber",
-]
 
 [[package]]
 name = "reqwest"
@@ -2670,6 +2681,20 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "service_discovery"
+version = "0.1.0"
+dependencies = [
+ "parking_lot",
+ "prost",
+ "proto-servicediscovery",
+ "tokio",
+ "tonic",
+ "tonic-build",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

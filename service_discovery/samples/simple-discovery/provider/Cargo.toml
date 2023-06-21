@@ -1,18 +1,15 @@
 [package]
-name = "registry"
+name = "provider"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-prost = { workspace = true }
+chariott-common = { path = "../../../../common/" }
+proto-servicediscovery = { path = "../../../proto_build/"}
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 tonic = { workspace = true }
 tracing = { version = "0.1" }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-parking_lot = { workspace = true }
-proto-registry = { path = "./proto/"}
-
-[build-dependencies]
-tonic-build = { workspace = true }
+url = { workspace = true }
