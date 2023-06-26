@@ -17,13 +17,12 @@ pub struct HelloWorldImpl {}
 
 #[tonic::async_trait]
 impl HelloWorld for HelloWorldImpl {
-    /// Says Hello, followed by the input string
     /// This function returns a message which says Hello, followed by the string
-    /// provided in a [`HelloRequest`]. Returns a [`HelloResponse`]
+    /// provided in the request.
     ///
     /// # Arguments
     ///
-    /// * `request` - A [`HelloRequest`] wrapped by a [`tonic::Request`].
+    /// * `request` - Contains the input string
     async fn say_hello(
         &self,
         request: Request<HelloRequest>,

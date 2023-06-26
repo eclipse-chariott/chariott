@@ -38,12 +38,9 @@ impl ServiceRegistryImpl {
 impl ServiceRegistry for ServiceRegistryImpl {
     /// Registers a service by adding it to the service registry.
     ///
-    /// This function registers a service based on a [`RegisterRequest`]. Returns a
-    /// [`RegisterResponse`].
-    ///
     /// # Arguments
     ///
-    /// * `request` - A [`RegisterRequest`] wrapped by a [`tonic::Request`].
+    /// * `request` - Contains the necessary metadata for the service to be registered
     async fn register(
         &self,
         request: Request<RegisterRequest>,
@@ -83,12 +80,9 @@ impl ServiceRegistry for ServiceRegistryImpl {
 
     /// Unregisters a service by removing it from the registry.
     ///
-    /// This function unregisters a service based on a [`UnregisterRequest`]. Returns a
-    /// [`UnregisterResponse`].
-    ///
     /// # Arguments
     ///
-    /// * `request` - A [`UnregisterRequest`] wrapped by a [`tonic::Request`].
+    /// * `request` - Contains the service identification information for the service to unregister
     async fn unregister(
         &self,
         request: Request<UnregisterRequest>,
@@ -120,12 +114,9 @@ impl ServiceRegistry for ServiceRegistryImpl {
 
     /// Discovers a list of services based on the namespace, or logical grouping of services.
     ///
-    /// This function discovers a list of services based on a [`DiscoverByNamespaceRequest`]. Returns a
-    /// [`DiscoverByNamespaceResponse`].
-    ///
     /// # Arguments
     ///
-    /// * `request` - A [`DiscoverByNamespaceRequest`] wrapped by a [`tonic::Request`].
+    /// * `request` - Contains the namespace of the services to be discovered
     async fn discover_by_namespace(
         &self,
         request: Request<DiscoverByNamespaceRequest>,
@@ -160,12 +151,9 @@ impl ServiceRegistry for ServiceRegistryImpl {
     /// Discovers a single service based on its "fully qualified name", consisting of the namespace,
     /// name, and version of the service.
     ///
-    /// This function discovers a service based on a [`DiscoverRequest`]. Returns a
-    /// [`DiscoverResponse`].
-    ///
     /// # Arguments
     ///
-    /// * `request` - A [`DiscoverRequest`] wrapped by a [`tonic::Request`].
+    /// * `request` - Contains the service identification information for the service to discover
     async fn discover(
         &self,
         request: Request<DiscoverRequest>,
@@ -201,14 +189,11 @@ impl ServiceRegistry for ServiceRegistryImpl {
         }
     }
 
-    /// Lists the contents of the service registry.
-    ///
-    /// This function retrieves all services currently registered based on an [`ListRequest`]. Returns a
-    /// [`ListResponse`].
+    /// Lists all services currently registered with the service registry.
     ///
     /// # Arguments
     ///
-    /// * `request` - A [`ListRequest`] wrapped by a [`tonic::Request`].
+    /// * `request` - Empty ListRequest
     async fn list(&self, _request: Request<ListRequest>) -> Result<Response<ListResponse>, Status> {
         let lock = self.registry_map.read();
         let services_list = lock.values().cloned().collect();
