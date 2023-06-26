@@ -29,7 +29,7 @@ service ServiceRegistry {
 
 // Representation of a service including all of its metadata that the registry stores
 message ServiceMetadata {
-  // Logical grouping of services. Multiple services can share the same namespace. 
+  // Logical grouping of services. Multiple services can share the same namespace.
   // example: sdv.samples
   string namespace = 1;
   // Unique name of the service.
@@ -39,12 +39,12 @@ message ServiceMetadata {
   // The uri that clients can use to communicate with this service
   string uri = 4;
   // Used by clients to validate that they can communicate with this service. A short description of
-  // the communication kind, potentially including the network protocol and api specification type. 
+  // the communication kind, potentially including the network protocol and api specification type.
   // example: grpc+proto
   string communication_kind = 5;
   // Used by clients to validate that they can communicate with this service. Communication communication_reference
   // can be a reference to the api specification
-  // example: hello_world_service.v1.proto 
+  // example: hello_world_service.v1.proto
   string communication_reference = 6;
 }
 

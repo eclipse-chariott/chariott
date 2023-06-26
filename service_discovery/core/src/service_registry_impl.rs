@@ -30,7 +30,7 @@ impl ServiceRegistryImpl {
     pub fn new(
         registry_map: Arc<RwLock<HashMap<ServiceIdentifier, ServiceMetadata>>>,
     ) -> ServiceRegistryImpl {
-        ServiceRegistryImpl { registry_map: registry_map }
+        ServiceRegistryImpl { registry_map }
     }
 }
 
