@@ -12,8 +12,8 @@ package hello_world;
 // The service entry point to the Hello World service. This simple service only has one method to
 // show the basic flow of applications calling one another
 service HelloWorld {
-    // Method which just logs and returns a message "Hello, {input string}" when it is called
-    rpc SayHello(HelloRequest) returns (HelloResponse);
+  // Method which just logs and returns a message "Hello, {input string}" when it is called
+  rpc SayHello(HelloRequest) returns (HelloResponse);
 }
 
 // Representation of a request with the "name" or string that you would like to say hello to

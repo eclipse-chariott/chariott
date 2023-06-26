@@ -4,24 +4,26 @@
 
 //! A simple consumer for a sample of Chariott Service Discovery.
 //!
-//! This consumer "discovers" the hello world service through Chariott, and then
+//! This consumer "discovers" the hello world service through the registry, and then
 //! directly calls the SayHello method on it, using a known interface. This returns
 //! a message containing "Hello, " followed by the string provided in the request.
 
 // Tells cargo to warn if a doc comment is missing and should be provided.
 #![warn(missing_docs)]
 
-use proto_servicediscovery::chariott_registry::v1::registry_client::RegistryClient;
-use proto_servicediscovery::chariott_registry::v1::DiscoverServiceRequest;
-use proto_servicediscovery::hello_world::v1::hello_world_client::HelloWorldClient;
-use proto_servicediscovery::hello_world::v1::HelloRequest;
+use samples_proto::hello_world::v1::hello_world_client::HelloWorldClient;
+use samples_proto::hello_world::v1::HelloRequest;
+use service_discovery_proto::service_registry::v1::service_registry_client::ServiceRegistryClient;
+use service_discovery_proto::service_registry::v1::DiscoverRequest;
 use tonic::Request;
 use tracing::info;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
 
-/// URL for the chariott service registry
-const CHARIOTT_SERVICE_REGISTRY_URL: &str = "http://0.0.0.0:50000";
+/// URL for the service registry
+const SERVICE_REGISTRY_URL: &str = "http://0.0.0.0:50000";
+/// Expected provider communication kind. Validate against this to ensure we can communicate with the service that the service registry returns
+const EXPECTED_COMMUNICATION_KIND: &str = "grpc+proto";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -37,8 +39,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     collector.init();
 
     // Create a registry client
-    let mut registry_client = RegistryClient::connect(CHARIOTT_SERVICE_REGISTRY_URL).await?;
-    let discover_request = Request::new(DiscoverServiceRequest {
+    let mut service_registry_client = ServiceRegistryClient::connect(SERVICE_REGISTRY_URL).await?;
+    let discover_request = Request::new(DiscoverRequest {
         namespace: String::from("sdv.samples"),
         name: String::from("hello-world"),
         version: String::from("1.0.0.0"),
@@ -46,11 +48,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Discover the simple provider service
     let service_option =
-        registry_client.discover_service(discover_request).await?.into_inner().service;
+        service_registry_client.discover(discover_request).await?.into_inner().service;
     match service_option {
         Some(service) => {
-            info!("Discovered service {:?}", service);
-            if service.communication_kind != *"grpc+proto"
+            info!("Discovered service {service:?}");
+            if service.communication_kind != EXPECTED_COMMUNICATION_KIND
                 || service.communication_reference != *"hello_world_service.v1.proto"
             {
                 return Err("Simple Discover Consumer does not recognize communication_kind or communication_reference of provider; cannot communicate")?;

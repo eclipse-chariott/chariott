@@ -1,3 +1,7 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+# SPDX-License-Identifier: MIT
+
 [workspace]
 members = [
     "common",
@@ -19,8 +23,6 @@ members = [
     "service_discovery/samples/simple-discovery/consumer",
     "service_discovery/samples/simple-discovery/provider"
 ]
-
-exclude = []
 
 [package]
 name = "chariott"

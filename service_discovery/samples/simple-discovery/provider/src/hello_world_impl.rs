@@ -2,12 +2,12 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-//! Module containing gRPC service implementation based on [`proto_servicediscovery::hello_world::v1`].
+//! Module containing gRPC service implementation based on [`samples_proto::hello_world::v1`].
 //!
 //! Provides a gRPC endpoint for external services to call a hello world method.
 
-use proto_servicediscovery::hello_world::v1::hello_world_server::HelloWorld;
-use proto_servicediscovery::hello_world::v1::{HelloRequest, HelloResponse};
+use samples_proto::hello_world::v1::hello_world_server::HelloWorld;
+use samples_proto::hello_world::v1::{HelloRequest, HelloResponse};
 use tonic::{Request, Response, Status};
 use tracing::info;
 

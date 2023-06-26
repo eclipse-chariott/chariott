@@ -2,17 +2,17 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-//! Module containing gRPC service implementation based on [`proto_servicediscovery::chariott_registry::v1`].
+//! Module containing gRPC service implementation based on [`service_discovery_proto::service_registry::v1`].
 //!
 //! Provides a gRPC endpoint for external services to interact with to register and discover
 //! services. Note: Identifiers in all Registry operations are case-sensitive.
-//!
-use parking_lot::{RwLock, RwLockReadGuard, RwLockWriteGuard};
-use proto_servicediscovery::chariott_registry::v1::registry_server::Registry;
-use proto_servicediscovery::chariott_registry::v1::{
-    DiscoverByNamespaceRequest, DiscoverByNamespaceResponse, DiscoverServiceRequest,
-    DiscoverServiceResponse, InspectRequest, InspectResponse, RegisterRequest, RegisterResponse,
-    RegistrationStatus, ServiceMetadata, UnregisterRequest, UnregisterResponse,
+
+use parking_lot::RwLock;
+use service_discovery_proto::service_registry::v1::service_registry_server::ServiceRegistry;
+use service_discovery_proto::service_registry::v1::{
+    DiscoverByNamespaceRequest, DiscoverByNamespaceResponse, DiscoverRequest, DiscoverResponse,
+    ListRequest, ListResponse, RegisterRequest, RegisterResponse, RegistrationStatus,
+    ServiceMetadata, UnregisterRequest, UnregisterResponse,
 };
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -20,15 +20,23 @@ use std::vec::Vec;
 use tonic::{Request, Response, Status};
 use tracing::{info, warn};
 
-/// Base structure for the registry gRPC service
+/// Base structure for the service registry gRPC service
 #[derive(Clone, Debug)]
-pub struct RegistryImpl {
-    pub registry_map: Arc<RwLock<HashMap<ServiceIdentifiers, ServiceMetadata>>>,
+pub struct ServiceRegistryImpl {
+    registry_map: Arc<RwLock<HashMap<ServiceIdentifier, ServiceMetadata>>>,
+}
+
+impl ServiceRegistryImpl {
+    pub fn new(
+        registry_map: Arc<RwLock<HashMap<ServiceIdentifier, ServiceMetadata>>>,
+    ) -> ServiceRegistryImpl {
+        ServiceRegistryImpl { registry_map: registry_map }
+    }
 }
 
 #[tonic::async_trait]
-impl Registry for RegistryImpl {
-    /// Registers a service by adding it to the registry.
+impl ServiceRegistry for ServiceRegistryImpl {
+    /// Registers a service by adding it to the service registry.
     ///
     /// This function registers a service based on a [`RegisterRequest`]. Returns a
     /// [`RegisterResponse`].
@@ -43,42 +51,39 @@ impl Registry for RegistryImpl {
         let request_inner = request.into_inner();
         let service_to_register =
             request_inner.service.ok_or_else(|| Status::invalid_argument("Service is required"))?;
-        let service_identifiers = ServiceIdentifiers {
+        let service_identifier = ServiceIdentifier {
             namespace: service_to_register.namespace.clone(),
             name: service_to_register.name.clone(),
             version: service_to_register.version.clone(),
         };
-        info!("Received a register request for: {:?}", service_identifiers);
+        info!("Received a register request for: {service_identifier:?}");
 
-        let registration_status;
         // This block controls the lifetime of the lock.
         {
-            let mut lock: RwLockWriteGuard<HashMap<ServiceIdentifiers, ServiceMetadata>> =
-                self.registry_map.write();
-            match lock.get(&service_identifiers) {
-                Some(_) => {
-                    lock.insert(service_identifiers.clone(), service_to_register.clone());
-                    registration_status = RegistrationStatus::Updated;
-                    info!("Updated the service entry in Chariott service registry; overwrote previous entry: {:?}", service_to_register);
+            let mut lock = self.registry_map.write();
+            match lock.get(&service_identifier) {
+                Some(existing_service) => {
+                    let error_message = format!("Register failed. A service already exists with the same service identifier: {existing_service:?}");
+                    warn!(error_message);
+                    Err(Status::already_exists(error_message))
                 }
                 None => {
-                    lock.insert(service_identifiers.clone(), service_to_register.clone());
-                    registration_status = RegistrationStatus::NewlyRegistered;
+                    lock.insert(service_identifier.clone(), service_to_register.clone());
                     info!(
-                        "Registered new service in Chariott service registry: {:?}",
-                        service_to_register
+                        "Registered new service in the service registry: {service_to_register:?}"
                     );
+                    let register_response = RegisterResponse {
+                        registration_status: RegistrationStatus::NewlyRegistered as i32,
+                    };
+                    Ok(Response::new(register_response))
                 }
-            };
+            }
         }
-        let register_response =
-            RegisterResponse { registration_status: registration_status as i32 };
-        Ok(Response::new(register_response))
     }
 
     /// Unregisters a service by removing it from the registry.
     ///
-    /// This function registers a service based on a [`UnregisterRequest`]. Returns a
+    /// This function unregisters a service based on a [`UnregisterRequest`]. Returns a
     /// [`UnregisterResponse`].
     ///
     /// # Arguments
@@ -89,35 +94,28 @@ impl Registry for RegistryImpl {
         request: Request<UnregisterRequest>,
     ) -> Result<Response<UnregisterResponse>, Status> {
         let request_inner = request.into_inner();
-        let service_identifiers = ServiceIdentifiers {
+        let service_identifier = ServiceIdentifier {
             namespace: request_inner.namespace,
             name: request_inner.name,
             version: request_inner.version,
         };
-        info!("Received an unregister request for: {:?}", service_identifiers);
+        info!("Received an unregister request for: {service_identifier:?}");
 
-        // This block controls the lifetime of the lock.
-        {
-            let mut lock: RwLockWriteGuard<HashMap<ServiceIdentifiers, ServiceMetadata>> =
-                self.registry_map.write();
-            match lock.remove(&service_identifiers) {
-                Some(removed_service) => {
-                    info!(
-                        "Successfully removed service entry in Chariott service registry: {:?}",
-                        removed_service
-                    );
-                }
-                None => {
-                    let not_found_message = format!(
-                        "Unable to remove service from registry: {:?}",
-                        service_identifiers
-                    );
-                    warn!(not_found_message); //namespace: {0}, name: {1}, version: {2}")
-                    return Err(Status::not_found(not_found_message));
-                }
-            };
+        let mut lock = self.registry_map.write();
+        match lock.remove(&service_identifier) {
+            Some(removed_service) => {
+                info!(
+                    "Successfully removed service entry from service registry: {removed_service:?}"
+                );
+                Ok(Response::new(UnregisterResponse {}))
+            }
+            None => {
+                let not_found_message =
+                    format!("Unable to remove service from registry: {service_identifier:?}");
+                warn!(not_found_message);
+                Err(Status::not_found(not_found_message))
+            }
         }
-        Ok(Response::new(UnregisterResponse {}))
     }
 
     /// Discovers a list of services based on the namespace, or logical grouping of services.
@@ -133,17 +131,22 @@ impl Registry for RegistryImpl {
         request: Request<DiscoverByNamespaceRequest>,
     ) -> Result<Response<DiscoverByNamespaceResponse>, Status> {
         let namespace = request.into_inner().namespace;
-        let mut service_list: Vec<ServiceMetadata> = Vec::new();
+        let service_list: Vec<ServiceMetadata>;
 
         // This block controls the lifetime of the lock.
         {
-            let lock: RwLockReadGuard<HashMap<ServiceIdentifiers, ServiceMetadata>> =
-                self.registry_map.read();
-            for (service_identifier, service_metadata) in lock.iter() {
-                if service_identifier.namespace == namespace {
-                    service_list.push(service_metadata.clone());
-                }
-            }
+            service_list = {
+                let lock = self.registry_map.read();
+                lock.iter()
+                    .filter_map(|(service_identifier, service_metadata)| {
+                        if service_identifier.namespace == namespace {
+                            Some(service_metadata.clone())
+                        } else {
+                            None
+                        }
+                    })
+                    .collect()
+            };
         }
         if service_list.is_empty() {
             Err(Status::not_found(format!("No registrations found for namespace {namespace}")))
@@ -157,19 +160,19 @@ impl Registry for RegistryImpl {
     /// Discovers a single service based on its "fully qualified name", consisting of the namespace,
     /// name, and version of the service.
     ///
-    /// This function discovers a service based on a [`DiscoverServiceRequest`]. Returns a
-    /// [`DiscoverServiceResponse`].
+    /// This function discovers a service based on a [`DiscoverRequest`]. Returns a
+    /// [`DiscoverResponse`].
     ///
     /// # Arguments
     ///
-    /// * `request` - A [`DiscoverServiceRequest`] wrapped by a [`tonic::Request`].
-    async fn discover_service(
+    /// * `request` - A [`DiscoverRequest`] wrapped by a [`tonic::Request`].
+    async fn discover(
         &self,
-        request: Request<DiscoverServiceRequest>,
-    ) -> Result<Response<DiscoverServiceResponse>, Status> {
+        request: Request<DiscoverRequest>,
+    ) -> Result<Response<DiscoverResponse>, Status> {
         let request_inner = request.into_inner();
 
-        let service_identifiers = ServiceIdentifiers {
+        let service_identifier = ServiceIdentifier {
             namespace: request_inner.namespace.clone(),
             name: request_inner.name.clone(),
             version: request_inner.version,
@@ -177,21 +180,19 @@ impl Registry for RegistryImpl {
 
         // This block controls the lifetime of the lock.
         {
-            let lock: RwLockReadGuard<HashMap<ServiceIdentifiers, ServiceMetadata>> =
-                self.registry_map.read();
-            match lock.get(&service_identifiers) {
+            let lock = self.registry_map.read();
+            match lock.get(&service_identifier) {
                 Some(service) => {
-                    info!("Read service in DiscoverService {:?}", service);
-                    let discover_service_response =
-                        DiscoverServiceResponse { service: Some(service.clone()) };
-                    Ok(Response::new(discover_service_response))
+                    info!("Read service in Discover {service:?}");
+                    let discover_response = DiscoverResponse { service: Some(service.clone()) };
+                    Ok(Response::new(discover_response))
                 }
                 None => {
                     let not_found_message = format!(
                         "No service found for namespace: {0}, name: {1}, version: {2}",
-                        service_identifiers.namespace,
-                        service_identifiers.name,
-                        service_identifiers.version
+                        service_identifier.namespace,
+                        service_identifier.name,
+                        service_identifier.version
                     );
                     warn!(not_found_message);
                     Err(Status::not_found(not_found_message))
@@ -200,29 +201,25 @@ impl Registry for RegistryImpl {
         }
     }
 
-    /// Inspects the contents of the service registry.
+    /// Lists the contents of the service registry.
     ///
-    /// This function retrieves all services currently registered based on an [`InspectRequest`]. Returns a
-    /// [`InspectResponse`].
+    /// This function retrieves all services currently registered based on an [`ListRequest`]. Returns a
+    /// [`ListResponse`].
     ///
     /// # Arguments
     ///
-    /// * `request` - A [`InspectRequest`] wrapped by a [`tonic::Request`].
-    async fn inspect(
-        &self,
-        _request: Request<InspectRequest>,
-    ) -> Result<Response<InspectResponse>, Status> {
-        let lock: RwLockReadGuard<HashMap<ServiceIdentifiers, ServiceMetadata>> =
-            self.registry_map.read();
+    /// * `request` - A [`ListRequest`] wrapped by a [`tonic::Request`].
+    async fn list(&self, _request: Request<ListRequest>) -> Result<Response<ListResponse>, Status> {
+        let lock = self.registry_map.read();
         let services_list = lock.values().cloned().collect();
-        let inspect_response = InspectResponse { services: services_list };
-        Ok(Response::new(inspect_response))
+        let list_response = ListResponse { services: services_list };
+        Ok(Response::new(list_response))
     }
 }
 
 /// Identifiers for a given service.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub struct ServiceIdentifiers {
+pub struct ServiceIdentifier {
     /// namespace represents a logical grouping of services
     namespace: String,
     /// the service name (without the namespace)
@@ -236,13 +233,12 @@ mod registry_impl_test {
     use super::*;
 
     fn has_service(
-        registry_map: Arc<RwLock<HashMap<ServiceIdentifiers, ServiceMetadata>>>,
-        key: &ServiceIdentifiers,
+        registry_map: Arc<RwLock<HashMap<ServiceIdentifier, ServiceMetadata>>>,
+        key: &ServiceIdentifier,
     ) -> bool {
         // This block controls the lifetime of the lock.
         {
-            let lock: RwLockReadGuard<HashMap<ServiceIdentifiers, ServiceMetadata>> =
-                registry_map.read();
+            let lock = registry_map.read();
             lock.contains_key(key)
         }
     }
@@ -260,7 +256,7 @@ mod registry_impl_test {
         };
 
         let registry_map = Arc::new(RwLock::new(HashMap::new()));
-        let registry_impl = RegistryImpl { registry_map };
+        let registry_impl = ServiceRegistryImpl { registry_map };
         let request = tonic::Request::new(RegisterRequest { service: Some(service1.clone()) });
         let result = registry_impl.register(request).await;
         assert!(result.is_ok(), "register result is not okay: {result:?}");
@@ -268,34 +264,27 @@ mod registry_impl_test {
             result.unwrap().into_inner().registration_status.clone(),
             RegistrationStatus::NewlyRegistered as i32
         );
-        let service_identifiers = ServiceIdentifiers {
+        let service_identifier = ServiceIdentifier {
             namespace: service1.namespace.clone(),
             name: service1.name.clone(),
             version: service1.version.clone(),
         };
         assert!(
-            has_service(registry_impl.registry_map.clone(), &service_identifiers),
+            has_service(registry_impl.registry_map.clone(), &service_identifier),
             "service not present in registry"
         );
 
-        // Test updating a registration
+        // Test adding a registration with same identifier fails
         service1.uri = String::from("localhost:1001");
-        let update_request =
+        let existing_service_request =
             tonic::Request::new(RegisterRequest { service: Some(service1.clone()) });
-        let updated_result = registry_impl.register(update_request).await;
+        let existing_service_result = registry_impl.register(existing_service_request).await;
 
-        assert!(updated_result.is_ok(), "register result is not okay: {updated_result:?}");
-        assert_eq!(
-            updated_result.unwrap().into_inner().registration_status.clone(),
-            RegistrationStatus::Updated as i32
+        assert!(
+            existing_service_result.is_err(),
+            "Registering an existing service should fail: {existing_service_result:?}"
         );
-        // This block controls the lifetime of the lock.
-        {
-            let lock: RwLockReadGuard<HashMap<ServiceIdentifiers, ServiceMetadata>> =
-                registry_impl.registry_map.read();
-            let updated_service_result = lock.get(&service_identifiers);
-            assert_eq!(updated_service_result.unwrap().uri, String::from("localhost:1001"));
-        }
+        assert_eq!(existing_service_result.unwrap_err().code(), Status::already_exists("").code());
     }
 
     #[tokio::test]
@@ -310,7 +299,7 @@ mod registry_impl_test {
             communication_kind: String::from("grpc+proto"),
             communication_reference: String::from("sdv.test.test_service.v1.proto"),
         };
-        let service_identifiers1 = ServiceIdentifiers {
+        let service_identifier1 = ServiceIdentifier {
             namespace: service1.namespace.clone(),
             name: service1.name.clone(),
             version: service1.version.clone(),
@@ -318,31 +307,29 @@ mod registry_impl_test {
 
         // This block controls the lifetime of the lock.
         {
-            let mut lock: RwLockWriteGuard<HashMap<ServiceIdentifiers, ServiceMetadata>> =
-                registry_map.write();
-            lock.insert(service_identifiers1.clone(), service1.clone());
+            let mut lock = registry_map.write();
+            lock.insert(service_identifier1.clone(), service1.clone());
         }
 
-        let registry_impl = RegistryImpl { registry_map };
+        let registry_impl = ServiceRegistryImpl { registry_map };
 
         // Unregister Service
         let request = tonic::Request::new(UnregisterRequest {
-            namespace: service_identifiers1.namespace.clone(),
-            name: service_identifiers1.name.clone(),
-            version: service_identifiers1.version.clone(),
+            namespace: service_identifier1.namespace.clone(),
+            name: service_identifier1.name.clone(),
+            version: service_identifier1.version.clone(),
         });
         let result = registry_impl.unregister(request).await;
         assert!(result.is_ok(), "Unregister result is not okay: {result:?}");
 
         // Unregister Service that doesn't exist
         let request2 = tonic::Request::new(UnregisterRequest {
-            namespace: service_identifiers1.namespace.clone(),
-            name: service_identifiers1.name.clone(),
-            version: service_identifiers1.version.clone(),
+            namespace: service_identifier1.namespace.clone(),
+            name: service_identifier1.name.clone(),
+            version: service_identifier1.version.clone(),
         });
         let not_found_status = Status::not_found(format!(
-            "Unable to remove service from registry: {:?}",
-            service_identifiers1
+            "Unable to remove service from registry: {service_identifier1:?}"
         ));
         let result = registry_impl.unregister(request2).await.err().unwrap();
         assert_eq!(result.code(), not_found_status.code());
@@ -361,7 +348,7 @@ mod registry_impl_test {
             communication_kind: String::from("grpc+proto"),
             communication_reference: String::from("sdv.test.test_service.v1.proto"),
         };
-        let service_identifiers1 = ServiceIdentifiers {
+        let service_identifier1 = ServiceIdentifier {
             namespace: service1.namespace.clone(),
             name: service1.name.clone(),
             version: service1.version.clone(),
@@ -369,26 +356,25 @@ mod registry_impl_test {
 
         // This block controls the lifetime of the lock.
         {
-            let mut lock: RwLockWriteGuard<HashMap<ServiceIdentifiers, ServiceMetadata>> =
-                registry_map.write();
-            lock.insert(service_identifiers1.clone(), service1.clone());
+            let mut lock = registry_map.write();
+            lock.insert(service_identifier1.clone(), service1.clone());
         }
 
-        let registry_impl = RegistryImpl { registry_map };
+        let registry_impl = ServiceRegistryImpl { registry_map };
 
         // Discover Service
-        let request = tonic::Request::new(DiscoverServiceRequest {
-            namespace: service_identifiers1.namespace.clone(),
-            name: service_identifiers1.name.clone(),
-            version: service_identifiers1.version.clone(),
+        let request = tonic::Request::new(DiscoverRequest {
+            namespace: service_identifier1.namespace.clone(),
+            name: service_identifier1.name.clone(),
+            version: service_identifier1.version.clone(),
         });
-        let result = registry_impl.discover_service(request).await;
-        assert!(result.is_ok(), "DiscoverService result is not okay: {result:?}");
+        let result = registry_impl.discover(request).await;
+        assert!(result.is_ok(), "Discover result is not okay: {result:?}");
         assert_eq!(result.unwrap().into_inner().service, Some(service1.clone()));
 
         // Discover by namespace
         let request_namespace = tonic::Request::new(DiscoverByNamespaceRequest {
-            namespace: service_identifiers1.namespace.clone(),
+            namespace: service_identifier1.namespace.clone(),
         });
         let result_namespace = registry_impl.discover_by_namespace(request_namespace).await;
         assert!(
@@ -399,7 +385,7 @@ mod registry_impl_test {
     }
 
     #[tokio::test]
-    async fn inspect_test() {
+    async fn list_test() {
         let registry_map = Arc::new(RwLock::new(HashMap::new()));
 
         let service1 = ServiceMetadata {
@@ -418,12 +404,12 @@ mod registry_impl_test {
             communication_kind: String::from("grpc+proto"),
             communication_reference: String::from("sdv.test.test_service.v2.proto"),
         };
-        let service_identifiers1 = ServiceIdentifiers {
+        let service_identifier1 = ServiceIdentifier {
             namespace: service1.namespace.clone(),
             name: service1.name.clone(),
             version: service1.version.clone(),
         };
-        let service_identifiers2 = ServiceIdentifiers {
+        let service_identifier2 = ServiceIdentifier {
             namespace: service2.namespace.clone(),
             name: service2.name.clone(),
             version: service2.version.clone(),
@@ -431,27 +417,20 @@ mod registry_impl_test {
 
         // This block controls the lifetime of the lock.
         {
-            let mut lock: RwLockWriteGuard<HashMap<ServiceIdentifiers, ServiceMetadata>> =
-                registry_map.write();
-            lock.insert(service_identifiers1.clone(), service1.clone());
-            lock.insert(service_identifiers2.clone(), service2.clone());
+            let mut lock = registry_map.write();
+            lock.insert(service_identifier1.clone(), service1.clone());
+            lock.insert(service_identifier2.clone(), service2.clone());
         }
 
-        let registry_impl = RegistryImpl { registry_map };
+        let registry_impl = ServiceRegistryImpl { registry_map };
 
-        // Test that inspect returns the two services
-        let request = tonic::Request::new(InspectRequest {});
-        let result = registry_impl.inspect(request).await;
-        assert!(result.is_ok(), "Inspect result is not okay: {result:?}");
+        // Test that list returns the two services
+        let request = tonic::Request::new(ListRequest {});
+        let result = registry_impl.list(request).await;
+        assert!(result.is_ok(), "List result is not okay: {result:?}");
         let result_services = result.unwrap().into_inner().services;
         assert_eq!(result_services.len(), 2);
-        assert!(
-            result_services.contains(&service1),
-            "Service1 not present in the inspect response"
-        );
-        assert!(
-            result_services.contains(&service2),
-            "Service2 not present in the inspect response"
-        );
+        assert!(result_services.contains(&service1), "Service1 not present in the list response");
+        assert!(result_services.contains(&service2), "Service2 not present in the list response");
     }
 }

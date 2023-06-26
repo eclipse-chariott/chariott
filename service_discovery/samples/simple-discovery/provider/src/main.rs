@@ -6,19 +6,19 @@
 //!
 //! This provider has one service, the hello_world service, which has one
 //! method that returns a message containing "Hello, " followed by the string
-//! provided in the request. The provider registers itself with Chariott.
+//! provided in the request. The provider registers itself in the registry.
 
 // Tells cargo to warn if a doc comment is missing and should be provided.
 #![warn(missing_docs)]
 
 use chariott_common::error::Error;
 use hello_world_impl::HelloWorldImpl;
-use proto_servicediscovery::hello_world::v1::hello_world_server::HelloWorldServer;
+use samples_proto::hello_world::v1::hello_world_server::HelloWorldServer;
 use std::net::SocketAddr;
 use url::Url;
 
-use proto_servicediscovery::chariott_registry::v1::registry_client::RegistryClient;
-use proto_servicediscovery::chariott_registry::v1::{RegisterRequest, ServiceMetadata};
+use service_discovery_proto::service_registry::v1::service_registry_client::ServiceRegistryClient;
+use service_discovery_proto::service_registry::v1::{RegisterRequest, ServiceMetadata};
 use tonic::transport::Server;
 use tonic::Request;
 use tracing::info;
@@ -27,10 +27,12 @@ use tracing_subscriber::EnvFilter;
 
 mod hello_world_impl;
 
-/// URL for the chariott service registry
-const CHARIOTT_SERVICE_REGISTRY_URL: &str = "http://0.0.0.0:50000";
+/// URL for the service registry
+const SERVICE_REGISTRY_URL: &str = "http://0.0.0.0:50000";
 /// Endpoint for the hello world service, which is also a provider
 const HELLO_WORLD_ENDPOINT: &str = "0.0.0.0:50064";
+/// communication kind for this service
+const COMMUNICATION_KIND: &str = "grpc+proto";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -45,8 +47,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     collector.init();
 
-    // Intitialize addresses for provider and chariott communication.
-    let provider_url_str = format!("http://{}", HELLO_WORLD_ENDPOINT);
+    // Intitialize addresses for provider communication.
+    let provider_url_str = format!("http://{HELLO_WORLD_ENDPOINT}");
     let socket_address: SocketAddr = HELLO_WORLD_ENDPOINT
         .parse()
         .map_err(|e| Error::from_error("error getting SocketAddr", Box::new(e)))?;
@@ -58,15 +60,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         name: "hello-world".to_string(),
         version: "1.0.0.0".to_string(),
         uri: provider_url_str.clone(),
-        communication_kind: String::from("grpc+proto"),
+        communication_kind: COMMUNICATION_KIND.to_owned(),
         communication_reference: String::from("hello_world_service.v1.proto"),
     };
 
-    let mut registry_client = RegistryClient::connect(CHARIOTT_SERVICE_REGISTRY_URL).await?;
+    let mut service_registry_client = ServiceRegistryClient::connect(SERVICE_REGISTRY_URL).await?;
 
     let register_request = Request::new(RegisterRequest { service: Some(service_metadata) });
-    registry_client.register(register_request).await?.into_inner();
-    info!("Hello World Service registered as a Chariott provider");
+    service_registry_client.register(register_request).await?.into_inner();
+    info!("Hello World Service registered as a provider");
 
     let hello_world_impl = HelloWorldImpl::default();
     // Grpc server for handling calls from clients

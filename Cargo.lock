@@ -592,7 +592,8 @@ name = "consumer"
 version = "0.1.0"
 dependencies = [
  "chariott-common",
- "proto-servicediscovery",
+ "samples_proto",
+ "service_discovery_proto",
  "tokio",
  "tonic",
  "tracing",
@@ -2303,16 +2304,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "proto-servicediscovery"
-version = "0.1.0"
-dependencies = [
- "prost",
- "tokio",
- "tonic",
- "tonic-build",
-]
-
-[[package]]
 name = "protobuf"
 version = "2.27.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2323,7 +2314,8 @@ name = "provider"
 version = "0.1.0"
 dependencies = [
  "chariott-common",
- "proto-servicediscovery",
+ "samples_proto",
+ "service_discovery_proto",
  "tokio",
  "tonic",
  "tracing",
@@ -2575,6 +2567,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "samples_proto"
+version = "0.1.0"
+dependencies = [
+ "prost",
+ "tokio",
+ "tonic",
+ "tonic-build",
+]
+
+[[package]]
 name = "schannel"
 version = "0.1.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2689,12 +2691,22 @@ version = "0.1.0"
 dependencies = [
  "parking_lot",
  "prost",
- "proto-servicediscovery",
+ "service_discovery_proto",
  "tokio",
  "tonic",
  "tonic-build",
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "service_discovery_proto"
+version = "0.1.0"
+dependencies = [
+ "prost",
+ "tokio",
+ "tonic",
+ "tonic-build",
 ]
 
 [[package]]

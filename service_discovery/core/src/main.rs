@@ -12,7 +12,7 @@
 #![warn(missing_docs)]
 
 use parking_lot::RwLock;
-use proto_servicediscovery::chariott_registry::v1::registry_server::RegistryServer;
+use service_discovery_proto::service_registry::v1::service_registry_server::ServiceRegistryServer;
 use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -21,10 +21,10 @@ use tracing::{debug, info};
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
 
-mod registry_impl;
+mod service_registry_impl;
 
-/// Endpoint for the chariott service registry
-const CHARIOTT_SERVICE_REGISTRY_ADDR: &str = "0.0.0.0:50000";
+/// Endpoint for the service registry
+const SERVICE_REGISTRY_ADDR: &str = "0.0.0.0:50000";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -40,13 +40,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     collector.init();
 
     // Start up registry service
-    let addr: SocketAddr = CHARIOTT_SERVICE_REGISTRY_ADDR.parse()?;
+    let addr: SocketAddr = SERVICE_REGISTRY_ADDR.parse()?;
     let registry_impl =
-        registry_impl::RegistryImpl { registry_map: Arc::new(RwLock::new(HashMap::new())) };
-    info!("Chariott Registry listening on {addr}");
+        service_registry_impl::ServiceRegistryImpl::new(Arc::new(RwLock::new(HashMap::new())));
+    info!("Service Registry listening on {addr}");
 
-    Server::builder().add_service(RegistryServer::new(registry_impl)).serve(addr).await?;
+    Server::builder().add_service(ServiceRegistryServer::new(registry_impl)).serve(addr).await?;
 
-    debug!("The Chariott Registry has completed.");
+    debug!("The Service Registry has completed.");
     Ok(())
 }
