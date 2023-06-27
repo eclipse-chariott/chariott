@@ -172,7 +172,7 @@ impl ServiceRegistry for ServiceRegistryImpl {
         match service_option {
             Some(service) => {
                 info!("Read service in Discover {service:?}");
-                let discover_response = DiscoverResponse { service: Some(service.clone()) };
+                let discover_response = DiscoverResponse { service: Some(service) };
                 Ok(Response::new(discover_response))
             }
             None => {
