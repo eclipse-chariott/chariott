@@ -24,6 +24,8 @@ use tracing_subscriber::EnvFilter;
 const SERVICE_REGISTRY_URL: &str = "http://0.0.0.0:50000";
 /// Expected provider communication kind. Validate against this to ensure we can communicate with the service that the service registry returns
 const EXPECTED_COMMUNICATION_KIND: &str = "grpc+proto";
+/// Expected provider communication reference. Validate against this to ensure we can communicate with the service that the service registry returns
+const EXPECTED_COMMUNICATION_REFERENCE: &str = "hello_world_service.v1.proto";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -53,7 +55,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some(service) => {
             info!("Discovered service {service:?}");
             if service.communication_kind != EXPECTED_COMMUNICATION_KIND
-                || service.communication_reference != *"hello_world_service.v1.proto"
+                || service.communication_reference != EXPECTED_COMMUNICATION_REFERENCE
             {
                 return Err("Simple Discover Consumer does not recognize communication_kind or communication_reference of provider; cannot communicate")?;
             }

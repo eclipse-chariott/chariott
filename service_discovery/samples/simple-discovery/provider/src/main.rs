@@ -33,6 +33,8 @@ const SERVICE_REGISTRY_URL: &str = "http://0.0.0.0:50000";
 const HELLO_WORLD_ENDPOINT: &str = "0.0.0.0:50064";
 /// communication kind for this service
 const COMMUNICATION_KIND: &str = "grpc+proto";
+/// communication reference for this service
+const COMMUNICATION_REFERENCE: &str = "hello_world_service.v1.proto";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -61,7 +63,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         version: "1.0.0.0".to_string(),
         uri: provider_url_str.clone(),
         communication_kind: COMMUNICATION_KIND.to_owned(),
-        communication_reference: String::from("hello_world_service.v1.proto"),
+        communication_reference: COMMUNICATION_REFERENCE.to_owned(),
     };
 
     let mut service_registry_client = ServiceRegistryClient::connect(SERVICE_REGISTRY_URL).await?;
