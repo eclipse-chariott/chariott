@@ -122,23 +122,20 @@ impl ServiceRegistry for ServiceRegistryImpl {
         request: Request<DiscoverByNamespaceRequest>,
     ) -> Result<Response<DiscoverByNamespaceResponse>, Status> {
         let namespace = request.into_inner().namespace;
-        let service_list: Vec<ServiceMetadata>;
 
         // This block controls the lifetime of the lock.
-        {
-            service_list = {
-                let lock = self.registry_map.read();
-                lock.iter()
-                    .filter_map(|(service_identifier, service_metadata)| {
-                        if service_identifier.namespace == namespace {
-                            Some(service_metadata.clone())
-                        } else {
-                            None
-                        }
-                    })
-                    .collect()
-            };
-        }
+        let service_list: Vec<ServiceMetadata> = {
+            let lock = self.registry_map.read();
+            lock.iter()
+                .filter_map(|(service_identifier, service_metadata)| {
+                    if service_identifier.namespace == namespace {
+                        Some(service_metadata.clone())
+                    } else {
+                        None
+                    }
+                })
+                .collect()
+        };
         if service_list.is_empty() {
             Err(Status::not_found(format!("No registrations found for namespace {namespace}")))
         } else {
@@ -167,24 +164,26 @@ impl ServiceRegistry for ServiceRegistryImpl {
         };
 
         // This block controls the lifetime of the lock.
-        {
+        let service_option = {
             let lock = self.registry_map.read();
-            match lock.get(&service_identifier) {
-                Some(service) => {
-                    info!("Read service in Discover {service:?}");
-                    let discover_response = DiscoverResponse { service: Some(service.clone()) };
-                    Ok(Response::new(discover_response))
-                }
-                None => {
-                    let not_found_message = format!(
-                        "No service found for namespace: {0}, name: {1}, version: {2}",
-                        service_identifier.namespace,
-                        service_identifier.name,
-                        service_identifier.version
-                    );
-                    warn!(not_found_message);
-                    Err(Status::not_found(not_found_message))
-                }
+            lock.get(&service_identifier).cloned()
+        };
+
+        match service_option {
+            Some(service) => {
+                info!("Read service in Discover {service:?}");
+                let discover_response = DiscoverResponse { service: Some(service.clone()) };
+                Ok(Response::new(discover_response))
+            }
+            None => {
+                let not_found_message = format!(
+                    "No service found for namespace: {0}, name: {1}, version: {2}",
+                    service_identifier.namespace,
+                    service_identifier.name,
+                    service_identifier.version
+                );
+                warn!(not_found_message);
+                Err(Status::not_found(not_found_message))
             }
         }
     }
