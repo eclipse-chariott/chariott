@@ -48,20 +48,13 @@ message ServiceMetadata {
   string communication_reference = 6;
 }
 
-// Status of a registration operation
-enum RegistrationStatus {
-  // An entry did not previously exist in the service registry for this service
-  NEWLY_REGISTERED = 0;
-}
-
 // Request used to register a service, including all of its metadata
 message RegisterRequest {
   ServiceMetadata service = 1;
 }
 
-// Response from `Register` which shows the status of the register operation
+// Response from `Register`
 message RegisterResponse {
-  RegistrationStatus registration_status = 1;
 }
 
 // Request used to unregister a service

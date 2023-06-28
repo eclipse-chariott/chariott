@@ -11,8 +11,8 @@ use parking_lot::RwLock;
 use service_discovery_proto::service_registry::v1::service_registry_server::ServiceRegistry;
 use service_discovery_proto::service_registry::v1::{
     DiscoverByNamespaceRequest, DiscoverByNamespaceResponse, DiscoverRequest, DiscoverResponse,
-    ListRequest, ListResponse, RegisterRequest, RegisterResponse, RegistrationStatus,
-    ServiceMetadata, UnregisterRequest, UnregisterResponse,
+    ListRequest, ListResponse, RegisterRequest, RegisterResponse, ServiceMetadata,
+    UnregisterRequest, UnregisterResponse,
 };
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -69,10 +69,7 @@ impl ServiceRegistry for ServiceRegistryImpl {
                     info!(
                         "Registered new service in the service registry: {service_to_register:?}"
                     );
-                    let register_response = RegisterResponse {
-                        registration_status: RegistrationStatus::NewlyRegistered as i32,
-                    };
-                    Ok(Response::new(register_response))
+                    Ok(Response::new(RegisterResponse {}))
                 }
             }
         }
@@ -136,13 +133,8 @@ impl ServiceRegistry for ServiceRegistryImpl {
                 })
                 .collect()
         };
-        if service_list.is_empty() {
-            Err(Status::not_found(format!("No registrations found for namespace {namespace}")))
-        } else {
-            let discover_by_namespace_response =
-                DiscoverByNamespaceResponse { services: service_list };
-            Ok(Response::new(discover_by_namespace_response))
-        }
+        let discover_by_namespace_response = DiscoverByNamespaceResponse { services: service_list };
+        Ok(Response::new(discover_by_namespace_response))
     }
 
     /// Discovers a single service based on its "fully qualified name", consisting of the namespace,
@@ -244,10 +236,7 @@ mod registry_impl_test {
         let request = tonic::Request::new(RegisterRequest { service: Some(service1.clone()) });
         let result = registry_impl.register(request).await;
         assert!(result.is_ok(), "register result is not okay: {result:?}");
-        assert_eq!(
-            result.unwrap().into_inner().registration_status.clone(),
-            RegistrationStatus::NewlyRegistered as i32
-        );
+
         let service_identifier = ServiceIdentifier {
             namespace: service1.namespace.clone(),
             name: service1.name.clone(),
@@ -366,6 +355,17 @@ mod registry_impl_test {
             "DiscoverByNamespace result is not okay: {result_namespace:?}"
         );
         assert_eq!(result_namespace.unwrap().into_inner().services[0], service1.clone());
+
+        // Discover by namespace that has no services
+        let request_namespace_none =
+            tonic::Request::new(DiscoverByNamespaceRequest { namespace: String::from("sdv.none") });
+        let result_namespace_none =
+            registry_impl.discover_by_namespace(request_namespace_none).await;
+        assert!(
+            result_namespace_none.is_ok(),
+            "DiscoverByNamespace with no services result is not okay: {result_namespace_none:?}"
+        );
+        assert!(result_namespace_none.unwrap().into_inner().services.is_empty());
     }
 
     #[tokio::test]
