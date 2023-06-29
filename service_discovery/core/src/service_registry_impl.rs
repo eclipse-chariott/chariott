@@ -125,11 +125,7 @@ impl ServiceRegistry for ServiceRegistryImpl {
             let lock = self.registry_map.read();
             lock.iter()
                 .filter_map(|(service_identifier, service_metadata)| {
-                    if service_identifier.namespace == namespace {
-                        Some(service_metadata.clone())
-                    } else {
-                        None
-                    }
+                    (service_identifier.namespace == namespace).then(|| service_metadata.clone())
                 })
                 .collect()
         };
