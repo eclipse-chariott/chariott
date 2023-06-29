@@ -1,0 +1,21 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+# SPDX-License-Identifier: MIT
+
+[package]
+name = "service_discovery"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[dependencies]
+parking_lot = { workspace = true }
+prost = { workspace = true }
+service_discovery_proto = { path = "../proto_build/"}
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tonic = { workspace = true }
+tracing = { version = "0.1" }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[build-dependencies]
+tonic-build = { workspace = true }

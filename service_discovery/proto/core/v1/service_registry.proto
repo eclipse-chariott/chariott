@@ -1,0 +1,100 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+// SPDX-License-Identifier: MIT
+
+syntax = "proto3";
+package service_registry;
+
+// Service Registry definition
+//
+// The protobuf definitions for Chariott's service registry
+
+// The entry point for the Registry gRPC Service.
+service ServiceRegistry {
+  // Register, or add a service to the registry
+  rpc Register(RegisterRequest) returns (RegisterResponse) {}
+
+  // Unregister, or remove a service from the registry
+  rpc Unregister(UnregisterRequest) returns (UnregisterResponse) {}
+
+  // Discover, or retrieve the metadata for a single service given its fully qualified name
+  rpc Discover(DiscoverRequest) returns (DiscoverResponse) {}
+
+  // Discover a list of services given their namespace
+  rpc DiscoverByNamespace(DiscoverByNamespaceRequest) returns (DiscoverByNamespaceResponse) {}
+
+  // List, or retrieve all contents of the service registry
+  rpc List(ListRequest) returns (ListResponse) {}
+}
+
+// Representation of a service including all of its metadata that the registry stores
+message ServiceMetadata {
+  // Logical grouping of services. Multiple services can share the same namespace.
+  // example: sdv.samples
+  string namespace = 1;
+  // Unique name of the service.
+  string name = 2;
+  // The combination of namespace, name, and version uniquely identify a service
+  string version = 3;
+  // The uri that clients can use to communicate with this service
+  string uri = 4;
+  // Used by clients to validate that they can communicate with this service. A short description of
+  // the communication kind, potentially including the network protocol and api specification type.
+  // example: grpc+proto
+  string communication_kind = 5;
+  // Used by clients to validate that they can communicate with this service. Communication communication_reference
+  // can be a reference to the api specification
+  // example: hello_world_service.v1.proto
+  string communication_reference = 6;
+}
+
+// Request used to register a service, including all of its metadata
+message RegisterRequest {
+  ServiceMetadata service = 1;
+}
+
+// Response from `Register`
+message RegisterResponse {
+}
+
+// Request used to unregister a service
+message UnregisterRequest {
+  string namespace = 1;
+  string name = 2;
+  string version = 3;
+}
+
+// Response from `Unregister`
+message UnregisterResponse {
+}
+
+// Request to retrieve the metadata for a service given its service identifiers
+message DiscoverRequest {
+  string namespace = 1;
+  string name = 2;
+  string version = 3;
+}
+
+// Response including the single service's metadata
+message DiscoverResponse {
+  ServiceMetadata service = 1;
+}
+
+// Request to retrieve the metadata for a list of services given their namespace
+message DiscoverByNamespaceRequest {
+  string namespace = 1;
+}
+
+// Repsonse with all services registered for this namespace
+message DiscoverByNamespaceResponse {
+  repeated ServiceMetadata services = 1;
+}
+
+// Request to list the registry, or retrieve all registered services
+message ListRequest {
+}
+
+// Response with a list of all registered services
+message ListResponse {
+    repeated ServiceMetadata services = 1;
+}

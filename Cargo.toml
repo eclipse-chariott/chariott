@@ -1,3 +1,7 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+# SPDX-License-Identifier: MIT
+
 [workspace]
 members = [
     "common",
@@ -15,9 +19,10 @@ members = [
     "examples/common",
     "keyvalue",
     "proto.rs",
+    "service_discovery/core",
+    "service_discovery/samples/simple-discovery/consumer",
+    "service_discovery/samples/simple-discovery/provider"
 ]
-
-exclude = []
 
 [package]
 name = "chariott"
@@ -55,6 +60,7 @@ chariott-common = { path = "./common/" }
 chariott-proto = { path = "./proto.rs/" }
 futures = { version = "0.3" }
 lazy_static = "1.4.0"
+parking_lot = "0.12.1"
 prost = "0.11"
 prost-types = "0.11"
 regex = "1.7"
