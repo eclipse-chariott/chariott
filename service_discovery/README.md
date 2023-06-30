@@ -22,9 +22,10 @@ The [Developing with Service Discovery](#developing-with-service-discovery) show
 ## High-level Design
 
 The service discovery system consists of 3 parts:
-1.  The Service Registry
-2.  A provider 
-3.  A consumer
+
+1. The Service Registry
+2. A provider
+3. A consumer
 
 The Chariott Service Registry stores enough metadata about a service for a consumer to be able to communicate directly with the provider. A service is uniquely identified by its namespace, name, and version. Namespace is a logical grouping of services. An example in the repo is "sdv.samples", which is the namespace for all of the sample services. Today, there can only be one service registered with the same namespace, name, version combination, and any attempt to register again will fail. See the ServiceMetadata type in the [service registry proto](./proto/core/v1/service_registry.proto) for more detailed information and examples of the metadata required for each service.
 
@@ -112,7 +113,7 @@ To register a service, replace your path to the service discovery directory in t
 ```shell
 grpcurl -proto {path_to_service_discovery}/proto/core/v1/service_registry.proto -plaintext -d @ 0.0.0.0:50000 service_registry.ServiceRegistry/Register <<EOF
 {
-  "service": 
+  "service":
     {
       "namespace": "sdv.samples",
       "name": "service1",
@@ -120,7 +121,7 @@ grpcurl -proto {path_to_service_discovery}/proto/core/v1/service_registry.proto 
       "uri": "https://localhost:1000",
       "communication_kind": "grpc+proto",
       "communication_reference": "sample.communication_reference.v1.proto"
-    }    
+    }
 }
 EOF
 ```
@@ -140,7 +141,7 @@ grpcurl -proto {path_to_service_discovery}/proto/core/v1/service_registry.proto 
 {
   "namespace": "sdv.samples",
   "name": "service1",
-  "version": "1.0.0.0",
+  "version": "1.0.0.0"
 }
 EOF
 ```
@@ -173,7 +174,7 @@ grpcurl -proto {path_to_service_discovery}/proto/core/v1/service_registry.proto 
 {
   "namespace": "sdv.samples",
   "name": "service1",
-  "version": "1.0.0.0",
+  "version": "1.0.0.0"
 }
 EOF
 ```
