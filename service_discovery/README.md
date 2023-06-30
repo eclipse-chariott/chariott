@@ -11,7 +11,8 @@
 - [Developing with Service Discovery](#developing-with-service-discovery)
 - [Trademarks](#trademarks)
 
-## Introduction 
+## Introduction
+
 This Service Discovery system for Eclipse Chariott aims to simplify in-vehicle application development by abstracting out where services are running, so that applications that want to leverage the resources and capabilities of another application can discover the location and metadata necessary to communicate. This is a new version of Service Discovery which is decoupled from the intent broker, and it is currently under development. If you would like to use the existing version of Chariott with intent brokering, please refer to the [top-level Readme](./../README.md) for details.
 
 The [Getting Started](#getting-started) section shows how to get started and run the Service Discovery system locally.
@@ -19,17 +20,20 @@ The [Getting Started](#getting-started) section shows how to get started and run
 The [Developing with Service Discovery](#developing-with-service-discovery) shows what is necessary to start developing applications that use Service Discovery.
 
 ## High-level Design
+
 The service discovery system consists of 3 parts:
-1.	The Service Registry
-2.	A provider 
-3.	A consumer
+1.  The Service Registry
+2.  A provider 
+3.  A consumer
 
 The Chariott Service Registry stores enough metadata about a service for a consumer to be able to communicate directly with the provider. A service is uniquely identified by its namespace, name, and version. Namespace is a logical grouping of services. An example in the repo is "sdv.samples", which is the namespace for all of the sample services. Today, there can only be one service registered with the same namespace, name, version combination, and any attempt to register again will fail. See the ServiceMetadata type in the [service registry proto](./proto/core/v1/service_registry.proto) for more detailed information and examples of the metadata required for each service.
 
 Providers and consumers are applications, or any software components. An application can take on the role or "provider", "consumer", or both. A provider is an application which registers itself and gets added to the service registry, whereas a consumer is an appplication which searches for applications in the service registry, using one of the read operations on the registry (i.e. Discover to retrieve a single service).
 
-## Getting Started 
+## Getting Started
+
 ### Prerequisites
+
 This guide uses `apt` as the package manager in the examples. You may need to substitute your own
 package manager in place of `apt` when going through these steps.
 
@@ -49,6 +53,7 @@ package manager in place of `apt` when going through these steps.
     git lfs install
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     ```
+
     You will need to restart your shell to refresh the environment variables.
 
     > **NOTE**: The rust toolchain version is managed by the rust-toolchain.toml file, so once you
@@ -63,6 +68,7 @@ package manager in place of `apt` when going through these steps.
     > **NOTE**: The protobuf compiler is needed for building the project.
 
 ### Building
+
 Running the following in the root directory of the Chariott repository will build everything in the service_discovery directory as well:
 
 ```shell
@@ -76,13 +82,14 @@ cargo build -p service_discovery
 ```
 
 ### Running the Tests
+
 After successfully building the service, you can run all of the unit tests by running the following at `chariott/service_discovery/core`:
 
 ```shell
 cargo test
 ```
 
-## Running Service Discovery
+## Running the Service
 
 Below are the steps to run Service Discovery, which is gRPC based,
 and an easy way to interact with it is through the use of the
@@ -90,7 +97,7 @@ and an easy way to interact with it is through the use of the
 
 ### Start the Service
 
-In a terminal window, run: 
+In a terminal window, run:
 
 ```shell
 cargo run -p service_discovery
@@ -172,9 +179,11 @@ EOF
 ```
 
 ### Sample applications
-Sample applications, including the "simple discovery" sample to help get started with development can be found [here](./samples/README.md)
+
+Sample applications, including the "simple discovery" sample to help get started with development can be found [here](./samples/README.md).
 
 ## Developing with Service Discovery
+
 In order to develop your own applicataions which can register and discover other services through the service registry, compile the [service_registry.proto](./proto/core/v1/service_registry.proto) file into the language of your choice, and use the generated client to perform operations on the service registry. That way, your applications do not need any dependencies on the core of the service discovery system, only the protobuf interface to be able to call the grpc service.
 
 ## Trademarks
