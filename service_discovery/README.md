@@ -68,7 +68,7 @@ package manager in place of `apt` when going through these steps.
 1. Install git and git-lfs
 
     ```shell
-    sudo apt install -y git git-lfs 
+    sudo apt install -y git git-lfs
     git lfs install
     ```
 
@@ -137,7 +137,7 @@ This service implements the gRPC methods defined in
 To register a service, replace your path to the service discovery directory in the command:
 
 ```shell
-grpcurl -proto {path_to_service_discovery}/proto/core/v1/service_registry.proto -plaintext -d @ 
+grpcurl -proto {path_to_service_discovery}/proto/core/v1/service_registry.proto -plaintext -d @
 0.0.0.0:50000 service_registry.ServiceRegistry/Register <<EOF
 {
   "service":
@@ -165,7 +165,7 @@ In order to discover your newly registered service you can call discover, again 
 to service discovery:
 
 ```shell
-grpcurl -proto {path_to_service_discovery}/proto/core/v1/service_registry.proto -plaintext -d @ 
+grpcurl -proto {path_to_service_discovery}/proto/core/v1/service_registry.proto -plaintext -d @
 0.0.0.0:50000 service_registry.ServiceRegistry/Discover <<EOF
 {
   "namespace": "sdv.samples",
@@ -180,7 +180,7 @@ This will return all of the metadata stored for that service.
 You can also register more services under the same namespace, and then discover by the namespace with the following command. This is helpful if you want to retrieve a list of services that share the same logical grouping.
 
 ```shell
-grpcurl -proto {path_to_service_discovery}/proto/core/v1/service_registry.proto -plaintext -d @ 
+grpcurl -proto {path_to_service_discovery}/proto/core/v1/service_registry.proto -plaintext -d @
 0.0.0.0:50000 service_registry.ServiceRegistry/DiscoverByNamespace <<EOF
 {
       "namespace": "sdv.samples"
@@ -191,7 +191,7 @@ EOF
 You can also list all registered services with:
 
 ```shell
-grpcurl -proto {path_to_service_discovery}/proto/core/v1/service_registry.proto -plaintext -d @ 
+grpcurl -proto {path_to_service_discovery}/proto/core/v1/service_registry.proto -plaintext -d @
 0.0.0.0:50000 service_registry.ServiceRegistry/List <<EOF
 {
 }
@@ -201,7 +201,7 @@ EOF
 And when you want to unregister a service you can use the following:
 
 ```shell
-grpcurl -proto {path_to_service_discovery}/proto/core/v1/service_registry.proto -plaintext -d @ 
+grpcurl -proto {path_to_service_discovery}/proto/core/v1/service_registry.proto -plaintext -d @
 0.0.0.0:50000 service_registry.ServiceRegistry/Unregister <<EOF
 {
   "namespace": "sdv.samples",

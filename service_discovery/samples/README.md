@@ -29,7 +29,7 @@ applications.
 The consumer "discovers" the location of the Hello World service by calling discover on the service
 registry. The consumer then validates that the communication_kind (which can include the protocol
 and api specification type) and communication_reference (a string to identify the api
-specification) are what it expects and knows how to communicate with. Finally, the consumer calls 
+specification) are what it expects and knows how to communicate with. Finally, the consumer calls
 the SayHello method on the uri provided in the discover response to use the provider directly. You
 will see the output of these operations in the terminal windows when you run the services.
 
