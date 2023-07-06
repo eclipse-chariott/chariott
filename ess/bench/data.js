@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1687453065708,
+  "lastUpdate": 1688653470342,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -2879,6 +2879,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 298183387,
             "range": "± 22912993",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9932c061ddb1e794ae689899a4e55d1b872eca3f",
+          "message": "Add documentation for service discovery (#150)\n\n* READMEs for service discovery and samples\r\n\r\n* Docs updates\r\n\r\n* Fix spacing\r\n\r\n* More spacing fixes:\r\n\r\n* First iteration comments\r\n\r\n* Spacing",
+          "timestamp": "2023-07-06T10:19:48-04:00",
+          "tree_id": "02692aebd4b98f23aa6c916a004bde6cf22bfd55",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/9932c061ddb1e794ae689899a4e55d1b872eca3f"
+        },
+        "date": 1688653469301,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 499387,
+            "range": "± 37737",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3361311,
+            "range": "± 89000",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 31122229,
+            "range": "± 239995",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 5005425,
+            "range": "± 256900",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 32974261,
+            "range": "± 1522110",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 316666058,
+            "range": "± 2153848",
             "unit": "ns/iter"
           }
         ]
