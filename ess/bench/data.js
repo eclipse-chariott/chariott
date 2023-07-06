@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1688653762852,
+  "lastUpdate": 1688672794286,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -2999,6 +2999,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 310403382,
             "range": "± 4336218",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "59347656df3bed151ea8c6e19b92186a7260fb4f",
+          "message": "Update criterion version to address security vulnerability (#152)\n\n* Update criterion version to address security vulnerability\r\n\r\n* Remove 'ignore' in security audit now that it's been addressed\r\n\r\n* Make cargo audit a single line",
+          "timestamp": "2023-07-06T15:41:05-04:00",
+          "tree_id": "dc07074d83c8af60fd946d6449e64e04ca0ef86d",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/59347656df3bed151ea8c6e19b92186a7260fb4f"
+        },
+        "date": 1688672792924,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 472380,
+            "range": "± 23223",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3237534,
+            "range": "± 142153",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 31983495,
+            "range": "± 2213474",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 4675641,
+            "range": "± 296494",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 33113181,
+            "range": "± 1182533",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 332875957,
+            "range": "± 13839724",
             "unit": "ns/iter"
           }
         ]
