@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1688654906503,
+  "lastUpdate": 1688673398108,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -3120,6 +3120,84 @@ window.BENCHMARK_DATA = {
             "value": 6,
             "unit": "Millisecond",
             "range": "p95=10"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "59347656df3bed151ea8c6e19b92186a7260fb4f",
+          "message": "Update criterion version to address security vulnerability (#152)\n\n* Update criterion version to address security vulnerability\r\n\r\n* Remove 'ignore' in security audit now that it's been addressed\r\n\r\n* Make cargo audit a single line",
+          "timestamp": "2023-07-06T15:41:05-04:00",
+          "tree_id": "dc07074d83c8af60fd946d6449e64e04ca0ef86d",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/59347656df3bed151ea8c6e19b92186a7260fb4f"
+        },
+        "date": 1688673396929,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 36,
+            "unit": "Percent",
+            "range": "p95=38"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6811,
+            "unit": "Bytes",
+            "range": "p95=6992"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1764",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "5",
+            "unit": "blocks"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 8,
+            "unit": "Millisecond",
+            "range": "p95=14"
           }
         ]
       }
