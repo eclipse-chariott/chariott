@@ -14,10 +14,9 @@
     - [Install Dependencies](#install-dependencies)
     - [Build all binaries and run tests natively](#build-all-binaries-and-run-tests-natively)
     - [Build and run Chariott only](#build-and-run-chariott-only)
-- [Use Chariott Service Discovery only]()
+- [Use Chariott Service Discovery only](#use-chariott-service-discovery-only)
 - [How to run the examples and interact with Chariott](#how-to-run-the-examples-and-interact-with-chariott)
 - [How to run the dog mode demo](#how-to-run-the-dog-mode-demo)
-- [Development requirements](#development-requirements)
 - [Trademarks](#trademarks)
 
 ## What is Chariott?
@@ -97,6 +96,7 @@ If you decide not to use the Devcontainer, refer to the `devcontainer.json` and 
 cargo build --workspace
 cargo test --workspace
 ```
+
 #### Build on MacOS with Docker VirtuoFS
 
 As reported in [this issue](https://github.com/eclipse-chariott/chariott/issues/111), some extra
@@ -193,7 +193,7 @@ examples.
 
     ```shell
     sudo apt install pkg-config
-    sudo apt install libssl-dev 
+    sudo apt install libssl-dev
     ```
 
 #### Build all binaries and run tests natively
