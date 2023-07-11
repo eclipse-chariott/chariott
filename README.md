@@ -102,8 +102,8 @@ cargo test --workspace
 As reported in [this issue](https://github.com/eclipse-chariott/chariott/issues/111), some extra
 steps are needed to build if you are using MacOS with Docker VirtuoFS.
 
-Docker Desktop provides a fast VirtuoFS implementation on a Mac but rust build process breaks in
-devcontainers if VirtuoFS is enabled. The solution is not disabling the VirtuoFS, because this
+Docker Desktop provides a fast VirtuoFS implementation on a Mac but the rust build process breaks
+in devcontainers if VirtuoFS is enabled. The solution is not disabling the VirtuoFS, because this
 significantly slows down the I/O operations in the containers.
 
 The workaround is to create a target folder outside the chariott workspace and set the environment
@@ -112,7 +112,7 @@ variable to the new target folder. The following sequence works in the devcontai
 ```shell
 vscode ➜ /workspaces/chariott (main) $ sudo mkdir ../target
 vscode ➜ /workspaces/chariott (main) $ sudo chown vscode:vscode ../target
-vscode ➜ /workspaces/chariott (main) $ CARGO_TARGET_DIR=../target cargo build -p cargo
+vscode ➜ /workspaces/chariott (main) $ CARGO_TARGET_DIR=../target cargo build -p chariott
 vscode ➜ /workspaces/chariott (main) $ CARGO_TARGET_DIR=../target cargo run -p chariott
 ```
 
