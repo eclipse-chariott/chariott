@@ -1,6 +1,5 @@
 # Project Eclipse Chariott
 
-- [CI Status](#ci-status)
 - [What is Chariott?](#what-is-chariott)
 - [How to develop with Chariott](#how-to-develop-with-chariott)
   - [Terminology](#terminology)
@@ -9,23 +8,16 @@
 - [Getting started](#getting-started)
   - [Using Dev Container](#dev-container)
     - [Build all binaries and run tests](#build-all-binaries-and-run-tests)
+      - [Build on MacOS with Docker VirtuoFS](#build-on-macos-with-docker-virtuofs)
     - [Using Podman instead of Docker](#using-podman-instead-of-docker)
   - [Without Dev Container](#without-dev-container)
-    - [Install Build Dependencies](#install-build-dependencies)
+    - [Install Dependencies](#install-dependencies)
     - [Build all binaries and run tests natively](#build-all-binaries-and-run-tests-natively)
     - [Build and run Chariott only](#build-and-run-chariott-only)
+- [Use Chariott Service Discovery only](#use-chariott-service-discovery-only)
 - [How to run the examples and interact with Chariott](#how-to-run-the-examples-and-interact-with-chariott)
 - [How to run the dog mode demo](#how-to-run-the-dog-mode-demo)
-- [Development requirements](#development-requirements)
 - [Trademarks](#trademarks)
-
-## CI Status
-
-<!-- TODO: Add back after we move to new Repo -->
-
-- Rust CI
-- E2E CI
-- Security Audit
 
 ## What is Chariott?
 
@@ -105,6 +97,25 @@ cargo build --workspace
 cargo test --workspace
 ```
 
+#### Build on MacOS with Docker VirtuoFS
+
+As reported in [this issue](https://github.com/eclipse-chariott/chariott/issues/111), some extra
+steps are needed to build if you are using MacOS with Docker VirtuoFS.
+
+Docker Desktop provides a fast VirtuoFS implementation on a Mac but the rust build process breaks
+in devcontainers if VirtuoFS is enabled. The solution is not disabling the VirtuoFS, because this
+significantly slows down the I/O operations in the containers.
+
+The workaround is to create a target folder outside the chariott workspace and set the environment
+variable to the new target folder. The following sequence works in the devcontainer:
+
+```shell
+vscode ➜ /workspaces/chariott (main) $ sudo mkdir ../target
+vscode ➜ /workspaces/chariott (main) $ sudo chown vscode:vscode ../target
+vscode ➜ /workspaces/chariott (main) $ CARGO_TARGET_DIR=../target cargo build -p chariott
+vscode ➜ /workspaces/chariott (main) $ CARGO_TARGET_DIR=../target cargo run -p chariott
+```
+
 #### Using Podman instead of Docker
 
 If you want to use Podman you have to [enable Podman in Visual Studio
@@ -134,21 +145,62 @@ with the following additions:
 
 ### Without dev container
 
-#### Install Build Dependencies
+#### Install Dependencies
 
 As stated above, the `devcontainer.json` and the Dockerfile
 `.devcontainer/Dockerfile` contain a list of the plugins/tools we use for Chariott.
 Below we have listed the steps to get started, but refer to those files if there are any discrepancies.
 
-- Install [rust](https://rustup.rs/#)
-- Install [cmake](https://cmake.org/install/)
-- Install [protobuf-compiler](https://grpc.io/docs/protoc-installation/)
+This guide uses `apt` as the package manager in the examples. You may need to substitute your own
+package manager in place of `apt` when going through these steps.
+
+1. Install gcc:
+
+    ```shell
+    sudo apt install gcc
+    ```
+
+    > **NOTE**: Rust needs gcc's linker.
+
+1. Install git and git-lfs
+
+    ```shell
+    sudo apt install -y git git-lfs
+    git lfs install
+    ```
+
+1. Install [rust](https://rustup.rs/#), using the default installation, for example:
+
+    ```shell
+    sudo apt install curl
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    ```
+
+    You will need to restart your shell to refresh the environment variables.
+    > **NOTE**: The rust toolchain version is managed by the rust-toolchain.toml file, so once you
+                install rustup there is no need to manually install a toolchain or set a default.
+
+1. Install Protobuf Compiler:
+
+    ```shell
+    sudo apt install -y protobuf-compiler
+    ```
+
+    > **NOTE**: The protobuf compiler is needed for building the project.
+
+1. Ensure you have openssl and pkg-config installed. These are needed for some of the tests and
+examples.
+
+    ```shell
+    sudo apt install pkg-config
+    sudo apt install libssl-dev
+    ```
 
 #### Build all binaries and run tests natively
 
 ```bash
-cargo build
-cargo test
+cargo build --workspace
+cargo test --workspace
 ```
 
 #### Build and run Chariott only
@@ -156,6 +208,12 @@ cargo test
 ```bash
 cargo run -p chariott
 ```
+
+## Use Chariott Service Discovery Only
+
+There is a new Service Discovery mechanism that is decoupled from intent brokering. It is currently
+under development. Please refer to [this document](./service_discovery/README.md) for more
+information.
 
 ## How to run the examples and interact with Chariott
 
@@ -171,10 +229,6 @@ This walkthrough is described in the [examples kv-app README](examples/applicati
 ## How to run the dog mode demo
 
 To run the dog mode demo, please refer to the [dog mode demo](./examples/applications/README.md).
-
-## Development requirements
-
-If you are setting up your environment for development and want to contribute to the Chariott repository, [Git LFS](https://git-lfs.com/) is also required. Be sure to run `git lfs install` after you have installed it.
 
 ## Trademarks
 
