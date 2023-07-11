@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1689018881088,
+  "lastUpdate": 1689092416278,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -3276,6 +3276,84 @@ window.BENCHMARK_DATA = {
             "value": 8,
             "unit": "Millisecond",
             "range": "p95=15"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d7d34ad91f8849c69f971975c124e51b500f145a",
+          "message": "Readme Updates (#154)\n\n* Readme Updates",
+          "timestamp": "2023-07-11T12:06:35-04:00",
+          "tree_id": "a72578f184438e8df679ddb1536422ea94f917e6",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/d7d34ad91f8849c69f971975c124e51b500f145a"
+        },
+        "date": 1689092415170,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 33,
+            "unit": "Percent",
+            "range": "p95=34"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6787,
+            "unit": "Bytes",
+            "range": "p95=6868"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1960",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "7",
+            "unit": "blocks"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 7,
+            "unit": "Millisecond",
+            "range": "p95=12"
           }
         ]
       }
