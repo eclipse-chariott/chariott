@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1689092416278,
+  "lastUpdate": 1689196682348,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -3354,6 +3354,84 @@ window.BENCHMARK_DATA = {
             "value": 7,
             "unit": "Millisecond",
             "range": "p95=12"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105753233+devkelley@users.noreply.github.com",
+            "name": "devkelley",
+            "username": "devkelley"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f8205ee2a069715bd19d1775bf554d4262a64dfc",
+          "message": "updated tokio dependencies (#155)",
+          "timestamp": "2023-07-12T14:05:19-07:00",
+          "tree_id": "bedce5dfc37ca55c109d59b0c00d247ec5211d70",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/f8205ee2a069715bd19d1775bf554d4262a64dfc"
+        },
+        "date": 1689196681594,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 26,
+            "unit": "Percent",
+            "range": "p95=27"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6795,
+            "unit": "Bytes",
+            "range": "p95=6960"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1764",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "5",
+            "unit": "blocks"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 5,
+            "unit": "Millisecond",
+            "range": "p95=10"
           }
         ]
       }
