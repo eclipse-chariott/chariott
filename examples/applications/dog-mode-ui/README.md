@@ -13,9 +13,11 @@ If you do not have these already, follow the instructions
 [here](https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-2004#add-the-microsoft-package-repository),
 but replace the current version of the SDK with version 6 (dotnet-sdk-6.0).
 
- Once the update is done, run:
+Once the update is done, run:
 
-    dotnet --info
+```bash 
+dotnet --info
+```
 
 to ensure the installation was successful. At the end of the output message, you should see
 something like the following. Ensure that they are major version 6, and that you have both the
