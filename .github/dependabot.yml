@@ -10,5 +10,6 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      patterns:
-        - "*" # Groups all dependencies into one PR
+      dev-dependencies:
+        patterns:
+          - "*" # Groups all dependencies into one PR
