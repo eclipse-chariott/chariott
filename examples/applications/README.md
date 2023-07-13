@@ -20,6 +20,32 @@ Based on certain conditions, actions are taken. For example, if the battery is
 low, the owner is notified to return to the car immediately. If the temperature
 rises, the air conditioning is turned on.
 
+## Setup
+
+You will need the .NET SDK and ASP.NET Core Runtime version 6. As of the writing of this,
+installing the .NET SDK on Ubuntu installs the SDK, runtime, and ASP.NET Core runtime.
+
+If you do not have these already, follow the instructions
+[here](https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-2004#add-the-microsoft-package-repository),
+but replace the current version of the SDK with version 6 (dotnet-sdk-6.0). 
+
+ Once the update is done, run:
+
+    dotnet --info
+
+to ensure the installation was successful. At the end of the output message, you should see
+something like the following. Ensure that they are major version 6, and that you have both the
+SDK and ASP.NET Core runtime.
+
+```
+.NET SDKs installed:
+  6.0.412 [/usr/share/dotnet/sdk]
+
+.NET runtimes installed:
+  Microsoft.AspNetCore.App 6.0.20 [/usr/share/dotnet/shared/Microsoft.AspNetCore.App]
+  Microsoft.NETCore.App 6.0.20 [/usr/share/dotnet/shared/Microsoft.NETCore.App]
+```
+
 ### Automatic dog mode
 
 You can follow a simulation of this scenario by executing

@@ -6,20 +6,29 @@ the SDV Application Programming Model through the dog mode scenario.
 
 ## Setup
 
-The instructions in this section assume the current working directory of the
-shell is the same directory where this document.
+You will need the .NET SDK and ASP.NET Core Runtime version 6. As of the writing of this,
+installing the .NET SDK on Ubuntu installs the SDK, runtime, and ASP.NET Core runtime.
 
-Run the following script to install the required .NET SDK:
+If you do not have these already, follow the instructions 
+[here](https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-2004#add-the-microsoft-package-repository),
+but replace the current version of the SDK with version 6 (dotnet-sdk-6.0). 
 
-    ./install.sh
-
-When the script ends successfully, it will print how to update the `PATH`
-variable so that the .NET CLI (`dotnet`) can be found at its installed
-location. Once the update is done, run:
+ Once the update is done, run:
 
     dotnet --info
 
-to ensure the installation was successful.
+to ensure the installation was successful. At the end of the output message, you should see
+something like the following. Ensure that they are major version 6, and that you have both the
+SDK and ASP.NET Core runtime.
+
+```
+.NET SDKs installed:
+  6.0.412 [/usr/share/dotnet/sdk]
+
+.NET runtimes installed:
+  Microsoft.AspNetCore.App 6.0.20 [/usr/share/dotnet/shared/Microsoft.AspNetCore.App]
+  Microsoft.NETCore.App 6.0.20 [/usr/share/dotnet/shared/Microsoft.NETCore.App]
+```
 
 ## Running
 
