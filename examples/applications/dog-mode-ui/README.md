@@ -15,7 +15,7 @@ but replace the current version of the SDK with version 6 (dotnet-sdk-6.0).
 
 Once the update is done, run:
 
-```bash 
+```bash
 dotnet --info
 ```
 
