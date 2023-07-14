@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1689196259026,
+  "lastUpdate": 1689349280178,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -3239,6 +3239,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 339814371,
             "range": "± 15280757",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "502d5c0d6cf3cf18cb79955c4a73c3e293c8906e",
+          "message": "DogMode .NET dependencies (#157)\n\n* DogMode .NET dependencies and logs",
+          "timestamp": "2023-07-14T11:36:00-04:00",
+          "tree_id": "35e72de928eaa44e569ed18d406daef046eb1aa4",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/502d5c0d6cf3cf18cb79955c4a73c3e293c8906e"
+        },
+        "date": 1689349279451,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 554297,
+            "range": "± 48591",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3396300,
+            "range": "± 60235",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 33096138,
+            "range": "± 531193",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 5139149,
+            "range": "± 108140",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 34847631,
+            "range": "± 482533",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 329447039,
+            "range": "± 854478",
             "unit": "ns/iter"
           }
         ]
