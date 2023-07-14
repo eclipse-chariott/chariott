@@ -20,6 +20,34 @@ Based on certain conditions, actions are taken. For example, if the battery is
 low, the owner is notified to return to the car immediately. If the temperature
 rises, the air conditioning is turned on.
 
+## Setup
+
+You will need the .NET SDK and ASP.NET Core Runtime version 6. As of the writing of this,
+installing the .NET SDK on Ubuntu installs the SDK, runtime, and ASP.NET Core runtime.
+
+If you do not have these already, follow the instructions
+[here](https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-2004#add-the-microsoft-package-repository),
+but replace the current version of the SDK with version 6 (dotnet-sdk-6.0).
+
+Once the update is done, run:
+
+```bash
+dotnet --info
+```
+
+to ensure the installation was successful. At the end of the output message, you should see
+something like the following. Ensure that they are major version 6, and that you have both the
+SDK and ASP.NET Core runtime.
+
+```bash
+.NET SDKs installed:
+  6.0.412 [/usr/share/dotnet/sdk]
+
+.NET runtimes installed:
+  Microsoft.AspNetCore.App 6.0.20 [/usr/share/dotnet/shared/Microsoft.AspNetCore.App]
+  Microsoft.NETCore.App 6.0.20 [/usr/share/dotnet/shared/Microsoft.NETCore.App]
+```
+
 ### Automatic dog mode
 
 You can follow a simulation of this scenario by executing
@@ -46,6 +74,9 @@ The script will run the following components:
 7. Dog Mode Logic Application from `examples/appliations/dog-mode-logic`
 8. [Dog Mode UI Application][ui]
 
+Once you have run the script, you can inspect the application logs that are written to
+`target/logs`. This is helpful for troubleshooting if you experience unexpected behavior.
+
 After the UI is being served, you can access it under <http://localhost:5079/>.
 By default, the UI will also display the stream from the camera used to detect
 whether a dog is present. You can access the camera stream at
@@ -59,8 +90,7 @@ the fallback local object detection.
 The simulation will oscillate the temperature between a lower and upper bound.
 If the temperature is above a threshold and a dog is detected, you can see the
 air conditioning being turned on. If the temperature falls, or the dog has left
-the car, the air conditioning will be turned off. You can also inspect the
-application logs that are written to `target/logs`.
+the car, the air conditioning will be turned off.
 
 ### Manual dog mode
 

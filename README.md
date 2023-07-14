@@ -217,6 +217,8 @@ information.
 
 ## How to run the examples and interact with Chariott
 
+Refer to individual example applications' documentation for additional setup or dependencies that may be required.
+
 As Chariott's out of the box communication protocol is gRPC, the interaction with the
 examples is done through gRPC. To illustrate how to invoke the gRPC methods we
 use the [grpcurl](https://github.com/fullstorydev/grpcurl) command line tool with the example application
