@@ -1696,7 +1696,7 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #### Used by
 
-- [exr]( https://github.com/johannesvollmer/exrs ) 1.6.5
+- [exr]( https://github.com/johannesvollmer/exrs ) 1.7.0
 
 #### License
 
@@ -2507,10 +2507,10 @@ DEALINGS IN THE SOFTWARE.
 - [num-integer]( https://github.com/rust-num/num-integer ) 0.1.45
 - [num-rational]( https://github.com/rust-num/num-rational ) 0.4.1
 - [num-traits]( https://github.com/rust-num/num-traits ) 0.2.15
-- [regex]( https://github.com/rust-lang/regex ) 1.9.0
-- [regex-automata]( https://github.com/rust-lang/regex/tree/master/regex-automata ) 0.3.0
+- [regex]( https://github.com/rust-lang/regex ) 1.9.1
+- [regex-automata]( https://github.com/rust-lang/regex/tree/master/regex-automata ) 0.3.3
 - [regex-syntax]( https://github.com/rust-lang/regex ) 0.6.29
-- [regex-syntax]( https://github.com/rust-lang/regex/tree/master/regex-syntax ) 0.7.3
+- [regex-syntax]( https://github.com/rust-lang/regex/tree/master/regex-syntax ) 0.7.4
 
 #### License
 
@@ -5251,7 +5251,7 @@ DEALINGS IN THE SOFTWARE.
 
 #### Used by
 
-- [time]( https://github.com/time-rs/time ) 0.3.22
+- [time]( https://github.com/time-rs/time ) 0.3.23
 - [time-core]( https://github.com/time-rs/time ) 0.1.1
 
 #### License
@@ -6364,7 +6364,7 @@ DEALINGS IN THE SOFTWARE.
 
 - [adler]( https://github.com/jonas-schievink/adler.git ) 1.0.2
 - [anyhow]( https://github.com/dtolnay/anyhow ) 1.0.71
-- [async-channel]( https://github.com/smol-rs/async-channel ) 1.8.0
+- [async-channel]( https://github.com/smol-rs/async-channel ) 1.9.0
 - [async-executor]( https://github.com/smol-rs/async-executor ) 1.5.1
 - [async-global-executor]( https://github.com/Keruspe/async-global-executor ) 2.3.1
 - [async-io]( https://github.com/smol-rs/async-io ) 1.13.0
@@ -6390,21 +6390,21 @@ DEALINGS IN THE SOFTWARE.
 - [pin-project]( https://github.com/taiki-e/pin-project ) 1.1.2
 - [pin-project-internal]( https://github.com/taiki-e/pin-project ) 1.1.2
 - [pin-project-lite]( https://github.com/taiki-e/pin-project-lite ) 0.2.10
-- [portable-atomic]( https://github.com/taiki-e/portable-atomic ) 1.3.3
+- [portable-atomic]( https://github.com/taiki-e/portable-atomic ) 1.4.0
 - [prettyplease]( https://github.com/dtolnay/prettyplease ) 0.1.25
-- [proc-macro2]( https://github.com/dtolnay/proc-macro2 ) 1.0.63
+- [proc-macro2]( https://github.com/dtolnay/proc-macro2 ) 1.0.64
 - [quote]( https://github.com/dtolnay/quote ) 1.0.29
 - [rustix]( https://github.com/bytecodealliance/rustix ) 0.37.23
-- [rustix]( https://github.com/bytecodealliance/rustix ) 0.38.3
+- [rustix]( https://github.com/bytecodealliance/rustix ) 0.38.4
 - [rustversion]( https://github.com/dtolnay/rustversion ) 1.0.13
 - [semver]( https://github.com/dtolnay/semver ) 1.0.17
-- [serde]( https://github.com/serde-rs/serde ) 1.0.166
-- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.166
-- [serde_json]( https://github.com/serde-rs/json ) 1.0.100
+- [serde]( https://github.com/serde-rs/serde ) 1.0.171
+- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.171
+- [serde_json]( https://github.com/serde-rs/json ) 1.0.102
 - [syn]( https://github.com/dtolnay/syn ) 1.0.109
-- [syn]( https://github.com/dtolnay/syn ) 2.0.23
-- [thiserror]( https://github.com/dtolnay/thiserror ) 1.0.41
-- [thiserror-impl]( https://github.com/dtolnay/thiserror ) 1.0.41
+- [syn]( https://github.com/dtolnay/syn ) 2.0.25
+- [thiserror]( https://github.com/dtolnay/thiserror ) 1.0.43
+- [thiserror-impl]( https://github.com/dtolnay/thiserror ) 1.0.43
 - [unicode-ident]( https://github.com/dtolnay/unicode-ident ) 1.0.10
 - [waker-fn]( https://github.com/stjepang/waker-fn ) 1.1.0
 - [wasi]( https://github.com/bytecodealliance/wasi ) 0.11.0+wasi-snapshot-preview1
