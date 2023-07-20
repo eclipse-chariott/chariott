@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1689879771242,
+  "lastUpdate": 1689880202869,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -3359,6 +3359,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 275817541,
             "range": "± 748422",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105753233+devkelley@users.noreply.github.com",
+            "name": "devkelley",
+            "username": "devkelley"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5dc7006a02f3a8909c9a6f3f8f2c80237152ab25",
+          "message": "Devkelley/update dependabot (#156)\n\n* Update dependabot.yml to group dependency version updates\r\n\r\n* fix bad formatting",
+          "timestamp": "2023-07-20T12:04:34-07:00",
+          "tree_id": "4918248dcb91510ae3149d307108f8c50e83e88a",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/5dc7006a02f3a8909c9a6f3f8f2c80237152ab25"
+        },
+        "date": 1689880202111,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 521189,
+            "range": "± 33500",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3480564,
+            "range": "± 126790",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 32976945,
+            "range": "± 396527",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 5100708,
+            "range": "± 191719",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 36360156,
+            "range": "± 1386636",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 353927843,
+            "range": "± 7070297",
             "unit": "ns/iter"
           }
         ]
