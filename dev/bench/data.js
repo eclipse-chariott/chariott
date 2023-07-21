@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1689881190681,
+  "lastUpdate": 1689965739336,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -3666,6 +3666,84 @@ window.BENCHMARK_DATA = {
             "value": 6,
             "unit": "Millisecond",
             "range": "p95=10"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "41898282+github-actions[bot]@users.noreply.github.com",
+            "name": "github-actions[bot]",
+            "username": "github-actions[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4f4c7933ae11bb624a3ad1195f53f1418b90b5bd",
+          "message": "chore: Notice file change (#166)\n\n* Update email on notice file generation\r\n\r\n* New notice file\r\n\r\n---------\r\n\r\nCo-authored-by: Lauren Datz <105828115+ladatz@users.noreply.github.com>\r\nCo-authored-by: Automated Notice Generation Pipeline <noreply@github.com>",
+          "timestamp": "2023-07-21T14:41:59-04:00",
+          "tree_id": "89c600769b2604a30554328eae73c3f5209a82d6",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/4f4c7933ae11bb624a3ad1195f53f1418b90b5bd"
+        },
+        "date": 1689965738047,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 30,
+            "unit": "Percent",
+            "range": "p95=31"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6951,
+            "unit": "Bytes",
+            "range": "p95=7065"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2008",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 6,
+            "unit": "Millisecond",
+            "range": "p95=11"
           }
         ]
       }
