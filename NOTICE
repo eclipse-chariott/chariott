@@ -6334,7 +6334,7 @@ DEALINGS IN THE SOFTWARE.
 - [semver]( https://github.com/dtolnay/semver ) 1.0.18
 - [serde]( https://github.com/serde-rs/serde ) 1.0.173
 - [serde_json]( https://github.com/serde-rs/json ) 1.0.103
-- [serde_repr]( https://github.com/dtolnay/serde-repr ) 0.1.15
+- [serde_repr]( https://github.com/dtolnay/serde-repr ) 0.1.14
 - [syn]( https://github.com/dtolnay/syn ) 1.0.109
 - [syn]( https://github.com/dtolnay/syn ) 2.0.26
 - [thiserror]( https://github.com/dtolnay/thiserror ) 1.0.43
