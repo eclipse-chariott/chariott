@@ -32,7 +32,7 @@ COPY ./ .
 
 RUN rustup target add x86_64-unknown-linux-musl
 
-RUN cargo build --release --target=x86_64-unknown-linux-musl
+RUN cargo build --release --target=x86_64-unknown-linux-musl -p service_discovery
 
 ####################################################################################################
 ## Final image
@@ -46,9 +46,9 @@ COPY --from=builder /etc/group /etc/group
 WORKDIR /sdv
 
 # Copy our build
-COPY --from=builder /sdv/target/x86_64-unknown-linux-musl/release/chariott /sdv/chariott
+COPY --from=builder /sdv/target/x86_64-unknown-linux-musl/release/service_discovery /sdv/service_discovery
 
 # Use the unprivileged chariott user during execution.
 USER chariott:chariott
 
-CMD ["./chariott"]
+CMD ["./service_discovery"]
