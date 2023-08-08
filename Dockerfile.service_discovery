@@ -5,10 +5,11 @@
 ARG RUST_VERSION=1.65
 FROM rust:${RUST_VERSION} AS builder
 
-# Dockerfile for building Eclipse Chariott runtime container
+# Dockerfile for building Eclipse Chariott Service Discovery container
 #
-# This Dockerfile utilizes a two step build process. It builds Chariott with
-# statically linked dependencies (using musl) for a x86_64 architecture.
+# This Dockerfile utilizes a two step build process. It builds Chariott
+# Service Discovery with statically linked dependencies (using musl)
+# for a x86_64 architecture.
 
 # Chariott user id
 ARG CHARIOTT_UID=10001
@@ -16,7 +17,7 @@ ARG CHARIOTT_UID=10001
 RUN apt update && apt upgrade -y
 RUN apt install -y cmake protobuf-compiler
 
-# unprivileged identity to run Chariott as
+# unprivileged identity to run Chariott Service Discovery as
 RUN adduser \
     --disabled-password \
     --gecos "" \
