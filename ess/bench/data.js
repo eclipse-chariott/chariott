@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1691424618991,
+  "lastUpdate": 1691519980564,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -3659,6 +3659,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 279976354,
             "range": "± 752241",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "2381741+sealemar@users.noreply.github.com",
+            "name": "Sergey M",
+            "username": "sealemar"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "87a70f11808aee04c4de0a7e1bc6561133297dbf",
+          "message": "Changed Dockerfile to build 'service_discovery' instead of 'chariott' (#178)\n\n* Changed Dockerfile to build 'service_discovery' instead of 'chariott'\r\n\r\n* Made Dockerfile.service_discovery into a separate Dockerfile\r\n\r\n* Fixed comments",
+          "timestamp": "2023-08-08T14:33:38-04:00",
+          "tree_id": "ddea3db8c7b7b1010d28e4585d981d87c5e2f605",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/87a70f11808aee04c4de0a7e1bc6561133297dbf"
+        },
+        "date": 1691519979885,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 564567,
+            "range": "± 44520",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3380533,
+            "range": "± 156313",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 31897265,
+            "range": "± 1169790",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 5350211,
+            "range": "± 221854",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 33702867,
+            "range": "± 895798",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 338939077,
+            "range": "± 12214304",
             "unit": "ns/iter"
           }
         ]
