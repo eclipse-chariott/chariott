@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1691425139292,
+  "lastUpdate": 1691520432187,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -3978,6 +3978,84 @@ window.BENCHMARK_DATA = {
             "value": 6754,
             "unit": "Bytes",
             "range": "p95=6848"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "2381741+sealemar@users.noreply.github.com",
+            "name": "Sergey M",
+            "username": "sealemar"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "87a70f11808aee04c4de0a7e1bc6561133297dbf",
+          "message": "Changed Dockerfile to build 'service_discovery' instead of 'chariott' (#178)\n\n* Changed Dockerfile to build 'service_discovery' instead of 'chariott'\r\n\r\n* Made Dockerfile.service_discovery into a separate Dockerfile\r\n\r\n* Fixed comments",
+          "timestamp": "2023-08-08T14:33:38-04:00",
+          "tree_id": "ddea3db8c7b7b1010d28e4585d981d87c5e2f605",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/87a70f11808aee04c4de0a7e1bc6561133297dbf"
+        },
+        "date": 1691520431452,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1912",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "6",
+            "unit": "blocks"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 5,
+            "unit": "Millisecond",
+            "range": "p95=9"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 25,
+            "unit": "Percent",
+            "range": "p95=26"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6524,
+            "unit": "Bytes",
+            "range": "p95=6762"
           }
         ]
       }
