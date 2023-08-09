@@ -9,6 +9,7 @@
 </p>
 
 ## Index
+
 - [What is Chariott?](#what-is-chariott)
 - [How to develop with Chariott](#how-to-develop-with-chariott)
   - [Terminology](#terminology)
