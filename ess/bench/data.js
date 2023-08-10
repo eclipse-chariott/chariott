@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1691677105492,
+  "lastUpdate": 1691683154024,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -3779,6 +3779,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 279190857,
             "range": "± 176281",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105753233+devkelley@users.noreply.github.com",
+            "name": "devkelley",
+            "username": "devkelley"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "163eba1fe505d42c82c55df417bb369ebdc01b69",
+          "message": "Add badges to chariott readme (#181)",
+          "timestamp": "2023-08-10T08:52:18-07:00",
+          "tree_id": "993f8c037057c33bb7dd217ec6e47f7950458e6a",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/163eba1fe505d42c82c55df417bb369ebdc01b69"
+        },
+        "date": 1691683152752,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 502563,
+            "range": "± 39300",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3512859,
+            "range": "± 174378",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 34064524,
+            "range": "± 1685582",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 4854282,
+            "range": "± 227556",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 35643430,
+            "range": "± 1430362",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 350770992,
+            "range": "± 10355661",
             "unit": "ns/iter"
           }
         ]
