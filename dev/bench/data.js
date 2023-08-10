@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1691678135926,
+  "lastUpdate": 1691683615266,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -4134,6 +4134,84 @@ window.BENCHMARK_DATA = {
             "value": 6648,
             "unit": "Bytes",
             "range": "p95=6819"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105753233+devkelley@users.noreply.github.com",
+            "name": "devkelley",
+            "username": "devkelley"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "163eba1fe505d42c82c55df417bb369ebdc01b69",
+          "message": "Add badges to chariott readme (#181)",
+          "timestamp": "2023-08-10T08:52:18-07:00",
+          "tree_id": "993f8c037057c33bb7dd217ec6e47f7950458e6a",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/163eba1fe505d42c82c55df417bb369ebdc01b69"
+        },
+        "date": 1691683614192,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1960",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "7",
+            "unit": "blocks"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 5,
+            "unit": "Millisecond",
+            "range": "p95=9"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 26,
+            "unit": "Percent",
+            "range": "p95=27"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6688,
+            "unit": "Bytes",
+            "range": "p95=6811"
           }
         ]
       }
