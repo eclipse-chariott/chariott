@@ -1,5 +1,15 @@
 # Project Eclipse Chariott
 
+<p align="center">
+    <a href="https://github.com/eclipse-chariott/chariott/tags"><img alt="Version tag" src="https://img.shields.io/github/v/tag/eclipse-chariott/chariott?label=version"></a>
+    <a href="https://github.com/eclipse-chariott/chariott/issues"><img alt="issues: N/A" src="https://img.shields.io/github/issues/eclipse-chariott/chariott"></a>
+    <a href="https://github.com/eclipse-chariott/chariott/actions/workflows/rust-ci.yml"><img alt="build: N/A" src="https://img.shields.io/github/actions/workflow/status/eclipse-chariott/chariott/rust-ci.yml"></a>
+    <img src="https://img.shields.io/badge/status-maintained-green.svg" alt="status: maintained">
+    <a href="https://github.com/eclipse-chariott/chariott/blob/main/LICENSE"><img alt="license: MIT" src="https://img.shields.io/github/license/eclipse-chariott/chariott"></a>
+</p>
+
+## Index
+
 - [What is Chariott?](#what-is-chariott)
 - [How to develop with Chariott](#how-to-develop-with-chariott)
   - [Terminology](#terminology)
