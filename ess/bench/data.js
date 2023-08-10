@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1691519980564,
+  "lastUpdate": 1691677105492,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -3719,6 +3719,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 338939077,
             "range": "± 12214304",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "36f8a8e5539453caa99ed346ee95bb38b7ca9745",
+          "message": "chore: Bump the dev-dependencies group with 5 updates (#177)\n\nBumps the dev-dependencies group with 5 updates:\r\n\r\n| Package | Update |\r\n| --- | --- |\r\n| [async-trait](https://github.com/dtolnay/async-trait) | 0.1.71 to 0.1.72 |\r\n| [regex](https://github.com/rust-lang/regex) | 1.9.1 to 1.9.3 |\r\n| [serde](https://github.com/serde-rs/serde) | 1.0.173 to 1.0.179 |\r\n| [serde_json](https://github.com/serde-rs/json) | 1.0.103 to 1.0.104 |\r\n| [tempfile](https://github.com/Stebalien/tempfile) | 3.6.0 to 3.7.1 |\r\n\r\n\r\nUpdates `async-trait` from 0.1.71 to 0.1.72\r\n- [Release notes](https://github.com/dtolnay/async-trait/releases)\r\n- [Commits](https://github.com/dtolnay/async-trait/compare/0.1.71...0.1.72)\r\n\r\nUpdates `regex` from 1.9.1 to 1.9.3\r\n- [Release notes](https://github.com/rust-lang/regex/releases)\r\n- [Changelog](https://github.com/rust-lang/regex/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/rust-lang/regex/compare/1.9.1...1.9.3)\r\n\r\nUpdates `serde` from 1.0.173 to 1.0.179\r\n- [Release notes](https://github.com/serde-rs/serde/releases)\r\n- [Commits](https://github.com/serde-rs/serde/compare/v1.0.173...v1.0.179)\r\n\r\nUpdates `serde_json` from 1.0.103 to 1.0.104\r\n- [Release notes](https://github.com/serde-rs/json/releases)\r\n- [Commits](https://github.com/serde-rs/json/compare/v1.0.103...v1.0.104)\r\n\r\nUpdates `tempfile` from 3.6.0 to 3.7.1\r\n- [Changelog](https://github.com/Stebalien/tempfile/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/Stebalien/tempfile/compare/v3.6.0...v3.7.1)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: async-trait\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: regex\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde_json\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tempfile\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-08-10T10:12:51-04:00",
+          "tree_id": "233ea1f1a23a39f12b61ed1a02abb0bba6623d2e",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/36f8a8e5539453caa99ed346ee95bb38b7ca9745"
+        },
+        "date": 1691677104563,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 397486,
+            "range": "± 8710",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2867292,
+            "range": "± 10077",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 27787615,
+            "range": "± 133761",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 3813640,
+            "range": "± 112014",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 28527583,
+            "range": "± 158746",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 279190857,
+            "range": "± 176281",
             "unit": "ns/iter"
           }
         ]
