@@ -2528,8 +2528,8 @@ DEALINGS IN THE SOFTWARE.
 - [num-integer]( https://github.com/rust-num/num-integer ) 0.1.45
 - [num-rational]( https://github.com/rust-num/num-rational ) 0.4.1
 - [num-traits]( https://github.com/rust-num/num-traits ) 0.2.15
-- [regex]( https://github.com/rust-lang/regex ) 1.9.1
-- [regex-automata]( https://github.com/rust-lang/regex/tree/master/regex-automata ) 0.3.3
+- [regex]( https://github.com/rust-lang/regex ) 1.9.3
+- [regex-automata]( https://github.com/rust-lang/regex/tree/master/regex-automata ) 0.3.6
 - [regex-syntax]( https://github.com/rust-lang/regex ) 0.6.29
 - [regex-syntax]( https://github.com/rust-lang/regex/tree/master/regex-syntax ) 0.7.4
 
@@ -2891,7 +2891,7 @@ DEALINGS IN THE SOFTWARE.
 
 #### Used by
 
-- [tempfile]( https://github.com/Stebalien/tempfile ) 3.6.0
+- [tempfile]( https://github.com/Stebalien/tempfile ) 3.7.1
 - [xattr]( https://github.com/Stebalien/xattr ) 0.2.3
 
 #### License
@@ -6127,7 +6127,6 @@ SOFTWARE.
 - [plotters-svg]( https://github.com/plotters-rs/plotters.git ) 0.3.5
 - [provider]( https://crates.io/crates/provider ) 0.1.0
 - [samples_proto]( https://crates.io/crates/samples_proto ) 0.1.0
-- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.173
 - [service_discovery]( https://crates.io/crates/service_discovery ) 0.1.0
 - [service_discovery_proto]( https://crates.io/crates/service_discovery_proto ) 0.1.0
 - [simple-provider]( https://crates.io/crates/simple-provider ) 0.1.0
@@ -6326,13 +6325,14 @@ DEALINGS IN THE SOFTWARE.
 - [async-lock]( https://github.com/smol-rs/async-lock ) 2.7.0
 - [async-std]( https://github.com/async-rs/async-std ) 1.12.0
 - [async-task]( https://github.com/smol-rs/async-task ) 4.4.0
-- [async-trait]( https://github.com/dtolnay/async-trait ) 0.1.71
+- [async-trait]( https://github.com/dtolnay/async-trait ) 0.1.72
 - [atomic-waker]( https://github.com/smol-rs/atomic-waker ) 1.1.1
 - [blocking]( https://github.com/smol-rs/blocking ) 1.3.1
 - [concurrent-queue]( https://github.com/smol-rs/concurrent-queue ) 2.2.0
 - [env_logger]( https://github.com/rust-cli/env_logger/ ) 0.10.0
 - [event-listener]( https://github.com/smol-rs/event-listener ) 2.5.3
 - [fastrand]( https://github.com/smol-rs/fastrand ) 1.9.0
+- [fastrand]( https://github.com/smol-rs/fastrand ) 2.0.0
 - [futures-lite]( https://github.com/smol-rs/futures-lite ) 1.13.0
 - [hermit-abi]( https://github.com/hermitcore/rusty-hermit ) 0.3.2
 - [io-lifetimes]( https://github.com/sunfishcode/io-lifetimes ) 1.0.11
@@ -6353,8 +6353,9 @@ DEALINGS IN THE SOFTWARE.
 - [rustix]( https://github.com/bytecodealliance/rustix ) 0.38.4
 - [rustversion]( https://github.com/dtolnay/rustversion ) 1.0.14
 - [semver]( https://github.com/dtolnay/semver ) 1.0.18
-- [serde]( https://github.com/serde-rs/serde ) 1.0.173
-- [serde_json]( https://github.com/serde-rs/json ) 1.0.103
+- [serde]( https://github.com/serde-rs/serde ) 1.0.179
+- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.179
+- [serde_json]( https://github.com/serde-rs/json ) 1.0.104
 - [serde_repr]( https://github.com/dtolnay/serde-repr ) 0.1.15
 - [syn]( https://github.com/dtolnay/syn ) 1.0.109
 - [syn]( https://github.com/dtolnay/syn ) 2.0.26
