@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1692216962147,
+  "lastUpdate": 1692731682458,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -3899,6 +3899,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 285740297,
             "range": "± 1879276",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6a7bc9444d104b08ebe0464409978dbef4503cb4",
+          "message": "chore: Bump the dev-dependencies group with 8 updates (#184)\n\nBumps the dev-dependencies group with 8 updates:\r\n\r\n| Package | From | To |\r\n| --- | --- | --- |\r\n| [async-trait](https://github.com/dtolnay/async-trait) | `0.1.72` | `0.1.73` |\r\n| [anyhow](https://github.com/dtolnay/anyhow) | `1.0.72` | `1.0.75` |\r\n| [serde](https://github.com/serde-rs/serde) | `1.0.179` | `1.0.185` |\r\n| [serde_json](https://github.com/serde-rs/json) | `1.0.104` | `1.0.105` |\r\n| [tempfile](https://github.com/Stebalien/tempfile) | `3.7.1` | `3.8.0` |\r\n| [reqwest](https://github.com/seanmonstar/reqwest) | `0.11.18` | `0.11.19` |\r\n| [image](https://github.com/image-rs/image) | `0.24.6` | `0.24.7` |\r\n| [tensorflow](https://github.com/tensorflow/rust) | `0.20.0` | `0.21.0` |\r\n\r\n\r\nUpdates `async-trait` from 0.1.72 to 0.1.73\r\n- [Release notes](https://github.com/dtolnay/async-trait/releases)\r\n- [Commits](https://github.com/dtolnay/async-trait/compare/0.1.72...0.1.73)\r\n\r\nUpdates `anyhow` from 1.0.72 to 1.0.75\r\n- [Release notes](https://github.com/dtolnay/anyhow/releases)\r\n- [Commits](https://github.com/dtolnay/anyhow/compare/1.0.72...1.0.75)\r\n\r\nUpdates `serde` from 1.0.179 to 1.0.185\r\n- [Release notes](https://github.com/serde-rs/serde/releases)\r\n- [Commits](https://github.com/serde-rs/serde/compare/v1.0.179...v1.0.185)\r\n\r\nUpdates `serde_json` from 1.0.104 to 1.0.105\r\n- [Release notes](https://github.com/serde-rs/json/releases)\r\n- [Commits](https://github.com/serde-rs/json/compare/v1.0.104...v1.0.105)\r\n\r\nUpdates `tempfile` from 3.7.1 to 3.8.0\r\n- [Changelog](https://github.com/Stebalien/tempfile/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/Stebalien/tempfile/compare/v3.7.1...v3.8.0)\r\n\r\nUpdates `reqwest` from 0.11.18 to 0.11.19\r\n- [Release notes](https://github.com/seanmonstar/reqwest/releases)\r\n- [Changelog](https://github.com/seanmonstar/reqwest/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/seanmonstar/reqwest/compare/v0.11.18...v0.11.19)\r\n\r\nUpdates `image` from 0.24.6 to 0.24.7\r\n- [Changelog](https://github.com/image-rs/image/blob/master/CHANGES.md)\r\n- [Commits](https://github.com/image-rs/image/compare/v0.24.6...v0.24.7)\r\n\r\nUpdates `tensorflow` from 0.20.0 to 0.21.0\r\n- [Changelog](https://github.com/tensorflow/rust/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/tensorflow/rust/compare/v0.20.0...v0.21.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: async-trait\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: anyhow\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde_json\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tempfile\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: reqwest\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: image\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tensorflow\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-08-22T15:08:53-04:00",
+          "tree_id": "c2717319c5780e9cf0fb2fc9bebc5befc74b6a55",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/6a7bc9444d104b08ebe0464409978dbef4503cb4"
+        },
+        "date": 1692731681520,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 472151,
+            "range": "± 50315",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2863114,
+            "range": "± 69153",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 27514999,
+            "range": "± 246146",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 4330586,
+            "range": "± 88637",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 28804194,
+            "range": "± 288832",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 277284598,
+            "range": "± 458119",
             "unit": "ns/iter"
           }
         ]
