@@ -206,7 +206,7 @@ This page lists the licenses of the projects used in cargo-about.
 
 #### Used by
 
-- [tensorflow]( https://github.com/tensorflow/rust ) 0.20.0
+- [tensorflow]( https://github.com/tensorflow/rust ) 0.21.0
 
 #### License
 
@@ -1467,7 +1467,7 @@ limitations under the License.
 
 - [bollard-stubs]( https://crates.io/crates/bollard-stubs ) 1.42.0-rc.7
 - [tensorflow-internal-macros]( https://github.com/tensorflow/rust ) 0.0.3
-- [tensorflow-sys]( https://github.com/tensorflow/rust ) 0.23.0
+- [tensorflow-sys]( https://github.com/tensorflow/rust ) 0.24.0
 
 #### License
 
@@ -2823,7 +2823,7 @@ DEALINGS IN THE SOFTWARE.
 
 #### Used by
 
-- [winreg]( https://github.com/gentoo90/winreg-rs ) 0.10.1
+- [winreg]( https://github.com/gentoo90/winreg-rs ) 0.50.0
 
 #### License
 
@@ -2891,7 +2891,7 @@ DEALINGS IN THE SOFTWARE.
 
 #### Used by
 
-- [tempfile]( https://github.com/Stebalien/tempfile ) 3.7.1
+- [tempfile]( https://github.com/Stebalien/tempfile ) 3.8.0
 - [xattr]( https://github.com/Stebalien/xattr ) 0.2.3
 
 #### License
@@ -3415,7 +3415,7 @@ THE SOFTWARE.
 
 #### Used by
 
-- [reqwest]( https://github.com/seanmonstar/reqwest ) 0.11.18
+- [reqwest]( https://github.com/seanmonstar/reqwest ) 0.11.19
 
 #### License
 
@@ -5837,7 +5837,7 @@ SOFTWARE.
 
 #### Used by
 
-- [tiff]( https://github.com/image-rs/image-tiff ) 0.8.1
+- [tiff]( https://github.com/image-rs/image-tiff ) 0.9.0
 
 #### License
 
@@ -6317,7 +6317,7 @@ DEALINGS IN THE SOFTWARE.
 #### Used by
 
 - [adler]( https://github.com/jonas-schievink/adler.git ) 1.0.2
-- [anyhow]( https://github.com/dtolnay/anyhow ) 1.0.72
+- [anyhow]( https://github.com/dtolnay/anyhow ) 1.0.75
 - [async-channel]( https://github.com/smol-rs/async-channel ) 1.9.0
 - [async-executor]( https://github.com/smol-rs/async-executor ) 1.5.1
 - [async-global-executor]( https://github.com/Keruspe/async-global-executor ) 2.3.1
@@ -6325,7 +6325,7 @@ DEALINGS IN THE SOFTWARE.
 - [async-lock]( https://github.com/smol-rs/async-lock ) 2.7.0
 - [async-std]( https://github.com/async-rs/async-std ) 1.12.0
 - [async-task]( https://github.com/smol-rs/async-task ) 4.4.0
-- [async-trait]( https://github.com/dtolnay/async-trait ) 0.1.72
+- [async-trait]( https://github.com/dtolnay/async-trait ) 0.1.73
 - [atomic-waker]( https://github.com/smol-rs/atomic-waker ) 1.1.1
 - [blocking]( https://github.com/smol-rs/blocking ) 1.3.1
 - [concurrent-queue]( https://github.com/smol-rs/concurrent-queue ) 2.2.0
@@ -6353,12 +6353,12 @@ DEALINGS IN THE SOFTWARE.
 - [rustix]( https://github.com/bytecodealliance/rustix ) 0.38.4
 - [rustversion]( https://github.com/dtolnay/rustversion ) 1.0.14
 - [semver]( https://github.com/dtolnay/semver ) 1.0.18
-- [serde]( https://github.com/serde-rs/serde ) 1.0.179
-- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.179
-- [serde_json]( https://github.com/serde-rs/json ) 1.0.104
+- [serde]( https://github.com/serde-rs/serde ) 1.0.185
+- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.185
+- [serde_json]( https://github.com/serde-rs/json ) 1.0.105
 - [serde_repr]( https://github.com/dtolnay/serde-repr ) 0.1.15
 - [syn]( https://github.com/dtolnay/syn ) 1.0.109
-- [syn]( https://github.com/dtolnay/syn ) 2.0.26
+- [syn]( https://github.com/dtolnay/syn ) 2.0.29
 - [thiserror]( https://github.com/dtolnay/thiserror ) 1.0.43
 - [thiserror-impl]( https://github.com/dtolnay/thiserror ) 1.0.43
 - [unicode-ident]( https://github.com/dtolnay/unicode-ident ) 1.0.11
@@ -6617,7 +6617,7 @@ SOFTWARE.
 
 #### Used by
 
-- [image]( https://github.com/image-rs/image ) 0.24.6
+- [image]( https://github.com/image-rs/image ) 0.24.7
 
 #### License
 
