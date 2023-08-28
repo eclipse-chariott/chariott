@@ -64,9 +64,9 @@ parking_lot = "0.12.1"
 prost = "0.11"
 prost-types = "0.11"
 regex = "1.9"
-serde = "1.0.185"
+serde = "1.0.188"
 serde_json = "1.0.105"
-tokio = { version = "1.29", features = ["macros"] }
+tokio = { version = "1.32", features = ["macros"] }
 tokio-util = "0.7"
 tokio-stream = { version = "0.1", features = ["net"] }
 tonic = "0.9"
@@ -74,7 +74,7 @@ tonic-build = "0.9"
 tracing = { version = "0.1" }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 uuid = { version = "1.2.1", features = ["v4"] }
-url = "2.2"
+url = "2.4"
 test-case = "2.2.2"
 
 [build-dependencies]
