@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1692732745210,
+  "lastUpdate": 1693245107910,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -4338,6 +4338,84 @@ window.BENCHMARK_DATA = {
             "value": 6623,
             "unit": "Bytes",
             "range": "p95=6811"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2008",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "41898282+github-actions[bot]@users.noreply.github.com",
+            "name": "github-actions[bot]",
+            "username": "github-actions[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "01bba85097f8efabd1f7ea2ed5275da54598d3a5",
+          "message": "New notice file (#186)\n\nCo-authored-by: Automated Notice Generation Pipeline <chariott-bot@eclipse.org>",
+          "timestamp": "2023-08-28T13:36:00-04:00",
+          "tree_id": "edf71383c5160016830ca393a0153b3445dd9596",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/01bba85097f8efabd1f7ea2ed5275da54598d3a5"
+        },
+        "date": 1693245106933,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 5,
+            "unit": "Millisecond",
+            "range": "p95=9"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 25,
+            "unit": "Percent",
+            "range": "p95=26"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6443,
+            "unit": "Bytes",
+            "range": "p95=6640"
           },
           {
             "name": "Definitely Lost Bytes",
