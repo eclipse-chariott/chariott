@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1693245107910,
+  "lastUpdate": 1693327227338,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -4416,6 +4416,84 @@ window.BENCHMARK_DATA = {
             "value": 6443,
             "unit": "Bytes",
             "range": "p95=6640"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2008",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f62b6e6b1e2e138836b78bd5ab3203dfe79fdf49",
+          "message": "Add devskim to chariott (#187)",
+          "timestamp": "2023-08-29T12:24:23-04:00",
+          "tree_id": "437f01b8db6b81c1ed27a351d1012e6794ee7889",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/f62b6e6b1e2e138836b78bd5ab3203dfe79fdf49"
+        },
+        "date": 1693327226648,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 5,
+            "unit": "Millisecond",
+            "range": "p95=9"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 25,
+            "unit": "Percent",
+            "range": "p95=26"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6967,
+            "unit": "Bytes",
+            "range": "p95=7082"
           },
           {
             "name": "Definitely Lost Bytes",
