@@ -30,7 +30,7 @@ async-trait = { workspace = true }
 chariott-common = { path = "../../../common/" }
 env_logger = "*"
 test-log = "0.2.10"
-tokio-test = "0.4.2"
+tokio-test = "0.4.3"
 
 [build-dependencies]
 tonic-build = { workspace = true }
