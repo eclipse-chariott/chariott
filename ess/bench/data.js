@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1693326627445,
+  "lastUpdate": 1693583744327,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -4079,6 +4079,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 278829842,
             "range": "± 593124",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1a806fca4f9d40ed64f6b57a36c506e16f5f27d6",
+          "message": "chore: Bump the dev-dependencies group with 7 updates (#188)\n\nBumps the dev-dependencies group with 7 updates:\r\n\r\n| Package | From | To |\r\n| --- | --- | --- |\r\n| [tokio](https://github.com/tokio-rs/tokio) | `1.29.1` | `1.32.0` |\r\n| [url](https://github.com/servo/rust-url) | `2.4.0` | `2.4.1` |\r\n| [regex](https://github.com/rust-lang/regex) | `1.9.3` | `1.9.4` |\r\n| [serde](https://github.com/serde-rs/serde) | `1.0.185` | `1.0.188` |\r\n| [base64](https://github.com/marshallpierce/rust-base64) | `0.21.2` | `0.21.3` |\r\n| [reqwest](https://github.com/seanmonstar/reqwest) | `0.11.19` | `0.11.20` |\r\n| [tokio-test](https://github.com/tokio-rs/tokio) | `0.4.2` | `0.4.3` |\r\n\r\n\r\nUpdates `tokio` from 1.29.1 to 1.32.0\r\n- [Release notes](https://github.com/tokio-rs/tokio/releases)\r\n- [Commits](https://github.com/tokio-rs/tokio/compare/tokio-1.29.1...tokio-1.32.0)\r\n\r\nUpdates `url` from 2.4.0 to 2.4.1\r\n- [Release notes](https://github.com/servo/rust-url/releases)\r\n- [Commits](https://github.com/servo/rust-url/compare/v2.4.0...v2.4.1)\r\n\r\nUpdates `regex` from 1.9.3 to 1.9.4\r\n- [Release notes](https://github.com/rust-lang/regex/releases)\r\n- [Changelog](https://github.com/rust-lang/regex/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/rust-lang/regex/compare/1.9.3...1.9.4)\r\n\r\nUpdates `serde` from 1.0.185 to 1.0.188\r\n- [Release notes](https://github.com/serde-rs/serde/releases)\r\n- [Commits](https://github.com/serde-rs/serde/compare/v1.0.185...v1.0.188)\r\n\r\nUpdates `base64` from 0.21.2 to 0.21.3\r\n- [Changelog](https://github.com/marshallpierce/rust-base64/blob/master/RELEASE-NOTES.md)\r\n- [Commits](https://github.com/marshallpierce/rust-base64/compare/v0.21.2...v0.21.3)\r\n\r\nUpdates `reqwest` from 0.11.19 to 0.11.20\r\n- [Release notes](https://github.com/seanmonstar/reqwest/releases)\r\n- [Changelog](https://github.com/seanmonstar/reqwest/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/seanmonstar/reqwest/compare/v0.11.19...v0.11.20)\r\n\r\nUpdates `tokio-test` from 0.4.2 to 0.4.3\r\n- [Release notes](https://github.com/tokio-rs/tokio/releases)\r\n- [Commits](https://github.com/tokio-rs/tokio/compare/tokio-test-0.4.2...tokio-test-0.4.3)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: tokio\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: url\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: regex\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: base64\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: reqwest\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tokio-test\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-09-01T11:48:31-04:00",
+          "tree_id": "ced96f1849b20828afe99c7cb3088361f19a19eb",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/1a806fca4f9d40ed64f6b57a36c506e16f5f27d6"
+        },
+        "date": 1693583743262,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 542187,
+            "range": "± 67515",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3348539,
+            "range": "± 143931",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 32065689,
+            "range": "± 1183991",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 5385435,
+            "range": "± 270212",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 33895425,
+            "range": "± 790466",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 323703198,
+            "range": "± 2157935",
             "unit": "ns/iter"
           }
         ]
