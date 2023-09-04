@@ -48,7 +48,7 @@ prost-types = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "time"] }
 tokio-util = { workspace = true }
 tonic = { workspace = true }
-tonic-reflection = "0.9"
+tonic-reflection = "0.10"
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 url = { workspace = true }
