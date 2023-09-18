@@ -5,7 +5,7 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-bollard = "0.14"
+bollard = "0.15"
 chariott-common = { workspace = true }
 examples-common = { path = "../../common/" }
 futures = { workspace = true }
