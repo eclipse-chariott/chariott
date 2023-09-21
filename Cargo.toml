@@ -48,7 +48,7 @@ prost-types = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "time"] }
 tokio-util = { workspace = true }
 tonic = { workspace = true }
-tonic-reflection = "0.9"
+tonic-reflection = "0.10"
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 url = { workspace = true }
@@ -61,16 +61,16 @@ chariott-proto = { path = "./proto.rs/" }
 futures = { version = "0.3" }
 lazy_static = "1.4.0"
 parking_lot = "0.12.1"
-prost = "0.11"
-prost-types = "0.11"
+prost = "0.12"
+prost-types = "0.12"
 regex = "1.9"
 serde = "1.0.188"
-serde_json = "1.0.105"
+serde_json = "1.0.107"
 tokio = { version = "1.32", features = ["macros"] }
 tokio-util = "0.7"
 tokio-stream = { version = "0.1", features = ["net"] }
-tonic = "0.9"
-tonic-build = "0.9"
+tonic = "0.10"
+tonic-build = "0.10"
 tracing = { version = "0.1" }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 uuid = { version = "1.2.1", features = ["v4"] }
