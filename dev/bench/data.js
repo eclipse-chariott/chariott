@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1695317803807,
+  "lastUpdate": 1695319560832,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -4679,6 +4679,84 @@ window.BENCHMARK_DATA = {
           {
             "name": "Possibly Lost Blocks",
             "value": "6",
+            "unit": "blocks"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b74014ac05e0f484fa7f169a191c5e987e1bf380",
+          "message": "chore: Bump the dev-dependencies group with 7 updates (#193)\n\n* chore: Bump the dev-dependencies group with 7 updates\r\n\r\nBumps the dev-dependencies group with 7 updates:\r\n\r\n| Package | From | To |\r\n| --- | --- | --- |\r\n| [async-recursion](https://github.com/dcchut/async-recursion) | `1.0.4` | `1.0.5` |\r\n| [tonic-reflection](https://github.com/hyperium/tonic) | `0.9.2` | `0.10.0` |\r\n| [regex](https://github.com/rust-lang/regex) | `1.9.4` | `1.9.5` |\r\n| [serde_json](https://github.com/serde-rs/json) | `1.0.105` | `1.0.107` |\r\n| [base64](https://github.com/marshallpierce/rust-base64) | `0.21.3` | `0.21.4` |\r\n| [bollard](https://github.com/fussybeaver/bollard) | `0.14.0` | `0.15.0` |\r\n| [bytes](https://github.com/tokio-rs/bytes) | `1.4.0` | `1.5.0` |\r\n\r\n\r\nUpdates `async-recursion` from 1.0.4 to 1.0.5\r\n- [Release notes](https://github.com/dcchut/async-recursion/releases)\r\n- [Commits](https://github.com/dcchut/async-recursion/compare/v1.0.4...v1.0.5)\r\n\r\nUpdates `tonic-reflection` from 0.9.2 to 0.10.0\r\n- [Changelog](https://github.com/hyperium/tonic/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/hyperium/tonic/compare/v0.9.2...v0.10.0)\r\n\r\nUpdates `regex` from 1.9.4 to 1.9.5\r\n- [Release notes](https://github.com/rust-lang/regex/releases)\r\n- [Changelog](https://github.com/rust-lang/regex/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/rust-lang/regex/compare/1.9.4...1.9.5)\r\n\r\nUpdates `serde_json` from 1.0.105 to 1.0.107\r\n- [Release notes](https://github.com/serde-rs/json/releases)\r\n- [Commits](https://github.com/serde-rs/json/compare/v1.0.105...v1.0.107)\r\n\r\nUpdates `base64` from 0.21.3 to 0.21.4\r\n- [Changelog](https://github.com/marshallpierce/rust-base64/blob/master/RELEASE-NOTES.md)\r\n- [Commits](https://github.com/marshallpierce/rust-base64/compare/v0.21.3...v0.21.4)\r\n\r\nUpdates `bollard` from 0.14.0 to 0.15.0\r\n- [Release notes](https://github.com/fussybeaver/bollard/releases)\r\n- [Commits](https://github.com/fussybeaver/bollard/compare/v0.14.0...v0.15.0)\r\n\r\nUpdates `bytes` from 1.4.0 to 1.5.0\r\n- [Release notes](https://github.com/tokio-rs/bytes/releases)\r\n- [Changelog](https://github.com/tokio-rs/bytes/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/tokio-rs/bytes/compare/v1.4.0...v1.5.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: async-recursion\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tonic-reflection\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: regex\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde_json\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: base64\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: bollard\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: bytes\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\n* Update prost and tonic versions\r\n\r\n---------\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\r\nCo-authored-by: Devin Kelley <105753233+devkelley@users.noreply.github.com>",
+          "timestamp": "2023-09-21T10:29:45-07:00",
+          "tree_id": "5112864bdd5bca65322fe53b4cd9bf652ea1e0ad",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/b74014ac05e0f484fa7f169a191c5e987e1bf380"
+        },
+        "date": 1695319559665,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 8,
+            "unit": "Millisecond",
+            "range": "p95=15"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 37,
+            "unit": "Percent",
+            "range": "p95=40"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 7065,
+            "unit": "Bytes",
+            "range": "p95=7349"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1960",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "7",
             "unit": "blocks"
           }
         ]
