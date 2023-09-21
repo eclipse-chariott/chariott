@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1693583744327,
+  "lastUpdate": 1695316781055,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -4139,6 +4139,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 323703198,
             "range": "± 2157935",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "12a75699988db62ac7d416dad5460939cfad4aa6",
+          "message": "Update to v2 of the mobilenet model, which seems more compatible in multiple environments (#194)\n\n* Update to v2 of the mobilenet model, which seems more compatible in multiple environments\r\n\r\n* Update readme\r\n\r\n* Wording updates\r\n\r\n* Spacing",
+          "timestamp": "2023-09-21T13:12:56-04:00",
+          "tree_id": "b34ee943fa84100647c24ffa10bfb47515a520f7",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/12a75699988db62ac7d416dad5460939cfad4aa6"
+        },
+        "date": 1695316780448,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 437311,
+            "range": "± 16474",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2850964,
+            "range": "± 128147",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 27215178,
+            "range": "± 97838",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 4051280,
+            "range": "± 34312",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 28889120,
+            "range": "± 1244345",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 275157215,
+            "range": "± 1774376",
             "unit": "ns/iter"
           }
         ]
