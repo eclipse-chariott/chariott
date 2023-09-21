@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1693584485322,
+  "lastUpdate": 1695317803807,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -4572,6 +4572,84 @@ window.BENCHMARK_DATA = {
             "value": 6947,
             "unit": "Bytes",
             "range": "p95=7167"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1912",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "6",
+            "unit": "blocks"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "12a75699988db62ac7d416dad5460939cfad4aa6",
+          "message": "Update to v2 of the mobilenet model, which seems more compatible in multiple environments (#194)\n\n* Update to v2 of the mobilenet model, which seems more compatible in multiple environments\r\n\r\n* Update readme\r\n\r\n* Wording updates\r\n\r\n* Spacing",
+          "timestamp": "2023-09-21T13:12:56-04:00",
+          "tree_id": "b34ee943fa84100647c24ffa10bfb47515a520f7",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/12a75699988db62ac7d416dad5460939cfad4aa6"
+        },
+        "date": 1695317802340,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 8,
+            "unit": "Millisecond",
+            "range": "p95=14"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 38,
+            "unit": "Percent",
+            "range": "p95=38"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6545,
+            "unit": "Bytes",
+            "range": "p95=6635"
           },
           {
             "name": "Definitely Lost Bytes",
