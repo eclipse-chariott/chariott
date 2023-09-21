@@ -25,7 +25,7 @@ pub struct DetectionLogic {
 impl DetectionLogic {
     pub fn new() -> Self {
         let mut graph = Graph::new();
-        let proto = include_bytes!("../models/ssd_mobilenet_v1_coco.pb");
+        let proto = include_bytes!("../models/ssd_mobilenet_v2_coco.pb");
 
         graph.import_graph_def(proto, &ImportGraphDefOptions::new()).unwrap();
 
