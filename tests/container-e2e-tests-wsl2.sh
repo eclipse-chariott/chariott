@@ -41,7 +41,7 @@ docker run --init --rm --name chariott --detach --publish 4243:4243 "chariott:$T
 
 # build kv-app docker container
 docker build --tag "kv-app:$TAG" --file "$DOCKERFILE_CONTEXT/examples/applications/Dockerfile.kv-app.ci" --build-arg APP_NAME=kv-app "$DOCKERFILE_CONTEXT"
-docker run --init --rm --name kv-app --detach --publish 50064:50064 --env ANNOUNCE_URL=http://host.docker.internal:50064 --env CHARIOTT_URL=http://host.docker.internal:4243 "kv-app:$TAG"
+docker run --init --rm --name kv-app --detach --publish 50064:50064 --env ANNOUNCE_URL=http://host.docker.internal:50064 --env CHARIOTT_URL=http://host.docker.internal:4243 "kv-app:$TAG" # DevSkim: ignore DS137138
 
 # run the end to end tests
 cargo test --test "*e2e"
