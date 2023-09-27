@@ -290,7 +290,6 @@ impl<T: ChariottCommunication> Chariott for T {
                     .map(|v| {
                         Value::try_from(v).map_err(|_| Error::new("Could not parse read value."))
                     })
-                    // DevSkim: ignore DS176209 TODO: replace with common::OptionExt after #13
                     .map_or(Ok(None), |r| r.map(Some)),
                 None => Ok(None),
             })
