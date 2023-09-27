@@ -28,7 +28,7 @@ use tracing_subscriber::EnvFilter;
 mod hello_world_impl;
 
 /// URL for the service registry
-const SERVICE_REGISTRY_URL: &str = "http://0.0.0.0:50000";
+const SERVICE_REGISTRY_URL: &str = "http://0.0.0.0:50000"; // DevSkim: ignore DS137138
 /// Endpoint for the hello world service, which is also a provider
 const HELLO_WORLD_ENDPOINT: &str = "0.0.0.0:50064";
 /// communication kind for this service

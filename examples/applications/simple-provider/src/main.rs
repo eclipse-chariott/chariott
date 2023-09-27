@@ -135,9 +135,9 @@ chariott::provider::main!(wain);
 
 async fn wain() -> Result<(), Error> {
     // Intitialize addresses for provider and chariott communication.
-    let chariott_url = "http://0.0.0.0:4243".to_string();
+    let chariott_url = "http://0.0.0.0:4243".to_string(); // DevSkim: ignore DS137138
     let base_provider_address = "0.0.0.0:50064".to_string();
-    let provider_url_str = format!("http://{}", base_provider_address.clone());
+    let provider_url_str = format!("http://{}", base_provider_address.clone()); // DevSkim: ignore DS137138
     let socket_address: SocketAddr = base_provider_address
         .clone()
         .parse()

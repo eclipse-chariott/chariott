@@ -179,7 +179,7 @@ mod tests {
     fn when_empty_does_not_resolve() {
         // arrange
         let subject =
-            IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new());
+            IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new()); // DevSkim: ignore DS162092
 
         // act + assert
         assert!(subject.resolve(&IntentConfigurationBuilder::new().build()).is_none());
@@ -409,7 +409,7 @@ mod tests {
     }
 
     impl Setup {
-        const STREAMING_URL: &str = "https://localhost:4243";
+        const STREAMING_URL: &str = "https://localhost:4243"; // DevSkim: ignore DS162092
 
         fn new() -> Self {
             let intent = IntentConfigurationBuilder::new().build();
@@ -440,7 +440,7 @@ mod tests {
 
         fn combine(setups: impl IntoIterator<Item = Setup>) -> IntentBroker {
             let broker =
-                IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new());
+                IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new()); // DevSkim: ignore DS162092
 
             let services_by_intent = setups.into_iter().fold(HashMap::new(), |mut acc, s| {
                 acc.entry(s.intent.clone()).or_insert_with(Vec::new).push(s.service);

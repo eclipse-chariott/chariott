@@ -25,7 +25,7 @@ async fn wain() -> Result<(), Error> {
         "sdv.detection",
         [Intent::Inspect, Intent::Invoke],
         "LOCAL_DETECTION_URL",
-        "http://0.0.0.0:50061",
+        "http://0.0.0.0:50061", // DevSkim: ignore DS137138
         ExecutionLocality::Local,
     )
     .await?;

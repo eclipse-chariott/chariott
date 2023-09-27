@@ -26,7 +26,7 @@ async fn wain() -> Result<(), Error> {
         "sdv.invoke.controller",
         [Intent::Discover, Intent::Invoke],
         "MASSAGE_URL",
-        "http://0.0.0.0:50064",
+        "http://0.0.0.0:50064", // DevSkim: ignore DS137138
         ExecutionLocality::Local,
     )
     .await?;

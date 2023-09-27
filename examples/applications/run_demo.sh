@@ -60,7 +60,7 @@ cargo build --workspace
 
 sleep 2
 
-./examples/applications/dog-mode-ui/mock_provider_dog_mode_demo.sh | ANNOUNCE_URL=http://localhost:50051 ./target/debug/mock-vas > target/logs/mock_vas.txt 2>&1 &
+./examples/applications/dog-mode-ui/mock_provider_dog_mode_demo.sh | ANNOUNCE_URL=http://localhost:50051 ./target/debug/mock-vas > target/logs/mock_vas.txt 2>&1 & 
 MOCK_VAS_PID=$!
 ANNOUNCE_URL=http://localhost:50064 ./target/debug/kv-app > target/logs/kv_app.txt 2>&1 &
 SIMULATED_CAMERA_APP_IMAGES_DIRECTORY=./examples/applications/simulated-camera/images ANNOUNCE_URL=http://localhost:50066 ./target/debug/simulated-camera-app > target/logs/simulated_camera_app.txt 2>&1 &

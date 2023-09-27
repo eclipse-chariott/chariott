@@ -222,7 +222,7 @@ mod registry_impl_test {
             namespace: String::from("sdv.test"),
             name: String::from("test_service"),
             version: String::from("1.0.0.0"),
-            uri: String::from("localhost:1000"),
+            uri: String::from("localhost:1000"), // DevSkim: ignore DS162092
             communication_kind: String::from("grpc+proto"),
             communication_reference: String::from("sdv.test.test_service.v1.proto"),
         };
@@ -244,7 +244,7 @@ mod registry_impl_test {
         );
 
         // Test adding a registration with same identifier fails
-        service1.uri = String::from("localhost:1001");
+        service1.uri = String::from("localhost:1001"); // DevSkim: ignore DS162092
         let existing_service_request =
             tonic::Request::new(RegisterRequest { service: Some(service1.clone()) });
         let existing_service_result = registry_impl.register(existing_service_request).await;
@@ -264,7 +264,7 @@ mod registry_impl_test {
             namespace: String::from("sdv.test"),
             name: String::from("test_service"),
             version: String::from("1.0.0.0"),
-            uri: String::from("localhost:1000"),
+            uri: String::from("localhost:1000"), // DevSkim: ignore DS162092
             communication_kind: String::from("grpc+proto"),
             communication_reference: String::from("sdv.test.test_service.v1.proto"),
         };
@@ -313,7 +313,7 @@ mod registry_impl_test {
             namespace: String::from("sdv.test"),
             name: String::from("test_service"),
             version: String::from("1.0.0.0"),
-            uri: String::from("localhost:1000"),
+            uri: String::from("localhost:1000"), // DevSkim: ignore DS162092
             communication_kind: String::from("grpc+proto"),
             communication_reference: String::from("sdv.test.test_service.v1.proto"),
         };
@@ -372,7 +372,7 @@ mod registry_impl_test {
             namespace: String::from("sdv.test"),
             name: String::from("test_service"),
             version: String::from("1.0.0.0"),
-            uri: String::from("localhost:1000"),
+            uri: String::from("localhost:1000"), // DevSkim: ignore DS162092
             communication_kind: String::from("grpc+proto"),
             communication_reference: String::from("sdv.test.test_service.v1.proto"),
         };
@@ -380,7 +380,7 @@ mod registry_impl_test {
             namespace: String::from("sdv.test"),
             name: String::from("test_service"),
             version: String::from("2.0.0.0"),
-            uri: String::from("localhost:2000"),
+            uri: String::from("localhost:2000"), // DevSkim: ignore DS162092
             communication_kind: String::from("grpc+proto"),
             communication_reference: String::from("sdv.test.test_service.v2.proto"),
         };

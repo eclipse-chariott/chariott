@@ -348,7 +348,7 @@ pub(crate) mod tests {
     #[tokio::test]
     async fn system_discover_binding_succeeds() {
         // arrange
-        let url: Url = "http://localhost:4243".parse().unwrap();
+        let url: Url = "http://localhost:4243".parse().unwrap(); // DevSkim: ignore DS162092
 
         // act
         let result = RuntimeBinding::<GrpcProvider>::SystemDiscover(url.clone())

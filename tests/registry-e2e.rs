@@ -25,7 +25,7 @@ async fn expired_registrations_are_pruned_after_ttl() -> Result<(), anyhow::Erro
     let builder = RegistrationBuilder::new(
         "e2e",
         "1.0.0",
-        "http://localhost/".parse().unwrap(),
+        "http://localhost/".parse().unwrap(), // DevSkim: ignore DS162092
         &namespace,
         [Intent::Inspect],
         ExecutionLocality::Local,
@@ -60,7 +60,7 @@ async fn when_provider_registers_notifies_registry_observers() -> anyhow::Result
     let builder = RegistrationBuilder::new(
         "registration.provider.e2e",
         "1.0.0",
-        "http://localhost:7090".parse().unwrap(), // arbitrary url, the provider will never be invoked
+        "http://localhost:7090".parse().unwrap(), // // DevSkim: ignore DS162092 arbitrary url, the provider will never be invoked
         &namespace,
         [Intent::Inspect],
         ExecutionLocality::Local,

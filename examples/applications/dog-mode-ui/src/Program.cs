@@ -26,7 +26,7 @@ builder.Services.AddSingleton(_ => new SocketsHttpHandler { EnableMultipleHttp2C
 
 builder.Services.AddGrpcClient<ChariottRuntime.ChariottService.ChariottServiceClient>((sp, options) =>
 {
-    options.Address = new Uri("http://localhost:4243/");
+    options.Address = new Uri("http://localhost:4243/"); // DevSkim: ignore DS162092
     options.ChannelOptionsActions.Add(options =>
     {
         options.HttpHandler = sp.GetRequiredService<SocketsHttpHandler>();

@@ -21,7 +21,7 @@ use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
 
 /// URL for the service registry
-const SERVICE_REGISTRY_URL: &str = "http://0.0.0.0:50000";
+const SERVICE_REGISTRY_URL: &str = "http://0.0.0.0:50000"; // DevSkim: ignore DS137138
 /// Expected provider communication kind. Validate against this to ensure we can communicate with the service that the service registry returns
 const EXPECTED_COMMUNICATION_KIND: &str = "grpc+proto";
 /// Expected provider communication reference. Validate against this to ensure we can communicate with the service that the service registry returns

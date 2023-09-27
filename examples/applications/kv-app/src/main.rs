@@ -27,7 +27,7 @@ async fn wain() -> Result<(), Error> {
         "sdv.kvs",
         [Intent::Read, Intent::Write, Intent::Subscribe, Intent::Discover],
         "KVS_URL",
-        "http://0.0.0.0:50064",
+        "http://0.0.0.0:50064", // DevSkim: ignore DS137138
         ExecutionLocality::Local,
     )
     .await?;

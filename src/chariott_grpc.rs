@@ -432,7 +432,7 @@ mod tests {
 
     fn setup() -> ChariottServer<IntentBroker> {
         let broker =
-            IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new());
+            IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new()); // DevSkim: ignore DS162092
         ChariottServer::new(Registry::new(broker.clone(), Default::default()), broker)
     }
 

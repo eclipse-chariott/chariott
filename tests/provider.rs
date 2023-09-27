@@ -44,7 +44,7 @@ impl Provider {
                 .serve_with_incoming(listener),
         );
 
-        format!("http://localhost:{port}").parse().unwrap()
+        format!("http://localhost:{port}").parse().unwrap() // DevSkim: ignore DS162092
     }
 }
 
