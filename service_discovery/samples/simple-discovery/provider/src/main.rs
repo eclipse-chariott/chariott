@@ -50,7 +50,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     collector.init();
 
     // Intitialize addresses for provider communication.
-    let provider_url_str = format!("http://{HELLO_WORLD_ENDPOINT}");
+    let provider_url_str = format!("http://{HELLO_WORLD_ENDPOINT}"); // DevSkim: ignore DS137138
     let socket_address: SocketAddr = HELLO_WORLD_ENDPOINT
         .parse()
         .map_err(|e| Error::from_error("error getting SocketAddr", Box::new(e)))?;

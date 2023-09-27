@@ -98,7 +98,7 @@ app.MapGet("/events", async context =>
             }
         }
     }
-    catch (OperationCanceledException) // TODO investigate why this is needed;
+    catch (OperationCanceledException) // DevSkim: ignore DS176209 TODO investigate why this is needed;
     {                                  // seems to "sometimes" crash the process
         // ignore                      // if browser is closed (request aborted).
     }

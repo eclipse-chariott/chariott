@@ -481,7 +481,7 @@ pub(crate) mod tests {
         let setup = Setup::new();
         let mut registry = setup.clone().build();
         let service = setup.service.clone().build();
-        let updated_service = setup.service.url("http://updated_url").build();
+        let updated_service = setup.service.url("http://updated_url").build(); // DevSkim: ignore DS137138
 
         // act
         registry.upsert(updated_service.clone(), setup.intents.clone(), now()).unwrap();
@@ -531,7 +531,7 @@ pub(crate) mod tests {
         // arrange
         let service_a = ServiceConfigurationBuilder::with_nonce("A");
         let service_b = ServiceConfigurationBuilder::with_nonce("B");
-        let service_a_reregistration = service_a.clone().url("http://service-a-new").build();
+        let service_a_reregistration = service_a.clone().url("http://service-a-new").build(); // DevSkim: ignore DS137138
 
         let intent_1 = IntentConfigurationBuilder::with_nonce("1").build();
         let intent_2 = IntentConfigurationBuilder::with_nonce("2").build();
@@ -755,12 +755,12 @@ pub(crate) mod tests {
     fn test_create_new_service_configuration() {
         let service = ServiceConfiguration::new(
             ServiceId::new("name", "version"),
-            "http://foo".parse().unwrap(),
+            "http://foo".parse().unwrap(), // DevSkim: ignore DS137138
             ExecutionLocality::Local,
         );
         assert_eq!(service.id.name(), "name".into());
         assert_eq!(service.id.version(), "version".into());
-        assert_eq!(service.url, "http://foo".parse().unwrap());
+        assert_eq!(service.url, "http://foo".parse().unwrap()); // DevSkim: ignore DS137138
         assert_eq!(service.locality, ExecutionLocality::Local);
     }
 
@@ -1085,7 +1085,7 @@ pub(crate) mod tests {
         pub fn with_nonce(nonce: impl std::fmt::Display) -> Self {
             Self(ServiceConfiguration::new(
                 ServiceId::new(format!("mock-service-{nonce}"), "0.1.0"),
-                format!("http://service-{nonce}").parse().unwrap(),
+                format!("http://service-{nonce}").parse().unwrap(), // DevSkim: ignore DS137138
                 ExecutionLocality::Cloud,
             ))
         }

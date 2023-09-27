@@ -441,7 +441,7 @@ mod tests {
             service: Some(IntentServiceRegistration {
                 name: "test".to_string(),
                 version: "1.0".to_string(),
-                url: "http://test.com".to_string(),
+                url: "http://test.com".to_string(), // DevSkim: ignore DS137138
                 locality: ExecutionLocality::Local as i32,
             }),
         }
@@ -452,7 +452,7 @@ mod tests {
             service: Some(IntentServiceRegistration {
                 name: "test".to_string(),
                 version: "1.0".to_string(),
-                url: "http://test.com".to_string(),
+                url: "http://test.com".to_string(), // DevSkim: ignore DS137138
                 locality: ExecutionLocality::Local as i32,
             }),
             intents: vec![
@@ -473,7 +473,7 @@ mod tests {
             service: Some(IntentServiceRegistration {
                 name: "test".to_string(),
                 version: "1.0".to_string(),
-                url: "http://test.com".to_string(),
+                url: "http://test.com".to_string(), // DevSkim: ignore DS137138
                 locality: ExecutionLocality::Local as i32,
             }),
             intents: vec![

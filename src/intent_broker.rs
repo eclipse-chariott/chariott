@@ -257,7 +257,7 @@ mod tests {
                 intent: intent.clone(),
                 service: ServiceConfigurationBuilder::new()
                     .name(name)
-                    .url(&format!("http://{}", name))
+                    .url(&format!("http://{}", name)) // DevSkim: ignore DS137138
                     .execution_locality(locality),
             }),
         );
@@ -353,7 +353,7 @@ mod tests {
     #[test]
     fn when_refreshing_does_not_depend_on_previous_state() {
         // arrange
-        const SERVICE_URL: &str = "http://service_b";
+        const SERVICE_URL: &str = "http://service_b"; // DevSkim: ignore DS137138
         let setup = Setup::new();
         let service_b = setup.service.clone().url(SERVICE_URL).build();
         let subject = setup.clone().build();
