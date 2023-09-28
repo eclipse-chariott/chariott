@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1695907041900,
+  "lastUpdate": 1695923899425,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -4319,6 +4319,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 321470585,
             "range": "± 6423905",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "56423e8bbd6040084edf823ebefb5a56eb482847",
+          "message": "Remove v1 of the mobile net to resolve storage issues in workflows (#197)",
+          "timestamp": "2023-09-28T13:50:07-04:00",
+          "tree_id": "c2107bbd75a8ae5c2adf7f22c70fd8aa000a5a26",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/56423e8bbd6040084edf823ebefb5a56eb482847"
+        },
+        "date": 1695923897979,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 565047,
+            "range": "± 61135",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3413666,
+            "range": "± 157255",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 32077024,
+            "range": "± 3016690",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 5276849,
+            "range": "± 257718",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 36054180,
+            "range": "± 2071555",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 326661147,
+            "range": "± 14904452",
             "unit": "ns/iter"
           }
         ]
