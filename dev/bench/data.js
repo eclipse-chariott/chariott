@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1695907721107,
+  "lastUpdate": 1695924746911,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -4835,6 +4835,84 @@ window.BENCHMARK_DATA = {
           {
             "name": "Possibly Lost Blocks",
             "value": "7",
+            "unit": "blocks"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "56423e8bbd6040084edf823ebefb5a56eb482847",
+          "message": "Remove v1 of the mobile net to resolve storage issues in workflows (#197)",
+          "timestamp": "2023-09-28T13:50:07-04:00",
+          "tree_id": "c2107bbd75a8ae5c2adf7f22c70fd8aa000a5a26",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/56423e8bbd6040084edf823ebefb5a56eb482847"
+        },
+        "date": 1695924746119,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 6,
+            "unit": "Millisecond",
+            "range": "p95=11"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 32,
+            "unit": "Percent",
+            "range": "p95=33"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6718,
+            "unit": "Bytes",
+            "range": "p95=7180"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1912",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "6",
             "unit": "blocks"
           }
         ]
