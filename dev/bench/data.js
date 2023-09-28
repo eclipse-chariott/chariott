@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1695319560832,
+  "lastUpdate": 1695907721107,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -4728,6 +4728,84 @@ window.BENCHMARK_DATA = {
             "value": 7065,
             "unit": "Bytes",
             "range": "p95=7349"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1960",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "7",
+            "unit": "blocks"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "af31e89e4985b33e3ae7682c1f83132ea0578fde",
+          "message": "Address devskim warnings (#196)\n\n* Address devskim warnings\r\n\r\n* TODO suppression must be on the same line as todo comment\r\n\r\n* Address warnings in scripts",
+          "timestamp": "2023-09-28T09:09:14-04:00",
+          "tree_id": "c537d73eaacea1207bddb2c2fe84c5dfec451e8a",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/af31e89e4985b33e3ae7682c1f83132ea0578fde"
+        },
+        "date": 1695907720401,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 5,
+            "unit": "Millisecond",
+            "range": "p95=10"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 28,
+            "unit": "Percent",
+            "range": "p95=28"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6742,
+            "unit": "Bytes",
+            "range": "p95=6951"
           },
           {
             "name": "Definitely Lost Bytes",
