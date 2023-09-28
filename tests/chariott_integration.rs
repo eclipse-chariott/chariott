@@ -164,7 +164,7 @@ async fn setup(provider: Provider) -> Subject {
 
 async fn setup_multiple(providers: impl IntoIterator<Item = ProviderSetup>) -> Subject {
     let namespace = "sdv.integration".to_owned();
-    let broker = IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new());
+    let broker = IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new()); // DevSkim: ignore DS162092
     let mut registry = Registry::new(broker.clone(), Default::default());
 
     for ProviderSetup { provider, port, name, locality } in providers {

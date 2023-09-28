@@ -369,7 +369,8 @@ where
     ClientId: Eq + Hash,
     EventId: Eq + Hash,
 {
-    #[allow(clippy::too_many_arguments)] // TODO address too many arguments
+    // DevSkim: ignore DS176209 TODO address too many arguments
+    #[allow(clippy::too_many_arguments)]
     async fn serve_with_handlers(
         mut self,
         f: impl Fn(Event, u64) -> ClientEvent,
@@ -595,7 +596,7 @@ mod tests {
         // act
         sut.publish(&EVENT_ID, Event(EVENT_ID, SeqNum(0), DATA1));
         sut.publish(&EVENT_ID, Event(EVENT_ID, SeqNum(0), DATA2));
-        // TODO investigate how to avoid sleeping here
+        // DevSkim: ignore DS176209 TODO investigate how to avoid sleeping here
         // see also: https://github.com/tokio-rs/tokio/issues/2443
         std::thread::sleep(Duration::from_secs_f64(0.1));
         // assert

@@ -25,7 +25,7 @@ async fn wain() -> Result<(), Error> {
         "sdv.detection",
         [Intent::Inspect, Intent::Invoke],
         "CLOUD_DETECTION_URL",
-        "http://0.0.0.0:50063",
+        "http://0.0.0.0:50063", // DevSkim: ignore DS137138
         ExecutionLocality::Cloud,
     )
     .await?;

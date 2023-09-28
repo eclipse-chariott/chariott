@@ -432,7 +432,7 @@ mod tests {
 
     fn setup() -> ChariottServer<IntentBroker> {
         let broker =
-            IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new());
+            IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new()); // DevSkim: ignore DS162092
         ChariottServer::new(Registry::new(broker.clone(), Default::default()), broker)
     }
 
@@ -441,7 +441,7 @@ mod tests {
             service: Some(IntentServiceRegistration {
                 name: "test".to_string(),
                 version: "1.0".to_string(),
-                url: "http://test.com".to_string(),
+                url: "http://test.com".to_string(), // DevSkim: ignore DS137138
                 locality: ExecutionLocality::Local as i32,
             }),
         }
@@ -452,7 +452,7 @@ mod tests {
             service: Some(IntentServiceRegistration {
                 name: "test".to_string(),
                 version: "1.0".to_string(),
-                url: "http://test.com".to_string(),
+                url: "http://test.com".to_string(), // DevSkim: ignore DS137138
                 locality: ExecutionLocality::Local as i32,
             }),
             intents: vec![
@@ -473,7 +473,7 @@ mod tests {
             service: Some(IntentServiceRegistration {
                 name: "test".to_string(),
                 version: "1.0".to_string(),
-                url: "http://test.com".to_string(),
+                url: "http://test.com".to_string(), // DevSkim: ignore DS137138
                 locality: ExecutionLocality::Local as i32,
             }),
             intents: vec![

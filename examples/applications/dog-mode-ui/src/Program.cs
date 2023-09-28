@@ -26,7 +26,7 @@ builder.Services.AddSingleton(_ => new SocketsHttpHandler { EnableMultipleHttp2C
 
 builder.Services.AddGrpcClient<ChariottRuntime.ChariottService.ChariottServiceClient>((sp, options) =>
 {
-    options.Address = new Uri("http://localhost:4243/");
+    options.Address = new Uri("http://localhost:4243/"); // DevSkim: ignore DS162092
     options.ChannelOptionsActions.Add(options =>
     {
         options.HttpHandler = sp.GetRequiredService<SocketsHttpHandler>();
@@ -98,7 +98,7 @@ app.MapGet("/events", async context =>
             }
         }
     }
-    catch (OperationCanceledException) // TODO investigate why this is needed;
+    catch (OperationCanceledException) // DevSkim: ignore DS176209 TODO investigate why this is needed;
     {                                  // seems to "sometimes" crash the process
         // ignore                      // if browser is closed (request aborted).
     }

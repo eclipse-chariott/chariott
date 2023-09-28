@@ -21,7 +21,7 @@ async fn wain() -> Result<(), Error> {
         "sdv.vdt",
         [Intent::Discover, Intent::Invoke, Intent::Inspect, Intent::Subscribe, Intent::Read],
         "VAS_URL",
-        "http://0.0.0.0:50051",
+        "http://0.0.0.0:50051", // DevSkim: ignore DS137138
         ExecutionLocality::Local,
     )
     .await?;

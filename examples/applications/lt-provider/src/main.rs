@@ -43,7 +43,7 @@ async fn wain() -> Result<(), Error> {
         "lt.provider",
         [Intent::Invoke],
         "LT_PROVIDER_URL",
-        "http://0.0.0.0:50051",
+        "http://0.0.0.0:50051", // DevSkim: ignore DS137138
         ExecutionLocality::Local,
     )
     .await?;
