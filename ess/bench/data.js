@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1695317863718,
+  "lastUpdate": 1695907041900,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -4259,6 +4259,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 332883971,
             "range": "± 8917324",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "af31e89e4985b33e3ae7682c1f83132ea0578fde",
+          "message": "Address devskim warnings (#196)\n\n* Address devskim warnings\r\n\r\n* TODO suppression must be on the same line as todo comment\r\n\r\n* Address warnings in scripts",
+          "timestamp": "2023-09-28T09:09:14-04:00",
+          "tree_id": "c537d73eaacea1207bddb2c2fe84c5dfec451e8a",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/af31e89e4985b33e3ae7682c1f83132ea0578fde"
+        },
+        "date": 1695907040635,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 527735,
+            "range": "± 43654",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3159081,
+            "range": "± 120213",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 31299318,
+            "range": "± 738630",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 5050028,
+            "range": "± 150682",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 32476380,
+            "range": "± 1602919",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 321470585,
+            "range": "± 6423905",
             "unit": "ns/iter"
           }
         ]
