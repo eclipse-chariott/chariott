@@ -166,8 +166,8 @@ impl<T: Observer> Registry<T> {
         change_series.observe(&self.observer, self);
 
         self.known_services
-            .iter()
-            .map(|(_, ts)| *ts + ttl)
+            .values()
+            .map(|ts| *ts + ttl)
             .min()
             .map(|t| (Specific, t))
             .unwrap_or((Default, timestamp + ttl))

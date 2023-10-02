@@ -53,7 +53,7 @@ fn event_sub_system_bench(c: &mut Criterion) {
                 let (_, mut receiver_stream) = sut.read_events(client_id.clone());
                 {
                     let sender = sender.clone();
-                    _ = runtime.handle().spawn(async move {
+                    runtime.handle().spawn(async move {
                         let mut count: usize = 0;
                         while (receiver_stream.next().await).is_some() {
                             count += 1;
