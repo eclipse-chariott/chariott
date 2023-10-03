@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1695924746911,
+  "lastUpdate": 1696351232601,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -4884,6 +4884,84 @@ window.BENCHMARK_DATA = {
             "value": 6718,
             "unit": "Bytes",
             "range": "p95=7180"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1912",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "6",
+            "unit": "blocks"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105753233+devkelley@users.noreply.github.com",
+            "name": "devkelley",
+            "username": "devkelley"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c4d3705235fb9aadf82e6a52fd1d6300be2e4ce0",
+          "message": "[fix]: Add GIT_LFS_SKIP_SMUDGE var to failing workflows (#203)",
+          "timestamp": "2023-10-03T09:11:52-07:00",
+          "tree_id": "6bc01c5ff6c5d521596552c60434de74cff8564c",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/c4d3705235fb9aadf82e6a52fd1d6300be2e4ce0"
+        },
+        "date": 1696351231734,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 7,
+            "unit": "Millisecond",
+            "range": "p95=12"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 33,
+            "unit": "Percent",
+            "range": "p95=34"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6349,
+            "unit": "Bytes",
+            "range": "p95=6414"
           },
           {
             "name": "Definitely Lost Bytes",
