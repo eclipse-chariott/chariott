@@ -44,6 +44,8 @@ jobs:
         run: cargo bench --manifest-path ess/Cargo.toml --bench load_bench -- --output-format bencher | tee output.txt
 
       - name: Store benchmark result
+        env:
+          GIT_LFS_SKIP_SMUDGE: 1
         uses: benchmark-action/github-action-benchmark@v1
         if: ${{ github.event_name != 'workflow_dispatch' }}
         with:

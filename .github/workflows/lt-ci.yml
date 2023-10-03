@@ -161,6 +161,8 @@ jobs:
           find -type f -name "*.out" -exec cat {} \; | jq '.[]' | jq -s > lt-output/all.json
 
       - name: Store combined benchmark result
+        env:
+          GIT_LFS_SKIP_SMUDGE: 1
         uses: benchmark-action/github-action-benchmark@v1
         if: ${{ github.event_name != 'workflow_dispatch' }}
         with:
