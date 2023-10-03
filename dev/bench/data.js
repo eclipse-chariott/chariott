@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1696351232601,
+  "lastUpdate": 1696352278242,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -4962,6 +4962,84 @@ window.BENCHMARK_DATA = {
             "value": 6349,
             "unit": "Bytes",
             "range": "p95=6414"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1912",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "6",
+            "unit": "blocks"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "08e52b0cf01d3d4a1bade5a0c7c7181f5540d5b8",
+          "message": "Update rust toolchain to 1.70 (#199)\n\n* Update rust toolchain to latest stable version\r\n\r\n* Resolve new cargo clippy/ build warnings",
+          "timestamp": "2023-10-03T12:46:53-04:00",
+          "tree_id": "46d3d64adefc2092f18f89d9d0923d8d77dd932e",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/08e52b0cf01d3d4a1bade5a0c7c7181f5540d5b8"
+        },
+        "date": 1696352277502,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 5,
+            "unit": "Millisecond",
+            "range": "p95=10"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 27,
+            "unit": "Percent",
+            "range": "p95=28"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 8683,
+            "unit": "Bytes",
+            "range": "p95=8844"
           },
           {
             "name": "Definitely Lost Bytes",
