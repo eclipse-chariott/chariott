@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1696349946636,
+  "lastUpdate": 1696351933588,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -4439,6 +4439,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 275342118,
             "range": "± 1906121",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "08e52b0cf01d3d4a1bade5a0c7c7181f5540d5b8",
+          "message": "Update rust toolchain to 1.70 (#199)\n\n* Update rust toolchain to latest stable version\r\n\r\n* Resolve new cargo clippy/ build warnings",
+          "timestamp": "2023-10-03T12:46:53-04:00",
+          "tree_id": "46d3d64adefc2092f18f89d9d0923d8d77dd932e",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/08e52b0cf01d3d4a1bade5a0c7c7181f5540d5b8"
+        },
+        "date": 1696351932365,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 550537,
+            "range": "± 79975",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 3619409,
+            "range": "± 179844",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 35767188,
+            "range": "± 2152736",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 4818753,
+            "range": "± 336157",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 35423468,
+            "range": "± 2048493",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 346770650,
+            "range": "± 9754075",
             "unit": "ns/iter"
           }
         ]
