@@ -223,7 +223,7 @@ where
     {
         let client_by_id = self.client_by_id.read().unwrap();
         match client_by_id.get(client_id) {
-            Some(client) => client.subscriptions.iter().map(|(id, _)| id.clone()).collect(),
+            Some(client) => client.subscriptions.keys().cloned().collect(),
             None => vec![],
         }
     }

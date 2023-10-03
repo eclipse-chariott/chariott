@@ -110,7 +110,7 @@ async fn register_and_announce_provider(
     ttl_seconds: u64,
 ) -> Result<(), Error> {
     // Initiate registration and announce thread.
-    _ = tokio::task::spawn(async move {
+    tokio::task::spawn(async move {
         let mut client = None;
 
         // Loop that handles provider registration and announce heartbeat pattern.

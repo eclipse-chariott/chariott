@@ -38,7 +38,7 @@ impl Provider {
         socket.bind(SocketAddr::new(IpAddr::V4(Ipv4Addr::UNSPECIFIED), port)).unwrap();
         let listener = TcpListenerStream::new(socket.listen(2).unwrap());
 
-        _ = spawn(
+        spawn(
             Server::builder()
                 .add_service(ProviderServiceServer::new(self))
                 .serve_with_incoming(listener),

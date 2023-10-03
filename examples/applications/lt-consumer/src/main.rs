@@ -56,8 +56,7 @@ async fn wain() -> Result<(), Error> {
     let invoke_count: u64 = env(TARGET_INVOKE_COUNT_ENV).unwrap();
     let target_rate: u32 = env(TARGET_RATE_ENV).unwrap();
     let collect_docker_stats = env(COLLECT_DOCKER_STATS_ENV).unwrap_or(false);
-    let chunk_execution_duration =
-        Duration::from_millis(1_000 * CHUNK_SIZE as u64 / target_rate as u64);
+    let chunk_execution_duration = Duration::from_millis(1_000 * CHUNK_SIZE / target_rate as u64);
 
     let chariott = GrpcChariott::connect().await?;
     let latency_metric = Arc::new(Mutex::new(Summary::with_defaults()));
@@ -104,7 +103,7 @@ async fn wain() -> Result<(), Error> {
             let latency_metric = Arc::clone(&latency_metric);
             let invoke_fulfillments = Arc::clone(&invoke_fulfillments);
 
-            _ = tokio::task::spawn(async move {
+            tokio::task::spawn(async move {
                 // Measure the latency based on the sample rate.
                 let now = if c % SAMPLE_RATE == 0 { Some(Instant::now()) } else { None };
 

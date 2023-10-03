@@ -75,7 +75,7 @@ pub async fn register(
     // Potential race condition if we register before the server is up.
     // Since this is only an example, we do not ensure that the race does not
     // happen.
-    _ = tokio::task::spawn(registration.register());
+    tokio::task::spawn(registration.register());
 
     Ok((announce_url, socket_address))
 }
