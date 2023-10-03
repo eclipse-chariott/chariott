@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1695923899425,
+  "lastUpdate": 1696349946636,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -4379,6 +4379,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 326661147,
             "range": "± 14904452",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105753233+devkelley@users.noreply.github.com",
+            "name": "devkelley",
+            "username": "devkelley"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c4d3705235fb9aadf82e6a52fd1d6300be2e4ce0",
+          "message": "[fix]: Add GIT_LFS_SKIP_SMUDGE var to failing workflows (#203)",
+          "timestamp": "2023-10-03T09:11:52-07:00",
+          "tree_id": "6bc01c5ff6c5d521596552c60434de74cff8564c",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/c4d3705235fb9aadf82e6a52fd1d6300be2e4ce0"
+        },
+        "date": 1696349945266,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 436035,
+            "range": "± 14131",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2828582,
+            "range": "± 22689",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 27253646,
+            "range": "± 118396",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 4394781,
+            "range": "± 22657",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 28428965,
+            "range": "± 475343",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 275342118,
+            "range": "± 1906121",
             "unit": "ns/iter"
           }
         ]
