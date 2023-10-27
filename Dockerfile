@@ -2,8 +2,8 @@
 # Licensed under the MIT license.
 # SPDX-License-Identifier: MIT
 
-ARG RUST_VERSION=1.65
-FROM rust:${RUST_VERSION} AS builder
+ARG RUST_VERSION=1.70
+FROM docker.io/library/rust:${RUST_VERSION} AS builder
 
 # Dockerfile for building Eclipse Chariott runtime container
 #
