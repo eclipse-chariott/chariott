@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1696974367478,
+  "lastUpdate": 1698439995200,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -5147,6 +5147,84 @@ window.BENCHMARK_DATA = {
           {
             "name": "Possibly Lost Blocks",
             "value": "8",
+            "unit": "blocks"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d3ece6a08b3127e564a7a90e2254c24192f24312",
+          "message": "Use rust from public registry instead of local (#217)",
+          "timestamp": "2023-10-27T16:40:37-04:00",
+          "tree_id": "db6d887ddd382c0db384ccce0de89d27418bc613",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/d3ece6a08b3127e564a7a90e2254c24192f24312"
+        },
+        "date": 1698439994016,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 7,
+            "unit": "Millisecond",
+            "range": "p95=13"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 34,
+            "unit": "Percent",
+            "range": "p95=35"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6714,
+            "unit": "Bytes",
+            "range": "p95=7004"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1912",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "6",
             "unit": "blocks"
           }
         ]
