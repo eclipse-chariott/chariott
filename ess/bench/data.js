@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1696973890208,
+  "lastUpdate": 1698439463162,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -4559,6 +4559,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 304515102,
             "range": "± 4488729",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d3ece6a08b3127e564a7a90e2254c24192f24312",
+          "message": "Use rust from public registry instead of local (#217)",
+          "timestamp": "2023-10-27T16:40:37-04:00",
+          "tree_id": "db6d887ddd382c0db384ccce0de89d27418bc613",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/d3ece6a08b3127e564a7a90e2254c24192f24312"
+        },
+        "date": 1698439462476,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 433163,
+            "range": "± 21286",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 2676200,
+            "range": "± 18305",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 25736254,
+            "range": "± 342514",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 3947841,
+            "range": "± 46600",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 26751470,
+            "range": "± 197748",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 259032699,
+            "range": "± 1915296",
             "unit": "ns/iter"
           }
         ]
