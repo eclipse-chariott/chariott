@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1698439995200,
+  "lastUpdate": 1698678052994,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -5196,6 +5196,84 @@ window.BENCHMARK_DATA = {
             "value": 6714,
             "unit": "Bytes",
             "range": "p95=7004"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "1912",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "6",
+            "unit": "blocks"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "81474c771d8092ec7bb5fb7bd48c328a6dc56eba",
+          "message": "Fix typo in grpcurl commands in service discovery readme (#219)",
+          "timestamp": "2023-10-30T10:50:20-04:00",
+          "tree_id": "453c0c1e9598c83d636ead14f0d38ca34e4ab63d",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/81474c771d8092ec7bb5fb7bd48c328a6dc56eba"
+        },
+        "date": 1698678051623,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 7,
+            "unit": "Millisecond",
+            "range": "p95=12"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 33,
+            "unit": "Percent",
+            "range": "p95=34"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 6664,
+            "unit": "Bytes",
+            "range": "p95=6827"
           },
           {
             "name": "Definitely Lost Bytes",
