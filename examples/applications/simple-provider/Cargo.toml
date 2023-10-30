@@ -18,5 +18,5 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 url = { workspace = true }
 uuid = { workspace = true }
-serde = "1.0.188"
-serde_json = "1.0.107"
+serde = "1.0.190"
+serde_json = "1.0.108"
