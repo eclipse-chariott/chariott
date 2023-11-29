@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1698678052994,
+  "lastUpdate": 1701267727466,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -5303,6 +5303,84 @@ window.BENCHMARK_DATA = {
           {
             "name": "Possibly Lost Blocks",
             "value": "6",
+            "unit": "blocks"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a52c49d07cf8bd8aa317f93649966d10d033b017",
+          "message": "chore: Bump the dev-dependencies group with 21 updates (#232)\n\n* chore: Bump the dev-dependencies group with 21 updates\r\n\r\nBumps the dev-dependencies group with 21 updates:\r\n\r\n| Package | From | To |\r\n| --- | --- | --- |\r\n| [async-trait](https://github.com/dtolnay/async-trait) | `0.1.73` | `0.1.74` |\r\n| [prost](https://github.com/tokio-rs/prost) | `0.12.1` | `0.12.3` |\r\n| [prost-types](https://github.com/tokio-rs/prost) | `0.12.1` | `0.12.3` |\r\n| [tokio](https://github.com/tokio-rs/tokio) | `1.32.0` | `1.34.0` |\r\n| [tokio-util](https://github.com/tokio-rs/tokio) | `0.7.8` | `0.7.10` |\r\n| [tonic](https://github.com/hyperium/tonic) | `0.10.0` | `0.10.2` |\r\n| [tonic-reflection](https://github.com/hyperium/tonic) | `0.10.0` | `0.10.2` |\r\n| [tracing](https://github.com/tokio-rs/tracing) | `0.1.37` | `0.1.40` |\r\n| [tracing-subscriber](https://github.com/tokio-rs/tracing) | `0.3.17` | `0.3.18` |\r\n| [url](https://github.com/servo/rust-url) | `2.4.1` | `2.5.0` |\r\n| [futures](https://github.com/rust-lang/futures-rs) | `0.3.28` | `0.3.29` |\r\n| [uuid](https://github.com/uuid-rs/uuid) | `1.4.1` | `1.6.1` |\r\n| [tonic-build](https://github.com/hyperium/tonic) | `0.10.0` | `0.10.2` |\r\n| [regex](https://github.com/rust-lang/regex) | `1.9.5` | `1.10.2` |\r\n| [serde](https://github.com/serde-rs/serde) | `1.0.188` | `1.0.193` |\r\n| [serde_json](https://github.com/serde-rs/json) | `1.0.107` | `1.0.108` |\r\n| [tempfile](https://github.com/Stebalien/tempfile) | `3.8.0` | `3.8.1` |\r\n| [base64](https://github.com/marshallpierce/rust-base64) | `0.21.4` | `0.21.5` |\r\n| [reqwest](https://github.com/seanmonstar/reqwest) | `0.11.20` | `0.11.22` |\r\n| [env_logger](https://github.com/rust-cli/env_logger) | `0.10.0` | `0.10.1` |\r\n| [test-log](https://github.com/d-e-s-o/test-log) | `0.2.12` | `0.2.13` |\r\n\r\n\r\nUpdates `async-trait` from 0.1.73 to 0.1.74\r\n- [Release notes](https://github.com/dtolnay/async-trait/releases)\r\n- [Commits](https://github.com/dtolnay/async-trait/compare/0.1.73...0.1.74)\r\n\r\nUpdates `prost` from 0.12.1 to 0.12.3\r\n- [Release notes](https://github.com/tokio-rs/prost/releases)\r\n- [Commits](https://github.com/tokio-rs/prost/compare/v0.12.1...v0.12.3)\r\n\r\nUpdates `prost-types` from 0.12.1 to 0.12.3\r\n- [Release notes](https://github.com/tokio-rs/prost/releases)\r\n- [Commits](https://github.com/tokio-rs/prost/compare/v0.12.1...v0.12.3)\r\n\r\nUpdates `tokio` from 1.32.0 to 1.34.0\r\n- [Release notes](https://github.com/tokio-rs/tokio/releases)\r\n- [Commits](https://github.com/tokio-rs/tokio/compare/tokio-1.32.0...tokio-1.34.0)\r\n\r\nUpdates `tokio-util` from 0.7.8 to 0.7.10\r\n- [Release notes](https://github.com/tokio-rs/tokio/releases)\r\n- [Commits](https://github.com/tokio-rs/tokio/commits)\r\n\r\nUpdates `tonic` from 0.10.0 to 0.10.2\r\n- [Changelog](https://github.com/hyperium/tonic/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/hyperium/tonic/compare/v0.10.0...v0.10.2)\r\n\r\nUpdates `tonic-reflection` from 0.10.0 to 0.10.2\r\n- [Changelog](https://github.com/hyperium/tonic/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/hyperium/tonic/compare/v0.10.0...v0.10.2)\r\n\r\nUpdates `tracing` from 0.1.37 to 0.1.40\r\n- [Release notes](https://github.com/tokio-rs/tracing/releases)\r\n- [Commits](https://github.com/tokio-rs/tracing/compare/tracing-0.1.37...tracing-0.1.40)\r\n\r\nUpdates `tracing-subscriber` from 0.3.17 to 0.3.18\r\n- [Release notes](https://github.com/tokio-rs/tracing/releases)\r\n- [Commits](https://github.com/tokio-rs/tracing/compare/tracing-subscriber-0.3.17...tracing-subscriber-0.3.18)\r\n\r\nUpdates `url` from 2.4.1 to 2.5.0\r\n- [Release notes](https://github.com/servo/rust-url/releases)\r\n- [Commits](https://github.com/servo/rust-url/compare/v2.4.1...v2.5.0)\r\n\r\nUpdates `futures` from 0.3.28 to 0.3.29\r\n- [Release notes](https://github.com/rust-lang/futures-rs/releases)\r\n- [Changelog](https://github.com/rust-lang/futures-rs/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/rust-lang/futures-rs/compare/0.3.28...0.3.29)\r\n\r\nUpdates `uuid` from 1.4.1 to 1.6.1\r\n- [Release notes](https://github.com/uuid-rs/uuid/releases)\r\n- [Commits](https://github.com/uuid-rs/uuid/compare/1.4.1...1.6.1)\r\n\r\nUpdates `tonic-build` from 0.10.0 to 0.10.2\r\n- [Changelog](https://github.com/hyperium/tonic/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/hyperium/tonic/compare/v0.10.0...v0.10.2)\r\n\r\nUpdates `regex` from 1.9.5 to 1.10.2\r\n- [Release notes](https://github.com/rust-lang/regex/releases)\r\n- [Changelog](https://github.com/rust-lang/regex/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/rust-lang/regex/compare/1.9.5...1.10.2)\r\n\r\nUpdates `serde` from 1.0.188 to 1.0.193\r\n- [Release notes](https://github.com/serde-rs/serde/releases)\r\n- [Commits](https://github.com/serde-rs/serde/compare/v1.0.188...v1.0.193)\r\n\r\nUpdates `serde_json` from 1.0.107 to 1.0.108\r\n- [Release notes](https://github.com/serde-rs/json/releases)\r\n- [Commits](https://github.com/serde-rs/json/compare/v1.0.107...v1.0.108)\r\n\r\nUpdates `tempfile` from 3.8.0 to 3.8.1\r\n- [Changelog](https://github.com/Stebalien/tempfile/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/Stebalien/tempfile/commits)\r\n\r\nUpdates `base64` from 0.21.4 to 0.21.5\r\n- [Changelog](https://github.com/marshallpierce/rust-base64/blob/master/RELEASE-NOTES.md)\r\n- [Commits](https://github.com/marshallpierce/rust-base64/compare/v0.21.4...v0.21.5)\r\n\r\nUpdates `reqwest` from 0.11.20 to 0.11.22\r\n- [Release notes](https://github.com/seanmonstar/reqwest/releases)\r\n- [Changelog](https://github.com/seanmonstar/reqwest/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/seanmonstar/reqwest/compare/v0.11.20...v0.11.22)\r\n\r\nUpdates `env_logger` from 0.10.0 to 0.10.1\r\n- [Release notes](https://github.com/rust-cli/env_logger/releases)\r\n- [Changelog](https://github.com/rust-cli/env_logger/blob/main/CHANGELOG.md)\r\n- [Commits](https://github.com/rust-cli/env_logger/compare/v0.10.0...v0.10.1)\r\n\r\nUpdates `test-log` from 0.2.12 to 0.2.13\r\n- [Release notes](https://github.com/d-e-s-o/test-log/releases)\r\n- [Changelog](https://github.com/d-e-s-o/test-log/blob/main/CHANGELOG.md)\r\n- [Commits](https://github.com/d-e-s-o/test-log/compare/v0.2.12...v0.2.13)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: async-trait\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: prost\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: prost-types\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tokio\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tokio-util\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tonic\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tonic-reflection\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tracing\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tracing-subscriber\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: url\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: futures\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: uuid\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tonic-build\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: regex\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde_json\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tempfile\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: base64\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: reqwest\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: env_logger\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: test-log\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\n* Update Cargo.lock\r\n\r\n---------\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\r\nCo-authored-by: Lauren Datz <105828115+ladatz@users.noreply.github.com>",
+          "timestamp": "2023-11-29T09:14:23-05:00",
+          "tree_id": "2ad1424a6d3e4935be6c7b4f01ad94b822bc3440",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/a52c49d07cf8bd8aa317f93649966d10d033b017"
+        },
+        "date": 1701267726863,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 43,
+            "unit": "Percent",
+            "range": "p95=44"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 2798,
+            "unit": "Bytes",
+            "range": "p95=3060"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 2,
+            "unit": "Millisecond",
+            "range": "p95=7"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2620",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
             "unit": "blocks"
           }
         ]
