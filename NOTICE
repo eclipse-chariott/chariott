@@ -1928,14 +1928,23 @@ express Statement of Purpose.
 
 - [chariott]( https://crates.io/crates/chariott ) 0.1.0
 - [windows-sys]( https://github.com/microsoft/windows-rs ) 0.48.0
+- [windows-sys]( https://github.com/microsoft/windows-rs ) 0.52.0
 - [windows-targets]( https://github.com/microsoft/windows-rs ) 0.48.5
+- [windows-targets]( https://github.com/microsoft/windows-rs ) 0.52.0
 - [windows_aarch64_gnullvm]( https://github.com/microsoft/windows-rs ) 0.48.5
+- [windows_aarch64_gnullvm]( https://github.com/microsoft/windows-rs ) 0.52.0
 - [windows_aarch64_msvc]( https://github.com/microsoft/windows-rs ) 0.48.5
+- [windows_aarch64_msvc]( https://github.com/microsoft/windows-rs ) 0.52.0
 - [windows_i686_gnu]( https://github.com/microsoft/windows-rs ) 0.48.5
+- [windows_i686_gnu]( https://github.com/microsoft/windows-rs ) 0.52.0
 - [windows_i686_msvc]( https://github.com/microsoft/windows-rs ) 0.48.5
+- [windows_i686_msvc]( https://github.com/microsoft/windows-rs ) 0.52.0
 - [windows_x86_64_gnu]( https://github.com/microsoft/windows-rs ) 0.48.5
+- [windows_x86_64_gnu]( https://github.com/microsoft/windows-rs ) 0.52.0
 - [windows_x86_64_gnullvm]( https://github.com/microsoft/windows-rs ) 0.48.5
+- [windows_x86_64_gnullvm]( https://github.com/microsoft/windows-rs ) 0.52.0
 - [windows_x86_64_msvc]( https://github.com/microsoft/windows-rs ) 0.48.5
+- [windows_x86_64_msvc]( https://github.com/microsoft/windows-rs ) 0.52.0
 
 #### License
 
@@ -6263,15 +6272,6 @@ SOFTWARE.
 - [valuable]( https://github.com/tokio-rs/valuable ) 0.1.0
 - [winapi-i686-pc-windows-gnu]( https://github.com/retep998/winapi-rs ) 0.4.0
 - [winapi-x86_64-pc-windows-gnu]( https://github.com/retep998/winapi-rs ) 0.4.0
-- [windows-sys]( https://github.com/microsoft/windows-rs ) 0.52.0
-- [windows-targets]( https://github.com/microsoft/windows-rs ) 0.52.0
-- [windows_aarch64_gnullvm]( https://github.com/microsoft/windows-rs ) 0.52.0
-- [windows_aarch64_msvc]( https://github.com/microsoft/windows-rs ) 0.52.0
-- [windows_i686_gnu]( https://github.com/microsoft/windows-rs ) 0.52.0
-- [windows_i686_msvc]( https://github.com/microsoft/windows-rs ) 0.52.0
-- [windows_x86_64_gnu]( https://github.com/microsoft/windows-rs ) 0.52.0
-- [windows_x86_64_gnullvm]( https://github.com/microsoft/windows-rs ) 0.52.0
-- [windows_x86_64_msvc]( https://github.com/microsoft/windows-rs ) 0.52.0
 - [zune-inflate]( https://crates.io/crates/zune-inflate ) 0.2.54
 
 #### License
