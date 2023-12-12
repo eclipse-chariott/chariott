@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1702316414531,
+  "lastUpdate": 1702406499086,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -4859,6 +4859,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 132873759,
             "range": "± 663671",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "944bf88860f64dd1e1cc94c17fdd270d9291de58",
+          "message": "chore: Bump the dev-dependencies group with 2 updates (#235)\n\nBumps the dev-dependencies group with 2 updates: [tokio](https://github.com/tokio-rs/tokio) and [test-log](https://github.com/d-e-s-o/test-log).\r\n\r\n\r\nUpdates `tokio` from 1.34.0 to 1.35.0\r\n- [Release notes](https://github.com/tokio-rs/tokio/releases)\r\n- [Commits](https://github.com/tokio-rs/tokio/compare/tokio-1.34.0...tokio-1.35.0)\r\n\r\nUpdates `test-log` from 0.2.13 to 0.2.14\r\n- [Release notes](https://github.com/d-e-s-o/test-log/releases)\r\n- [Changelog](https://github.com/d-e-s-o/test-log/blob/main/CHANGELOG.md)\r\n- [Commits](https://github.com/d-e-s-o/test-log/compare/v0.2.13...v0.2.14)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: tokio\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: test-log\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-12-12T13:38:34-05:00",
+          "tree_id": "3be4c4fe7c4235fdbc263c9e0a27b31034c44b11",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/944bf88860f64dd1e1cc94c17fdd270d9291de58"
+        },
+        "date": 1702406497902,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 186664,
+            "range": "± 5275",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1325069,
+            "range": "± 26815",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 12937329,
+            "range": "± 506236",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1739214,
+            "range": "± 23307",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 13078553,
+            "range": "± 68980",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 130094541,
+            "range": "± 486345",
             "unit": "ns/iter"
           }
         ]
