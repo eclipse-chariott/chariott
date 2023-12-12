@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1702316644239,
+  "lastUpdate": 1702406787718,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -5538,6 +5538,84 @@ window.BENCHMARK_DATA = {
             "value": 2962,
             "unit": "Bytes",
             "range": "p95=3109"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "944bf88860f64dd1e1cc94c17fdd270d9291de58",
+          "message": "chore: Bump the dev-dependencies group with 2 updates (#235)\n\nBumps the dev-dependencies group with 2 updates: [tokio](https://github.com/tokio-rs/tokio) and [test-log](https://github.com/d-e-s-o/test-log).\r\n\r\n\r\nUpdates `tokio` from 1.34.0 to 1.35.0\r\n- [Release notes](https://github.com/tokio-rs/tokio/releases)\r\n- [Commits](https://github.com/tokio-rs/tokio/compare/tokio-1.34.0...tokio-1.35.0)\r\n\r\nUpdates `test-log` from 0.2.13 to 0.2.14\r\n- [Release notes](https://github.com/d-e-s-o/test-log/releases)\r\n- [Changelog](https://github.com/d-e-s-o/test-log/blob/main/CHANGELOG.md)\r\n- [Commits](https://github.com/d-e-s-o/test-log/compare/v0.2.13...v0.2.14)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: tokio\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: test-log\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-12-12T13:38:34-05:00",
+          "tree_id": "3be4c4fe7c4235fdbc263c9e0a27b31034c44b11",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/944bf88860f64dd1e1cc94c17fdd270d9291de58"
+        },
+        "date": 1702406787068,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 2,
+            "unit": "Millisecond",
+            "range": "p95=7"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2620",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 43,
+            "unit": "Percent",
+            "range": "p95=45"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 2585,
+            "unit": "Bytes",
+            "range": "p95=2871"
           }
         ]
       }
