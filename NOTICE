@@ -5,7 +5,7 @@ This page lists the licenses of the projects used in cargo-about.
 ## Overview of licenses
 
 - MIT License (159)
-- Apache License 2.0 (8)
+- Apache License 2.0 (9)
 - BSD 3-Clause "New" or "Revised" License (6)
 - Creative Commons Zero v1.0 Universal (1)
 - Unicode License Agreement - Data Files and Software (2016) (1)
@@ -1466,7 +1466,6 @@ limitations under the License.
 #### Used by
 
 - [bollard-stubs]( https://crates.io/crates/bollard-stubs ) 1.43.0-rc.2
-- [openssl]( https://github.com/sfackler/rust-openssl ) 0.10.60
 - [tensorflow-internal-macros]( https://github.com/tensorflow/rust ) 0.0.3
 - [tensorflow-sys]( https://github.com/tensorflow/rust ) 0.24.0
 
@@ -1540,6 +1539,33 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
 http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+```
+
+### Apache-2.0 (Apache License 2.0)
+
+#### Used by
+
+- [openssl]( https://github.com/sfackler/rust-openssl ) 0.10.60
+
+#### License
+
+```text
+Copyright 2011-2017 Google Inc.
+          2013 Jack Lloyd
+          2013-2014 Steven Fackler
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -5499,7 +5525,7 @@ SOFTWARE.
 
 #### Used by
 
-- [tokio]( https://github.com/tokio-rs/tokio ) 1.34.0
+- [tokio]( https://github.com/tokio-rs/tokio ) 1.35.0
 - [tokio-stream]( https://github.com/tokio-rs/tokio ) 0.1.14
 - [tokio-test]( https://github.com/tokio-rs/tokio ) 0.4.3
 - [tokio-util]( https://github.com/tokio-rs/tokio ) 0.7.10
@@ -6106,7 +6132,7 @@ SOFTWARE.
 
 #### Used by
 
-- [test-log]( https://github.com/d-e-s-o/test-log.git ) 0.2.13
+- [test-log]( https://github.com/d-e-s-o/test-log.git ) 0.2.14
 
 #### License
 
@@ -6269,6 +6295,7 @@ SOFTWARE.
 - [system-configuration]( https://github.com/mullvad/system-configuration-rs ) 0.5.1
 - [system-configuration-sys]( https://github.com/mullvad/system-configuration-rs ) 0.5.0
 - [test-case-macros]( https://github.com/frondeus/test-case ) 2.2.2
+- [test-log-macros]( https://github.com/d-e-s-o/test-log.git ) 0.2.14
 - [valuable]( https://github.com/tokio-rs/valuable ) 0.1.0
 - [winapi-i686-pc-windows-gnu]( https://github.com/retep998/winapi-rs ) 0.4.0
 - [winapi-x86_64-pc-windows-gnu]( https://github.com/retep998/winapi-rs ) 0.4.0
