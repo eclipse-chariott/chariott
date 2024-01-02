@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1704219133051,
+  "lastUpdate": 1704220792688,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -5694,6 +5694,84 @@ window.BENCHMARK_DATA = {
             "value": 2720,
             "unit": "Bytes",
             "range": "p95=3203"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0d704269d3edee44f1af0ab3dc0f2b591096f105",
+          "message": "chore: Bump the dev-dependencies group with 8 updates (#241)\n\n* chore: Bump the dev-dependencies group with 8 updates\r\n\r\nBumps the dev-dependencies group with 8 updates:\r\n\r\n| Package | From | To |\r\n| --- | --- | --- |\r\n| [async-trait](https://github.com/dtolnay/async-trait) | `0.1.74` | `0.1.76` |\r\n| [tokio](https://github.com/tokio-rs/tokio) | `1.35.0` | `1.35.1` |\r\n| [anyhow](https://github.com/dtolnay/anyhow) | `1.0.75` | `1.0.78` |\r\n| [serde_json](https://github.com/serde-rs/json) | `1.0.108` | `1.0.109` |\r\n| [tempfile](https://github.com/Stebalien/tempfile) | `3.8.1` | `3.9.0` |\r\n| [reqwest](https://github.com/seanmonstar/reqwest) | `0.11.22` | `0.11.23` |\r\n| [futures-util](https://github.com/rust-lang/futures-rs) | `0.3.29` | `0.3.30` |\r\n| [metrics-util](https://github.com/metrics-rs/metrics) | `0.15.1` | `0.16.0` |\r\n\r\n\r\nUpdates `async-trait` from 0.1.74 to 0.1.76\r\n- [Release notes](https://github.com/dtolnay/async-trait/releases)\r\n- [Commits](https://github.com/dtolnay/async-trait/compare/0.1.74...0.1.76)\r\n\r\nUpdates `tokio` from 1.35.0 to 1.35.1\r\n- [Release notes](https://github.com/tokio-rs/tokio/releases)\r\n- [Commits](https://github.com/tokio-rs/tokio/compare/tokio-1.35.0...tokio-1.35.1)\r\n\r\nUpdates `anyhow` from 1.0.75 to 1.0.78\r\n- [Release notes](https://github.com/dtolnay/anyhow/releases)\r\n- [Commits](https://github.com/dtolnay/anyhow/compare/1.0.75...1.0.78)\r\n\r\nUpdates `serde_json` from 1.0.108 to 1.0.109\r\n- [Release notes](https://github.com/serde-rs/json/releases)\r\n- [Commits](https://github.com/serde-rs/json/compare/v1.0.108...v1.0.109)\r\n\r\nUpdates `tempfile` from 3.8.1 to 3.9.0\r\n- [Changelog](https://github.com/Stebalien/tempfile/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/Stebalien/tempfile/compare/v3.8.1...v3.9.0)\r\n\r\nUpdates `reqwest` from 0.11.22 to 0.11.23\r\n- [Release notes](https://github.com/seanmonstar/reqwest/releases)\r\n- [Changelog](https://github.com/seanmonstar/reqwest/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/seanmonstar/reqwest/compare/v0.11.22...v0.11.23)\r\n\r\nUpdates `futures-util` from 0.3.29 to 0.3.30\r\n- [Release notes](https://github.com/rust-lang/futures-rs/releases)\r\n- [Changelog](https://github.com/rust-lang/futures-rs/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/rust-lang/futures-rs/compare/0.3.29...0.3.30)\r\n\r\nUpdates `metrics-util` from 0.15.1 to 0.16.0\r\n- [Changelog](https://github.com/metrics-rs/metrics/blob/main/release.toml)\r\n- [Commits](https://github.com/metrics-rs/metrics/compare/metrics-util-v0.15.1...metrics-util-v0.16.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: async-trait\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tokio\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: anyhow\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde_json\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tempfile\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: reqwest\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: futures-util\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: metrics-util\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\n* Update Cargo.lock\r\n\r\n---------\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\r\nCo-authored-by: Lauren Datz <105828115+ladatz@users.noreply.github.com>",
+          "timestamp": "2024-01-02T13:31:56-05:00",
+          "tree_id": "2ff3eeb5181ed4a23c35cd1cf25d5f495cadc52b",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/0d704269d3edee44f1af0ab3dc0f2b591096f105"
+        },
+        "date": 1704220792119,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 2,
+            "unit": "Millisecond",
+            "range": "p95=7"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2620",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 42,
+            "unit": "Percent",
+            "range": "p95=44"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 2908,
+            "unit": "Bytes",
+            "range": "p95=3133"
           }
         ]
       }
