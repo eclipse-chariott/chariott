@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 
 set -e
-cd "$(dirname "$0")/../.."
+cd "$(dirname "$0")/../../.."
 
 if [[ "$1" == "-h" || "$1" == "--help" ]]; then
     echo 'Run Chariott demo.
@@ -60,13 +60,13 @@ cargo build --workspace
 
 sleep 2
 
-./examples/applications/dog-mode-ui/mock_provider_dog_mode_demo.sh | ANNOUNCE_URL=http://localhost:50051 ./target/debug/mock-vas > target/logs/mock_vas.txt 2>&1 & # DevSkim: ignore DS162092
+./intent_brokering/examples/applications/dog-mode-ui/mock_provider_dog_mode_demo.sh | ANNOUNCE_URL=http://localhost:50051 ./target/debug/mock-vas > target/logs/mock_vas.txt 2>&1 & # DevSkim: ignore DS162092
 MOCK_VAS_PID=$!
 ANNOUNCE_URL=http://localhost:50064 ./target/debug/kv-app > target/logs/kv_app.txt 2>&1 & # DevSkim: ignore DS162092
-SIMULATED_CAMERA_APP_IMAGES_DIRECTORY=./examples/applications/simulated-camera/images ANNOUNCE_URL=http://localhost:50066 ./target/debug/simulated-camera-app > target/logs/simulated_camera_app.txt 2>&1 & # DevSkim: ignore DS162092
+SIMULATED_CAMERA_APP_IMAGES_DIRECTORY=./intent_brokering/examples/applications/simulated-camera/images ANNOUNCE_URL=http://localhost:50066 ./target/debug/simulated-camera-app > target/logs/simulated_camera_app.txt 2>&1 & # DevSkim: ignore DS162092
 CAMERA_PID=$!
 TENSORFLOW_LIB_PATH="$(dirname $(find target -name libtensorflow.so -printf '%T@\t%p\n' | sort -nr | cut -f 2- | head -1))"
-LIBRARY_PATH=$TENSORFLOW_LIB_PATH LD_LIBRARY_PATH=$TENSORFLOW_LIB_PATH CATEGORIES_FILE_PATH=./examples/applications/local-object-detection/models/categories.json ANNOUNCE_URL=http://localhost:50061  ./target/debug/local-object-detection-app > target/logs/local_object_detection_app.txt 2>&1 & # DevSkim: ignore DS162092
+LIBRARY_PATH=$TENSORFLOW_LIB_PATH LD_LIBRARY_PATH=$TENSORFLOW_LIB_PATH CATEGORIES_FILE_PATH=./intent_brokering/examples/applications/local-object-detection/models/categories.json ANNOUNCE_URL=http://localhost:50061  ./target/debug/local-object-detection-app > target/logs/local_object_detection_app.txt 2>&1 & # DevSkim: ignore DS162092
 LOCAL_DETECTION_PID=$!
 if [[ ! -z "$cognitive_endpoint" || ! -z "$cognitive_key" ]]; then
     COGNITIVE_ENDPOINT=$cognitive_endpoint COGNITIVE_KEY=$cognitive_key ANNOUNCE_URL=http://localhost:50063 ./target/debug/cloud-object-detection-app > target/logs/cloud_object_detection_app.txt 2>&1 & # DevSkim: ignore DS162092
@@ -81,6 +81,6 @@ sleep 5
 
 sleep 2
 
-dotnet run --project examples/applications/dog-mode-ui/src > ./target/logs/ui.txt 2>&1 &
+dotnet run --project intent_brokering/examples/applications/dog-mode-ui/src > ./target/logs/ui.txt 2>&1 &
 
 wait

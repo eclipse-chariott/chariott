@@ -11,7 +11,6 @@
 // Tells cargo to warn if a doc comment is missing and should be provided.
 #![warn(missing_docs)]
 
-use chariott_common::error::Error;
 use hello_world_impl::HelloWorldImpl;
 use samples_proto::hello_world::v1::hello_world_server::HelloWorldServer;
 use std::net::SocketAddr;
@@ -52,10 +51,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Intitialize addresses for provider communication.
     let provider_url_str = format!("http://{HELLO_WORLD_ENDPOINT}"); // DevSkim: ignore DS137138
     let socket_address: SocketAddr = HELLO_WORLD_ENDPOINT
-        .parse()
-        .map_err(|e| Error::from_error("error getting SocketAddr", Box::new(e)))?;
-    let _provider_url: Url = Url::parse(&provider_url_str)
-        .map_err(|e| Error::from_error("error getting Url", Box::new(e)))?;
+        .parse()?;
+    let _provider_url: Url = Url::parse(&provider_url_str)?;
 
     let service_metadata: ServiceMetadata = ServiceMetadata {
         namespace: "sdv.samples".to_string(),
