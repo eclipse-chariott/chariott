@@ -5,14 +5,14 @@ on:
     branches:
       - main
     paths:
-      - "common/**"
-      - "ess/**"
-      - "examples/**"
-      - "keyvalue/**"
-      - "proto/**"
-      - 'proto.rs/**'
-      - "src/**"
-      - "tests/**"
+      - "intent_brokering/common/**"
+      - "intent_brokering/ess/**"
+      - "intent_brokering/examples/**"
+      - "intent_brokering/keyvalue/**"
+      - "intent_brokering/proto/**"
+      - 'intent_brokering/proto.rs/**'
+      - "intent_brokering/src/**"
+      - "intent_brokering/tests/**"
       - ".github/workflows/e2e.yaml"
       - 'Cargo.lock'
       - 'Cargo.toml'
