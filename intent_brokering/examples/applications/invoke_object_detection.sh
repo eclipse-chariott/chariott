@@ -21,7 +21,7 @@ fi
 
 
 DETECTION_NAMESPACE="sdv.detection"
-if [ "$(../../tools/charc inspect system.registry $DETECTION_NAMESPACE | jq '. | length')" -eq 0 ]
+if [ "$(../../intent_brokering/tools/charc inspect system.registry $DETECTION_NAMESPACE | jq '. | length')" -eq 0 ]
 then
     echo>&2 "No providers registered for $DETECTION_NAMESPACE."
     exit 1

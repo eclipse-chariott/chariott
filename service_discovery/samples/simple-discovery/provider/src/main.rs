@@ -50,8 +50,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Intitialize addresses for provider communication.
     let provider_url_str = format!("http://{HELLO_WORLD_ENDPOINT}"); // DevSkim: ignore DS137138
-    let socket_address: SocketAddr = HELLO_WORLD_ENDPOINT
-        .parse()?;
+    let socket_address: SocketAddr = HELLO_WORLD_ENDPOINT.parse()?;
     let _provider_url: Url = Url::parse(&provider_url_str)?;
 
     let service_metadata: ServiceMetadata = ServiceMetadata {

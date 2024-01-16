@@ -57,7 +57,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./examples/applications/Dockerfile.kv-app.ci
+          file: ./intent_brokering/examples/applications/Dockerfile.kv-app.ci
           build-args: APP_NAME=kv-app
           load: true
           tags: kv-app:1

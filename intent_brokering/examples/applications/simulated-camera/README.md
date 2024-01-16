@@ -8,14 +8,14 @@ manual mode where you specify the frame rate event yourself.
 ## To run the application
 
 1. Start chariott runtime by executing `cargo run` from the root directory
-2. Navigate to `examples/applications/simulated-camera` directory
+2. Navigate to `intent_brokering/examples/applications/simulated-camera` directory
 3. Create a `images` directory and place there all the `.jpg` files you want the
    camera application to stream
 4. Start camera application by executing `cargo run` from the
-   `examples/applications/simulated-camera` directory.
+   `intent_brokering/examples/applications/simulated-camera` directory.
 5. In another terminal, open a channel to the simulated-camera with `grpcurl -v \
    -plaintext -import-path proto -proto \
-   proto/chariott/streaming/v1/streaming.proto localhost:50066 \
+   intent_brokering/proto/chariott/streaming/v1/streaming.proto localhost:50066 \
    chariott.streaming.v1.ChannelService/Open` and take a note of the returned
    channel id in the metadata _x-chariott-channel-id_.
 6. In yet another terminal, call the following, using the channel id from the

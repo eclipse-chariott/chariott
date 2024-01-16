@@ -64,7 +64,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./Dockerfile.valgrind
+          file: ./Dockerfile.intent_brokering.valgrind
           load: true
           tags: val-chariott:1
 

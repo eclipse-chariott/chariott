@@ -76,7 +76,7 @@ More information can be found in the protobuf definitions in `./proto`.
 
 There is a separate document that describes the example applications and
 scenarios that are supported by Chariott. It can be found
-[here](./examples/applications/README.md).
+[here](./intent_brokering/examples/applications/README.md).
 
 ## Requirements
 
@@ -236,11 +236,11 @@ use the [grpcurl](https://github.com/fullstorydev/grpcurl) command line tool wit
 and read state. The state is stored in memory and is not persisted. It also demonstrates
 the use of the `ess` and `keyvalue` crates.
 
-This walkthrough is described in the [examples kv-app README](examples/applications/kv-app/README.md).
+This walkthrough is described in the [examples kv-app README](intent_brokering/examples/applications/kv-app/README.md).
 
 ## How to run the dog mode demo
 
-To run the dog mode demo, please refer to the [dog mode demo](./examples/applications/README.md).
+To run the dog mode demo, please refer to the [dog mode demo](./intent_brokering/examples/applications/README.md).
 
 ## Trademarks
 

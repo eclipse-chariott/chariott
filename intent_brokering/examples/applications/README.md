@@ -11,7 +11,7 @@ The dog mode allows a car owner to keep their dog safe while they are away from
 the car. If the ambient temperature is high, different applications will
 interact with each other to ensure that the temperature inside the car is at a
 safe level for the dog. This works as follows: first, the dog mode logic
-application (`examples/applications/dog-mode-logic`) detects whether a dog is
+application (`intent_brokering/examples/applications/dog-mode-logic`) detects whether a dog is
 present, either by automatically connecting a [camera][simulated camera] with
 [object detection][local object detection], or through user interaction in the
 [UI application][ui]. If a dog is detected, it will monitor various vehicle
@@ -53,7 +53,7 @@ SDK and ASP.NET Core runtime.
 You can follow a simulation of this scenario by executing
 
 ```bash
-./examples/applications/run_demo.sh --cognitive_endpoint "<placeholder>" --cognitive_key "<placeholder>"
+./intent_brokering/examples/applications/run_demo.sh --cognitive_endpoint "<placeholder>" --cognitive_key "<placeholder>"
 ```
 
 from the repository root directory.

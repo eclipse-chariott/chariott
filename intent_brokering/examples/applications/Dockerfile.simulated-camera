@@ -15,7 +15,7 @@ RUN mkdir -p /sdv/images
 
 # Copy our build
 COPY --from=base /sdv/target/x86_64-unknown-linux-musl/release/${APP_NAME} /sdv/${APP_NAME}
-COPY ./examples/applications/simulated-camera/images /sdv/images/
+COPY ./intent_brokering/examples/applications/simulated-camera/images /sdv/images/
 
 # Use the unprivileged chariott user during execution.
 USER ${USER_NAME}:${USER_NAME}

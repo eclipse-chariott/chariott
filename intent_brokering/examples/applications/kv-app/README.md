@@ -66,7 +66,7 @@ Open a channel for receiving events:
 
 ```bash
 grpcurl -v -plaintext -import-path proto -proto \
-    proto/chariott/streaming/v1/streaming.proto 0.0.0.0:50064 \
+    intent_brokering/proto/chariott/streaming/v1/streaming.proto 0.0.0.0:50064 \
     chariott.streaming.v1.ChannelService/Open | tee events.log &
 ```
 
