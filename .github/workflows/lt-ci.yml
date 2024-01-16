@@ -57,6 +57,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
+          file: Dockerfile.intent_brokering
           load: true
           tags: chariott:1
 

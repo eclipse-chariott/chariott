@@ -2,5 +2,3 @@ version: v1
 directories:
   - intent_brokering/proto
   - intent_brokering/examples/applications/proto
-  - service_discovery/proto
-  - service_discovery/samples/proto
