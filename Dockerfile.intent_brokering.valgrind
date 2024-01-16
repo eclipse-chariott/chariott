@@ -32,7 +32,7 @@ WORKDIR /sdv
 
 COPY ./ .
 
-RUN cargo build --release
+RUN cargo build --release -p chariott
 
 #############################################################x#######################################
 ## Final image
