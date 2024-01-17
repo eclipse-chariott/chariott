@@ -7,7 +7,7 @@ manual mode where you specify the frame rate event yourself.
 
 ## To run the application
 
-1. Start chariott runtime by executing `cargo run` from the root directory
+1. Start chariott runtime by executing `cargo run -p chariott` from the root directory
 2. Navigate to `intent_brokering/examples/applications/simulated-camera` directory
 3. Create a `images` directory and place there all the `.jpg` files you want the
    camera application to stream
