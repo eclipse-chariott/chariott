@@ -12,7 +12,6 @@
     - [Install Dependencies](#install-dependencies)
     - [Build all binaries and run tests natively](#build-all-binaries-and-run-tests-natively)
     - [Build and run Chariott only](#build-and-run-chariott-only)
-- [Use Chariott Service Discovery only](#use-chariott-service-discovery-only)
 - [How to run the examples and interact with Chariott](#how-to-run-the-examples-and-interact-with-chariott)
 - [How to run the dog mode demo](#how-to-run-the-dog-mode-demo)
 - [Trademarks](#trademarks)

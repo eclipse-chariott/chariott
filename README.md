@@ -20,7 +20,7 @@ Chariott is a [gRPC](https://grpc.io) service that provides a common interface f
 applications. It facilitates Service Discovery of applications which advertise their capabilities
 by registering themselves with Chariott's service registry. Other applications that need to consume
 resources and capabilities can Discover services through Chariott's service registry. There are two
-components in this project: [Intent Brokering](./intent_brokering/README.md) and 
+components in this project: [Intent Brokering](./intent_brokering/README.md) and
 [Service Discovery](./service_discovery/README.md). Today, they are two separate components which
 do not interact. Each has its own gRPC service.
 
