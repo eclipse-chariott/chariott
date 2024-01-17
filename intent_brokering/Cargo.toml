@@ -33,10 +33,8 @@ uuid = { workspace = true }
 tokio-stream = { workspace = true }
 test-case = { workspace = true }
 
-
 [build-dependencies]
 tonic-build = { workspace = true }
-
 
 [[test]]
 name = "store-e2e"
