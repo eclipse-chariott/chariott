@@ -1,4 +1,4 @@
-# Service Discovery
+# Intent Brokering
 
 - [Terminology](#terminology)
 - [Concept of Intents](#concept-of-intents)
