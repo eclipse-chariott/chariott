@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1704727076463,
+  "lastUpdate": 1705612781536,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -5159,6 +5159,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 130400492,
             "range": "± 721612",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9d25261bad661551a21059074f9e91a5e64f013f",
+          "message": "chore: Bump the dev-dependencies group with 4 updates (#248)\n\n* chore: Bump the dev-dependencies group with 4 updates\r\n\r\nBumps the dev-dependencies group with 4 updates: [serde](https://github.com/serde-rs/serde), [serde_json](https://github.com/serde-rs/json), [base64](https://github.com/marshallpierce/rust-base64) and [image](https://github.com/image-rs/image).\r\n\r\n\r\nUpdates `serde` from 1.0.194 to 1.0.195\r\n- [Release notes](https://github.com/serde-rs/serde/releases)\r\n- [Commits](https://github.com/serde-rs/serde/compare/v1.0.194...v1.0.195)\r\n\r\nUpdates `serde_json` from 1.0.110 to 1.0.111\r\n- [Release notes](https://github.com/serde-rs/json/releases)\r\n- [Commits](https://github.com/serde-rs/json/compare/v1.0.110...v1.0.111)\r\n\r\nUpdates `base64` from 0.21.5 to 0.21.7\r\n- [Changelog](https://github.com/marshallpierce/rust-base64/blob/master/RELEASE-NOTES.md)\r\n- [Commits](https://github.com/marshallpierce/rust-base64/compare/v0.21.5...v0.21.7)\r\n\r\nUpdates `image` from 0.24.7 to 0.24.8\r\n- [Changelog](https://github.com/image-rs/image/blob/master/CHANGES.md)\r\n- [Commits](https://github.com/image-rs/image/compare/v0.24.7...v0.24.8)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: serde\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde_json\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: base64\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: image\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\n* Cargo update\r\n\r\n---------\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\r\nCo-authored-by: Lauren Datz <105828115+ladatz@users.noreply.github.com>",
+          "timestamp": "2024-01-18T13:16:46-08:00",
+          "tree_id": "d7b43a66f67e113aa84ea37786d48aa63768ed9a",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/9d25261bad661551a21059074f9e91a5e64f013f"
+        },
+        "date": 1705612780391,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 189856,
+            "range": "± 7123",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1334931,
+            "range": "± 29702",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 12962825,
+            "range": "± 733149",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1696049,
+            "range": "± 45741",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 13140653,
+            "range": "± 44553",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 128308597,
+            "range": "± 4349462",
             "unit": "ns/iter"
           }
         ]
