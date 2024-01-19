@@ -8,12 +8,12 @@ on:
     branches:
       - main
     paths:
-      - 'common/**'
-      - 'src/**'
-      - 'tests/**'
-      - 'proto/**'
-      - 'proto.rs/**'
-      - 'examples/**'
+      - 'intent_brokering/common/**'
+      - 'intent_brokering/src/**'
+      - 'intent_brokering/tests/**'
+      - 'intent_brokering/proto/**'
+      - 'intent_brokering/proto.rs/**'
+      - 'intent_brokering/examples/**'
       - '.github/workflows/lt-ci.yml'
       - 'Cargo.lock'
       - 'Cargo.toml'
@@ -32,7 +32,7 @@ env:
   AUTO_PUSH: ${{ github.event_name == 'push' }}
   # Comment the performance numbers of the load tests only on PRs and if the PR
   # comes from within the Eclipse organization.
-  COMMENT_ALWAYS: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'eclipse/chariott' }}
+  COMMENT_ALWAYS: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'eclipse-chariott/chariott' }}
 
 jobs:
   benchmark:
@@ -57,6 +57,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
+          file: Dockerfile.intent_brokering
           load: true
           tags: chariott:1
 
@@ -64,7 +65,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./Dockerfile.valgrind
+          file: ./Dockerfile.intent_brokering.valgrind
           load: true
           tags: val-chariott:1
 
@@ -72,7 +73,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./examples/applications/Dockerfile.lt-provider-app.ci
+          file: ./intent_brokering/examples/applications/Dockerfile.lt-provider-app.ci
           build-args: APP_NAME=lt-provider-app
           load: true
           tags: lt-provider-app:1

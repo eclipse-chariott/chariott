@@ -7,7 +7,7 @@ To run the application:
 
 1. Start chariott runtime by executing `cargo run` from the root directory
 2. Start it by executing `cargo run` from the
-   `examples/applications/cloud-object-detection` directory while specifying
+   `intent_brokering/examples/applications/cloud-object-detection` directory while specifying
    `COGNITIVE_ENDPOINT` (i.e. `myendpoint.cognitiveservices.azure.com`) and
    `COGNITIVE_KEY` environment variables.
 3. In the root directory create a `detect_image.json` file with the following
@@ -36,7 +36,7 @@ To run the application:
    ```
 
 4. Execute detection with `grpcurl -v -plaintext -import-path proto/ \
-   -import-path examples/applications/proto -use-reflection -proto \
-   examples/applications/proto/examples/detection/v1/detection.proto -d @ \
+   -import-path intent_brokering/examples/applications/proto -use-reflection -proto \
+   intent_brokering/examples/applications/proto/examples/detection/v1/detection.proto -d @ \
    localhost:4243 chariott.runtime.v1.ChariottService/Fulfill < \
    detect_image.json`

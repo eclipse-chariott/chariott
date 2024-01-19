@@ -8,14 +8,14 @@ on:
     branches:
       - main
     paths:
-      - 'common/**'
-      - 'src/**'
-      - 'tests/**'
-      - 'proto/**'
-      - 'proto.rs/**'
-      - 'ess/**'
-      - 'keyvalue/**'
-      - 'examples/**'
+      - 'intent_brokering/common/**'
+      - 'intent_brokering/src/**'
+      - 'intent_brokering/tests/**'
+      - 'intent_brokering/proto/**'
+      - 'intent_brokering/proto.rs/**'
+      - 'intent_brokering/ess/**'
+      - 'intent_brokering/keyvalue/**'
+      - 'intent_brokering/examples/**'
       - '.github/workflows/rust-ci.yml'
       - 'Cargo.lock'
       - 'Cargo.toml'

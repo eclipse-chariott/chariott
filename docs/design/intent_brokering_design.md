@@ -6,7 +6,7 @@
 
 ## <a name="introduction">Introduction</a>
 
-Project Eclipse Chariott delivers a metadata-driven application programming model. Today, Chariott serves two main purposes. First, it offers service discovery of "provider" applications advertising their functionality. These providers register their capabilities with Chariott. Second, Chariott provides the brokering of intent requests from any application towards the offering providers. Chariott was founded on [Capability Oriented Architecture](https://www.linkedin.com/pulse/brief-introduction-capability-oriented-architecture-coa-haishi-bai/) (COA). Since Chariott provides a common [gRPC](https://grpc.io/) interface for interacting with applications, it can be used with any language supporting gRPC. For more details on the gRPC interfaces, please see the [proto folder](../../proto/chariott/).
+Project Eclipse Chariott delivers a metadata-driven application programming model. Today, Chariott serves two main purposes. First, it offers service discovery of "provider" applications advertising their functionality. These providers register their capabilities with Chariott. Second, Chariott provides the brokering of intent requests from any application towards the offering providers. Chariott was founded on [Capability Oriented Architecture](https://www.linkedin.com/pulse/brief-introduction-capability-oriented-architecture-coa-haishi-bai/) (COA). Since Chariott provides a common [gRPC](https://grpc.io/) interface for interacting with applications, it can be used with any language supporting gRPC. For more details on the gRPC interfaces, please see the [proto folder](../../intent_brokering/proto/chariott/).
 
 ## <a name="architecture">Architecture</a>
 

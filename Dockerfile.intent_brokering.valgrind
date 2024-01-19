@@ -5,10 +5,9 @@
 ARG RUST_VERSION=1.70
 FROM docker.io/library/rust:${RUST_VERSION} AS builder
 
-# Dockerfile for building Eclipse Chariott container for ARM64 with
-# cross-compilation.
+# Dockerfile for building Eclipse Chariott container
 #
-# This Dockerfile utilizes a two step build process. It builds the with
+# This Dockerfile utilizes a two step build process. It builds Chariott with
 # statically linked dependencies (using musl vs. glibc to accomplish this) for a
 # specific architecture such that we can utilize a scratch container without
 # further dependencies for our final container, minimizing container size.
@@ -17,7 +16,7 @@ FROM docker.io/library/rust:${RUST_VERSION} AS builder
 ARG CHARIOTT_UID=10001
 
 RUN apt update && apt upgrade -y
-RUN apt install -y cmake protobuf-compiler gcc-aarch64-linux-gnu
+RUN apt install -y cmake protobuf-compiler wget
 
 # unprivileged identity to run Chariott as
 RUN adduser \
@@ -33,14 +32,25 @@ WORKDIR /sdv
 
 COPY ./ .
 
-RUN rustup target add aarch64-unknown-linux-musl
-
-RUN cargo build --release --target=aarch64-unknown-linux-musl
+RUN cargo build --release -p chariott
 
 #############################################################x#######################################
 ## Final image
 ####################################################################################################
-FROM arm64v8/alpine:latest
+
+# **NOTE**
+# This image is based on debian and is not using musl. This is because
+# valgrind seems to have problems running with musl on Alpine. See this stackoverflow
+# post for more details:
+# https://stackoverflow.com/questions/61774643/valgrind-on-alpine-linux
+
+FROM debian:bullseye-slim
+
+# Install valgrind
+RUN apt update && apt install -y valgrind
+
+# Create output dir to mount
+RUN mkdir /output && chmod 777 /output
 
 # Import Chariott user and group from builder.
 COPY --from=builder /etc/passwd /etc/passwd
@@ -49,9 +59,12 @@ COPY --from=builder /etc/group /etc/group
 WORKDIR /sdv
 
 # Copy our build
-COPY --from=builder /sdv/target/aarch64-unknown-linux-musl/release/chariott /sdv/chariott
+COPY --from=builder /sdv/target/release/chariott /sdv/chariott
 
-# Use the unprivileged Chariott user during execution.
+# Give chariott user ownership of the /sdv directory
+RUN chown -R chariott:chariott /sdv
+
+# Use the unprivileged chariott user during execution.
 USER chariott::chariott
 
-CMD ["./chariott"]
+CMD ["valgrind", "--tool=memcheck", "--xml=yes", "--xml-file=/output/out.xml", "./chariott"]

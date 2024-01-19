@@ -9,7 +9,6 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-chariott-common = { path = "../../../../common/" }
 samples_proto = { path = "../../proto_build/" }
 service_discovery_proto = { path = "../../../proto_build" }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

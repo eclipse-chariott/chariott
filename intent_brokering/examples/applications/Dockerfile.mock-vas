@@ -15,7 +15,7 @@ RUN apk add bash
 
 # Copy our build
 COPY --from=base /sdv/target/x86_64-unknown-linux-musl/release/${APP_NAME} /sdv/${APP_NAME}
-COPY ./examples/applications/dog-mode-ui/mock_provider_dog_mode_demo.sh /sdv/
+COPY ./intent_brokering/examples/applications/dog-mode-ui/mock_provider_dog_mode_demo.sh /sdv/
 
 # Use the unprivileged chariott user during execution.
 USER ${USER_NAME}:${USER_NAME}

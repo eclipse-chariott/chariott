@@ -1,0 +1,45 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+# SPDX-License-Identifier: MIT
+
+[package]
+name = "chariott"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[dependencies]
+async-recursion = "1.0"
+async-trait = { workspace = true }
+chariott-common = { workspace = true }
+chariott-proto = { workspace = true }
+prost = { workspace = true }
+prost-types = { workspace = true }
+tokio = { workspace = true, features = ["rt-multi-thread", "time"] }
+tokio-util = { workspace = true }
+tonic = { workspace = true }
+tonic-reflection = "0.10"
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+url = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+examples-common = { path = "./examples/common" }
+futures = { workspace = true }
+tokio-util = { workspace = true }
+uuid = { workspace = true }
+tokio-stream = { workspace = true }
+test-case = { workspace = true }
+
+[build-dependencies]
+tonic-build = { workspace = true }
+
+[[test]]
+name = "store-e2e"
+test = false
+
+[[test]]
+name = "registry-e2e"
+test = false

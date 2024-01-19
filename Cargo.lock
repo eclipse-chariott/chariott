@@ -681,7 +681,6 @@ checksum = "245097e9a4535ee1e3e3931fcfcd55a796a44c643e8596ff6566d68f09b87bbc"
 name = "consumer"
 version = "0.1.0"
 dependencies = [
- "chariott-common",
  "samples_proto",
  "service_discovery_proto",
  "tokio",
@@ -2434,7 +2433,6 @@ checksum = "cf7e6d18738ecd0902d30d1ad232c9125985a3422929b16c65517b38adc14f96"
 name = "provider"
 version = "0.1.0"
 dependencies = [
- "chariott-common",
  "samples_proto",
  "service_discovery_proto",
  "tokio",

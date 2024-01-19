@@ -5,14 +5,14 @@ on:
     branches:
       - main
     paths:
-      - "common/**"
-      - "ess/**"
-      - "examples/**"
-      - "keyvalue/**"
-      - "proto/**"
-      - 'proto.rs/**'
-      - "src/**"
-      - "tests/**"
+      - "intent_brokering/common/**"
+      - "intent_brokering/ess/**"
+      - "intent_brokering/examples/**"
+      - "intent_brokering/keyvalue/**"
+      - "intent_brokering/proto/**"
+      - 'intent_brokering/proto.rs/**'
+      - "intent_brokering/src/**"
+      - "intent_brokering/tests/**"
       - ".github/workflows/e2e.yaml"
       - 'Cargo.lock'
       - 'Cargo.toml'
@@ -50,6 +50,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
+          file: ./Dockerfile.intent_brokering
           load: true
           tags: chariott:1
 
@@ -57,7 +58,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./examples/applications/Dockerfile.kv-app.ci
+          file: ./intent_brokering/examples/applications/Dockerfile.kv-app.ci
           build-args: APP_NAME=kv-app
           load: true
           tags: kv-app:1

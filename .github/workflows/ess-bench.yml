@@ -8,8 +8,8 @@ on:
     branches:
       - main
     paths:
-      - 'common/**'
-      - 'ess/**'
+      - 'intent_brokering/common/**'
+      - 'intent_brokering/ess/**'
       - '.github/workflows/ess-bench.yml'
 
 concurrency:
@@ -25,7 +25,7 @@ env:
   AUTO_PUSH: ${{ github.event_name == 'push' }}
   # Comment the performance numbers of the load tests only on PRs and if the PR
   # comes from within the Eclipse organization.
-  COMMENT_ALWAYS: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'eclipse/chariott' }}
+  COMMENT_ALWAYS: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'eclipse-chariott/chariott' }}
 
 jobs:
   benchmark:
@@ -41,7 +41,7 @@ jobs:
         run: sudo apt-get install -y protobuf-compiler
 
       - name: Run benchmark
-        run: cargo bench --manifest-path ess/Cargo.toml --bench load_bench -- --output-format bencher | tee output.txt
+        run: cargo bench --manifest-path intent_brokering/ess/Cargo.toml --bench load_bench -- --output-format bencher | tee output.txt
 
       - name: Store benchmark result
         env:

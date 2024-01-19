@@ -8,7 +8,7 @@ on:
     branches:
       - main
     paths:
-      - 'examples/applications/dog-mode-ui/**'
+      - 'intent_brokering/examples/applications/dog-mode-ui/**'
       - '.github/workflows/dotnet-ci.yml'
 
 concurrency:
@@ -24,8 +24,8 @@ jobs:
       - uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 6.0.403
-          global-json-file: examples/applications/dog-mode-ui/global.json
+          global-json-file: intent_brokering/examples/applications/dog-mode-ui/global.json
 
       - run: dotnet --info
 
-      - run: dotnet build examples/applications/dog-mode-ui
+      - run: dotnet build intent_brokering/examples/applications/dog-mode-ui
