@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1705613081862,
+  "lastUpdate": 1705689815280,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -6006,6 +6006,84 @@ window.BENCHMARK_DATA = {
             "value": 2879,
             "unit": "Bytes",
             "range": "p95=3097"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9939903831636b5a1534c7a1e38de5f28cb1c4b8",
+          "message": "Restructure Chariott repo to show the separation between intent brokering and service discovery (#247)\n\n* Add intent_brokering folder\r\n\r\n* Rename dockerfiles\r\n\r\n* Renamed docker files, updated workflow files\r\n\r\n* Updates\r\n\r\n* UPdated\r\n\r\n* Only build chariott package from intent-brokering dockerfiles\r\n\r\n* Revert cobertura change for now since it is not the goal of this change, address in a later PR\r\n\r\n* Update docs and add back tools folder\r\n\r\n* Fix spacing\r\n\r\n* Update intent_brokering/examples/applications/simulated-camera/README.md\r\n\r\nCo-authored-by: devkelley <105753233+devkelley@users.noreply.github.com>\r\n\r\n* Fix title of intent brokering readme\r\n\r\n---------\r\n\r\nCo-authored-by: devkelley <105753233+devkelley@users.noreply.github.com>",
+          "timestamp": "2024-01-19T13:35:05-05:00",
+          "tree_id": "3a8aa1d8384d837e26977c4d01e882f059517554",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/9939903831636b5a1534c7a1e38de5f28cb1c4b8"
+        },
+        "date": 1705689814703,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 2,
+            "unit": "Millisecond",
+            "range": "p95=7"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2716",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "10",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 43,
+            "unit": "Percent",
+            "range": "p95=44"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 2687,
+            "unit": "Bytes",
+            "range": "p95=2986"
           }
         ]
       }
