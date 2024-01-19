@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1705612781536,
+  "lastUpdate": 1705689495293,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -5219,6 +5219,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 128308597,
             "range": "± 4349462",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9939903831636b5a1534c7a1e38de5f28cb1c4b8",
+          "message": "Restructure Chariott repo to show the separation between intent brokering and service discovery (#247)\n\n* Add intent_brokering folder\r\n\r\n* Rename dockerfiles\r\n\r\n* Renamed docker files, updated workflow files\r\n\r\n* Updates\r\n\r\n* UPdated\r\n\r\n* Only build chariott package from intent-brokering dockerfiles\r\n\r\n* Revert cobertura change for now since it is not the goal of this change, address in a later PR\r\n\r\n* Update docs and add back tools folder\r\n\r\n* Fix spacing\r\n\r\n* Update intent_brokering/examples/applications/simulated-camera/README.md\r\n\r\nCo-authored-by: devkelley <105753233+devkelley@users.noreply.github.com>\r\n\r\n* Fix title of intent brokering readme\r\n\r\n---------\r\n\r\nCo-authored-by: devkelley <105753233+devkelley@users.noreply.github.com>",
+          "timestamp": "2024-01-19T13:35:05-05:00",
+          "tree_id": "3a8aa1d8384d837e26977c4d01e882f059517554",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/9939903831636b5a1534c7a1e38de5f28cb1c4b8"
+        },
+        "date": 1705689494080,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 181901,
+            "range": "± 8137",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1387207,
+            "range": "± 27413",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 13475026,
+            "range": "± 588165",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1677214,
+            "range": "± 52306",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 13701499,
+            "range": "± 85920",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 135835896,
+            "range": "± 2852155",
             "unit": "ns/iter"
           }
         ]
