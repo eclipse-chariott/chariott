@@ -4,8 +4,8 @@ This page lists the licenses of the projects used in cargo-about.
 
 ## Overview of licenses
 
-- MIT License (157)
-- Apache License 2.0 (9)
+- MIT License (373)
+- Apache License 2.0 (16)
 - BSD 3-Clause "New" or "Revised" License (6)
 - Creative Commons Zero v1.0 Universal (1)
 - Unicode License Agreement - Data Files and Software (2016) (1)
@@ -1952,7 +1952,6 @@ express Statement of Purpose.
 
 #### Used by
 
-- [chariott]( https://crates.io/crates/chariott ) 0.1.0
 - [windows-sys]( https://github.com/microsoft/windows-rs ) 0.48.0
 - [windows-sys]( https://github.com/microsoft/windows-rs ) 0.52.0
 - [windows-targets]( https://github.com/microsoft/windows-rs ) 0.48.5
@@ -2120,8 +2119,8 @@ DEALINGS IN THE SOFTWARE.
 #### Used by
 
 - [lazy_static]( https://github.com/rust-lang-nursery/lazy-static.rs ) 1.4.0
-- [rayon]( https://github.com/rayon-rs/rayon ) 1.8.0
-- [rayon-core]( https://github.com/rayon-rs/rayon ) 1.12.0
+- [rayon]( https://github.com/rayon-rs/rayon ) 1.8.1
+- [rayon-core]( https://github.com/rayon-rs/rayon ) 1.12.1
 
 #### License
 
@@ -2311,21 +2310,21 @@ DEALINGS IN THE SOFTWARE.
 - [cfg-if]( https://github.com/alexcrichton/cfg-if ) 1.0.0
 - [filetime]( https://github.com/alexcrichton/filetime ) 0.2.23
 - [flate2]( https://github.com/rust-lang/flate2-rs ) 1.0.28
-- [js-sys]( https://github.com/rustwasm/wasm-bindgen/tree/master/crates/js-sys ) 0.3.66
+- [js-sys]( https://github.com/rustwasm/wasm-bindgen/tree/master/crates/js-sys ) 0.3.67
 - [openssl-probe]( https://github.com/alexcrichton/openssl-probe ) 0.1.5
 - [openssl-sys]( https://github.com/sfackler/rust-openssl ) 0.9.98
-- [pkg-config]( https://github.com/rust-lang/pkg-config-rs ) 0.3.28
+- [pkg-config]( https://github.com/rust-lang/pkg-config-rs ) 0.3.29
 - [rustc-demangle]( https://github.com/alexcrichton/rustc-demangle ) 0.1.23
 - [socket2]( https://github.com/rust-lang/socket2 ) 0.4.10
 - [socket2]( https://github.com/rust-lang/socket2 ) 0.5.5
 - [tar]( https://github.com/alexcrichton/tar-rs ) 0.4.40
-- [wasm-bindgen]( https://github.com/rustwasm/wasm-bindgen ) 0.2.89
-- [wasm-bindgen-backend]( https://github.com/rustwasm/wasm-bindgen/tree/master/crates/backend ) 0.2.89
-- [wasm-bindgen-futures]( https://github.com/rustwasm/wasm-bindgen/tree/master/crates/futures ) 0.4.39
-- [wasm-bindgen-macro]( https://github.com/rustwasm/wasm-bindgen/tree/master/crates/macro ) 0.2.89
-- [wasm-bindgen-macro-support]( https://github.com/rustwasm/wasm-bindgen/tree/master/crates/macro-support ) 0.2.89
-- [wasm-bindgen-shared]( https://github.com/rustwasm/wasm-bindgen/tree/master/crates/shared ) 0.2.89
-- [web-sys]( https://github.com/rustwasm/wasm-bindgen/tree/master/crates/web-sys ) 0.3.66
+- [wasm-bindgen]( https://github.com/rustwasm/wasm-bindgen ) 0.2.90
+- [wasm-bindgen-backend]( https://github.com/rustwasm/wasm-bindgen/tree/master/crates/backend ) 0.2.90
+- [wasm-bindgen-futures]( https://github.com/rustwasm/wasm-bindgen/tree/master/crates/futures ) 0.4.40
+- [wasm-bindgen-macro]( https://github.com/rustwasm/wasm-bindgen/tree/master/crates/macro ) 0.2.90
+- [wasm-bindgen-macro-support]( https://github.com/rustwasm/wasm-bindgen/tree/master/crates/macro-support ) 0.2.90
+- [wasm-bindgen-shared]( https://github.com/rustwasm/wasm-bindgen/tree/master/crates/shared ) 0.2.90
+- [web-sys]( https://github.com/rustwasm/wasm-bindgen/tree/master/crates/web-sys ) 0.3.67
 
 #### License
 
@@ -2362,7 +2361,7 @@ DEALINGS IN THE SOFTWARE.
 
 #### Used by
 
-- [libz-sys]( https://github.com/rust-lang/libz-sys ) 1.1.12
+- [libz-sys]( https://github.com/rust-lang/libz-sys ) 1.1.14
 
 #### License
 
@@ -2609,11 +2608,10 @@ DEALINGS IN THE SOFTWARE.
 #### Used by
 
 - [bitflags]( https://github.com/bitflags/bitflags ) 1.3.2
-- [bitflags]( https://github.com/bitflags/bitflags ) 2.4.1
+- [bitflags]( https://github.com/bitflags/bitflags ) 2.4.2
 - [log]( https://github.com/rust-lang/log ) 0.4.20
 - [num-complex]( https://github.com/rust-num/num-complex ) 0.4.4
 - [num-integer]( https://github.com/rust-num/num-integer ) 0.1.45
-- [num-rational]( https://github.com/rust-num/num-rational ) 0.4.1
 - [num-traits]( https://github.com/rust-num/num-traits ) 0.2.17
 - [regex]( https://github.com/rust-lang/regex ) 1.10.2
 - [regex-automata]( https://github.com/rust-lang/regex/tree/master/regex-automata ) 0.4.3
@@ -2730,7 +2728,7 @@ DEALINGS IN THE SOFTWARE.
 
 #### Used by
 
-- [libc]( https://github.com/rust-lang/libc ) 0.2.151
+- [libc]( https://github.com/rust-lang/libc ) 0.2.152
 
 #### License
 
@@ -2980,7 +2978,7 @@ DEALINGS IN THE SOFTWARE.
 #### Used by
 
 - [tempfile]( https://github.com/Stebalien/tempfile ) 3.9.0
-- [xattr]( https://github.com/Stebalien/xattr ) 1.2.0
+- [xattr]( https://github.com/Stebalien/xattr ) 1.3.1
 
 #### License
 
@@ -3056,7 +3054,7 @@ DEALINGS IN THE SOFTWARE.
 
 - [gimli]( https://github.com/gimli-rs/gimli ) 0.28.1
 - [heck]( https://github.com/withoutboats/heck ) 0.4.1
-- [unicode-bidi]( https://github.com/servo/unicode-bidi ) 0.3.14
+- [unicode-bidi]( https://github.com/servo/unicode-bidi ) 0.3.15
 - [unicode-normalization]( https://github.com/unicode-rs/unicode-normalization ) 0.1.22
 
 #### License
@@ -3125,7 +3123,7 @@ THE SOFTWARE.
 
 #### Used by
 
-- [png]( https://github.com/image-rs/image-png.git ) 0.17.10
+- [png]( https://github.com/image-rs/image-png ) 0.17.11
 
 #### License
 
@@ -4148,7 +4146,7 @@ SOFTWARE.
 
 #### Used by
 
-- [h2]( https://github.com/hyperium/h2 ) 0.3.22
+- [h2]( https://github.com/hyperium/h2 ) 0.3.24
 
 #### License
 
@@ -4407,7 +4405,7 @@ DEALINGS IN THE SOFTWARE.
 
 #### Used by
 
-- [smallvec]( https://github.com/servo/rust-smallvec ) 1.11.2
+- [smallvec]( https://github.com/servo/rust-smallvec ) 1.13.0
 
 #### License
 
@@ -4613,6 +4611,44 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
+
+```
+
+### MIT (MIT License)
+
+#### Used by
+
+- [getrandom]( https://github.com/rust-random/getrandom ) 0.2.12
+
+#### License
+
+```text
+Copyright (c) 2018-2024 The rust-random Project Developers
+Copyright (c) 2014 The Rust Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 
 ```
 
@@ -5149,7 +5185,7 @@ DEALINGS IN THE SOFTWARE.
 
 #### Used by
 
-- [cpufeatures]( https://github.com/RustCrypto/utils ) 0.2.11
+- [cpufeatures]( https://github.com/RustCrypto/utils ) 0.2.12
 
 #### License
 
@@ -5555,8 +5591,8 @@ SOFTWARE.
 
 #### Used by
 
-- [clap]( https://github.com/clap-rs/clap ) 4.4.12
-- [env_logger]( https://github.com/rust-cli/env_logger ) 0.10.1
+- [clap]( https://github.com/clap-rs/clap ) 4.4.18
+- [env_logger]( https://github.com/rust-cli/env_logger ) 0.10.2
 
 #### License
 
@@ -5643,7 +5679,6 @@ DEALINGS IN THE SOFTWARE.
 
 #### Used by
 
-- [getrandom]( https://github.com/rust-random/getrandom ) 0.2.11
 - [rand]( https://github.com/rust-random/rand ) 0.8.5
 - [rand_chacha]( https://github.com/rust-random/rand ) 0.3.1
 - [rand_core]( https://github.com/rust-random/rand ) 0.6.4
@@ -5797,7 +5832,7 @@ according to those terms.
 
 #### Used by
 
-- [jpeg-decoder]( https://github.com/image-rs/jpeg-decoder ) 0.3.0
+- [jpeg-decoder]( https://github.com/image-rs/jpeg-decoder ) 0.3.1
 
 #### License
 
@@ -5930,7 +5965,7 @@ SOFTWARE.
 
 #### Used by
 
-- [tiff]( https://github.com/image-rs/image-tiff ) 0.9.0
+- [tiff]( https://github.com/image-rs/image-tiff ) 0.9.1
 
 #### License
 
@@ -6129,7 +6164,7 @@ SOFTWARE.
 
 #### Used by
 
-- [value-bag]( https://github.com/sval-rs/value-bag ) 1.4.2
+- [value-bag]( https://github.com/sval-rs/value-bag ) 1.6.0
 
 #### License
 
@@ -6196,6 +6231,7 @@ SOFTWARE.
 #### Used by
 
 - [anes]( https://github.com/zrzka/anes-rs ) 0.1.6
+- [chariott]( https://crates.io/crates/chariott ) 0.1.0
 - [chariott-common]( https://crates.io/crates/chariott-common ) 0.1.0
 - [chariott-proto]( https://crates.io/crates/chariott-proto ) 0.1.0
 - [cloud-object-detection-app]( https://crates.io/crates/cloud-object-detection-app ) 0.1.0
@@ -6284,7 +6320,7 @@ SOFTWARE.
 
 #### Used by
 
-- [fdeflate]( https://github.com/image-rs/fdeflate ) 0.3.3
+- [fdeflate]( https://github.com/image-rs/fdeflate ) 0.3.4
 
 #### License
 
@@ -6455,50 +6491,50 @@ DEALINGS IN THE SOFTWARE.
 - [async-executor]( https://github.com/smol-rs/async-executor ) 1.8.0
 - [async-global-executor]( https://github.com/Keruspe/async-global-executor ) 2.4.1
 - [async-io]( https://github.com/smol-rs/async-io ) 1.13.0
-- [async-io]( https://github.com/smol-rs/async-io ) 2.2.2
+- [async-io]( https://github.com/smol-rs/async-io ) 2.3.0
 - [async-lock]( https://github.com/smol-rs/async-lock ) 2.8.0
-- [async-lock]( https://github.com/smol-rs/async-lock ) 3.2.0
+- [async-lock]( https://github.com/smol-rs/async-lock ) 3.3.0
 - [async-std]( https://github.com/async-rs/async-std ) 1.12.0
-- [async-task]( https://github.com/smol-rs/async-task ) 4.6.0
+- [async-task]( https://github.com/smol-rs/async-task ) 4.7.0
 - [async-trait]( https://github.com/dtolnay/async-trait ) 0.1.77
 - [atomic-waker]( https://github.com/smol-rs/atomic-waker ) 1.1.2
 - [blocking]( https://github.com/smol-rs/blocking ) 1.5.1
 - [concurrent-queue]( https://github.com/smol-rs/concurrent-queue ) 2.4.0
 - [event-listener]( https://github.com/smol-rs/event-listener ) 2.5.3
-- [event-listener]( https://github.com/smol-rs/event-listener ) 4.0.2
+- [event-listener]( https://github.com/smol-rs/event-listener ) 4.0.3
 - [event-listener-strategy]( https://github.com/smol-rs/event-listener ) 0.4.0
 - [fastrand]( https://github.com/smol-rs/fastrand ) 1.9.0
 - [fastrand]( https://github.com/smol-rs/fastrand ) 2.0.1
 - [futures-lite]( https://github.com/smol-rs/futures-lite ) 1.13.0
-- [futures-lite]( https://github.com/smol-rs/futures-lite ) 2.1.0
-- [hermit-abi]( https://github.com/hermitcore/hermit-rs ) 0.3.3
+- [futures-lite]( https://github.com/smol-rs/futures-lite ) 2.2.0
+- [hermit-abi]( https://github.com/hermitcore/hermit-rs ) 0.3.4
 - [home]( https://github.com/rust-lang/cargo ) 0.5.9
 - [io-lifetimes]( https://github.com/sunfishcode/io-lifetimes ) 1.0.11
 - [is-terminal]( https://github.com/sunfishcode/is-terminal ) 0.4.10
 - [itoa]( https://github.com/dtolnay/itoa ) 1.0.10
 - [linux-raw-sys]( https://github.com/sunfishcode/linux-raw-sys ) 0.3.8
-- [linux-raw-sys]( https://github.com/sunfishcode/linux-raw-sys ) 0.4.12
+- [linux-raw-sys]( https://github.com/sunfishcode/linux-raw-sys ) 0.4.13
 - [once_cell]( https://github.com/matklad/once_cell ) 1.19.0
 - [parking]( https://github.com/smol-rs/parking ) 2.2.0
 - [pin-project]( https://github.com/taiki-e/pin-project ) 1.1.3
 - [pin-project-internal]( https://github.com/taiki-e/pin-project ) 1.1.3
 - [pin-project-lite]( https://github.com/taiki-e/pin-project-lite ) 0.2.13
 - [piper]( https://github.com/notgull/piper ) 0.2.1
-- [polling]( https://github.com/smol-rs/polling ) 3.3.1
+- [polling]( https://github.com/smol-rs/polling ) 3.3.2
 - [portable-atomic]( https://github.com/taiki-e/portable-atomic ) 1.6.0
 - [prettyplease]( https://github.com/dtolnay/prettyplease ) 0.2.16
-- [proc-macro2]( https://github.com/dtolnay/proc-macro2 ) 1.0.74
+- [proc-macro2]( https://github.com/dtolnay/proc-macro2 ) 1.0.76
 - [quote]( https://github.com/dtolnay/quote ) 1.0.35
 - [rustix]( https://github.com/bytecodealliance/rustix ) 0.37.27
-- [rustix]( https://github.com/bytecodealliance/rustix ) 0.38.28
+- [rustix]( https://github.com/bytecodealliance/rustix ) 0.38.30
 - [rustversion]( https://github.com/dtolnay/rustversion ) 1.0.14
-- [semver]( https://github.com/dtolnay/semver ) 1.0.20
-- [serde]( https://github.com/serde-rs/serde ) 1.0.194
-- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.194
-- [serde_json]( https://github.com/serde-rs/json ) 1.0.110
+- [semver]( https://github.com/dtolnay/semver ) 1.0.21
+- [serde]( https://github.com/serde-rs/serde ) 1.0.195
+- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.195
+- [serde_json]( https://github.com/serde-rs/json ) 1.0.111
 - [serde_repr]( https://github.com/dtolnay/serde-repr ) 0.1.18
 - [syn]( https://github.com/dtolnay/syn ) 1.0.109
-- [syn]( https://github.com/dtolnay/syn ) 2.0.46
+- [syn]( https://github.com/dtolnay/syn ) 2.0.48
 - [thiserror]( https://github.com/dtolnay/thiserror ) 1.0.56
 - [thiserror-impl]( https://github.com/dtolnay/thiserror ) 1.0.56
 - [unicode-ident]( https://github.com/dtolnay/unicode-ident ) 1.0.12
@@ -6758,7 +6794,7 @@ SOFTWARE.
 
 #### Used by
 
-- [image]( https://github.com/image-rs/image ) 0.24.7
+- [image]( https://github.com/image-rs/image ) 0.24.8
 
 #### License
 
@@ -6824,7 +6860,7 @@ SOFTWARE.
 
 #### Used by
 
-- [base64]( https://github.com/marshallpierce/rust-base64 ) 0.21.5
+- [base64]( https://github.com/marshallpierce/rust-base64 ) 0.21.7
 
 #### License
 
@@ -6861,7 +6897,7 @@ THE SOFTWARE.
 - [byteorder]( https://github.com/BurntSushi/byteorder ) 1.5.0
 - [memchr]( https://github.com/BurntSushi/memchr ) 2.7.1
 - [regex-automata]( https://github.com/BurntSushi/regex-automata ) 0.1.10
-- [termcolor]( https://github.com/BurntSushi/termcolor ) 1.4.0
+- [termcolor]( https://github.com/BurntSushi/termcolor ) 1.4.1
 - [walkdir]( https://github.com/BurntSushi/walkdir ) 2.4.0
 
 #### License
@@ -7027,7 +7063,7 @@ SOFTWARE.
 
 #### Used by
 
-- [clap_builder]( https://github.com/clap-rs/clap ) 4.4.12
+- [clap_builder]( https://github.com/clap-rs/clap ) 4.4.18
 - [clap_lex]( https://github.com/clap-rs/clap/tree/master/clap_lex ) 0.6.0
 
 #### License
@@ -7227,9 +7263,9 @@ SOFTWARE.
 
 #### Used by
 
-- [crossbeam-deque]( https://github.com/crossbeam-rs/crossbeam ) 0.8.4
-- [crossbeam-epoch]( https://github.com/crossbeam-rs/crossbeam ) 0.9.17
-- [crossbeam-utils]( https://github.com/crossbeam-rs/crossbeam ) 0.8.18
+- [crossbeam-deque]( https://github.com/crossbeam-rs/crossbeam ) 0.8.5
+- [crossbeam-epoch]( https://github.com/crossbeam-rs/crossbeam ) 0.9.18
+- [crossbeam-utils]( https://github.com/crossbeam-rs/crossbeam ) 0.8.19
 
 #### License
 
@@ -7425,7 +7461,6 @@ SOFTWARE.
 - [memchr]( https://github.com/BurntSushi/memchr ) 2.7.1
 - [regex-automata]( https://github.com/BurntSushi/regex-automata ) 0.1.10
 - [same-file]( https://github.com/BurntSushi/same-file ) 1.0.6
-- [termcolor]( https://github.com/BurntSushi/termcolor ) 1.4.0
 - [walkdir]( https://github.com/BurntSushi/walkdir ) 2.4.0
 - [winapi-util]( https://github.com/BurntSushi/winapi-util ) 0.1.6
 
