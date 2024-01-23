@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-use chariott_common::error::{Error, ResultExt};
+use intent_brokering_common::error::{Error, ResultExt};
 use examples_common::examples::detection::{DetectRequest, DetectResponse, DetectionObject};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};

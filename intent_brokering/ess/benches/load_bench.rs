@@ -1,4 +1,4 @@
-use chariott_common::tokio_runtime_fork::BuilderExt;
+use intent_brokering_common::tokio_runtime_fork::BuilderExt;
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 use ess::EventSubSystem;
 use futures::StreamExt;

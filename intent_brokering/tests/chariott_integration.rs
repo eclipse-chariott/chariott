@@ -6,16 +6,16 @@ use std::sync::atomic::{AtomicU16, Ordering};
 use std::time::Instant;
 
 use async_trait::async_trait;
-use chariott::registry::{
+use intent_brokering::registry::{
     ExecutionLocality, IntentConfiguration, IntentKind, ServiceConfiguration, ServiceId,
 };
-use chariott::streaming::StreamingEss;
-use chariott::{chariott_grpc::ChariottServer, registry::Registry, IntentBroker};
-use chariott_common::error::{Error, ResultExt as _};
-use chariott_common::shutdown::RouterExt as _;
-use chariott_proto::{
+use intent_brokering::streaming::StreamingEss;
+use intent_brokering::{chariott_grpc::IntentBrokeringServer, registry::Registry, IntentBroker};
+use intent_brokering_common::error::{Error, ResultExt as _};
+use intent_brokering_common::shutdown::RouterExt as _;
+use intent_brokering_proto::{
     common::{IntentEnum, IntentMessage},
-    runtime::{chariott_service_server::ChariottService, FulfillRequest, FulfillResponse},
+    runtime::{intent_brokering_service_server::IntentBrokeringService, FulfillRequest, FulfillResponse},
     streaming::channel_service_server::ChannelServiceServer,
 };
 use common::get_uuid;
@@ -138,7 +138,7 @@ async fn when_cancelled_shuts_down_provider() -> anyhow::Result<()> {
 
 struct Subject {
     namespace: String,
-    subject: ChariottServer<IntentBroker>,
+    subject: IntentBrokeringServer<IntentBroker>,
 }
 
 struct ProviderSetup {
@@ -179,7 +179,7 @@ async fn setup_multiple(providers: impl IntoIterator<Item = ProviderSetup>) -> S
             .unwrap();
     }
 
-    Subject { namespace, subject: ChariottServer::new(registry, broker) }
+    Subject { namespace, subject: IntentBrokeringServer::new(registry, broker) }
 }
 
 #[async_trait]

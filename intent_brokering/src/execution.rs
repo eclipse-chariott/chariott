@@ -8,8 +8,8 @@ use crate::connection_provider::{ConnectedProvider, ConnectionProvider};
 use crate::registry::IntentConfiguration;
 use crate::streaming::StreamingEss;
 use async_recursion::async_recursion;
-use chariott_common::query::regex_from_query;
-use chariott_proto::{
+use intent_brokering_common::query::regex_from_query;
+use intent_brokering_proto::{
     common::{
         discover_fulfillment::Service, inspect_fulfillment::Entry, DiscoverFulfillment,
         FulfillmentEnum, FulfillmentMessage, InspectFulfillment, IntentEnum, IntentMessage, List,
@@ -152,7 +152,7 @@ pub(crate) mod tests {
         registry::{IntentConfiguration, IntentKind},
     };
     use async_trait::async_trait;
-    use chariott_proto::{
+    use intent_brokering_proto::{
         common::{
             DiscoverFulfillment, FulfillmentEnum, FulfillmentMessage, InspectIntent,
             InvokeFulfillment, SubscribeFulfillment, SubscribeIntent,

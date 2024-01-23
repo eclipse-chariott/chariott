@@ -18,14 +18,14 @@ From the root directory:
 1. In a terminal (A) start Chariott with `cargo run`.
 2. In another terminal (B) start the mock-vas with `cargo run -p mock-vas`.
 3. In a terminal (C), open a channel to the mock-vas with `grpcurl -v -plaintext \
-   -import-path proto -proto proto/chariott/streaming/v1/streaming.proto \
-   localhost:50051 chariott.streaming.v1.ChannelService/Open` and take a note of
+   -import-path proto -proto proto/streaming/v1/streaming.proto \
+   localhost:50051 intent_brokering.streaming.v1.ChannelService/Open` and take a note of
    the returned channel id in the metadata _x-chariott-channel-id_.
 4. In another terminal D call the following, using the channel id from the
    previous step:
 
    ```shell
-   grpcurl -v -plaintext -d @ localhost:4243 chariott.runtime.v1.ChariottService/Fulfill <<EOM
+   grpcurl -v -plaintext -d @ localhost:4243 intent_brokering.runtime.v1.IntentBrokeringService/Fulfill <<EOM
    {
        "namespace": "sdv.vdt",
        "intent": {
@@ -51,7 +51,7 @@ From the root directory:
 
 In order to do so, you need to:
 
-- Implement the [streaming proto](../../../proto/chariott/streaming/v1/streaming.proto)
+- Implement the [streaming proto](../../../proto/streaming/v1/streaming.proto)
   and specifically the `OpenRequest` endpoint with a service.
   - This is done in the common examples library in [streaming.rs](../../common/src/chariott/streaming.rs)
   - Make sure to serve this service with your gRPC server.
@@ -59,4 +59,4 @@ In order to do so, you need to:
   handle.
   - In order to create the required client and register the subscriptions, you
     can use the [Event Sub System crate aka ESS crate](../../../ess/).
-  - This is done in mock-vas in [chariott_provider.rs](./src/chariott_provider.rs)
+  - This is done in mock-vas in [intent_provider.rs](./src/intent_provider.rs)

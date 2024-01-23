@@ -2,12 +2,12 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-mod chariott_provider;
+mod intent_provider;
 mod communication;
 mod simulation;
 
-use chariott_common::error::Error;
-use chariott_proto::runtime::{
+use intent_brokering_common::error::Error;
+use intent_brokering_proto::runtime::{
     intent_registration::Intent, intent_service_registration::ExecutionLocality,
 };
 use examples_common::chariott;

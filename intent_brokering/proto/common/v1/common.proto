@@ -11,7 +11,7 @@
 
 syntax = "proto3";
 
-package chariott.common.v1;
+package intent_brokering.common.v1;
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/any.proto";

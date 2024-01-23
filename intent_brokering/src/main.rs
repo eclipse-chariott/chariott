@@ -2,15 +2,15 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-use chariott::chariott_grpc::ChariottServer;
-use chariott::registry::{self, Registry};
-use chariott::streaming::StreamingEss;
-use chariott::IntentBroker;
-use chariott_common::config::{env, try_env};
-use chariott_common::ext::OptionExt as _;
-use chariott_common::shutdown::{ctrl_c_cancellation, RouterExt as _};
-use chariott_proto::{
-    runtime::chariott_service_server::ChariottServiceServer,
+use intent_brokering::chariott_grpc::IntentBrokeringServer;
+use intent_brokering::registry::{self, Registry};
+use intent_brokering::streaming::StreamingEss;
+use intent_brokering::IntentBroker;
+use intent_brokering_common::config::{env, try_env};
+use intent_brokering_common::ext::OptionExt as _;
+use intent_brokering_common::shutdown::{ctrl_c_cancellation, RouterExt as _};
+use intent_brokering_proto::{
+    runtime::intent_brokering_service_server::IntentBrokeringServiceServer,
     streaming::channel_service_server::ChannelServiceServer,
 };
 use registry::Composite;
@@ -73,9 +73,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = format!("0.0.0.0:{PORT}").parse().unwrap();
     tracing::info!("chariott listening on {addr}");
 
-    let server = Arc::new(ChariottServer::new(registry, broker));
+    let server = Arc::new(IntentBrokeringServer::new(registry, broker));
     let router = Server::builder()
-        .add_service(ChariottServiceServer::from_arc(Arc::clone(&server)))
+        .add_service(IntentBrokeringServiceServer::from_arc(Arc::clone(&server)))
         .add_service(ChannelServiceServer::new(streaming_ess));
 
     #[cfg(build = "debug")]
@@ -108,7 +108,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn registry_prune_loop(
-    server: Arc<ChariottServer<Composite<IntentBroker, StreamingEss>>>,
+    server: Arc<IntentBrokeringServer<Composite<IntentBroker, StreamingEss>>>,
     ctrl_c_cancellation_token: CancellationToken,
     error_cancellation_token: CancellationToken,
 ) {

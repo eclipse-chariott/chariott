@@ -15,15 +15,15 @@ use std::{
 use super::{inspection::Entry as InspectionEntry, value::Value};
 
 use async_trait::async_trait;
-use chariott_common::error::{Error, ResultExt as _};
-use chariott_proto::{
+use intent_brokering_common::error::{Error, ResultExt as _};
+use intent_brokering_proto::{
     common::{
         discover_fulfillment::Service as ServiceMessage, DiscoverFulfillment, DiscoverIntent,
         FulfillmentEnum, InspectFulfillment, InspectIntent, IntentEnum, IntentMessage,
         InvokeFulfillment, InvokeIntent, ReadFulfillment, ReadIntent, SubscribeFulfillment,
         SubscribeIntent, WriteFulfillment, WriteIntent,
     },
-    runtime::{chariott_service_client::ChariottServiceClient, FulfillRequest, FulfillResponse},
+    runtime::{intent_brokering_service_client::IntentBrokeringServiceClient, FulfillRequest, FulfillResponse},
     streaming::{channel_service_client::ChannelServiceClient, OpenRequest},
 };
 use futures::{stream::BoxStream, StreamExt};
@@ -80,14 +80,14 @@ impl_try_from_var!(Fulfillment, FulfillmentEnum::Discover, DiscoverFulfillment);
 
 #[derive(Clone)]
 pub struct GrpcChariott {
-    client: ChariottServiceClient<Channel>,
+    client: IntentBrokeringServiceClient<Channel>,
 }
 
 impl GrpcChariott {
     pub async fn connect() -> Result<Self, Error> {
         let chariott_url =
             env::var(CHARIOTT_URL_KEY).unwrap_or_else(|_| DEFAULT_CHARIOTT_URL.to_string());
-        let client = ChariottServiceClient::connect(chariott_url)
+        let client = IntentBrokeringServiceClient::connect(chariott_url)
             .await
             .map_err_with("Connecting to Chariott failed.")?;
 

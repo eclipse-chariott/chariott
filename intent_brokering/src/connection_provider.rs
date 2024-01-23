@@ -5,8 +5,8 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use chariott_common::error::{Error, ResultExt as _};
-use chariott_proto::provider::{
+use intent_brokering_common::error::{Error, ResultExt as _};
+use intent_brokering_proto::provider::{
     provider_service_client::ProviderServiceClient, FulfillRequest, FulfillResponse,
 };
 use tokio::sync::Mutex;
@@ -127,8 +127,8 @@ mod tests {
     };
 
     use async_trait::async_trait;
-    use chariott_common::error::Error;
-    use chariott_proto::provider::{FulfillRequest, FulfillResponse};
+    use intent_brokering_common::error::Error;
+    use intent_brokering_proto::provider::{FulfillRequest, FulfillResponse};
     use url::Url;
 
     use super::{ConnectedProvider, ConnectionProvider, ReusableProvider};

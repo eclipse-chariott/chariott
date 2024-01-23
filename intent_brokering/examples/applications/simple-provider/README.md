@@ -1,21 +1,21 @@
 # Simple Provider Example
 
-This is an example Chariott provider that shows how to register a provider with chariott.
+This is an example Intent provider that shows how to register a provider with the Intent Brokering service.
 
 ## Testing
 
-Start Chariott followed by this application:
+Start the Intent Brokering service followed by this application:
 
 ```bash
-cargo run -p chariott &
+cargo run -p intent-brokering &
 cargo run -p simple-provider &
 ```
 
 Once both are up and running successfully, use the following to 'discover'
-the provider. This will let you know that the provider is registered with Chariott:
+the provider. This will let you know that the provider is registered with the Intent Brokering service:
 
 ```bash
-grpcurl -plaintext -d @ 0.0.0.0:4243 chariott.runtime.v1.ChariottService/Fulfill <<EOF
+grpcurl -plaintext -d @ 0.0.0.0:4243 intent_brokering.runtime.v1.IntentBrokeringService/Fulfill <<EOF
 {
   "namespace": "sdv.simple.provider",
   "intent": {
@@ -29,6 +29,6 @@ To clean-up from the above commands, run:
 
 ```bash
 pkill simple-provider
-pkill chariott
+pkill intent-brokering
 pkill grpcurl
 ```

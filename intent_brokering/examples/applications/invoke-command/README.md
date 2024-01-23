@@ -5,18 +5,18 @@ It shows an example of a command that takes a json string as an input.
 
 ## Testing
 
-Start Chariott followed by this application:
+Start the Intent Brokering service followed by this application:
 
 ```bash
-cargo run -p chariott &
+cargo run -p intent-brokering &
 cargo run -p invoke-command &
 ```
 
 Once both are up and running successfully, use the following to 'discover'
-the provider. This will let you know that the provider is registered with Chariott:
+the provider. This will let you know that the provider is registered with the Intent Brokering service:
 
 ```bash
-grpcurl -plaintext -d @ 0.0.0.0:4243 chariott.runtime.v1.ChariottService/Fulfill <<EOF
+grpcurl -plaintext -d @ 0.0.0.0:4243 intent_brokering.runtime.v1.IntentBrokeringService/Fulfill <<EOF
 {
   "namespace": "sdv.invoke.controller",
   "intent": {
@@ -30,10 +30,10 @@ Once the service is confirmed registered, the below command can be run to call a
 on the provider. The command takes a json string and parses it/prints it out on the provider side.
 The 'command' parameter is used to tell the desired provider what command to run.The 'args'
 parameter is a list of arguments for the command. The args can be several types, defined
-in `proto\chariott\common\v1\common.proto` file under the `Value` message.
+in `proto\common\v1\common.proto` file under the `Value` message.
 
 ```bash
-grpcurl -plaintext -d @ 0.0.0.0:4243 chariott.runtime.v1.ChariottService/Fulfill <<EOF
+grpcurl -plaintext -d @ 0.0.0.0:4243 intent_brokering.runtime.v1.IntentBrokeringService/Fulfill <<EOF
 {
   "namespace": "sdv.invoke.controller",
   "intent": {
@@ -52,6 +52,6 @@ To clean-up from the above commands, run:
 
 ```bash
 pkill invoke-command
-pkill chariott
+pkill intent-brokering
 pkill grpcurl
 ```

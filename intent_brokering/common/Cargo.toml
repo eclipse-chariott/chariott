@@ -1,12 +1,12 @@
 [package]
-name = "chariott-common"
+name = "intent-brokering-common"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
 
 [dependencies]
 async-trait = { workspace = true }
-chariott-proto = { workspace = true }
+intent-brokering-proto = { workspace = true }
 ess = { path = "../ess" }
 regex = { workspace = true }
 serde = { workspace = true, features = ["derive"] }

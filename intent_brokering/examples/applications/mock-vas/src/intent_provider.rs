@@ -7,7 +7,7 @@ use std::sync::Arc;
 use std::vec;
 
 use async_trait::async_trait;
-use chariott_proto::{
+use intent_brokering_proto::{
     common::{
         discover_fulfillment::Service, DiscoverFulfillment, FulfillmentEnum, FulfillmentMessage,
         IntentEnum, InvokeFulfillment, ValueMessage,
@@ -35,13 +35,13 @@ const SCHEMA_REFERENCE: &str = "grpc+proto";
 
 pub type StreamingStore = chariott::streaming::StreamingStore<Value>;
 
-pub struct ChariottProvider {
+pub struct IntentProvider {
     url: Url,
     vehicle_simulation: VehicleSimulation,
     streaming_store: Arc<StreamingStore>,
 }
 
-impl ChariottProvider {
+impl IntentProvider {
     pub fn new(
         url: Url,
         simulation: VehicleSimulation,
@@ -80,7 +80,7 @@ fn command(path: &str, r#type: &str) -> Entry {
 }
 
 #[async_trait]
-impl ProviderService for ChariottProvider {
+impl ProviderService for IntentProvider {
     async fn fulfill(
         &self,
         request: Request<FulfillRequest>,

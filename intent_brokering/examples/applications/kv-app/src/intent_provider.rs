@@ -10,7 +10,7 @@ use tonic::{Request, Response, Status};
 
 use url::Url;
 
-use chariott_proto::{
+use intent_brokering_proto::{
     common::{
         discover_fulfillment::Service, value::Value, DiscoverFulfillment, FulfillmentEnum,
         FulfillmentMessage, IntentEnum, WriteFulfillment, WriteIntent,
@@ -20,12 +20,12 @@ use chariott_proto::{
 
 pub type StreamingStore = chariott::streaming::StreamingStore<Value>;
 
-pub struct ChariottProvider {
+pub struct IntentProvider {
     url: Url,
     streaming_store: Arc<StreamingStore>,
 }
 
-impl ChariottProvider {
+impl IntentProvider {
     pub fn new(url: Url, streaming_store: Arc<StreamingStore>) -> Self {
         Self { url, streaming_store }
     }
@@ -42,7 +42,7 @@ impl ChariottProvider {
 }
 
 #[async_trait]
-impl ProviderService for ChariottProvider {
+impl ProviderService for IntentProvider {
     async fn fulfill(
         &self,
         request: Request<FulfillRequest>,

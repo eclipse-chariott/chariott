@@ -36,9 +36,9 @@ EOF
     fi
     local ID; ID="$(date -u +%s.%N)"
     echo "$REQ" > "$GRPC_LOG_DIR_PATH/req-$ID"
-    grpcurl -plaintext -import-path ../proto -proto ../proto/chariott/runtime/v1/runtime.proto \
+    grpcurl -plaintext -import-path ../proto -proto ../proto/runtime/v1/runtime.proto \
         -d @ "${CHARIOTT_ADDRESS:-0.0.0.0:4243}" \
-        chariott.runtime.v1.ChariottService/Fulfill <<< "$REQ" \
+        intent_brokering.runtime.v1.IntentBrokeringService/Fulfill <<< "$REQ" \
         | tee "$GRPC_LOG_DIR_PATH/rsp-$ID"
     if [[ "${PIPESTATUS[*]}" != '0 0' ]]; then return 1; fi
 }
@@ -211,8 +211,8 @@ cmd_listen() {
         mkfifo "$EVENT_STREAM_FIFO"
     fi
     grpcurl -v -plaintext -import-path ../proto -proto \
-        ../proto/chariott/streaming/v1/streaming.proto "$ADDRESS" \
-        chariott.streaming.v1.ChannelService/Open > "$EVENT_STREAM_FIFO" &
+        ../proto/streaming/v1/streaming.proto "$ADDRESS" \
+        intent_brokering.streaming.v1.ChannelService/Open > "$EVENT_STREAM_FIFO" &
     echo>"$LISTENER_PID_FILE_PATH" $!
     touch "$EVENTS_FILE_PATH" "$MUX_EVENTS_FILE_PATH"
     local LINE

@@ -7,11 +7,11 @@ use std::{
     time::Duration,
 };
 
-use chariott_common::{
+use intent_brokering_common::{
     config::env,
     error::{Error, ResultExt as _},
 };
-use chariott_proto::{
+use intent_brokering_proto::{
     common::{FulfillmentEnum, FulfillmentMessage, IntentEnum, InvokeFulfillment},
     provider::{
         provider_service_server::{ProviderService, ProviderServiceServer},
@@ -51,8 +51,8 @@ async fn wain() -> Result<(), Error> {
     info!("LT provider listening: {url}");
 
     let provider = match (env(LATENCY_MEAN_ENV), env(LATENCY_STD_DEV_ENV)) {
-        (Some(mean), Some(std_dev)) => ChariottProvider::normal(mean, std_dev),
-        (_, _) => ChariottProvider::new(),
+        (Some(mean), Some(std_dev)) => IntentProvider::normal(mean, std_dev),
+        (_, _) => IntentProvider::new(),
     };
 
     Server::builder()
@@ -64,11 +64,11 @@ async fn wain() -> Result<(), Error> {
 
 type Rand = Arc<Mutex<DistIter<Normal<f32>, SmallRng, f32>>>;
 
-struct ChariottProvider {
+struct IntentProvider {
     latency_distribution: Option<Rand>,
 }
 
-impl ChariottProvider {
+impl IntentProvider {
     pub fn new() -> Self {
         info!("No simulation of response latencies, responding immediately.");
         Self { latency_distribution: None }
@@ -90,7 +90,7 @@ impl ChariottProvider {
 }
 
 #[async_trait]
-impl ProviderService for ChariottProvider {
+impl ProviderService for IntentProvider {
     async fn fulfill(
         &self,
         request: Request<FulfillRequest>,

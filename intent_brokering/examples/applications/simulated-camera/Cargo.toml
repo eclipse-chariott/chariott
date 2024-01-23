@@ -9,8 +9,8 @@ anyhow = { workspace = true }
 async-std = "1.12"
 async-stream = "0.3.3"
 async-trait = { workspace = true }
-chariott-common = { workspace = true }
-chariott-proto = { workspace = true }
+intent-brokering-common = { workspace = true }
+intent-brokering-proto = { workspace = true }
 ess = { path = "../../../ess/" }
 keyvalue = { path = "../../../keyvalue/" }
 examples-common = { path = "../../common/" }

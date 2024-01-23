@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\..\..\..\proto\chariott\common\v1\common.proto;..\..\..\..\proto\chariott\runtime\v1\runtime.proto;..\..\..\..\proto\chariott\streaming\v1\streaming.proto" ProtoRoot="..\..\..\..\proto\" GrpcServices="Client" Link="Protos\%(Filename)%(Extension)" />
+    <Protobuf Include="..\..\..\..\proto\common\v1\common.proto;..\..\..\..\proto\runtime\v1\runtime.proto;..\..\..\..\proto\streaming\v1\streaming.proto" ProtoRoot="..\..\..\..\proto\" GrpcServices="Client" Link="Protos\%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

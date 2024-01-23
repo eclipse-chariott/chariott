@@ -5,7 +5,7 @@
 use std::{ops::Deref, sync::Arc, time::SystemTime};
 
 use async_trait::async_trait;
-use chariott_proto::{
+use intent_brokering_proto::{
     common::ValueMessage,
     common::{SubscribeFulfillment, SubscribeIntent, ValueEnum},
     streaming::{channel_service_server::ChannelService, Event, OpenRequest},
@@ -99,7 +99,7 @@ impl<T> Deref for StreamingEss<T> {
 mod tests {
     use std::time::Duration;
 
-    use chariott_proto::{
+    use intent_brokering_proto::{
         common::{SubscribeIntent, ValueEnum, ValueMessage},
         streaming::{channel_service_server::ChannelService, OpenRequest},
     };

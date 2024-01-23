@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 use bollard::{container::StatsOptions, Docker};
-use chariott_common::{
+use intent_brokering_common::{
     config::env,
     error::{Error, ResultExt},
 };

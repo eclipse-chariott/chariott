@@ -2,14 +2,14 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-use chariott_common::error::{Error, ResultExt};
+use intent_brokering_common::error::{Error, ResultExt};
 use examples_common::chariott::value::Value;
 use std::{env, sync::Arc};
 use tokio::sync::broadcast::{self, Sender};
 use tokio_util::sync::CancellationToken;
 use tracing::{debug, info};
 
-use crate::chariott_provider::{
+use crate::intent_provider::{
     StreamingStore, ACTIVATE_AIR_CONDITIONING_COMMAND, AIR_CONDITIONING_STATE_PROPERTY,
     BATTERY_LEVEL_PROPERTY, CABIN_TEMPERATURE_PROPERTY, SEND_NOTIFICATION_COMMAND,
     SET_UI_MESSAGE_COMMAND,

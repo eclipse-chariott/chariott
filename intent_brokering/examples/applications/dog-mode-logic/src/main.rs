@@ -384,7 +384,7 @@ async fn on_dog_mode_timer(
 #[cfg(test)]
 mod tests {
     use async_trait::async_trait;
-    use chariott_common::error::Error;
+    use intent_brokering_common::error::Error;
     use examples_common::chariott::{api::Service, inspection::Entry};
 
     use super::*;

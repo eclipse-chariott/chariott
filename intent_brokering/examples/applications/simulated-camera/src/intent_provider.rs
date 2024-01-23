@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use chariott_proto::{
+use intent_brokering_proto::{
     common::{
         discover_fulfillment::Service, intent::Intent, DiscoverFulfillment, FulfillmentEnum,
         FulfillmentMessage,
@@ -28,12 +28,12 @@ pub type StreamingStore = chariott::streaming::StreamingStore<Value>;
 const SCHEMA_VERSION_STREAMING: &str = "chariott.streaming.v1";
 const SCHEMA_REFERENCE: &str = "grpc+proto";
 
-pub struct ChariottProvider {
+pub struct IntentProvider {
     url: Url,
     store: Arc<StreamingStore>,
 }
 
-impl ChariottProvider {
+impl IntentProvider {
     pub fn new(url: Url, store: Arc<StreamingStore>) -> Self {
         Self { url, store }
     }
@@ -61,7 +61,7 @@ fn property(path: &str, fpm: i32) -> Entry {
 }
 
 #[async_trait]
-impl ProviderService for ChariottProvider {
+impl ProviderService for IntentProvider {
     async fn fulfill(
         &self,
         request: Request<FulfillRequest>,

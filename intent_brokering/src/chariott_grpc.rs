@@ -5,10 +5,10 @@
 use std::sync::{Arc, RwLock};
 use std::time::Instant;
 
-use chariott_proto::{
+use intent_brokering_proto::{
     common::intent::Intent,
     runtime::{
-        chariott_service_server::ChariottService, AnnounceRequest, AnnounceResponse,
+        intent_brokering_service_server::IntentBrokeringService, AnnounceRequest, AnnounceResponse,
         FulfillRequest, FulfillResponse, IntentRegistration, IntentServiceRegistration,
         RegisterRequest, RegisterResponse, RegistrationState,
     },
@@ -34,12 +34,12 @@ const INTENT_MAPPING_WRITE: i32 = 3;
 const INTENT_MAPPING_INVOKE: i32 = 4;
 const INTENT_MAPPING_SUBSCRIBE: i32 = 5;
 
-pub struct ChariottServer<T: Observer> {
+pub struct IntentBrokeringServer<T: Observer> {
     broker: IntentBroker,
     registry: Arc<RwLock<Registry<T>>>,
 }
 
-impl<T: Observer> ChariottServer<T> {
+impl<T: Observer> IntentBrokeringServer<T> {
     pub fn new(registry: Registry<T>, broker: IntentBroker) -> Self {
         Self { registry: Arc::new(RwLock::new(registry)), broker }
     }
@@ -52,7 +52,7 @@ impl<T: Observer> ChariottServer<T> {
     fn create_configruation_from_registration(
         intent: IntentRegistration,
     ) -> Result<IntentConfiguration, Status> {
-        ChariottServer::<T>::map_intent_value(intent.intent)
+        IntentBrokeringServer::<T>::map_intent_value(intent.intent)
             .map(|kind| IntentConfiguration::new(intent.namespace, kind))
     }
 
@@ -81,7 +81,7 @@ impl<T: Observer> ChariottServer<T> {
 }
 
 #[async_trait]
-impl<T: Observer + Send + Sync + 'static> ChariottService for ChariottServer<T> {
+impl<T: Observer + Send + Sync + 'static> IntentBrokeringService for IntentBrokeringServer<T> {
     async fn announce(
         &self,
         request: Request<AnnounceRequest>,
@@ -113,7 +113,7 @@ impl<T: Observer + Send + Sync + 'static> ChariottService for ChariottServer<T> 
         let intents: Result<Vec<_>, _> = request
             .intents
             .into_iter()
-            .map(ChariottServer::<T>::create_configruation_from_registration)
+            .map(IntentBrokeringServer::<T>::create_configruation_from_registration)
             .collect();
         self.registry
             .write()
@@ -134,7 +134,7 @@ impl<T: Observer + Send + Sync + 'static> ChariottService for ChariottServer<T> 
         let config = IntentConfiguration::new(
             request.namespace,
             match intent.intent {
-                Some(ref intent) => Ok(ChariottServer::<T>::map_intent_variant(intent)),
+                Some(ref intent) => Ok(IntentBrokeringServer::<T>::map_intent_variant(intent)),
                 None => Err(Status::invalid_argument("Intent is not known.")),
             }?,
         );
@@ -187,10 +187,10 @@ mod tests {
     use crate::registry::{Change, Observer, Registry};
     use crate::streaming::StreamingEss;
     use crate::{connection_provider::GrpcProvider, execution::tests::TestBinding};
-    use chariott_proto::{
+    use intent_brokering_proto::{
         common,
         runtime::{
-            chariott_service_server::ChariottService, intent_registration, AnnounceRequest,
+            intent_brokering_service_server::IntentBrokeringService, intent_registration, AnnounceRequest,
             IntentRegistration, IntentServiceRegistration, RegisterRequest, RegistrationState,
         },
     };
@@ -258,7 +258,7 @@ mod tests {
 
     #[test]
     fn intent_match_failure_are_caught() {
-        assert!(ChariottServer::<IntentBroker>::map_intent_value(-1).is_err());
+        assert!(IntentBrokeringServer::<IntentBroker>::map_intent_value(-1).is_err());
     }
 
     #[test]
@@ -279,7 +279,7 @@ mod tests {
 
         fn test(intent_value: i32, kind: IntentKind) {
             assert_eq!(
-                ChariottServer::<IntentBroker>::map_intent_value(intent_value).unwrap(),
+                IntentBrokeringServer::<IntentBroker>::map_intent_value(intent_value).unwrap(),
                 kind
             );
         }
@@ -398,7 +398,7 @@ mod tests {
                 IntentKind::Subscribe,
             ),
         ] {
-            assert_eq!(expected, ChariottServer::<IntentBroker>::map_intent_variant(&intent));
+            assert_eq!(expected, IntentBrokeringServer::<IntentBroker>::map_intent_variant(&intent));
         }
     }
 
@@ -430,10 +430,10 @@ mod tests {
         }
     }
 
-    fn setup() -> ChariottServer<IntentBroker> {
+    fn setup() -> IntentBrokeringServer<IntentBroker> {
         let broker =
             IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new()); // DevSkim: ignore DS162092
-        ChariottServer::new(Registry::new(broker.clone(), Default::default()), broker)
+            IntentBrokeringServer::new(Registry::new(broker.clone(), Default::default()), broker)
     }
 
     fn create_announce_request() -> AnnounceRequest {

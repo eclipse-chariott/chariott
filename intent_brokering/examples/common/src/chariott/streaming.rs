@@ -2,8 +2,8 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-use chariott_common::streaming_ess::StreamingEss;
-use chariott_proto::common::{
+use intent_brokering_common::streaming_ess::StreamingEss;
+use intent_brokering_proto::common::{
     fulfillment::Fulfillment, ReadFulfillment, ReadIntent, SubscribeIntent, ValueEnum, ValueMessage,
 };
 use keyvalue::{InMemoryKeyValueStore, Observer};

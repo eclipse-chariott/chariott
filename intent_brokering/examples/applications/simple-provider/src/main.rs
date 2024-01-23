@@ -2,18 +2,18 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-mod chariott_provider;
+mod intent_provider;
 
 use std::{net::SocketAddr, sync::Arc, time::Duration};
 
 use url::Url;
 
-use chariott_common::error::Error;
-use chariott_common::shutdown::RouterExt as _;
-use chariott_proto::{
+use intent_brokering_common::error::Error;
+use intent_brokering_common::shutdown::RouterExt as _;
+use intent_brokering_proto::{
     provider::provider_service_server::ProviderServiceServer,
     runtime::{
-        chariott_service_client::ChariottServiceClient, intent_registration::Intent,
+        intent_brokering_service_client::IntentBrokeringServiceClient, intent_registration::Intent,
         intent_service_registration::ExecutionLocality, AnnounceRequest, IntentRegistration,
         IntentServiceRegistration, RegisterRequest, RegistrationState,
     },
@@ -23,7 +23,7 @@ use tokio::time::sleep;
 use tonic::transport::{Channel, Server};
 use tracing::warn;
 
-use crate::chariott_provider::ChariottProvider;
+use crate::intent_provider::IntentProvider;
 
 #[derive(Clone)]
 struct RegisterParams {
@@ -37,10 +37,10 @@ struct RegisterParams {
 }
 
 async fn connect_chariott_client(
-    client: &mut Option<ChariottServiceClient<Channel>>,
+    client: &mut Option<IntentBrokeringServiceClient<Channel>>,
     chariott_url: String,
 ) -> Result<(), Error> {
-    *client = Some(ChariottServiceClient::connect(chariott_url).await.map_err(|e| {
+    *client = Some(IntentBrokeringServiceClient::connect(chariott_url).await.map_err(|e| {
         *client = None; // Set client back to None on error.
         Error::from_error("Could not connect to client", Box::new(e))
     })?);
@@ -49,7 +49,7 @@ async fn connect_chariott_client(
 }
 
 async fn register_and_announce_once(
-    client: &mut Option<ChariottServiceClient<Channel>>,
+    client: &mut Option<IntentBrokeringServiceClient<Channel>>,
     reg_params: RegisterParams,
 ) -> Result<(), Error> {
     // If there is no client, need to attempt connection.
@@ -160,7 +160,7 @@ async fn wain() -> Result<(), Error> {
 
     tracing::info!("Application listening on: {provider_url_str}");
 
-    let provider = Arc::new(ChariottProvider::new(provider_url.clone()));
+    let provider = Arc::new(IntentProvider::new(provider_url.clone()));
 
     Server::builder()
         .add_service(ProviderServiceServer::from_arc(Arc::clone(&provider)))

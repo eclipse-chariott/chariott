@@ -2,13 +2,13 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-mod chariott_provider;
+mod intent_provider;
 
 use std::sync::Arc;
 
-use chariott_common::error::Error;
-use chariott_common::shutdown::RouterExt as _;
-use chariott_proto::{
+use intent_brokering_common::error::Error;
+use intent_brokering_common::shutdown::RouterExt as _;
+use intent_brokering_proto::{
     provider::provider_service_server::ProviderServiceServer,
     runtime::{intent_registration::Intent, intent_service_registration::ExecutionLocality},
     streaming::channel_service_server::ChannelServiceServer,
@@ -16,7 +16,7 @@ use chariott_proto::{
 use examples_common::chariott;
 use tonic::transport::Server;
 
-use crate::chariott_provider::{ChariottProvider, StreamingStore};
+use crate::intent_provider::{IntentProvider, StreamingStore};
 
 chariott::provider::main!(wain);
 
@@ -35,7 +35,7 @@ async fn wain() -> Result<(), Error> {
     tracing::info!("Application listening on: {url}");
 
     let streaming_store = Arc::new(StreamingStore::new());
-    let provider = Arc::new(ChariottProvider::new(url.clone(), Arc::clone(&streaming_store)));
+    let provider = Arc::new(IntentProvider::new(url.clone(), Arc::clone(&streaming_store)));
 
     Server::builder()
         .add_service(ProviderServiceServer::from_arc(Arc::clone(&provider)))

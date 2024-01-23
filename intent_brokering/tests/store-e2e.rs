@@ -4,7 +4,7 @@
 
 use std::{collections::HashSet, error::Error as _, time::Duration};
 
-use chariott_common::error::Error;
+use intent_brokering_common::error::Error;
 use common::get_uuid;
 use examples_common::chariott::{
     api::{Chariott, ChariottExt, Event, GrpcChariott},

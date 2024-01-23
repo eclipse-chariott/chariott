@@ -6,7 +6,7 @@ use core::fmt;
 use std::collections::{HashMap, HashSet};
 use std::time::{Duration, Instant};
 
-use chariott_common::error::Error;
+use intent_brokering_common::error::Error;
 use url::Url;
 
 use crate::streaming::StreamingEss;
@@ -387,8 +387,8 @@ pub(crate) mod tests {
         time::Instant,
     };
 
-    use chariott_common::streaming_ess::StreamingEss;
-    use chariott_proto::common::{value::Value, SubscribeIntent};
+    use intent_brokering_common::streaming_ess::StreamingEss;
+    use intent_brokering_proto::common::{value::Value, SubscribeIntent};
     use test_case::test_case;
 
     use crate::{

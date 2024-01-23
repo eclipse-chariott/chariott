@@ -4,12 +4,12 @@
 
 use std::{env, net::SocketAddr, time::Duration};
 
-use chariott_common::{
+use intent_brokering_common::{
     config,
     error::{Error, ResultExt},
 };
-use chariott_proto::runtime::{
-    chariott_service_client::ChariottServiceClient, intent_registration::Intent,
+use intent_brokering_proto::runtime::{
+    intent_brokering_service_client::IntentBrokeringServiceClient, intent_registration::Intent,
     intent_service_registration::ExecutionLocality, AnnounceRequest, IntentRegistration,
     IntentServiceRegistration, RegisterRequest, RegistrationState,
 };
@@ -56,7 +56,7 @@ impl Builder {
             .unwrap();
 
         let announce_url: Url =
-            chariott_common::config::env(ANNOUNCE_URL_KEY).unwrap_or_else(|| url.clone());
+            intent_brokering_common::config::env(ANNOUNCE_URL_KEY).unwrap_or_else(|| url.clone());
 
         Self {
             name: name.into(),
@@ -143,12 +143,12 @@ impl Builder {
 
     pub async fn register_once(
         &self,
-        client: &mut Option<ChariottServiceClient<Channel>>,
+        client: &mut Option<IntentBrokeringServiceClient<Channel>>,
         first_iteration: bool,
     ) -> Result<(), Error> {
         if client.is_none() {
             *client = Some(
-                ChariottServiceClient::connect(self.chariott_url.to_string()).await.map_err_with(
+                IntentBrokeringServiceClient::connect(self.chariott_url.to_string()).await.map_err_with(
                     format!("Could not connect to Chariott ({})", self.chariott_url),
                 )?,
             );

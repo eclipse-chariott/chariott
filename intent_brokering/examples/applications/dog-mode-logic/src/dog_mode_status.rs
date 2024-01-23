@@ -4,7 +4,7 @@
 
 use anyhow::{anyhow, Error};
 use async_stream::try_stream;
-use chariott_proto::common::Blob;
+use intent_brokering_proto::common::Blob;
 use examples_common::{
     chariott::{
         api::{Chariott, ChariottExt as _, GrpcChariott},

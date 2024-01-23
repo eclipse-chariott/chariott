@@ -13,7 +13,7 @@
 //! In order to get started, reference this library in your Cargo.toml
 //!
 //! ```toml
-//! chariott_common = { path = "../common/" }
+//! intent_brokering_common = { path = "../common/" }
 //! ```
 //!
 

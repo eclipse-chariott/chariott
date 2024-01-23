@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 #[macro_export]
-macro_rules! chariott_provider_main {
+macro_rules! intent_provider_main {
     ($main:ident) => {
         #[cfg(not(tarpaulin_include))]
         #[::tokio::main]
@@ -33,15 +33,15 @@ macro_rules! chariott_provider_main {
     };
 }
 
-pub use chariott_provider_main as main;
+pub use intent_provider_main as main;
 
 use std::net::SocketAddr;
 
 use url::Url;
 
-use chariott_common::config::env;
-use chariott_common::error::{Error, ResultExt};
-use chariott_proto::runtime::{
+use intent_brokering_common::config::env;
+use intent_brokering_common::error::{Error, ResultExt};
+use intent_brokering_proto::runtime::{
     intent_registration::Intent, intent_service_registration::ExecutionLocality,
 };
 
