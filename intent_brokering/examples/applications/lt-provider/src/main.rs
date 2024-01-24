@@ -7,8 +7,8 @@ use std::{
     time::Duration,
 };
 
-use examples_common::chariott;
-use examples_common::chariott::value::Value;
+use examples_common::intent_brokering;
+use examples_common::intent_brokering::value::Value;
 use intent_brokering_common::{
     config::env,
     error::{Error, ResultExt as _},
@@ -34,10 +34,10 @@ const LATENCY_MEAN_ENV: &str = "LATENCY_MEAN";
 // Standard deviation of latency distribution in milliseconds.
 const LATENCY_STD_DEV_ENV: &str = "LATENCY_STD_DEV";
 
-chariott::provider::main!(wain);
+intent_brokering::provider::main!(wain);
 
 async fn wain() -> Result<(), Error> {
-    let (url, socket_address) = chariott::provider::register(
+    let (url, socket_address) = intent_brokering::provider::register(
         "lt.provider",
         "0.0.1",
         "lt.provider",

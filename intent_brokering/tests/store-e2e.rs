@@ -5,8 +5,8 @@
 use std::{collections::HashSet, error::Error as _, time::Duration};
 
 use common::get_uuid;
-use examples_common::chariott::{
-    api::{Chariott, ChariottExt, Event, GrpcChariott},
+use examples_common::intent_brokering::{
+    api::{IntentBrokering, IntentBrokeringExt, Event, GrpcIntentBrokering},
     value::Value,
 };
 use intent_brokering_common::error::Error;
@@ -20,10 +20,10 @@ const KV_NAMESPACE: &str = "sdv.kvs";
 #[tokio::test]
 async fn when_key_does_not_exist_returns_none() -> Result<(), anyhow::Error> {
     // arrange
-    let mut chariott = setup().await;
+    let mut intent_broker = setup().await;
 
     // act
-    let response = chariott.read(KV_NAMESPACE, get_uuid()).await?;
+    let response = intent_broker.read(KV_NAMESPACE, get_uuid()).await?;
 
     // assert
     assert_eq!(None, response);
@@ -34,13 +34,13 @@ async fn when_key_does_not_exist_returns_none() -> Result<(), anyhow::Error> {
 #[tokio::test]
 async fn when_writing_value_returns_value_on_read() -> Result<(), anyhow::Error> {
     // arrange
-    let mut chariott = setup().await;
+    let mut intent_broker = setup().await;
     let value: Value = "some_value".into();
     let key = get_uuid();
 
     // act
-    chariott.write(KV_NAMESPACE, key.clone(), value.clone()).await?;
-    let response = chariott.read(KV_NAMESPACE, key).await?;
+    intent_broker.write(KV_NAMESPACE, key.clone(), value.clone()).await?;
+    let response = intent_broker.read(KV_NAMESPACE, key).await?;
 
     // assert
     assert_eq!(Some(value), response);
@@ -51,10 +51,10 @@ async fn when_writing_value_returns_value_on_read() -> Result<(), anyhow::Error>
 #[tokio::test]
 async fn when_provider_does_not_exist_returns_error() {
     // arrange
-    let mut chariott = setup().await;
+    let mut intent_broker = setup().await;
 
     // act
-    let response = chariott.read("sdv.does_not_exist", "key").await;
+    let response = intent_broker.read("sdv.does_not_exist", "key").await;
 
     // assert
     assert!(response.unwrap_err().source().unwrap().to_string().contains("No provider found."));
@@ -63,13 +63,13 @@ async fn when_provider_does_not_exist_returns_error() {
 #[tokio::test]
 async fn when_writing_while_streaming_publishes_value() -> Result<(), anyhow::Error> {
     // arrange
-    let mut chariott = setup().await;
+    let mut intent_broker = setup().await;
     let key = get_uuid();
     let value: Value = 10.into();
 
     // act
-    let response_stream = chariott.listen(KV_NAMESPACE, [key.clone()]).await?;
-    chariott.write(KV_NAMESPACE, key.clone(), value.clone()).await?;
+    let response_stream = intent_broker.listen(KV_NAMESPACE, [key.clone()]).await?;
+    intent_broker.write(KV_NAMESPACE, key.clone(), value.clone()).await?;
 
     // assert
     let event = response_stream.take(1).collect::<Vec<Result<Event, Error>>>().await;
@@ -85,13 +85,13 @@ async fn when_writing_while_streaming_publishes_value() -> Result<(), anyhow::Er
 async fn when_streaming_increases_sequence_number() -> Result<(), anyhow::Error> {
     // arrange
     const NUMBER_OF_EVENTS: u64 = 5;
-    let mut chariott = setup().await;
+    let mut intent_broker = setup().await;
     let key = get_uuid();
 
     // act
-    let response_stream = chariott.listen(KV_NAMESPACE, [key.clone()]).await?;
+    let response_stream = intent_broker.listen(KV_NAMESPACE, [key.clone()]).await?;
     for _ in 0..NUMBER_OF_EVENTS {
-        chariott.write(KV_NAMESPACE, key.clone(), 10.into()).await?;
+        intent_broker.write(KV_NAMESPACE, key.clone(), 10.into()).await?;
     }
 
     // assert
@@ -114,11 +114,11 @@ async fn when_streaming_increases_sequence_number() -> Result<(), anyhow::Error>
 #[tokio::test]
 async fn when_writing_to_a_different_key_does_not_publish_value() -> Result<(), anyhow::Error> {
     // arrange
-    let mut chariott = setup().await;
+    let mut intent_broker = setup().await;
 
     // act
-    let mut response_stream = chariott.listen(KV_NAMESPACE, [get_uuid()]).await?;
-    chariott.write(KV_NAMESPACE, get_uuid(), 10.into()).await?;
+    let mut response_stream = intent_broker.listen(KV_NAMESPACE, [get_uuid()]).await?;
+    intent_broker.write(KV_NAMESPACE, get_uuid(), 10.into()).await?;
 
     // assert
 
@@ -136,6 +136,6 @@ async fn when_writing_to_a_different_key_does_not_publish_value() -> Result<(), 
     Ok(())
 }
 
-async fn setup() -> impl Chariott {
-    GrpcChariott::connect().await.unwrap()
+async fn setup() -> impl IntentBrokering {
+    GrpcIntentBrokering::connect().await.unwrap()
 }

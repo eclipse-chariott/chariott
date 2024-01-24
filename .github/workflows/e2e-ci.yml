@@ -46,13 +46,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Build Chariott Container
+      - name: Build Intent Brokering service Container
         uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile.intent_brokering
           load: true
-          tags: chariott:1
+          tags: intent_brokering:1
 
       - name: Build KV-App Container
         uses: docker/build-push-action@v3
@@ -63,12 +63,12 @@ jobs:
           load: true
           tags: kv-app:1
 
-      - name: Start Chariott
+      - name: Start Intent Brokering
         run: |
-          docker run -d --name chariott --network host \
+          docker run -d --name intent_brokering --network host \
             -e RUST_LOG=debug \
             -e CHARIOTT_REGISTRY_TTL_SECS \
-            chariott:1
+            intent_brokering:1
 
       - name: Start KV-App
         run: |
@@ -78,17 +78,17 @@ jobs:
         run: |
           cargo test --test "*e2e"
 
-      - name: Print Chariott log output
+      - name: Print Intent Brokering log output
         if: ${{ always() }}
         run: |
-          docker logs chariott > chariott.log
-          docker logs chariott
+          docker logs intent_brokering > intent_brokering.log
+          docker logs intent_brokering
 
-      - name: Archive Chariott log output
+      - name: Archive Intent Brokering log output
         uses: actions/upload-artifact@v1
         with:
-          name: Chariott E2E log
-          path: chariott.log
+          name: Intent Brokering E2E log
+          path: intent_brokering.log
 
       - name: Print KV App log output
         if: ${{ always() }}

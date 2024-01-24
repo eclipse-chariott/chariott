@@ -7,15 +7,15 @@ use std::time::Instant;
 
 use async_trait::async_trait;
 use common::get_uuid;
-use examples_common::chariott::{
-    api::{Chariott, ChariottCommunication},
+use examples_common::intent_brokering::{
+    api::{IntentBrokering, IntentBrokeringCommunication},
     value::Value,
 };
 use intent_brokering::registry::{
     ExecutionLocality, IntentConfiguration, IntentKind, ServiceConfiguration, ServiceId,
 };
 use intent_brokering::streaming::StreamingEss;
-use intent_brokering::{chariott_grpc::IntentBrokeringServer, registry::Registry, IntentBroker};
+use intent_brokering::{intent_brokering_grpc::IntentBrokeringServer, registry::Registry, IntentBroker};
 use intent_brokering_common::error::{Error, ResultExt as _};
 use intent_brokering_common::shutdown::RouterExt as _;
 use intent_brokering_proto::{
@@ -185,7 +185,7 @@ async fn setup_multiple(providers: impl IntoIterator<Item = ProviderSetup>) -> S
 }
 
 #[async_trait]
-impl ChariottCommunication for Subject {
+impl IntentBrokeringCommunication for Subject {
     async fn fulfill(
         &mut self,
         namespace: impl Into<Box<str>> + Send,

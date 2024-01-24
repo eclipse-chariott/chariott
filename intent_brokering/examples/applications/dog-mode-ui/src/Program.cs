@@ -250,7 +250,7 @@ sealed class SdvEventReadingService : BackgroundService
             cancellationToken: cancellationToken);
 
             var streamingAddress = streamingAddressCandidates.Fulfillment.Discover.Services
-                .First(s => s.SchemaReference == "chariott.streaming.v1" && s.SchemaKind == "grpc+proto")
+                .First(s => s.SchemaReference == "intent_brokering.streaming.v1" && s.SchemaKind == "grpc+proto")
                 .Url;
 
             var channel = GrpcChannel.ForAddress(streamingAddress, new GrpcChannelOptions

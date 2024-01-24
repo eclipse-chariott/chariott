@@ -6,16 +6,16 @@ mod camera;
 mod communication;
 mod intent_provider;
 
-use examples_common::chariott;
+use examples_common::intent_brokering;
 use intent_brokering_common::error::Error;
 use intent_brokering_proto::runtime::{
     intent_registration::Intent, intent_service_registration::ExecutionLocality,
 };
 
-chariott::provider::main!(wain);
+intent_brokering::provider::main!(wain);
 
 async fn wain() -> Result<(), Error> {
-    let (url, socket_address) = chariott::provider::register(
+    let (url, socket_address) = intent_brokering::provider::register(
         "sdv.cabin.camera",
         "0.0.1",
         "sdv.camera.simulated",

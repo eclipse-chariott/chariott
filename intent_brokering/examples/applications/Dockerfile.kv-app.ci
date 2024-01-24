@@ -5,9 +5,9 @@
 ARG RUST_VERSION=1.70
 FROM docker.io/library/rust:${RUST_VERSION} AS builder
 
-# Dockerfile for building Eclipse Chariott container
+# Dockerfile for building the kv-app container
 #
-# This Dockerfile utilizes a two step build process. It builds Chariott with
+# This Dockerfile utilizes a two step build process. It builds kv-app with
 # statically linked dependencies (using musl vs. glibc to accomplish this) for a
 # specific architecture such that we can utilize a scratch container without
 # further dependencies for our final container, minimizing container size.
@@ -29,7 +29,7 @@ RUN rustup target add x86_64-unknown-linux-musl
 
 RUN cargo build --release --target=x86_64-unknown-linux-musl --package kv-app
 
-# unprivileged identity to run Chariott as
+# unprivileged identity to run kv-app as
 RUN adduser \
     --disabled-password \
     --gecos "" \
@@ -45,7 +45,7 @@ RUN adduser \
 FROM alpine:latest
 ARG APP_NAME
 ARG USER_NAME
-# Import Chariott user and group from builder.
+# Import kv-app user and group from builder.
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
 
@@ -54,6 +54,6 @@ WORKDIR /sdv
 # Copy our build
 COPY --from=builder /sdv/target/x86_64-unknown-linux-musl/release/kv-app /sdv/kv-app
 
-# Use the unprivileged chariott user during execution.
+# Use the unprivileged kv-app user during execution.
 USER ${USER_NAME}:${USER_NAME}
 CMD ["sh", "-c", "./kv-app"]

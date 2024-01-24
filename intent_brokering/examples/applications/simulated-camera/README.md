@@ -7,7 +7,7 @@ manual mode where you specify the frame rate event yourself.
 
 ## To run the application
 
-1. Start intent brokering runtime by executing `cargo run -p intent_brokering` from the root directory
+1. Start intent brokering runtime by executing `cargo run -p intent-brokering` from the root directory
 2. Navigate to `intent_brokering/examples/applications/simulated-camera` directory
 3. Create a `images` directory and place there all the `.jpg` files you want the
    camera application to stream

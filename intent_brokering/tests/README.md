@@ -10,7 +10,7 @@ To run the tests, you can either use the CI, or run the tests locally.
 Assuming the current working directory is the project root, run:
 
 ```sh
-cargo build --release -p chariott -p kv-app
+cargo build --release -p intent-brokering -p kv-app
 CHARIOTT_REGISTRY_TTL_SECS=7 ./target/release/chariott &
 ./target/release/kv-app &
 CHARIOTT_REGISTRY_TTL_SECS=7 cargo test --test '*e2e'

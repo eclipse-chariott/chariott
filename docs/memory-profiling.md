@@ -23,18 +23,18 @@ In case you want to build from source you can follow this [documentation](https:
 
 ## Scenario
 
-In order to have a consistent feedback loop for Chariott and valgrind, we'll use the
-load test benchmarking available in Chariott.
+In order to have a consistent feedback loop for Intent Brokering and valgrind, we'll use the
+load test benchmarking available in Intent Brokering.
 
 ## Running memcheck
 
-Memcheck is the default valgrind tool for memory profiling. The usage for Chariott
+Memcheck is the default valgrind tool for memory profiling. The usage for Intent Brokering
 together with the e2e tests is as follows:
 
-In a dedicated terminal, run valgrind with Chariott
+In a dedicated terminal, run valgrind with Intent Brokering
 
 ```bash
-valgrind ./target/debug/chariott
+valgrind ./target/debug/intent_brokering
 ```
 
 In another terminal, run the e2e tests
@@ -69,13 +69,13 @@ the end of the output. It looks like this:
 ## Running massif
 
 The other tool to use is **massif**. It writes its output to a file, which can be
-visualized with the `ms_print` tool. The usage for Chariott together with the e2e
+visualized with the `ms_print` tool. The usage for Intent Brokering together with the e2e
 tests is as follows:
 
-In a dedicated terminal, run massif with Chariott
+In a dedicated terminal, run massif with Intent Brokering
 
 ```bash
-valgrind --tool=massif ./target/debug/chariott
+valgrind --tool=massif ./target/debug/intent_brokering
 ```
 
 In another terminal, run the e2e tests
@@ -98,7 +98,7 @@ The output of `ms_print` looks like this (just a part of it):
 
 ```bash
 --------------------------------------------------------------------------------
-Command:            ./target/debug/chariott
+Command:            ./target/debug/intent_brokering
 Massif arguments:   (none)
 ms_print arguments: massif.out.7704
 --------------------------------------------------------------------------------

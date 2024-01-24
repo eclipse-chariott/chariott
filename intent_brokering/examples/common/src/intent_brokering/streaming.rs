@@ -24,7 +24,7 @@ impl<T: Clone + Send + 'static> Observer<EventId, T> for InternalStreamingEss<T>
 }
 
 /// Represents an in-memory store that contains a blanket implementation for
-/// integration with the Chariott streaming API. It generalizes over any type of
+/// integration with the IntentBrokering streaming API. It generalizes over any type of
 /// value to be published, as long as that value can be transformed into a value
 /// which is compatible with the Proto contract.
 pub struct StreamingStore<T> {

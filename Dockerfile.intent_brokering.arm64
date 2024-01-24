@@ -5,12 +5,12 @@
 ARG RUST_VERSION=1.70
 FROM docker.io/library/rust:${RUST_VERSION} AS builder
 
-# Dockerfile for building Eclipse Chariott container for ARM64 with
-# cross-compilation.
+# Dockerfile for building Eclipse Chariott Intent Brokering service container
+# for ARM64 with cross-compilation.
 #
 # This Dockerfile utilizes a two step build process. It builds the with
-# statically linked dependencies (using musl vs. glibc to accomplish this) for a
-# specific architecture such that we can utilize a scratch container without
+# statically linked dependencies (using musl vs. glibc to accomplish this) for
+# a specific architecture such that we can utilize a scratch container without
 # further dependencies for our final container, minimizing container size.
 
 # Chariott user id
@@ -19,7 +19,7 @@ ARG CHARIOTT_UID=10001
 RUN apt update && apt upgrade -y
 RUN apt install -y cmake protobuf-compiler gcc-aarch64-linux-gnu
 
-# unprivileged identity to run Chariott as
+# unprivileged identity to run Chariott Intent Brokering service as
 RUN adduser \
     --disabled-password \
     --gecos "" \
@@ -35,7 +35,7 @@ COPY ./ .
 
 RUN rustup target add aarch64-unknown-linux-musl
 
-RUN cargo build --release --target=aarch64-unknown-linux-musl -p chariott
+RUN cargo build --release --target=aarch64-unknown-linux-musl -p intent-brokering
 
 #############################################################x#######################################
 ## Final image
@@ -49,9 +49,9 @@ COPY --from=builder /etc/group /etc/group
 WORKDIR /sdv
 
 # Copy our build
-COPY --from=builder /sdv/target/aarch64-unknown-linux-musl/release/chariott /sdv/chariott
+COPY --from=builder /sdv/target/aarch64-unknown-linux-musl/release/intent_brokering /sdv/intent_brokering
 
 # Use the unprivileged Chariott user during execution.
 USER chariott::chariott
 
-CMD ["./chariott"]
+CMD ["./intent_brokering"]

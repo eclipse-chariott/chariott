@@ -16,16 +16,16 @@ use intent_brokering_proto::{
 use tonic::{Request, Response, Status};
 use url::Url;
 
-use examples_common::chariott::{
+use examples_common::intent_brokering::{
     self,
     inspection::{fulfill, Entry},
     streaming::ProtoExt as _,
     value::Value,
 };
 
-pub type StreamingStore = chariott::streaming::StreamingStore<Value>;
+pub type StreamingStore = intent_brokering::streaming::StreamingStore<Value>;
 
-const SCHEMA_VERSION_STREAMING: &str = "chariott.streaming.v1";
+const SCHEMA_VERSION_STREAMING: &str = "intent_brokering.streaming.v1";
 const SCHEMA_REFERENCE: &str = "grpc+proto";
 
 pub struct IntentProvider {

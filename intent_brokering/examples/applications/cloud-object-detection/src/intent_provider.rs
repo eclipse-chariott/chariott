@@ -13,7 +13,7 @@ use tracing::error;
 use crate::detection::DetectionLogic;
 
 use examples_common::{
-    chariott::inspection::{fulfill, Entry},
+    intent_brokering::inspection::{fulfill, Entry},
     examples::detection::DetectRequest,
 };
 

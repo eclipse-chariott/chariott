@@ -116,7 +116,7 @@ where
                 }
             }
             RuntimeBinding::SystemDiscover(url) => {
-                const SCHEMA_VERSION_STREAMING: &str = "chariott.streaming.v1";
+                const SCHEMA_VERSION_STREAMING: &str = "intent_brokering.streaming.v1";
                 const SCHEMA_REFERENCE: &str = "grpc+proto";
 
                 fulfill_response(FulfillmentEnum::Discover(DiscoverFulfillment {
@@ -364,7 +364,7 @@ pub(crate) mod tests {
                         services: vec![Service {
                             url: url.to_string(),
                             schema_kind: "grpc+proto".to_owned(),
-                            schema_reference: "chariott.streaming.v1".to_owned(),
+                            schema_reference: "intent_brokering.streaming.v1".to_owned(),
                             metadata: HashMap::new(),
                         }],
                     })),

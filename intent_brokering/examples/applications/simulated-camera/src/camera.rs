@@ -4,7 +4,7 @@
 
 use async_stream::try_stream;
 use core::panic;
-use examples_common::chariott::value::Value;
+use examples_common::intent_brokering::value::Value;
 use intent_brokering_common::error::Error;
 use std::collections::HashMap;
 use std::path::PathBuf;

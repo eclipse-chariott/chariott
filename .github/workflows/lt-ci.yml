@@ -53,21 +53,21 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Build chariott container
+      - name: Build intent brokering container
         uses: docker/build-push-action@v3
         with:
           context: .
           file: Dockerfile.intent_brokering
           load: true
-          tags: chariott:1
+          tags: intent_brokering:1
 
-      - name: Build valgrind enabled chariott container
+      - name: Build valgrind enabled intent brokering container
         uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile.intent_brokering.valgrind
           load: true
-          tags: val-chariott:1
+          tags: intent_brokering.valgrind:1
 
       - name: Build lt-provider-app container
         uses: docker/build-push-action@v3
@@ -78,9 +78,9 @@ jobs:
           load: true
           tags: lt-provider-app:1
 
-      - name: Start chariott and lt-provider-app
+      - name: Start intent_brokering and lt-provider-app
         run: |
-          docker run --init --detach --name chariott --network host chariott:1
+          docker run --init --detach --name intent_brokering --network host intent_brokering:1
           docker run --init --detach --name lt-provider-app --network host lt-provider-app:1
 
       - name: Run load tests
@@ -92,9 +92,9 @@ jobs:
       - name: Stop containers
         run: |
           docker kill --signal=SIGINT lt-provider-app
-          docker kill --signal=SIGINT chariott
+          docker kill --signal=SIGINT intent_brokering
           docker stop lt-provider-app
-          docker stop chariott
+          docker stop intent_brokering
 
       - name: Print performance numbers
         run: |
@@ -107,21 +107,21 @@ jobs:
       - name: Print log output
         if: ${{ always() }}
         run: |
-          docker logs chariott
+          docker logs intent_brokering
           docker logs lt-provider-app
           for f in lt-output/*.log; do
             echo -e "Printing output of file $f:\n"
             cat "$f";
           done
 
-      - name: Start chariott and lt-provider-app
+      - name: Start intent_brokering and lt-provider-app
         run: |
           docker rm lt-provider-app
-          docker rm chariott
+          docker rm intent_brokering
           mkdir -p valgrind-output
           sudo chown -R 10001:10001 valgrind-output
           sudo chmod -R 777 valgrind-output
-          docker run --init --detach --name val-chariott --network host --volume $(pwd)/valgrind-output:/output val-chariott:1
+          docker run --init --detach --name intent_brokering.valgrind --network host --volume $(pwd)/valgrind-output:/output intent_brokering.valgrind:1
           docker run --init --detach --name lt-provider-app --network host lt-provider-app:1
 
       - name: Run Memory Profiling using load tests
@@ -134,9 +134,9 @@ jobs:
       - name: Stop containers
         run: |
           docker kill --signal=SIGINT lt-provider-app
-          docker kill --signal=SIGINT val-chariott
+          docker kill --signal=SIGINT intent_brokering.valgrind
           docker stop lt-provider-app
-          docker stop val-chariott
+          docker stop intent_brokering.valgrind
 
       - name: Create valgrind benchmark report
         run: |
@@ -167,7 +167,7 @@ jobs:
         uses: benchmark-action/github-action-benchmark@v1
         if: ${{ github.event_name != 'workflow_dispatch' }}
         with:
-          name: Chariott Benchmark
+          name: Intent Brokering Benchmark
           tool: 'customSmallerIsBetter'
           output-file-path: lt-output/all.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -181,7 +181,7 @@ jobs:
       - name: Print log output
         if: ${{ always() }}
         run: |
-          docker logs val-chariott
+          docker logs intent_brokering.valgrind
           docker logs lt-provider-app
           for f in lt-output/*.log; do
             echo -e "Printing output of file $f:\n"

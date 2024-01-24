@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-use intent_brokering::chariott_grpc::IntentBrokeringServer;
+use intent_brokering::intent_brokering_grpc::IntentBrokeringServer;
 use intent_brokering::registry::{self, Registry};
 use intent_brokering::streaming::StreamingEss;
 use intent_brokering::IntentBroker;
@@ -53,7 +53,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         streaming_ess.clone(),
     );
 
-    let registry_config = try_env::<u64>("CHARIOTT_REGISTRY_TTL_SECS")
+    let registry_config = try_env::<u64>("INTENT_BROKERING_REGISTRY_TTL_SECS")
         .ok()?
         .map(Duration::from_secs)
         .map(|v| registry::Config::default().set_entry_ttl_bounded(v))
@@ -71,7 +71,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     tracing::info!("starting grpc services");
     let addr = format!("0.0.0.0:{PORT}").parse().unwrap();
-    tracing::info!("chariott listening on {addr}");
+    tracing::info!("intent broker listening on {addr}");
 
     let server = Arc::new(IntentBrokeringServer::new(registry, broker));
     let router = Server::builder()

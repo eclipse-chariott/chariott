@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 /**
-* Common Messages for the Chariott runtime.
+* Common Messages for the IntentBrokering runtime.
 *
 * The protobuf definitions for messages common to the other definitions.
 */
@@ -46,7 +46,7 @@ message WriteFulfillment {
 /** Subscribe to a source on the application. This requires an already open streaming channel.
 * The `channel_id` is used to identify the channel to use for subscription. This is provided
 * by the provider as a gRPC metadata header when establishing a channel through the streaming
-* interface call. See [chariott.streaming.v1.proto](chariott.streaming.v1.proto) for more details.
+* interface call. See [intent_brokering.streaming.v1.proto](intent_brokering.streaming.v1.proto) for more details.
 */
 message SubscribeIntent {
     string channel_id = 1;
@@ -113,7 +113,7 @@ message InspectFulfillment {
 /**
 * Invoke Intent
 *
-* The invoke intent is used to invoke a method on the application through the chariott runtime.
+* The invoke intent is used to invoke a method on the application through the intent brokering runtime.
 */
 message InvokeIntent {
     string command = 1;

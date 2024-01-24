@@ -5,8 +5,8 @@
 use anyhow::{anyhow, Error};
 use async_stream::try_stream;
 use examples_common::{
-    chariott::{
-        api::{Chariott, ChariottExt as _, GrpcChariott},
+    intent_brokering::{
+        api::{IntentBrokering, IntentBrokeringExt as _, GrpcIntentBrokering},
         value::Value,
     },
     examples::proto::detection::{DetectRequest, DetectResponse},
@@ -19,10 +19,10 @@ use tracing::{info, warn};
 use crate::{DogModeState, DOG_MODE_STATUS_ID, KEY_VALUE_STORE_NAMESPACE};
 
 pub(crate) async fn stream_dog_mode_status(
-    mut chariott: GrpcChariott,
+    mut intent_broker: GrpcIntentBrokering,
     state: &mut DogModeState,
 ) -> Result<BoxStream<'static, Result<bool, Error>>, Error> {
-    if let ok @ Ok(_) = detect_dog(chariott.clone()).await {
+    if let ok @ Ok(_) = detect_dog(intent_broker.clone()).await {
         info!("Using automated dog detection.");
 
         // The dog mode logic application is responsible for updating the
@@ -34,7 +34,7 @@ pub(crate) async fn stream_dog_mode_status(
         warn!("Automatic dog detection failed. Falling back to using an external application to turn on the dog mode.");
 
         Ok(Box::pin(
-            chariott
+            intent_broker
                 .listen(KEY_VALUE_STORE_NAMESPACE, [DOG_MODE_STATUS_ID.into()])
                 .await?
                 .map_err(|e| e.into())
@@ -48,7 +48,7 @@ pub(crate) async fn stream_dog_mode_status(
 }
 
 async fn detect_dog(
-    mut chariott: GrpcChariott,
+    mut intent_broker: GrpcIntentBrokering,
 ) -> Result<BoxStream<'static, Result<bool, Error>>, Error> {
     const CAMERA_NAMESPACE: &str = "sdv.camera.simulated";
     const FRAMES_METADATA_KEY: &str = "frames_per_minute";
@@ -61,22 +61,22 @@ async fn detect_dog(
     /// namespace. If there are intents, we assume that those are the
     /// supported intent.
     async fn ensure_vehicle_functionality(
-        chariott: &mut impl Chariott,
+        intent_broker: &mut impl IntentBrokering,
         namespace: &str,
     ) -> Result<(), Error> {
-        if chariott.inspect(SYSTEM_REGISTRY_NAMESPACE, namespace).await?.is_empty() {
+        if intent_broker.inspect(SYSTEM_REGISTRY_NAMESPACE, namespace).await?.is_empty() {
             Err(anyhow!("Vehicle does not have registrations for namespace '{namespace}'."))
         } else {
             Ok(())
         }
     }
 
-    ensure_vehicle_functionality(&mut chariott, CAMERA_NAMESPACE).await?;
-    ensure_vehicle_functionality(&mut chariott, OBJECT_DETECTION_NAMESPACE).await?;
+    ensure_vehicle_functionality(&mut intent_broker, CAMERA_NAMESPACE).await?;
+    ensure_vehicle_functionality(&mut intent_broker, OBJECT_DETECTION_NAMESPACE).await?;
 
     // Stream images from the camera at the highest frame rate.
 
-    let (subscription_key, frames) = chariott
+    let (subscription_key, frames) = intent_broker
         .inspect(CAMERA_NAMESPACE, "**")
         .await?
         .into_iter()
@@ -93,15 +93,15 @@ async fn detect_dog(
 
     info!("Streaming with frame rate of {frames}fpm.");
 
-    let images = chariott.listen(CAMERA_NAMESPACE, [subscription_key]).await?;
+    let images = intent_broker.listen(CAMERA_NAMESPACE, [subscription_key]).await?;
 
     let dog_mode_state_stream = try_stream! {
         for await image in images {
-            yield image_contains_dog(&mut chariott, image?.data).await?;
+            yield image_contains_dog(&mut intent_broker, image?.data).await?;
         }
     };
 
-    async fn image_contains_dog(chariott: &mut impl Chariott, image: Value) -> Result<bool, Error> {
+    async fn image_contains_dog(intent_broker: &mut impl IntentBrokering, image: Value) -> Result<bool, Error> {
         use prost::Message;
 
         let (media_type, bytes) = image
@@ -113,7 +113,7 @@ async fn detect_dog(
         let mut detect_request_bytes = vec![];
         detect_request.encode(&mut detect_request_bytes)?;
 
-        let detection_result = chariott
+        let detection_result = intent_broker
             .invoke(
                 OBJECT_DETECTION_NAMESPACE,
                 DETECT_COMMAND_NAME,

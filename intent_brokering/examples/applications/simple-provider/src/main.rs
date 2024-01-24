@@ -8,7 +8,7 @@ use std::{net::SocketAddr, sync::Arc, time::Duration};
 
 use url::Url;
 
-use examples_common::chariott;
+use examples_common::intent_brokering;
 use intent_brokering_common::error::Error;
 use intent_brokering_common::shutdown::RouterExt as _;
 use intent_brokering_proto::{
@@ -32,15 +32,15 @@ struct RegisterParams {
     version: String,
     intents: Vec<Intent>,
     url: String,
-    chariott_url: String,
+    intent_brokering_url: String,
     locality: ExecutionLocality,
 }
 
-async fn connect_chariott_client(
+async fn connect_intent_brokering_client(
     client: &mut Option<IntentBrokeringServiceClient<Channel>>,
-    chariott_url: String,
+    intent_brokering_url: String,
 ) -> Result<(), Error> {
-    *client = Some(IntentBrokeringServiceClient::connect(chariott_url).await.map_err(|e| {
+    *client = Some(IntentBrokeringServiceClient::connect(intent_brokering_url).await.map_err(|e| {
         *client = None; // Set client back to None on error.
         Error::from_error("Could not connect to client", Box::new(e))
     })?);
@@ -54,7 +54,7 @@ async fn register_and_announce_once(
 ) -> Result<(), Error> {
     // If there is no client, need to attempt connection.
     if client.is_none() {
-        connect_chariott_client(client, reg_params.chariott_url).await?;
+        connect_intent_brokering_client(client, reg_params.intent_brokering_url).await?;
     }
 
     let service = Some(IntentServiceRegistration {
@@ -66,19 +66,19 @@ async fn register_and_announce_once(
 
     let announce_req = AnnounceRequest { service: service.clone() };
 
-    // Always announce to Chariott.
+    // Always announce to IntentBrokering.
     let registration_state = client
         .as_mut()
         .expect("No client found")
         .announce(announce_req.clone())
         .await
-        .map_err(|e| Error::from_error("Error announcing to Chariott.", Box::new(e)))?
+        .map_err(|e| Error::from_error("Error announcing to IntentBrokering.", Box::new(e)))?
         .into_inner()
         .registration_state;
 
-    // Only attempt registration with Chariott if the announced state is 'ANNOUNCED'.
-    // The 'ANNOUNCED' state means that this service is not currently registered in Chariott.
-    // This also handles re-registration if Chariott crashes and comes back online.
+    // Only attempt registration with IntentBrokering if the announced state is 'ANNOUNCED'.
+    // The 'ANNOUNCED' state means that this service is not currently registered in IntentBrokering.
+    // This also handles re-registration if IntentBrokering crashes and comes back online.
     if registration_state == RegistrationState::Announced as i32 {
         let register_req = RegisterRequest {
             service: service.clone(),
@@ -92,14 +92,14 @@ async fn register_and_announce_once(
                 .collect(),
         };
 
-        tracing::info!("Registered with Chariott runtime: {:?}", register_req);
+        tracing::info!("Registered with IntentBrokering runtime: {:?}", register_req);
 
         _ = client
             .as_mut()
             .expect("No client found")
             .register(register_req.clone())
             .await
-            .map_err(|e| Error::from_error("Error registering with Chariott.", Box::new(e)))?;
+            .map_err(|e| Error::from_error("Error registering with IntentBrokering.", Box::new(e)))?;
     }
 
     Ok(())
@@ -131,11 +131,11 @@ async fn register_and_announce_provider(
 }
 
 // This macro sets up tracing and exit code handling.
-chariott::provider::main!(wain);
+intent_brokering::provider::main!(wain);
 
 async fn wain() -> Result<(), Error> {
-    // Intitialize addresses for provider and chariott communication.
-    let chariott_url = "http://0.0.0.0:4243".to_string(); // DevSkim: ignore DS137138
+    // Intitialize addresses for provider and intent_brokering communication.
+    let intent_brokering_url = "http://0.0.0.0:4243".to_string(); // DevSkim: ignore DS137138
     let base_provider_address = "0.0.0.0:50064".to_string();
     let provider_url_str = format!("http://{}", base_provider_address.clone()); // DevSkim: ignore DS137138
     let socket_address: SocketAddr = base_provider_address
@@ -151,7 +151,7 @@ async fn wain() -> Result<(), Error> {
         version: "0.0.1".to_string(),
         intents: [Intent::Discover].to_vec(),
         url: provider_url_str.clone(),
-        chariott_url,
+        intent_brokering_url,
         locality: ExecutionLocality::Local,
     };
 

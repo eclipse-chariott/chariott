@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-pub mod chariott_grpc;
+pub mod intent_brokering_grpc;
 mod connection_provider;
 mod execution;
 mod intent_broker;

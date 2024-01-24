@@ -18,10 +18,10 @@ if [ -z "$IMAGE_TAG" ]; then
 fi
 
 # Build base image for all example applications
-docker build --tag "chariott:base" --file ./intent_brokering/examples/applications/Dockerfile.base .
+docker build --tag "intent_brokering_examples:base" --file ./intent_brokering/examples/applications/Dockerfile.base .
 
-# Build Chariott
-docker build --tag "$(concat_image_registry chariott:"$IMAGE_TAG")" --file ./intent_brokering/examples/applications/Dockerfile.generic --build-arg APP_NAME=chariott .
+# Build Intent Brokering service
+docker build --tag "$(concat_image_registry intent_brokering:"$IMAGE_TAG")" --file ./intent_brokering/examples/applications/Dockerfile.generic --build-arg APP_NAME=intent_brokering .
 
 # Build Examples
 docker build --tag "$(concat_image_registry cloud-object-detection-app:"$IMAGE_TAG")" --file ./intent_brokering/examples/applications/Dockerfile.cloud-object-detection --build-arg APP_NAME=cloud-object-detection-app .

@@ -6,7 +6,7 @@ mod intent_provider;
 
 use std::sync::Arc;
 
-use examples_common::chariott;
+use examples_common::intent_brokering;
 use intent_brokering_common::error::Error;
 use intent_brokering_common::shutdown::RouterExt as _;
 use intent_brokering_proto::{
@@ -17,10 +17,10 @@ use tonic::transport::Server;
 
 use crate::intent_provider::IntentProvider;
 
-chariott::provider::main!(wain);
+intent_brokering::provider::main!(wain);
 
 async fn wain() -> Result<(), Error> {
-    let (url, socket_address) = chariott::provider::register(
+    let (url, socket_address) = intent_brokering::provider::register(
         "sdv.invoke.controller",
         "0.0.1",
         "sdv.invoke.controller",

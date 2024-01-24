@@ -1,5 +1,5 @@
 [env]
-DEFAULT_CHARIOTT_URL = "http://0.0.0.0:4243"
+DEFAULT_INTENT_BROKER_URL = "http://0.0.0.0:4243"
 
 [target.'cfg(all())']
 rustflags = ["-D", "warnings"]

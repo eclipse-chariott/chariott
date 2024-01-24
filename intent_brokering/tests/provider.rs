@@ -5,7 +5,7 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use async_trait::async_trait;
-use examples_common::chariott::value::Value;
+use examples_common::intent_brokering::value::Value;
 use intent_brokering_proto::{
     common::{FulfillmentEnum, FulfillmentMessage, IntentEnum, InvokeFulfillment, InvokeIntent},
     provider::{

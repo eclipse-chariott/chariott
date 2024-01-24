@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 use bollard::{container::StatsOptions, Docker};
-use examples_common::chariott::{
+use examples_common::intent_brokering::{
     self,
-    api::{Chariott, GrpcChariott},
+    api::{IntentBrokering, GrpcIntentBrokering},
     value::Value,
 };
 use futures_util::stream::StreamExt;
@@ -28,7 +28,7 @@ use std::{
 use tokio::time::{sleep, sleep_until};
 use tracing::{debug, error, info, warn};
 
-const CHARIOTT_CONTAINER_NAME: &str = "chariott";
+const INTENT_BROKERING_CONTAINER_NAME: &str = "intent_broker";
 const LT_PROVIDER_NAMESPACE: &str = "lt.provider";
 
 // How many invoke fulfillments to schedule.
@@ -50,7 +50,7 @@ const RESULT_FILE: &str = "lt-output/app.out";
 const RESULT_FILE_DOCKER: &str = "lt-output/docker.out";
 const SAMPLE_RATE: u64 = 50;
 
-chariott::provider::main!(wain);
+intent_brokering::provider::main!(wain);
 
 async fn wain() -> Result<(), Error> {
     let invoke_count: u64 = env(TARGET_INVOKE_COUNT_ENV).unwrap();
@@ -58,7 +58,7 @@ async fn wain() -> Result<(), Error> {
     let collect_docker_stats = env(COLLECT_DOCKER_STATS_ENV).unwrap_or(false);
     let chunk_execution_duration = Duration::from_millis(1_000 * CHUNK_SIZE / target_rate as u64);
 
-    let chariott = GrpcChariott::connect().await?;
+    let intent_broker = GrpcIntentBrokering::connect().await?;
     let latency_metric = Arc::new(Mutex::new(Summary::with_defaults()));
     let invoke_fulfillments = Arc::new(AtomicUsize::new(0));
 
@@ -99,7 +99,7 @@ async fn wain() -> Result<(), Error> {
                 break;
             }
 
-            let mut chariott = chariott.clone();
+            let mut intent_broker = intent_broker.clone();
             let latency_metric = Arc::clone(&latency_metric);
             let invoke_fulfillments = Arc::clone(&invoke_fulfillments);
 
@@ -109,7 +109,7 @@ async fn wain() -> Result<(), Error> {
 
                 // Only the namespace matters when invoking. The load testing
                 // provider will not take action based on payload or command.
-                let sent_value = chariott.invoke(LT_PROVIDER_NAMESPACE, "foo", [Value::NULL]).await;
+                let sent_value = intent_broker.invoke(LT_PROVIDER_NAMESPACE, "foo", [Value::NULL]).await;
 
                 if let Some(request_instant) = now {
                     let latency = request_instant.elapsed().as_millis() as _;
@@ -200,7 +200,7 @@ async fn evaluate_docker_stats(
         let docker = Docker::connect_with_local_defaults()
             .map_err_with("could not connect with defaults to docker")?;
         let mut stats = docker.stats(
-            CHARIOTT_CONTAINER_NAME,
+            INTENT_BROKERING_CONTAINER_NAME,
             Some(StatsOptions { stream: true, ..Default::default() }),
         );
 

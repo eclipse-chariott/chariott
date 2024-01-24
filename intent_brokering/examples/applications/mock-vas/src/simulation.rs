@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-use examples_common::chariott::value::Value;
+use examples_common::intent_brokering::value::Value;
 use intent_brokering_common::error::{Error, ResultExt};
 use std::{env, sync::Arc};
 use tokio::sync::broadcast::{self, Sender};

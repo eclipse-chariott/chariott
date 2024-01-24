@@ -8,7 +8,7 @@ macro_rules! intent_provider_main {
         #[cfg(not(tarpaulin_include))]
         #[::tokio::main]
         async fn main() -> ::std::process::ExitCode {
-            use ::examples_common::chariott::provider::internal::trace_result;
+            use ::examples_common::intent_brokering::provider::internal::trace_result;
             use ::std::process::ExitCode;
             use ::tracing_subscriber::{util::SubscriberInitExt, EnvFilter};
 
