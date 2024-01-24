@@ -6,7 +6,7 @@ use std::{collections::HashSet, error::Error as _, time::Duration};
 
 use common::get_uuid;
 use examples_common::intent_brokering::{
-    api::{IntentBrokering, IntentBrokeringExt, Event, GrpcIntentBrokering},
+    api::{Event, GrpcIntentBrokering, IntentBrokering, IntentBrokeringExt},
     value::Value,
 };
 use intent_brokering_common::error::Error;

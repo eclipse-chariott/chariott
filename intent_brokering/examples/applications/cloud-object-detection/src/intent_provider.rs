@@ -13,8 +13,8 @@ use tracing::error;
 use crate::detection::DetectionLogic;
 
 use examples_common::{
-    intent_brokering::inspection::{fulfill, Entry},
     examples::detection::DetectRequest,
+    intent_brokering::inspection::{fulfill, Entry},
 };
 
 pub struct IntentProvider {

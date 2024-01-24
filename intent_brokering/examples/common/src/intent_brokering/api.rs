@@ -88,8 +88,8 @@ pub struct GrpcIntentBrokering {
 
 impl GrpcIntentBrokering {
     pub async fn connect() -> Result<Self, Error> {
-        let intent_brokering_url =
-            env::var(INTENT_BROKER_URL_KEY).unwrap_or_else(|_| DEFAULT_INTENT_BROKER_URL.to_string());
+        let intent_brokering_url = env::var(INTENT_BROKER_URL_KEY)
+            .unwrap_or_else(|_| DEFAULT_INTENT_BROKER_URL.to_string());
         let client = IntentBrokeringServiceClient::connect(intent_brokering_url)
             .await
             .map_err_with("Connecting to IntentBrokering failed.")?;

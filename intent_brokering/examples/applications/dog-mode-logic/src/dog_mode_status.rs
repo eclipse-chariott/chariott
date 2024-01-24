@@ -5,11 +5,11 @@
 use anyhow::{anyhow, Error};
 use async_stream::try_stream;
 use examples_common::{
+    examples::proto::detection::{DetectRequest, DetectResponse},
     intent_brokering::{
-        api::{IntentBrokering, IntentBrokeringExt as _, GrpcIntentBrokering},
+        api::{GrpcIntentBrokering, IntentBrokering, IntentBrokeringExt as _},
         value::Value,
     },
-    examples::proto::detection::{DetectRequest, DetectResponse},
 };
 use futures::{stream::BoxStream, TryStreamExt};
 use intent_brokering_proto::common::Blob;
@@ -101,7 +101,10 @@ async fn detect_dog(
         }
     };
 
-    async fn image_contains_dog(intent_broker: &mut impl IntentBrokering, image: Value) -> Result<bool, Error> {
+    async fn image_contains_dog(
+        intent_broker: &mut impl IntentBrokering,
+        image: Value,
+    ) -> Result<bool, Error> {
         use prost::Message;
 
         let (media_type, bytes) = image

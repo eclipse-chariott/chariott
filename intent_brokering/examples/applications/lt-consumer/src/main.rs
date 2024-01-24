@@ -5,7 +5,7 @@
 use bollard::{container::StatsOptions, Docker};
 use examples_common::intent_brokering::{
     self,
-    api::{IntentBrokering, GrpcIntentBrokering},
+    api::{GrpcIntentBrokering, IntentBrokering},
     value::Value,
 };
 use futures_util::stream::StreamExt;
@@ -109,7 +109,8 @@ async fn wain() -> Result<(), Error> {
 
                 // Only the namespace matters when invoking. The load testing
                 // provider will not take action based on payload or command.
-                let sent_value = intent_broker.invoke(LT_PROVIDER_NAMESPACE, "foo", [Value::NULL]).await;
+                let sent_value =
+                    intent_broker.invoke(LT_PROVIDER_NAMESPACE, "foo", [Value::NULL]).await;
 
                 if let Some(request_instant) = now {
                     let latency = request_instant.elapsed().as_millis() as _;

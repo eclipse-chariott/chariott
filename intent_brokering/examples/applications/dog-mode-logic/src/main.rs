@@ -10,7 +10,7 @@ use std::{
 use anyhow::{anyhow, Error};
 use dog_mode_status::stream_dog_mode_status;
 use examples_common::intent_brokering::{
-    api::{IntentBrokering, IntentBrokeringExt as _, GrpcIntentBrokering},
+    api::{GrpcIntentBrokering, IntentBrokering, IntentBrokeringExt as _},
     value::Value,
 };
 use tokio::{select, time::sleep_until};
@@ -165,7 +165,8 @@ pub async fn main() -> Result<(), Error> {
         )
         .await?;
 
-    let mut dog_mode_status_stream = stream_dog_mode_status(intent_broker.clone(), &mut state).await?;
+    let mut dog_mode_status_stream =
+        stream_dog_mode_status(intent_broker.clone(), &mut state).await?;
 
     let mut next_timer_wakeup = Instant::now() + TIMEOUT_EVALUATION_INTERVAL;
 
@@ -313,15 +314,19 @@ async fn run_dog_mode(
     // If the battery level fell below a threshold value, send a warning to the car owner.
     if previous_state.battery_level > LOW_BATTERY_LEVEL && state.battery_level <= LOW_BATTERY_LEVEL
     {
-        send_notification(intent_broker, "The battery is low, please return to the car.", state).await?;
-        set_ui_message(intent_broker, "The battery is low, the animal is in danger.", state).await?;
+        send_notification(intent_broker, "The battery is low, please return to the car.", state)
+            .await?;
+        set_ui_message(intent_broker, "The battery is low, the animal is in danger.", state)
+            .await?;
     }
 
     async fn activate_air_conditioning(
         intent_broker: &mut impl IntentBrokering,
         value: bool,
     ) -> Result<(), Error> {
-        _ = intent_broker.invoke(VDT_NAMESPACE, ACTIVATE_AIR_CONDITIONING_ID, [value.into()]).await?;
+        _ = intent_broker
+            .invoke(VDT_NAMESPACE, ACTIVATE_AIR_CONDITIONING_ID, [value.into()])
+            .await?;
         Ok(())
     }
 

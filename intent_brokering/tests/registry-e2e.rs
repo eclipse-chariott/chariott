@@ -6,7 +6,7 @@ use std::time::Duration;
 
 use common::get_uuid;
 use examples_common::intent_brokering::{
-    api::{IntentBrokering, IntentBrokeringExt as _, GrpcIntentBrokering},
+    api::{GrpcIntentBrokering, IntentBrokering, IntentBrokeringExt as _},
     registration::Builder as RegistrationBuilder,
 };
 use intent_brokering_proto::runtime::{
@@ -37,7 +37,8 @@ async fn expired_registrations_are_pruned_after_ttl() -> Result<(), anyhow::Erro
     builder.register_once(&mut None, true).await?;
 
     let initial_entries = intent_broker.inspect("system.registry", namespace.clone()).await?;
-    let ttl = Duration::from_secs(env!("INTENT_BROKERING_REGISTRY_TTL_SECS").parse::<u64>().unwrap() + 1);
+    let ttl =
+        Duration::from_secs(env!("INTENT_BROKERING_REGISTRY_TTL_SECS").parse::<u64>().unwrap() + 1);
     sleep(ttl).await;
     let entries = intent_broker.inspect("system.registry", namespace).await?;
 

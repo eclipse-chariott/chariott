@@ -15,7 +15,9 @@ use intent_brokering::registry::{
     ExecutionLocality, IntentConfiguration, IntentKind, ServiceConfiguration, ServiceId,
 };
 use intent_brokering::streaming::StreamingEss;
-use intent_brokering::{intent_brokering_grpc::IntentBrokeringServer, registry::Registry, IntentBroker};
+use intent_brokering::{
+    intent_brokering_grpc::IntentBrokeringServer, registry::Registry, IntentBroker,
+};
 use intent_brokering_common::error::{Error, ResultExt as _};
 use intent_brokering_common::shutdown::RouterExt as _;
 use intent_brokering_proto::{

@@ -40,10 +40,11 @@ async fn connect_intent_brokering_client(
     client: &mut Option<IntentBrokeringServiceClient<Channel>>,
     intent_brokering_url: String,
 ) -> Result<(), Error> {
-    *client = Some(IntentBrokeringServiceClient::connect(intent_brokering_url).await.map_err(|e| {
-        *client = None; // Set client back to None on error.
-        Error::from_error("Could not connect to client", Box::new(e))
-    })?);
+    *client =
+        Some(IntentBrokeringServiceClient::connect(intent_brokering_url).await.map_err(|e| {
+            *client = None; // Set client back to None on error.
+            Error::from_error("Could not connect to client", Box::new(e))
+        })?);
 
     Ok(())
 }
@@ -99,7 +100,9 @@ async fn register_and_announce_once(
             .expect("No client found")
             .register(register_req.clone())
             .await
-            .map_err(|e| Error::from_error("Error registering with IntentBrokering.", Box::new(e)))?;
+            .map_err(|e| {
+                Error::from_error("Error registering with IntentBrokering.", Box::new(e))
+            })?;
     }
 
     Ok(())
