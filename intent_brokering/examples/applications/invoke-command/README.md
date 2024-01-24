@@ -30,7 +30,7 @@ Once the service is confirmed registered, the below command can be run to call a
 on the provider. The command takes a json string and parses it/prints it out on the provider side.
 The 'command' parameter is used to tell the desired provider what command to run.The 'args'
 parameter is a list of arguments for the command. The args can be several types, defined
-in `proto\common\v1\common.proto` file under the `Value` message.
+in `proto\intent_brokering\common\v1\common.proto` file under the `Value` message.
 
 ```bash
 grpcurl -plaintext -d @ 0.0.0.0:4243 intent_brokering.runtime.v1.IntentBrokeringService/Fulfill <<EOF
