@@ -4,13 +4,13 @@
 
 use std::time::Duration;
 
-use intent_brokering_proto::runtime::{
-    intent_registration::Intent, intent_service_registration::ExecutionLocality,
-};
 use common::get_uuid;
 use examples_common::chariott::{
     api::{Chariott, ChariottExt as _, GrpcChariott},
     registration::Builder as RegistrationBuilder,
+};
+use intent_brokering_proto::runtime::{
+    intent_registration::Intent, intent_service_registration::ExecutionLocality,
 };
 use tokio::time::*;
 use tokio_stream::StreamExt as _;

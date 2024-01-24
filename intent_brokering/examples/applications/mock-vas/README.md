@@ -18,7 +18,7 @@ From the root directory:
 1. In a terminal (A) start Chariott with `cargo run`.
 2. In another terminal (B) start the mock-vas with `cargo run -p mock-vas`.
 3. In a terminal (C), open a channel to the mock-vas with `grpcurl -v -plaintext \
-   -import-path proto -proto proto/streaming/v1/streaming.proto \
+   -import-path proto -proto proto/intent_brokering/streaming/v1/streaming.proto \
    localhost:50051 intent_brokering.streaming.v1.ChannelService/Open` and take a note of
    the returned channel id in the metadata _x-chariott-channel-id_.
 4. In another terminal D call the following, using the channel id from the
@@ -51,7 +51,7 @@ From the root directory:
 
 In order to do so, you need to:
 
-- Implement the [streaming proto](../../../proto/streaming/v1/streaming.proto)
+- Implement the [streaming proto](../../../proto/intent_brokering/streaming/v1/streaming.proto)
   and specifically the `OpenRequest` endpoint with a service.
   - This is done in the common examples library in [streaming.rs](../../common/src/chariott/streaming.rs)
   - Make sure to serve this service with your gRPC server.

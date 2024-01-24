@@ -7,6 +7,10 @@ use std::sync::Arc;
 use std::vec;
 
 use async_trait::async_trait;
+use examples_common::chariott;
+use examples_common::chariott::inspection::{fulfill, Entry};
+use examples_common::chariott::streaming::ProtoExt as _;
+use examples_common::chariott::value::Value;
 use intent_brokering_proto::{
     common::{
         discover_fulfillment::Service, DiscoverFulfillment, FulfillmentEnum, FulfillmentMessage,
@@ -14,10 +18,6 @@ use intent_brokering_proto::{
     },
     provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
 };
-use examples_common::chariott;
-use examples_common::chariott::inspection::{fulfill, Entry};
-use examples_common::chariott::streaming::ProtoExt as _;
-use examples_common::chariott::value::Value;
 use tonic::{Request, Response, Status};
 use url::Url;
 

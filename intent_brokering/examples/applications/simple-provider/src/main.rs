@@ -8,6 +8,7 @@ use std::{net::SocketAddr, sync::Arc, time::Duration};
 
 use url::Url;
 
+use examples_common::chariott;
 use intent_brokering_common::error::Error;
 use intent_brokering_common::shutdown::RouterExt as _;
 use intent_brokering_proto::{
@@ -18,7 +19,6 @@ use intent_brokering_proto::{
         IntentServiceRegistration, RegisterRequest, RegistrationState,
     },
 };
-use examples_common::chariott;
 use tokio::time::sleep;
 use tonic::transport::{Channel, Server};
 use tracing::warn;

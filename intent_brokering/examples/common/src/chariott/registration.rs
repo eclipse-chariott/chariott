@@ -148,9 +148,12 @@ impl Builder {
     ) -> Result<(), Error> {
         if client.is_none() {
             *client = Some(
-                IntentBrokeringServiceClient::connect(self.chariott_url.to_string()).await.map_err_with(
-                    format!("Could not connect to Chariott ({})", self.chariott_url),
-                )?,
+                IntentBrokeringServiceClient::connect(self.chariott_url.to_string())
+                    .await
+                    .map_err_with(format!(
+                        "Could not connect to Chariott ({})",
+                        self.chariott_url
+                    ))?,
             );
         }
 

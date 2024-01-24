@@ -190,8 +190,9 @@ mod tests {
     use intent_brokering_proto::{
         common,
         runtime::{
-            intent_brokering_service_server::IntentBrokeringService, intent_registration, AnnounceRequest,
-            IntentRegistration, IntentServiceRegistration, RegisterRequest, RegistrationState,
+            intent_brokering_service_server::IntentBrokeringService, intent_registration,
+            AnnounceRequest, IntentRegistration, IntentServiceRegistration, RegisterRequest,
+            RegistrationState,
         },
     };
     use tonic::Code;
@@ -398,7 +399,10 @@ mod tests {
                 IntentKind::Subscribe,
             ),
         ] {
-            assert_eq!(expected, IntentBrokeringServer::<IntentBroker>::map_intent_variant(&intent));
+            assert_eq!(
+                expected,
+                IntentBrokeringServer::<IntentBroker>::map_intent_variant(&intent)
+            );
         }
     }
 
@@ -433,7 +437,7 @@ mod tests {
     fn setup() -> IntentBrokeringServer<IntentBroker> {
         let broker =
             IntentBroker::new("https://localhost:4243".parse().unwrap(), StreamingEss::new()); // DevSkim: ignore DS162092
-            IntentBrokeringServer::new(Registry::new(broker.clone(), Default::default()), broker)
+        IntentBrokeringServer::new(Registry::new(broker.clone(), Default::default()), broker)
     }
 
     fn create_announce_request() -> AnnounceRequest {

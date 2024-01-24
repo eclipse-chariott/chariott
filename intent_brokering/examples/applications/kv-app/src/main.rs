@@ -6,6 +6,7 @@ mod intent_provider;
 
 use std::sync::Arc;
 
+use examples_common::chariott;
 use intent_brokering_common::error::Error;
 use intent_brokering_common::shutdown::RouterExt as _;
 use intent_brokering_proto::{
@@ -13,7 +14,6 @@ use intent_brokering_proto::{
     runtime::{intent_registration::Intent, intent_service_registration::ExecutionLocality},
     streaming::channel_service_server::ChannelServiceServer,
 };
-use examples_common::chariott;
 use tonic::transport::Server;
 
 use crate::intent_provider::{IntentProvider, StreamingStore};

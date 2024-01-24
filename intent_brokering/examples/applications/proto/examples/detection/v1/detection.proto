@@ -6,7 +6,7 @@ syntax = "proto3";
 
 package examples.detection.v1;
 
-import "common/v1/common.proto";
+import "intent_brokering/common/v1/common.proto";
 
 message DetectRequest {
     intent_brokering.common.v1.Blob blob = 1;

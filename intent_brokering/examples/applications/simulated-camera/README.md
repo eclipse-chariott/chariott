@@ -15,7 +15,7 @@ manual mode where you specify the frame rate event yourself.
    `intent_brokering/examples/applications/simulated-camera` directory.
 5. In another terminal, open a channel to the simulated-camera with `grpcurl -v \
    -plaintext -import-path proto -proto \
-   intent_brokering/proto/streaming/v1/streaming.proto localhost:50066 \
+   intent_brokering/proto/intent_brokering/streaming/v1/streaming.proto localhost:50066 \
    intent_brokering.streaming.v1.ChannelService/Open` and take a note of the returned
    channel id in the metadata _x-chariott-channel-id_.
 6. In yet another terminal, call the following, using the channel id from the

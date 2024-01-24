@@ -4,7 +4,6 @@
 
 use anyhow::{anyhow, Error};
 use async_stream::try_stream;
-use intent_brokering_proto::common::Blob;
 use examples_common::{
     chariott::{
         api::{Chariott, ChariottExt as _, GrpcChariott},
@@ -13,6 +12,7 @@ use examples_common::{
     examples::proto::detection::{DetectRequest, DetectResponse},
 };
 use futures::{stream::BoxStream, TryStreamExt};
+use intent_brokering_proto::common::Blob;
 use tokio_stream::StreamExt;
 use tracing::{info, warn};
 

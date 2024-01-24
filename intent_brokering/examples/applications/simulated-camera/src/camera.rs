@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 use async_stream::try_stream;
-use intent_brokering_common::error::Error;
 use core::panic;
 use examples_common::chariott::value::Value;
+use intent_brokering_common::error::Error;
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;

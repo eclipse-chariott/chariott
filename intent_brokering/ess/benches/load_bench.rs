@@ -1,7 +1,7 @@
-use intent_brokering_common::tokio_runtime_fork::BuilderExt;
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 use ess::EventSubSystem;
 use futures::StreamExt;
+use intent_brokering_common::tokio_runtime_fork::BuilderExt;
 use std::sync::Arc;
 use tokio::sync::broadcast::{self, Receiver};
 type Ess = EventSubSystem<ClientId, EventId, Event, Event>;

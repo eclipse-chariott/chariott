@@ -17,7 +17,7 @@ syntax = "proto3";
 
 package intent_brokering.streaming.v1;
 
-import "common/v1/common.proto";
+import "intent_brokering/common/v1/common.proto";
 import "google/protobuf/timestamp.proto";
 
 /**

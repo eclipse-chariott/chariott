@@ -6,6 +6,11 @@ use std::sync::atomic::{AtomicU16, Ordering};
 use std::time::Instant;
 
 use async_trait::async_trait;
+use common::get_uuid;
+use examples_common::chariott::{
+    api::{Chariott, ChariottCommunication},
+    value::Value,
+};
 use intent_brokering::registry::{
     ExecutionLocality, IntentConfiguration, IntentKind, ServiceConfiguration, ServiceId,
 };
@@ -15,13 +20,10 @@ use intent_brokering_common::error::{Error, ResultExt as _};
 use intent_brokering_common::shutdown::RouterExt as _;
 use intent_brokering_proto::{
     common::{IntentEnum, IntentMessage},
-    runtime::{intent_brokering_service_server::IntentBrokeringService, FulfillRequest, FulfillResponse},
+    runtime::{
+        intent_brokering_service_server::IntentBrokeringService, FulfillRequest, FulfillResponse,
+    },
     streaming::channel_service_server::ChannelServiceServer,
-};
-use common::get_uuid;
-use examples_common::chariott::{
-    api::{Chariott, ChariottCommunication},
-    value::Value,
 };
 use provider::Provider;
 use tokio::task::spawn;

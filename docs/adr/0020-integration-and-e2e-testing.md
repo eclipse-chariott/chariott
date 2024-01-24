@@ -28,7 +28,7 @@ well as from the CI.
 
 Integration tests will be invoking the Chariott runtime server code directly,
 without using the [upstream gRPC
-layer](../../proto/chariott/runtime/v1/runtime.proto). We will not mock out any parts
+layer](../../intent_brokering/proto/intent_brokering/runtime/v1/runtime.proto). We will not mock out any parts
 from the Chariott runtime when integration testing, hence we will need to set up
 a provider that is exposing a gRPC endpoint in order to handle intent
 fulfillments.
@@ -88,4 +88,4 @@ This approach is equivalent to the setup in [ADR
       `cargo test`, and come with the advantages a test framework has without
       taking a dependency on test framework which we do not already use.
 
-[charc]: ../../tools/charc.md
+[charc]: ../../intent_brokering/tools/charc.md

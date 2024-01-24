@@ -15,6 +15,7 @@ use std::{
 use super::{inspection::Entry as InspectionEntry, value::Value};
 
 use async_trait::async_trait;
+use futures::{stream::BoxStream, StreamExt};
 use intent_brokering_common::error::{Error, ResultExt as _};
 use intent_brokering_proto::{
     common::{
@@ -23,10 +24,12 @@ use intent_brokering_proto::{
         InvokeFulfillment, InvokeIntent, ReadFulfillment, ReadIntent, SubscribeFulfillment,
         SubscribeIntent, WriteFulfillment, WriteIntent,
     },
-    runtime::{intent_brokering_service_client::IntentBrokeringServiceClient, FulfillRequest, FulfillResponse},
+    runtime::{
+        intent_brokering_service_client::IntentBrokeringServiceClient, FulfillRequest,
+        FulfillResponse,
+    },
     streaming::{channel_service_client::ChannelServiceClient, OpenRequest},
 };
-use futures::{stream::BoxStream, StreamExt};
 use tonic::{transport::Channel, Request, Response};
 use tracing::debug;
 

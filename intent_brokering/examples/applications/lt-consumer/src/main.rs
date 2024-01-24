@@ -3,16 +3,16 @@
 // SPDX-License-Identifier: MIT
 
 use bollard::{container::StatsOptions, Docker};
-use intent_brokering_common::{
-    config::env,
-    error::{Error, ResultExt},
-};
 use examples_common::chariott::{
     self,
     api::{Chariott, GrpcChariott},
     value::Value,
 };
 use futures_util::stream::StreamExt;
+use intent_brokering_common::{
+    config::env,
+    error::{Error, ResultExt},
+};
 use metrics_util::Summary;
 use serde::Serialize;
 use std::{

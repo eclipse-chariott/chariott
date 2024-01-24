@@ -2,16 +2,16 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-mod intent_provider;
 mod detection;
+mod intent_provider;
 
+use examples_common::chariott;
 use intent_brokering_common::error::Error;
 use intent_brokering_common::shutdown::RouterExt as _;
 use intent_brokering_proto::{
     provider::provider_service_server::ProviderServiceServer,
     runtime::{intent_registration::Intent, intent_service_registration::ExecutionLocality},
 };
-use examples_common::chariott;
 use tonic::transport::Server;
 
 use crate::intent_provider::IntentProvider;

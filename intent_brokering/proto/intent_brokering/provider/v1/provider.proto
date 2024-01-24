@@ -13,7 +13,7 @@ syntax = "proto3";
 
 package intent_brokering.provider.v1;
 
-import "common/v1/common.proto";
+import "intent_brokering/common/v1/common.proto";
 
 /**
 * The provider service definition.

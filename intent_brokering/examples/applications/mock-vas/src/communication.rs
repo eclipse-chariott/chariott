@@ -2,8 +2,8 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-use intent_brokering_common::shutdown::{ctrl_c_cancellation, RouterExt};
 use futures::future::join_all;
+use intent_brokering_common::shutdown::{ctrl_c_cancellation, RouterExt};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::spawn;

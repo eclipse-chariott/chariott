@@ -7,6 +7,8 @@ use std::{
     time::Duration,
 };
 
+use examples_common::chariott;
+use examples_common::chariott::value::Value;
 use intent_brokering_common::{
     config::env,
     error::{Error, ResultExt as _},
@@ -19,8 +21,6 @@ use intent_brokering_proto::{
     },
     runtime::{intent_registration::Intent, intent_service_registration::ExecutionLocality},
 };
-use examples_common::chariott;
-use examples_common::chariott::value::Value;
 use rand::{rngs::SmallRng, SeedableRng};
 use rand_distr::{DistIter, Distribution, Normal};
 use tokio::time::sleep;

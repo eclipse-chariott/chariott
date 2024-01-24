@@ -4,12 +4,12 @@
 
 use std::{collections::HashSet, error::Error as _, time::Duration};
 
-use intent_brokering_common::error::Error;
 use common::get_uuid;
 use examples_common::chariott::{
     api::{Chariott, ChariottExt, Event, GrpcChariott},
     value::Value,
 };
+use intent_brokering_common::error::Error;
 use tokio::time::{sleep_until, Instant};
 use tokio_stream::StreamExt as _;
 

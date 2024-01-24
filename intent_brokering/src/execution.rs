@@ -152,6 +152,7 @@ pub(crate) mod tests {
         registry::{IntentConfiguration, IntentKind},
     };
     use async_trait::async_trait;
+    use futures::Stream;
     use intent_brokering_proto::{
         common::{
             DiscoverFulfillment, FulfillmentEnum, FulfillmentMessage, InspectIntent,
@@ -159,7 +160,6 @@ pub(crate) mod tests {
         },
         streaming::{channel_service_server::ChannelService, OpenRequest},
     };
-    use futures::Stream;
     use tokio_stream::StreamExt as _;
     use tonic::{Code, Request};
 
