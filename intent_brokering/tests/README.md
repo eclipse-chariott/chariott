@@ -11,9 +11,9 @@ Assuming the current working directory is the project root, run:
 
 ```sh
 cargo build --release -p intent_brokering -p kv-app
-CHARIOTT_REGISTRY_TTL_SECS=7 ./target/release/chariott &
+INTENT_BROKERING_REGISTRY_TTL_SECS=7 ./target/release/chariott &
 ./target/release/kv-app &
-CHARIOTT_REGISTRY_TTL_SECS=7 cargo test --test '*e2e'
+INTENT_BROKERING_REGISTRY_TTL_SECS=7 cargo test --test '*e2e'
 ```
 
 If you want to display debug logs, make sure to set the log level via the `RUST_LOG` environment variable.

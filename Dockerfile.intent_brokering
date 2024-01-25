@@ -8,7 +8,7 @@ FROM docker.io/library/rust:${RUST_VERSION} AS builder
 # Dockerfile for building Eclipse Chariott Intent Brokering runtime container
 #
 # This Dockerfile utilizes a two step build process. It builds Intent Brokering
-# service with statically linked dependencies (using musl) for a x86_64 
+# service with statically linked dependencies (using musl) for a x86_64
 # architecture.
 
 # Chariott user id

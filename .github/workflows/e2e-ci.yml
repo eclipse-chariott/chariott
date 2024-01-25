@@ -24,7 +24,7 @@ concurrency:
 
 env:
   CARGO_TERM_COLOR: always
-  CHARIOTT_REGISTRY_TTL_SECS: 7
+  INTENT_BROKERING_REGISTRY_TTL_SECS: 7
 
 jobs:
   e2e:
@@ -67,7 +67,7 @@ jobs:
         run: |
           docker run -d --name intent_brokering --network host \
             -e RUST_LOG=debug \
-            -e CHARIOTT_REGISTRY_TTL_SECS \
+            -e INTENT_BROKERING_REGISTRY_TTL_SECS \
             intent_brokering:1
 
       - name: Start KV-App
