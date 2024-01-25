@@ -7,8 +7,8 @@ license = "MIT"
 [dependencies]
 async-trait = { workspace = true }
 base64 = "0.21.7"
-intent-brokering-common = { workspace = true }
-intent-brokering-proto = { workspace = true }
+intent_brokering_common = { workspace = true }
+intent_brokering_proto = { workspace = true }
 examples-common = { path = "../../common/" }
 futures = { workspace = true }
 lazy_static = { workspace = true }
@@ -24,7 +24,7 @@ url = { workspace = true }
 
 [dev-dependencies]
 async-trait = { workspace = true }
-intent-brokering-common = { workspace = true }
+intent_brokering_common = { workspace = true }
 
 [build-dependencies]
 tonic-build = { workspace = true }

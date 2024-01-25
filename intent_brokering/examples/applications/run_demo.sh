@@ -37,7 +37,7 @@ trap cleanup SIGINT
 cleanup()
 {
     echo>&2 "Stopping applications..."
-    pkill intent-brokering || true
+    pkill intent_brokering || true
     pkill kv-app || true
     pkill dog-mode-logic-app || true
     pkill DogModeDashboard || true
@@ -56,7 +56,7 @@ fi
 
 cargo build --workspace
 
-cargo run -p intent-brokering > target/logs/intent_brokering.txt 2>&1 &
+cargo run -p intent_brokering > target/logs/intent_brokering.txt 2>&1 &
 
 sleep 2
 

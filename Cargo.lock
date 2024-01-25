@@ -587,8 +587,8 @@ dependencies = [
  "base64",
  "examples-common",
  "futures",
- "intent-brokering-common",
- "intent-brokering-proto",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "lazy_static",
  "reqwest",
  "serde",
@@ -823,8 +823,8 @@ dependencies = [
  "async-trait",
  "examples-common",
  "futures",
- "intent-brokering-common",
- "intent-brokering-proto",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "prost",
  "prost-types",
  "serde",
@@ -892,7 +892,7 @@ version = "0.1.0"
 dependencies = [
  "criterion",
  "futures",
- "intent-brokering-common",
+ "intent_brokering_common",
  "tokio",
  "tokio-stream",
  "tokio-util",
@@ -934,8 +934,8 @@ dependencies = [
  "bytes",
  "ess",
  "futures",
- "intent-brokering-common",
- "intent-brokering-proto",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "keyvalue",
  "prost",
  "prost-types",
@@ -1513,7 +1513,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "intent-brokering"
+name = "intent_brokering"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -1521,8 +1521,8 @@ dependencies = [
  "async-trait",
  "examples-common",
  "futures",
- "intent-brokering-common",
- "intent-brokering-proto",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "prost",
  "prost-types",
  "test-case",
@@ -1539,12 +1539,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "intent-brokering-common"
+name = "intent_brokering_common"
 version = "0.1.0"
 dependencies = [
  "async-trait",
  "ess",
- "intent-brokering-proto",
+ "intent_brokering_proto",
  "regex",
  "serde",
  "tempfile",
@@ -1557,7 +1557,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "intent-brokering-proto"
+name = "intent_brokering_proto"
 version = "0.1.0"
 dependencies = [
  "prost",
@@ -1573,8 +1573,8 @@ dependencies = [
  "async-trait",
  "ess",
  "examples-common",
- "intent-brokering-common",
- "intent-brokering-proto",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "keyvalue",
  "serde",
  "serde_json",
@@ -1677,8 +1677,8 @@ dependencies = [
  "async-trait",
  "ess",
  "examples-common",
- "intent-brokering-common",
- "intent-brokering-proto",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "keyvalue",
  "tokio",
  "tokio-stream",
@@ -1753,8 +1753,8 @@ dependencies = [
  "async-trait",
  "examples-common",
  "image",
- "intent-brokering-common",
- "intent-brokering-proto",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "lazy_static",
  "ndarray",
  "serde",
@@ -1796,7 +1796,7 @@ dependencies = [
  "examples-common",
  "futures",
  "futures-util",
- "intent-brokering-common",
+ "intent_brokering_common",
  "metrics-util",
  "serde",
  "serde_json",
@@ -1810,8 +1810,8 @@ name = "lt-provider-app"
 version = "0.1.0"
 dependencies = [
  "examples-common",
- "intent-brokering-common",
- "intent-brokering-proto",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "rand",
  "rand_distr",
  "tokio",
@@ -1918,8 +1918,8 @@ dependencies = [
  "ess",
  "examples-common",
  "futures",
- "intent-brokering-common",
- "intent-brokering-proto",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "keyvalue",
  "lazy_static",
  "regex",
@@ -2906,8 +2906,8 @@ dependencies = [
  "async-trait",
  "ess",
  "examples-common",
- "intent-brokering-common",
- "intent-brokering-proto",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "keyvalue",
  "serde",
  "serde_json",
@@ -2931,8 +2931,8 @@ dependencies = [
  "ess",
  "examples-common",
  "futures",
- "intent-brokering-common",
- "intent-brokering-proto",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "keyvalue",
  "lazy_static",
  "regex",

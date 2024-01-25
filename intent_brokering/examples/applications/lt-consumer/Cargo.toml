@@ -6,7 +6,7 @@ license = "MIT"
 
 [dependencies]
 bollard = "0.15"
-intent-brokering-common = { workspace = true }
+intent_brokering_common = { workspace = true }
 examples-common = { path = "../../common/" }
 futures = { workspace = true }
 futures-util = "0.3"

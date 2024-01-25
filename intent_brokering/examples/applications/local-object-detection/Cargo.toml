@@ -6,8 +6,8 @@ license = "MIT"
 
 [dependencies]
 async-trait = { workspace = true }
-intent-brokering-common = { workspace = true }
-intent-brokering-proto = { workspace = true }
+intent_brokering_common = { workspace = true }
+intent_brokering_proto = { workspace = true }
 examples-common = { path = "../../common/" }
 image = "0.24.8"
 lazy_static = { workspace = true }

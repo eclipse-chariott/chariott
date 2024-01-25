@@ -8,8 +8,8 @@ license = "MIT"
 anyhow = { workspace = true }
 async-stream = "0.3.3"
 async-trait = { workspace = true }
-intent-brokering-common = { workspace = true }
-intent-brokering-proto = { workspace = true }
+intent_brokering_common = { workspace = true }
+intent_brokering_proto = { workspace = true }
 examples-common = { path = "../../common/" }
 futures = { workspace = true }
 prost = { workspace = true }

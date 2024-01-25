@@ -35,7 +35,7 @@ COPY ./ .
 
 RUN rustup target add aarch64-unknown-linux-musl
 
-RUN cargo build --release --target=aarch64-unknown-linux-musl -p intent-brokering
+RUN cargo build --release --target=aarch64-unknown-linux-musl -p intent_brokering
 
 #############################################################x#######################################
 ## Final image

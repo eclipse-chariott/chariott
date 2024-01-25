@@ -11,8 +11,8 @@
   - [Without Dev Container](#without-dev-container)
     - [Install Dependencies](#install-dependencies)
     - [Build all binaries and run tests natively](#build-all-binaries-and-run-tests-natively)
-    - [Build and run Intent Brokering only](#build-and-run-intent-brokering-only)
-- [How to run the examples and interact with Intent Brokering](#how-to-run-the-examples-and-interact-with-intent-brokering)
+    - [Build and run Intent Brokering only](#build-and-run-intent_brokering-only)
+- [How to run the examples and interact with Intent Brokering](#how-to-run-the-examples-and-interact-with-intent_brokering)
 - [How to run the dog mode demo](#how-to-run-the-dog-mode-demo)
 - [Trademarks](#trademarks)
 
@@ -98,8 +98,8 @@ variable to the new target folder. The following sequence works in the devcontai
 ```shell
 vscode ➜ /workspaces/chariott (main) $ sudo mkdir ../target
 vscode ➜ /workspaces/chariott (main) $ sudo chown vscode:vscode ../target
-vscode ➜ /workspaces/chariott (main) $ CARGO_TARGET_DIR=../target cargo build -p intent-brokering
-vscode ➜ /workspaces/chariott (main) $ CARGO_TARGET_DIR=../target cargo run -p intent-brokering
+vscode ➜ /workspaces/chariott (main) $ CARGO_TARGET_DIR=../target cargo build -p intent_brokering
+vscode ➜ /workspaces/chariott (main) $ CARGO_TARGET_DIR=../target cargo run -p intent_brokering
 ```
 
 #### Using Podman instead of Docker
@@ -192,7 +192,7 @@ cargo test --workspace
 #### Build and run Intent Brokering only
 
 ```bash
-cargo run -p intent-brokering
+cargo run -p intent_brokering
 ```
 
 ## How to run the examples and interact with Intent Brokering

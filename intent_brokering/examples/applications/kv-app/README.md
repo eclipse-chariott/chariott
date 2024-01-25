@@ -10,7 +10,7 @@ channel.
 Start the Intent Brokering Service followed by this application:
 
 ```bash
-cargo run -p intent-brokering &
+cargo run -p intent_brokering &
 cargo run -p kv-app &
 ```
 

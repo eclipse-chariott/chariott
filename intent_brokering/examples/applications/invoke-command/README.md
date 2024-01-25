@@ -8,7 +8,7 @@ It shows an example of a command that takes a json string as an input.
 Start the Intent Brokering service followed by this application:
 
 ```bash
-cargo run -p intent-brokering &
+cargo run -p intent_brokering &
 cargo run -p invoke-command &
 ```
 
@@ -52,6 +52,6 @@ To clean-up from the above commands, run:
 
 ```bash
 pkill invoke-command
-pkill intent-brokering
+pkill intent_brokering
 pkill grpcurl
 ```

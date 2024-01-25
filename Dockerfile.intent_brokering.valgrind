@@ -34,7 +34,7 @@ WORKDIR /sdv
 
 COPY ./ .
 
-RUN cargo build --release -p intent-brokering
+RUN cargo build --release -p intent_brokering
 
 #############################################################x#######################################
 ## Final image

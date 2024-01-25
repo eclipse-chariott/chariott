@@ -7,7 +7,7 @@ This is an example Intent provider that shows how to register a provider with th
 Start the Intent Brokering service followed by this application:
 
 ```bash
-cargo run -p intent-brokering &
+cargo run -p intent_brokering &
 cargo run -p simple-provider &
 ```
 
@@ -29,6 +29,6 @@ To clean-up from the above commands, run:
 
 ```bash
 pkill simple-provider
-pkill intent-brokering
+pkill intent_brokering
 pkill grpcurl
 ```

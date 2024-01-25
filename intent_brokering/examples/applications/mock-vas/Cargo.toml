@@ -8,8 +8,8 @@ license = "MIT"
 anyhow = { workspace = true }
 async-std = "1.12"
 async-trait = { workspace = true }
-intent-brokering-common = { workspace = true }
-intent-brokering-proto = { workspace = true }
+intent_brokering_common = { workspace = true }
+intent_brokering_proto = { workspace = true }
 ess = { path = "../../../ess/" }
 examples-common = { path = "../../common/" }
 futures = { workspace = true }
@@ -27,7 +27,7 @@ uuid = { workspace = true }
 
 [dev-dependencies]
 async-trait = { workspace = true }
-intent-brokering-common = { path = "../../../common/" }
+intent_brokering_common = { path = "../../../common/" }
 env_logger = "*"
 test-log = "0.2.14"
 tokio-test = "0.4.3"
