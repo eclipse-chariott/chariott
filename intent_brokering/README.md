@@ -11,8 +11,8 @@
   - [Without Dev Container](#without-dev-container)
     - [Install Dependencies](#install-dependencies)
     - [Build all binaries and run tests natively](#build-all-binaries-and-run-tests-natively)
-    - [Build and run Intent Brokering only](#build-and-run-intent_brokering-only)
-- [How to run the examples and interact with Intent Brokering](#how-to-run-the-examples-and-interact-with-intent_brokering)
+    - [Build and run Intent Brokering only](#build-and-run-intent-brokering-only)
+- [How to run the examples and interact with Intent Brokering](#how-to-run-the-examples-and-interact-with-intent-brokering)
 - [How to run the dog mode demo](#how-to-run-the-dog-mode-demo)
 - [Trademarks](#trademarks)
 
