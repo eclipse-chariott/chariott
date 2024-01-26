@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1705939127878,
+  "lastUpdate": 1706284880666,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -6162,6 +6162,84 @@ window.BENCHMARK_DATA = {
             "value": 3158,
             "unit": "Bytes",
             "range": "p95=3592"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "cd8b74efd019259d52eac25d1e810e86cb826816",
+          "message": "chore: Bump the dev-dependencies group with 2 updates (#250)\n\n* chore: Bump the dev-dependencies group with 2 updates\r\n\r\nBumps the dev-dependencies group with 2 updates: [regex](https://github.com/rust-lang/regex) and [uuid](https://github.com/uuid-rs/uuid).\r\n\r\n\r\nUpdates `regex` from 1.10.2 to 1.10.3\r\n- [Release notes](https://github.com/rust-lang/regex/releases)\r\n- [Changelog](https://github.com/rust-lang/regex/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/rust-lang/regex/compare/1.10.2...1.10.3)\r\n\r\nUpdates `uuid` from 1.6.1 to 1.7.0\r\n- [Release notes](https://github.com/uuid-rs/uuid/releases)\r\n- [Commits](https://github.com/uuid-rs/uuid/compare/1.6.1...1.7.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: regex\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: uuid\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\n* Cargo update\r\n\r\n---------\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\r\nCo-authored-by: Lauren Datz <105828115+ladatz@users.noreply.github.com>",
+          "timestamp": "2024-01-26T10:53:22-05:00",
+          "tree_id": "afb19c4c89d21db16f0f69d2a64a2a3e4c1492f9",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/cd8b74efd019259d52eac25d1e810e86cb826816"
+        },
+        "date": 1706284880102,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2620",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 43,
+            "unit": "Percent",
+            "range": "p95=44"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 2621,
+            "unit": "Bytes",
+            "range": "p95=3035"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 2,
+            "unit": "Millisecond",
+            "range": "p95=7"
           }
         ]
       }
