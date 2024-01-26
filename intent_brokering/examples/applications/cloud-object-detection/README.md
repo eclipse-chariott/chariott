@@ -5,7 +5,7 @@ Cognitive Services.
 
 To run the application:
 
-1. Start chariott runtime by executing `cargo run` from the root directory
+1. Start chariott runtime by executing `cargo run -p intent_brokering`
 2. Start it by executing `cargo run` from the
    `intent_brokering/examples/applications/cloud-object-detection` directory while specifying
    `COGNITIVE_ENDPOINT` (i.e. `myendpoint.cognitiveservices.azure.com`) and
@@ -38,5 +38,5 @@ To run the application:
 4. Execute detection with `grpcurl -v -plaintext -import-path proto/ \
    -import-path intent_brokering/examples/applications/proto -use-reflection -proto \
    intent_brokering/examples/applications/proto/examples/detection/v1/detection.proto -d @ \
-   localhost:4243 chariott.runtime.v1.IntentBrokeringService/Fulfill < \
+   localhost:4243 intent_brokering.runtime.v1.IntentBrokeringService/Fulfill < \
    detect_image.json`

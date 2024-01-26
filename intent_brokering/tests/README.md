@@ -1,6 +1,6 @@
 # E2E Tests
 
-The E2E tests are executed using Chariott and the KV App. Test files are
+The E2E tests are executed using Intent Brokering and the KV App. Test files are
 suffixed with `e2e.rs`.
 
 To run the tests, you can either use the CI, or run the tests locally.
@@ -11,7 +11,7 @@ Assuming the current working directory is the project root, run:
 
 ```sh
 cargo build --release -p intent_brokering -p kv-app
-INTENT_BROKERING_REGISTRY_TTL_SECS=7 ./target/release/chariott &
+INTENT_BROKERING_REGISTRY_TTL_SECS=7 ./target/release/intent_brokering &
 ./target/release/kv-app &
 INTENT_BROKERING_REGISTRY_TTL_SECS=7 cargo test --test '*e2e'
 ```
@@ -26,7 +26,7 @@ From the project root, run the following command:
 ./tests/container-e2e-tests-wsl2.sh .
 ```
 
-This will build the Chariott and KV App Docker images, and run the tests.
+This will build the Intent Brokering and KV App Docker images, and run the tests.
 
 ## Adding new tests
 
