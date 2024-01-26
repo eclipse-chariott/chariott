@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1705938881405,
+  "lastUpdate": 1706284578904,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -5339,6 +5339,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 131653141,
             "range": "± 461857",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "cd8b74efd019259d52eac25d1e810e86cb826816",
+          "message": "chore: Bump the dev-dependencies group with 2 updates (#250)\n\n* chore: Bump the dev-dependencies group with 2 updates\r\n\r\nBumps the dev-dependencies group with 2 updates: [regex](https://github.com/rust-lang/regex) and [uuid](https://github.com/uuid-rs/uuid).\r\n\r\n\r\nUpdates `regex` from 1.10.2 to 1.10.3\r\n- [Release notes](https://github.com/rust-lang/regex/releases)\r\n- [Changelog](https://github.com/rust-lang/regex/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/rust-lang/regex/compare/1.10.2...1.10.3)\r\n\r\nUpdates `uuid` from 1.6.1 to 1.7.0\r\n- [Release notes](https://github.com/uuid-rs/uuid/releases)\r\n- [Commits](https://github.com/uuid-rs/uuid/compare/1.6.1...1.7.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: regex\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: uuid\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\n* Cargo update\r\n\r\n---------\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\r\nCo-authored-by: Lauren Datz <105828115+ladatz@users.noreply.github.com>",
+          "timestamp": "2024-01-26T10:53:22-05:00",
+          "tree_id": "afb19c4c89d21db16f0f69d2a64a2a3e4c1492f9",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/cd8b74efd019259d52eac25d1e810e86cb826816"
+        },
+        "date": 1706284578383,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 176268,
+            "range": "± 7597",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1297773,
+            "range": "± 29930",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 12734893,
+            "range": "± 402073",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1653227,
+            "range": "± 58048",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 12820767,
+            "range": "± 81558",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 129018710,
+            "range": "± 875730",
             "unit": "ns/iter"
           }
         ]
