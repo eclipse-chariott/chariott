@@ -28,7 +28,7 @@ use std::{
 use tokio::time::{sleep, sleep_until};
 use tracing::{debug, error, info, warn};
 
-const INTENT_BROKERING_CONTAINER_NAME: &str = "intent_broker";
+const INTENT_BROKERING_CONTAINER_NAME: &str = "intent_brokering";
 const LT_PROVIDER_NAMESPACE: &str = "lt.provider";
 
 // How many invoke fulfillments to schedule.
