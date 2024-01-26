@@ -53,7 +53,7 @@ In order to do so, you need to:
 
 - Implement the [streaming proto](../../../proto/intent_brokering/streaming/v1/streaming.proto)
   and specifically the `OpenRequest` endpoint with a service.
-  - This is done in the common examples library in [streaming.rs](../../common/src/chariott/streaming.rs)
+  - This is done in the common examples library in [streaming.rs](../../common/src/intent_brokering/streaming.rs)
   - Make sure to serve this service with your gRPC server.
 - The application will send `SubscribeIntent` that your service would need to
   handle.
