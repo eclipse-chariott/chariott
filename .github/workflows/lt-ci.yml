@@ -87,7 +87,7 @@ jobs:
         run: |
           mkdir -p lt-output
           cargo build --release -p lt-consumer-app
-          COLLECT_DOCKER_STATS=true TARGET_INVOKE_COUNT=90000 TARGET_RATE=3000 ./target/release/lt-consumer-app > lt-output/lt-consumer-app.log 2>&1
+          COLLECT_DOCKER_STATS=true TARGET_INVOKE_COUNT=90000 TARGET_RATE=3000 ./target/release/lt-consumer-app
 
       - name: Stop containers
         run: |
