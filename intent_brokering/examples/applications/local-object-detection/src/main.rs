@@ -2,24 +2,24 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-mod chariott_provider;
 mod detection;
+mod intent_provider;
 
-use chariott_common::error::Error;
-use chariott_common::shutdown::RouterExt as _;
-use chariott_proto::{
+use examples_common::intent_brokering;
+use intent_brokering_common::error::Error;
+use intent_brokering_common::shutdown::RouterExt as _;
+use intent_brokering_proto::{
     provider::provider_service_server::ProviderServiceServer,
     runtime::{intent_registration::Intent, intent_service_registration::ExecutionLocality},
 };
-use examples_common::chariott;
 use tonic::transport::Server;
 
-use crate::chariott_provider::ChariottProvider;
+use crate::intent_provider::IntentProvider;
 
-chariott::provider::main!(wain);
+intent_brokering::provider::main!(wain);
 
 async fn wain() -> Result<(), Error> {
-    let (url, socket_address) = chariott::provider::register(
+    let (url, socket_address) = intent_brokering::provider::register(
         "sdv.local-detection",
         "0.0.1",
         "sdv.detection",
@@ -33,7 +33,7 @@ async fn wain() -> Result<(), Error> {
     tracing::info!("Application application listening: {url}");
 
     Server::builder()
-        .add_service(ProviderServiceServer::new(ChariottProvider::new()))
+        .add_service(ProviderServiceServer::new(IntentProvider::new()))
         .serve_with_ctrl_c_shutdown(socket_address)
         .await
 }

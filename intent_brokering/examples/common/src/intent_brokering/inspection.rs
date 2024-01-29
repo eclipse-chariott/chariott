@@ -4,8 +4,8 @@
 
 use std::{borrow::Borrow, collections::HashMap};
 
-use chariott_common::query::regex_from_query;
-use chariott_proto::common::{
+use intent_brokering_common::query::regex_from_query;
+use intent_brokering_proto::common::{
     fulfillment::Fulfillment, inspect_fulfillment::Entry as EntryMessage, InspectFulfillment,
 };
 

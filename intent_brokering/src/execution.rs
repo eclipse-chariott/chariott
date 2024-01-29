@@ -8,8 +8,8 @@ use crate::connection_provider::{ConnectedProvider, ConnectionProvider};
 use crate::registry::IntentConfiguration;
 use crate::streaming::StreamingEss;
 use async_recursion::async_recursion;
-use chariott_common::query::regex_from_query;
-use chariott_proto::{
+use intent_brokering_common::query::regex_from_query;
+use intent_brokering_proto::{
     common::{
         discover_fulfillment::Service, inspect_fulfillment::Entry, DiscoverFulfillment,
         FulfillmentEnum, FulfillmentMessage, InspectFulfillment, IntentEnum, IntentMessage, List,
@@ -116,7 +116,7 @@ where
                 }
             }
             RuntimeBinding::SystemDiscover(url) => {
-                const SCHEMA_VERSION_STREAMING: &str = "chariott.streaming.v1";
+                const SCHEMA_VERSION_STREAMING: &str = "intent_brokering.streaming.v1";
                 const SCHEMA_REFERENCE: &str = "grpc+proto";
 
                 fulfill_response(FulfillmentEnum::Discover(DiscoverFulfillment {
@@ -152,14 +152,14 @@ pub(crate) mod tests {
         registry::{IntentConfiguration, IntentKind},
     };
     use async_trait::async_trait;
-    use chariott_proto::{
+    use futures::Stream;
+    use intent_brokering_proto::{
         common::{
             DiscoverFulfillment, FulfillmentEnum, FulfillmentMessage, InspectIntent,
             InvokeFulfillment, SubscribeFulfillment, SubscribeIntent,
         },
         streaming::{channel_service_server::ChannelService, OpenRequest},
     };
-    use futures::Stream;
     use tokio_stream::StreamExt as _;
     use tonic::{Code, Request};
 
@@ -364,7 +364,7 @@ pub(crate) mod tests {
                         services: vec![Service {
                             url: url.to_string(),
                             schema_kind: "grpc+proto".to_owned(),
-                            schema_reference: "chariott.streaming.v1".to_owned(),
+                            schema_reference: "intent_brokering.streaming.v1".to_owned(),
                             metadata: HashMap::new(),
                         }],
                     })),

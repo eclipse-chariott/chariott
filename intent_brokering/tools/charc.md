@@ -1,7 +1,7 @@
 # `charc`
 
 `charc` is a Bash script for simple and quick session-based interactions with
-Chariott. `charc` stands for _Chariott console_.
+Chariott Intent Brokering. `charc` stands for _Chariott intent console_.
 
 ## Usage
 
@@ -24,10 +24,10 @@ Chariott. `charc` stands for _Chariott console_.
 
     charc inspect <namespace> <query>
 
-Issues the _inspect intent_ to Chariott for fullfilment by some provider
+Issues the _inspect intent_ to the Intent Broker for fullfilment by some provider
 providing the capability.
 
-For inspection of the Chariott registry of providers, use `system.registry`
+For inspection of the intent registry of providers, use `system.registry`
 for the `<namespace>` argument:
 
     ./charc inspect system.registry "**"
@@ -36,7 +36,7 @@ for the `<namespace>` argument:
 
     charc discover <namespace>
 
-Issues the _discover intent_ to Chariott for fullfilment by some provider
+Issues the _discover intent_ to the Intent Broker for fullfilment by some provider
 providing the capability, e.g.:
 
     ./charc discover sdv.vdt
@@ -48,7 +48,7 @@ connections.
 
     charc read <namespace> <key>
 
-Issues the _read intent_ to Chariott for fullfilment by some provider
+Issues the _read intent_ to the Intent Broker for fullfilment by some provider
 providing the capability, e.g.:
 
     ./charc read sdv.kvs time
@@ -57,7 +57,7 @@ providing the capability, e.g.:
 
     charc write <namespace> <key> <value>
 
-Issues the _write intent_ to Chariott for fullfilment by some provider
+Issues the _write intent_ to the Intent Broker for fullfilment by some provider
 providing the capability, e.g.:
 
     ./charc write sdv.kvs time "$(date)"
@@ -66,7 +66,7 @@ providing the capability, e.g.:
 
     charc invoke <namespace> <command> [(<type> <arg>)...]
 
-Issues the _invoke intent_ to Chariott for fullfilment by some provider
+Issues the _invoke intent_ to the Intent Broker for fullfilment by some provider
 providing the capability.
 
 The arguments after `<command>` are always in pairs of `<type>` and `<arg>`,
@@ -97,7 +97,7 @@ of the following:
     ./charc discovery sdv.kvs
 
 The end-point must use gRPC (`grpc+proto`) and conform to
-`chariott.streaming.v1`.
+`intent_brokering.streaming.v1`.
 
 This sub-command only needs to be issued once per namespace, but supports
 concurrently listening to multiple streams. It is required to use
@@ -113,7 +113,7 @@ eventually to close all opened streams.
 
     charc subscribe <namespace> <source>
 
-Issues the _subscribe intent_ to Chariott for fullfilment by some provider
+Issues the _subscribe intent_ to the Intent Broker for fullfilment by some provider
 providing the capability, e.g.:
 
     ./charc subscribe sdv.kvs time
@@ -148,7 +148,7 @@ for `<namespace>` to open a streaming channel.
     charc show (req|request|rsp|response)
 
 Shows the last gRPC request (`req`) sent or response (`rsp`) received by the
-last sub-command that communicated with Chariott.
+last sub-command that communicated with the Intent Broker.
 
 ### `end`
 

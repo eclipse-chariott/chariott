@@ -2,11 +2,11 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-use chariott_common::error::{Error, ResultExt};
-use chariott_proto::common::{Blob, InvokeFulfillment, InvokeIntent};
+use intent_brokering_common::error::{Error, ResultExt};
+use intent_brokering_proto::common::{Blob, InvokeFulfillment, InvokeIntent};
 use prost::Message;
 
-use crate::chariott::value::Value;
+use crate::intent_brokering::value::Value;
 
 use super::proto::detection::{
     DetectEntry, DetectRequest as DetectRequestMessage, DetectResponse as DetectResponseMessage,

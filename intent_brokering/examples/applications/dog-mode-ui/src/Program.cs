@@ -9,9 +9,9 @@ using System.Threading.Channels;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.Mvc;
-using ChariottCommon = Chariott.Common.V1;
-using ChariottRuntime = Chariott.Runtime.V1;
-using ChariottStreaming = Chariott.Streaming.V1;
+using IntentBrokeringCommon = IntentBrokering.Common.V1;
+using IntentBrokeringRuntime = IntentBrokering.Runtime.V1;
+using IntentBrokeringStreaming = IntentBrokering.Streaming.V1;
 
 var clients = new ConcurrentList<ChannelWriter<object>>();
 
@@ -24,7 +24,7 @@ builder.Services.AddHostedService<SdvEventReadingService>();
 builder.Services.AddSingleton<IEnumerable<ChannelWriter<object>>>(clients);
 builder.Services.AddSingleton(_ => new SocketsHttpHandler { EnableMultipleHttp2Connections = true });
 
-builder.Services.AddGrpcClient<ChariottRuntime.ChariottService.ChariottServiceClient>((sp, options) =>
+builder.Services.AddGrpcClient<IntentBrokeringRuntime.IntentBrokeringService.IntentBrokeringServiceClient>((sp, options) =>
 {
     options.Address = new Uri("http://localhost:4243/"); // DevSkim: ignore DS162092
     options.ChannelOptionsActions.Add(options =>
@@ -39,17 +39,17 @@ var app = builder.Build();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-app.MapPost("/dog-mode", async (HttpContext context, [FromServices] ChariottRuntime.ChariottService.ChariottServiceClient client) =>
+app.MapPost("/dog-mode", async (HttpContext context, [FromServices] IntentBrokeringRuntime.IntentBrokeringService.IntentBrokeringServiceClient client) =>
 {
-    _ = await client.FulfillAsync(new ChariottRuntime.FulfillRequest
+    _ = await client.FulfillAsync(new IntentBrokeringRuntime.FulfillRequest
     {
         Namespace = KeyValueStoreProperties.Namespace,
-        Intent = new ChariottCommon.Intent
+        Intent = new IntentBrokeringCommon.Intent
         {
-            Write = new ChariottCommon.WriteIntent
+            Write = new IntentBrokeringCommon.WriteIntent
             {
                 Key = KeyValueStoreProperties.DogModeStatus,
-                Value = new ChariottCommon.Value { Bool = "on" == context.Request.Form["on"] }
+                Value = new IntentBrokeringCommon.Value { Bool = "on" == context.Request.Form["on"] }
             }
         }
     });
@@ -67,15 +67,15 @@ app.MapGet("/events", async context =>
         {
             var dataLine = obj switch
             {
-                ChariottStreaming.Event e =>
+                IntentBrokeringStreaming.Event e =>
                     JsonSerializer.Serialize(new
                     {
                         id = e.Source,
                         data = e.Value.ValueCase switch
                         {
-                            ChariottCommon.Value.ValueOneofCase.Int32 => (object)e.Value.Int32,
-                            ChariottCommon.Value.ValueOneofCase.Bool => e.Value.Bool,
-                            ChariottCommon.Value.ValueOneofCase.Blob => new { type = e.Value.Blob.MediaType, value = e.Value.Blob.Bytes.ToBase64() },
+                            IntentBrokeringCommon.Value.ValueOneofCase.Int32 => (object)e.Value.Int32,
+                            IntentBrokeringCommon.Value.ValueOneofCase.Bool => e.Value.Bool,
+                            IntentBrokeringCommon.Value.ValueOneofCase.Blob => new { type = e.Value.Blob.MediaType, value = e.Value.Blob.Bytes.ToBase64() },
                             _ => "Unsupported value type",
                         }
                     }),
@@ -112,13 +112,13 @@ app.Run();
 
 sealed class SdvEventReadingService : BackgroundService
 {
-    readonly ChariottRuntime.ChariottService.ChariottServiceClient _client;
+    readonly IntentBrokeringRuntime.IntentBrokeringService.IntentBrokeringServiceClient _client;
     readonly IEnumerable<ChannelWriter<object>> _writers;
     readonly SocketsHttpHandler _httpHandler;
     readonly ILoggerFactory _loggerFactory;
     readonly ILogger<SdvEventReadingService> _logger;
 
-    public SdvEventReadingService(ChariottRuntime.ChariottService.ChariottServiceClient client,
+    public SdvEventReadingService(IntentBrokeringRuntime.IntentBrokeringService.IntentBrokeringServiceClient client,
                                   IEnumerable<ChannelWriter<object>> writers,
                                   SocketsHttpHandler httpHandler,
                                   ILoggerFactory loggerFactory,
@@ -236,21 +236,21 @@ sealed class SdvEventReadingService : BackgroundService
         public void Dispose() => _disposables.ForEach(d => d.Dispose());
     }
 
-    async Task<(IDisposable, IAsyncEnumerable<ChariottStreaming.Event>)> StreamAsync(string @namespace, IEnumerable<string> sources, CancellationToken cancellationToken)
+    async Task<(IDisposable, IAsyncEnumerable<IntentBrokeringStreaming.Event>)> StreamAsync(string @namespace, IEnumerable<string> sources, CancellationToken cancellationToken)
     {
         var disposables = new DisposableList();
 
         try
         {
-            var streamingAddressCandidates = await _client.FulfillAsync(new ChariottRuntime.FulfillRequest
+            var streamingAddressCandidates = await _client.FulfillAsync(new IntentBrokeringRuntime.FulfillRequest
             {
                 Namespace = @namespace,
-                Intent = new ChariottCommon.Intent { Discover = new ChariottCommon.DiscoverIntent() }
+                Intent = new IntentBrokeringCommon.Intent { Discover = new IntentBrokeringCommon.DiscoverIntent() }
             },
             cancellationToken: cancellationToken);
 
             var streamingAddress = streamingAddressCandidates.Fulfillment.Discover.Services
-                .First(s => s.SchemaReference == "chariott.streaming.v1" && s.SchemaKind == "grpc+proto")
+                .First(s => s.SchemaReference == "intent_brokering.streaming.v1" && s.SchemaKind == "grpc+proto")
                 .Url;
 
             var channel = GrpcChannel.ForAddress(streamingAddress, new GrpcChannelOptions
@@ -261,8 +261,8 @@ sealed class SdvEventReadingService : BackgroundService
 
             disposables.Add(channel);
 
-            var streamingClient = new ChariottStreaming.ChannelService.ChannelServiceClient(channel);
-            var streamingCall = streamingClient.Open(new ChariottStreaming.OpenRequest(), cancellationToken: cancellationToken);
+            var streamingClient = new IntentBrokeringStreaming.ChannelService.ChannelServiceClient(channel);
+            var streamingCall = streamingClient.Open(new IntentBrokeringStreaming.OpenRequest(), cancellationToken: cancellationToken);
             disposables.Add(streamingCall);
             var channelId = (await streamingCall.GetResponseHeadersAsync(cancellationToken)).Get("x-chariott-channel-id")?.Value ??
                 throw new InvalidOperationException("Channel ID not present in response header.");
@@ -274,12 +274,12 @@ sealed class SdvEventReadingService : BackgroundService
             foreach (var writer in _writers)
                 await writer.WriteAsync("connected", cancellationToken);
 
-            var rsr = await _client.FulfillAsync(new ChariottRuntime.FulfillRequest
+            var rsr = await _client.FulfillAsync(new IntentBrokeringRuntime.FulfillRequest
             {
                 Namespace = @namespace,
-                Intent = new ChariottCommon.Intent
+                Intent = new IntentBrokeringCommon.Intent
                 {
-                    Subscribe = new ChariottCommon.SubscribeIntent
+                    Subscribe = new IntentBrokeringCommon.SubscribeIntent
                     {
                         ChannelId = channelId,
                         Sources = { sources }

@@ -2,9 +2,9 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-mod chariott {
+mod intent_brokering {
     pub mod common {
-        pub use chariott_proto::common as v1;
+        pub use intent_brokering_proto::common as v1;
     }
 }
 

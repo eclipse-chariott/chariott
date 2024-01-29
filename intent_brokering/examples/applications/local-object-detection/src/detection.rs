@@ -2,9 +2,9 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-use chariott_common::error::Error;
 use examples_common::examples::detection::{DetectRequest, DetectResponse, DetectionObject};
 use image::{io::Reader, DynamicImage, GenericImageView};
+use intent_brokering_common::error::Error;
 use ndarray::prelude::Array;
 use serde::{Deserialize, Serialize};
 use std::{

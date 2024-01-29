@@ -4,12 +4,12 @@
 
 use std::{env, net::SocketAddr, time::Duration};
 
-use chariott_common::{
+use intent_brokering_common::{
     config,
     error::{Error, ResultExt},
 };
-use chariott_proto::runtime::{
-    chariott_service_client::ChariottServiceClient, intent_registration::Intent,
+use intent_brokering_proto::runtime::{
+    intent_brokering_service_client::IntentBrokeringServiceClient, intent_registration::Intent,
     intent_service_registration::ExecutionLocality, AnnounceRequest, IntentRegistration,
     IntentServiceRegistration, RegisterRequest, RegistrationState,
 };
@@ -20,8 +20,8 @@ use url::Url;
 
 use crate::url::UrlExt as _;
 
-const CHARIOTT_URL_KEY: &str = "CHARIOTT_URL";
-const DEFAULT_CHARIOTT_URL: &str = env!("DEFAULT_CHARIOTT_URL");
+const INTENT_BROKER_URL_KEY: &str = "INTENT_BROKER_URL";
+const DEFAULT_INTENT_BROKER_URL: &str = env!("DEFAULT_INTENT_BROKER_URL");
 const ANNOUNCE_URL_KEY: &str = "ANNOUNCE_URL";
 
 pub enum ConfigSource<'a, T> {
@@ -36,7 +36,7 @@ pub struct Builder {
     provider_url: Url,
     namespace: Box<str>,
     intents: Vec<Intent>,
-    chariott_url: Url,
+    intent_broker_url: Url,
     registration_interval: Duration,
     locality: ExecutionLocality,
 }
@@ -50,13 +50,13 @@ impl Builder {
         intents: impl IntoIterator<Item = Intent>,
         locality: ExecutionLocality,
     ) -> Self {
-        let chariott_url = env::var(CHARIOTT_URL_KEY)
-            .unwrap_or_else(|_| DEFAULT_CHARIOTT_URL.to_string())
+        let intent_broker_url = env::var(INTENT_BROKER_URL_KEY)
+            .unwrap_or_else(|_| DEFAULT_INTENT_BROKER_URL.to_string())
             .parse()
             .unwrap();
 
         let announce_url: Url =
-            chariott_common::config::env(ANNOUNCE_URL_KEY).unwrap_or_else(|| url.clone());
+            intent_brokering_common::config::env(ANNOUNCE_URL_KEY).unwrap_or_else(|| url.clone());
 
         Self {
             name: name.into(),
@@ -65,7 +65,7 @@ impl Builder {
             provider_url: url,
             namespace: namespace.into(),
             intents: intents.into_iter().collect(),
-            chariott_url,
+            intent_broker_url,
             registration_interval: Duration::from_secs(5),
             locality,
         }
@@ -75,7 +75,7 @@ impl Builder {
         match value {
             ConfigSource::Value(value) => self.registration_interval = value,
             ConfigSource::Environment(name) => {
-                let name = name.unwrap_or("CHARIOTT_REGISTRATION_INTERVAL");
+                let name = name.unwrap_or("INTENT_BROKER_REGISTRATION_INTERVAL");
                 let registration_interval = self.registration_interval;
                 return self.set_registration_interval(ConfigSource::Value(
                     config::env::<u64>(name)
@@ -87,13 +87,13 @@ impl Builder {
         self
     }
 
-    pub fn set_chariott_url(mut self, value: ConfigSource<Url>) -> Self {
+    pub fn set_intent_broker_url(mut self, value: ConfigSource<Url>) -> Self {
         match value {
-            ConfigSource::Value(value) => self.chariott_url = value,
+            ConfigSource::Value(value) => self.intent_broker_url = value,
             ConfigSource::Environment(name) => {
-                let name = name.unwrap_or("CHARIOTT_URL");
+                let name = name.unwrap_or("INTENT_BROKER_URL");
                 if let Some(url) = config::env::<Url>(name) {
-                    return self.set_chariott_url(ConfigSource::Value(url));
+                    return self.set_intent_broker_url(ConfigSource::Value(url));
                 }
             }
         }
@@ -101,7 +101,7 @@ impl Builder {
     }
 
     pub fn from_env(self) -> Self {
-        self.set_chariott_url(ConfigSource::Environment(None))
+        self.set_intent_broker_url(ConfigSource::Environment(None))
             .set_registration_interval(ConfigSource::Environment(None))
     }
 
@@ -143,14 +143,17 @@ impl Builder {
 
     pub async fn register_once(
         &self,
-        client: &mut Option<ChariottServiceClient<Channel>>,
+        client: &mut Option<IntentBrokeringServiceClient<Channel>>,
         first_iteration: bool,
     ) -> Result<(), Error> {
         if client.is_none() {
             *client = Some(
-                ChariottServiceClient::connect(self.chariott_url.to_string()).await.map_err_with(
-                    format!("Could not connect to Chariott ({})", self.chariott_url),
-                )?,
+                IntentBrokeringServiceClient::connect(self.intent_broker_url.to_string())
+                    .await
+                    .map_err_with(format!(
+                        "Could not connect to IntentBrokering ({})",
+                        self.intent_broker_url
+                    ))?,
             );
         }
 
@@ -167,7 +170,7 @@ impl Builder {
             let registration_state = client
                 .announce(announce_request.clone())
                 .await
-                .map_err_with("Error when announcing to Chariott.")?
+                .map_err_with("Error when announcing to IntentBrokering.")?
                 .into_inner()
                 .registration_state;
 
@@ -184,11 +187,11 @@ impl Builder {
                         .collect(),
                 };
 
-                tracing::info!("Registered with Chariott runtime: {:?}", register_request);
+                tracing::info!("Registered with IntentBrokering runtime: {:?}", register_request);
                 _ = client
                     .register(register_request.clone())
                     .await
-                    .map_err_with("Error when registering with Chariott.")?;
+                    .map_err_with("Error when registering with IntentBrokering.")?;
             }
         }
 

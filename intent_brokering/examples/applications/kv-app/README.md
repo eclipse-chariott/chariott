@@ -7,18 +7,18 @@ channel.
 
 ## Testing
 
-Start Chariott followed by this application:
+Start the Intent Brokering Service followed by this application:
 
 ```bash
-cargo run -p chariott &
+cargo run -p intent_brokering &
 cargo run -p kv-app &
 ```
 
 Once both are up and running successfully, use the following to write a
-key-value pair to the store via Chariott:
+key-value pair to the store via the Intent Brokering Service:
 
 ```bash
-grpcurl -plaintext -d @ 0.0.0.0:4243 chariott.runtime.v1.ChariottService/Fulfill <<EOF
+grpcurl -plaintext -d @ 0.0.0.0:4243 intent_brokering.runtime.v1.IntentBrokeringService/Fulfill <<EOF
 {
   "namespace": "sdv.kvs",
   "intent": {
@@ -36,7 +36,7 @@ EOF
 To read the value of the key written in the above example, run:
 
 ```bash
-grpcurl -plaintext -d @ 0.0.0.0:4243 chariott.runtime.v1.ChariottService/Fulfill <<EOF
+grpcurl -plaintext -d @ 0.0.0.0:4243 intent_brokering.runtime.v1.IntentBrokeringService/Fulfill <<EOF
 {
   "namespace": "sdv.kvs",
   "intent": {
@@ -51,7 +51,7 @@ EOF
 To discover the service end-points:
 
 ```bash
-grpcurl -plaintext -d @ 0.0.0.0:4243 chariott.runtime.v1.ChariottService/Fulfill <<EOF
+grpcurl -plaintext -d @ 0.0.0.0:4243 intent_brokering.runtime.v1.IntentBrokeringService/Fulfill <<EOF
 {
   "namespace": "sdv.kvs",
   "intent": {
@@ -66,8 +66,8 @@ Open a channel for receiving events:
 
 ```bash
 grpcurl -v -plaintext -import-path proto -proto \
-    intent_brokering/proto/chariott/streaming/v1/streaming.proto 0.0.0.0:50064 \
-    chariott.streaming.v1.ChannelService/Open | tee events.log &
+    intent_brokering/proto/intent_brokering/streaming/v1/streaming.proto 0.0.0.0:50064 \
+    intent_brokering.streaming.v1.ChannelService/Open | tee events.log &
 ```
 
 The above command will run in the background and write the events to the file
@@ -84,7 +84,7 @@ export CHANNEL_ID=$(grep -E "^x-chariott-channel-id:" events.log \
 Next, subscribe to a key for events to be delivered to the open channel:
 
 ```bash
-grpcurl -plaintext -d @ 0.0.0.0:4243 chariott.runtime.v1.ChariottService/Fulfill <<EOF
+grpcurl -plaintext -d @ 0.0.0.0:4243 intent_brokering.runtime.v1.IntentBrokeringService/Fulfill <<EOF
 {
   "namespace": "sdv.kvs",
   "intent": {
@@ -102,7 +102,7 @@ EOF
 Finally, writing to the key:
 
 ```bash
-grpcurl -plaintext -d @ 0.0.0.0:4243 chariott.runtime.v1.ChariottService/Fulfill <<EOF
+grpcurl -plaintext -d @ 0.0.0.0:4243 intent_brokering.runtime.v1.IntentBrokeringService/Fulfill <<EOF
 {
   "namespace": "sdv.kvs",
   "intent": {
@@ -123,7 +123,7 @@ To clean-up from the above commands, run:
 
 ```bash
 pkill kv-app
-pkill chariott
+pkill intent_brokering
 pkill grpcurl
 unset CHANNEL_ID
 ```

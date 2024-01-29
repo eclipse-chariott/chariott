@@ -2,6 +2,6 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-pub mod chariott;
 pub mod examples;
+pub mod intent_brokering;
 pub mod url;

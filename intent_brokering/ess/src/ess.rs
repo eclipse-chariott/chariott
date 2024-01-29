@@ -443,7 +443,7 @@ where
 #[cfg(test)]
 mod tests {
     use crate::{EventSubSystem, UpsertResult};
-    use chariott_common::tokio_runtime_fork;
+    use intent_brokering_common::tokio_runtime_fork;
     use std::time::Duration;
 
     #[derive(Debug, Clone, Eq, PartialEq, Hash)]

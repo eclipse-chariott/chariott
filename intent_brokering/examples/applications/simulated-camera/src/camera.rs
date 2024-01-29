@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 use async_stream::try_stream;
-use chariott_common::error::Error;
 use core::panic;
-use examples_common::chariott::value::Value;
+use examples_common::intent_brokering::value::Value;
+use intent_brokering_common::error::Error;
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -18,7 +18,7 @@ use tokio_stream::StreamExt;
 use tokio_util::sync::CancellationToken;
 use tracing::{debug, error, info, warn};
 
-use crate::chariott_provider::StreamingStore;
+use crate::intent_provider::StreamingStore;
 
 pub struct CameraLogic {
     store: Arc<StreamingStore>,

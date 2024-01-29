@@ -28,8 +28,8 @@ members = [
 [workspace.dependencies]
 anyhow = "1.0"
 async-trait = "0.1"
-chariott-common = { path = "./intent_brokering/common/" }
-chariott-proto = { path = "./intent_brokering/proto.rs/" }
+intent_brokering_common = { path = "./intent_brokering/common/" }
+intent_brokering_proto = { path = "./intent_brokering/proto.rs/" }
 futures = { version = "0.3" }
 lazy_static = "1.4.0"
 parking_lot = "0.12.1"

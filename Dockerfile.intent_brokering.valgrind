@@ -5,12 +5,14 @@
 ARG RUST_VERSION=1.70
 FROM docker.io/library/rust:${RUST_VERSION} AS builder
 
-# Dockerfile for building Eclipse Chariott container
+# Dockerfile for building Eclipse Chariott Intent Brokering service container
+# with valgrind
 #
-# This Dockerfile utilizes a two step build process. It builds Chariott with
-# statically linked dependencies (using musl vs. glibc to accomplish this) for a
-# specific architecture such that we can utilize a scratch container without
-# further dependencies for our final container, minimizing container size.
+# This Dockerfile utilizes a two step build process. It builds Chariott Intent
+# Brokering with statically linked dependencies (using musl vs. glibc to
+# accomplish this) for a specific architecture such that we can utilize a
+# scratch container without further dependencies for our final container,
+# minimizing container size.
 
 # Chariott user id
 ARG CHARIOTT_UID=10001
@@ -18,7 +20,7 @@ ARG CHARIOTT_UID=10001
 RUN apt update && apt upgrade -y
 RUN apt install -y cmake protobuf-compiler wget
 
-# unprivileged identity to run Chariott as
+# unprivileged identity to run Chariott Intent Brokering service as
 RUN adduser \
     --disabled-password \
     --gecos "" \
@@ -32,7 +34,7 @@ WORKDIR /sdv
 
 COPY ./ .
 
-RUN cargo build --release -p chariott
+RUN cargo build --release -p intent_brokering
 
 #############################################################x#######################################
 ## Final image
@@ -59,7 +61,7 @@ COPY --from=builder /etc/group /etc/group
 WORKDIR /sdv
 
 # Copy our build
-COPY --from=builder /sdv/target/release/chariott /sdv/chariott
+COPY --from=builder /sdv/target/release/intent_brokering /sdv/intent_brokering
 
 # Give chariott user ownership of the /sdv directory
 RUN chown -R chariott:chariott /sdv
@@ -67,4 +69,4 @@ RUN chown -R chariott:chariott /sdv
 # Use the unprivileged chariott user during execution.
 USER chariott::chariott
 
-CMD ["valgrind", "--tool=memcheck", "--xml=yes", "--xml-file=/output/out.xml", "./chariott"]
+CMD ["valgrind", "--tool=memcheck", "--xml=yes", "--xml-file=/output/out.xml", "./intent_brokering"]

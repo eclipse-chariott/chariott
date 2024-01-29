@@ -9,4 +9,4 @@ lint:
     - ENUM_ZERO_VALUE_SUFFIX
   ignore_only:
     RPC_RESPONSE_STANDARD_NAME:
-      - chariott/streaming/v1/streaming.proto
+      - intent_brokering/streaming/v1/streaming.proto

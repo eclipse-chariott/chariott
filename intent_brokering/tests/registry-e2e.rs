@@ -4,13 +4,13 @@
 
 use std::time::Duration;
 
-use chariott_proto::runtime::{
-    intent_registration::Intent, intent_service_registration::ExecutionLocality,
-};
 use common::get_uuid;
-use examples_common::chariott::{
-    api::{Chariott, ChariottExt as _, GrpcChariott},
+use examples_common::intent_brokering::{
+    api::{GrpcIntentBrokering, IntentBrokering, IntentBrokeringExt as _},
     registration::Builder as RegistrationBuilder,
+};
+use intent_brokering_proto::runtime::{
+    intent_registration::Intent, intent_service_registration::ExecutionLocality,
 };
 use tokio::time::*;
 use tokio_stream::StreamExt as _;
@@ -31,15 +31,16 @@ async fn expired_registrations_are_pruned_after_ttl() -> Result<(), anyhow::Erro
         ExecutionLocality::Local,
     );
 
-    let mut chariott = setup().await;
+    let mut intent_broker = setup().await;
 
     // act
     builder.register_once(&mut None, true).await?;
 
-    let initial_entries = chariott.inspect("system.registry", namespace.clone()).await?;
-    let ttl = Duration::from_secs(env!("CHARIOTT_REGISTRY_TTL_SECS").parse::<u64>().unwrap() + 1);
+    let initial_entries = intent_broker.inspect("system.registry", namespace.clone()).await?;
+    let ttl =
+        Duration::from_secs(env!("INTENT_BROKERING_REGISTRY_TTL_SECS").parse::<u64>().unwrap() + 1);
     sleep(ttl).await;
-    let entries = chariott.inspect("system.registry", namespace).await?;
+    let entries = intent_broker.inspect("system.registry", namespace).await?;
 
     // assert
     assert_eq!(1, initial_entries.len());
@@ -82,6 +83,6 @@ async fn when_provider_registers_notifies_registry_observers() -> anyhow::Result
     Ok(())
 }
 
-async fn setup() -> impl Chariott {
-    GrpcChariott::connect().await.unwrap()
+async fn setup() -> impl IntentBrokering {
+    GrpcIntentBrokering::connect().await.unwrap()
 }

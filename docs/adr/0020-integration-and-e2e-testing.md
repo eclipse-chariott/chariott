@@ -28,7 +28,7 @@ well as from the CI.
 
 Integration tests will be invoking the Chariott runtime server code directly,
 without using the [upstream gRPC
-layer](../../intent_brokering/proto/chariott/runtime/v1/runtime.proto). We will not mock out any parts
+layer](../../intent_brokering/proto/intent_brokering/runtime/v1/runtime.proto). We will not mock out any parts
 from the Chariott runtime when integration testing, hence we will need to set up
 a provider that is exposing a gRPC endpoint in order to handle intent
 fulfillments.

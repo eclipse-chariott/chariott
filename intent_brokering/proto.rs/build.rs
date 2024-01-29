@@ -6,9 +6,9 @@ use std::{error::Error, path::Path};
 use tonic_build::configure;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    compile_with_common("../proto/chariott/runtime/v1/runtime.proto")?;
-    compile_with_common("../proto/chariott/provider/v1/provider.proto")?;
-    compile_with_common("../proto/chariott/streaming/v1/streaming.proto")?;
+    compile_with_common("../proto/intent_brokering/runtime/v1/runtime.proto")?;
+    compile_with_common("../proto/intent_brokering/provider/v1/provider.proto")?;
+    compile_with_common("../proto/intent_brokering/streaming/v1/streaming.proto")?;
 
     Ok(())
 }

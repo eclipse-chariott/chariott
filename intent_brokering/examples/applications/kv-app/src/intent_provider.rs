@@ -5,12 +5,12 @@
 use std::{collections::HashMap, sync::Arc};
 
 use async_trait::async_trait;
-use examples_common::chariott::{self, streaming::ProtoExt as _};
+use examples_common::intent_brokering::{self, streaming::ProtoExt as _};
 use tonic::{Request, Response, Status};
 
 use url::Url;
 
-use chariott_proto::{
+use intent_brokering_proto::{
     common::{
         discover_fulfillment::Service, value::Value, DiscoverFulfillment, FulfillmentEnum,
         FulfillmentMessage, IntentEnum, WriteFulfillment, WriteIntent,
@@ -18,14 +18,14 @@ use chariott_proto::{
     provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
 };
 
-pub type StreamingStore = chariott::streaming::StreamingStore<Value>;
+pub type StreamingStore = intent_brokering::streaming::StreamingStore<Value>;
 
-pub struct ChariottProvider {
+pub struct IntentProvider {
     url: Url,
     streaming_store: Arc<StreamingStore>,
 }
 
-impl ChariottProvider {
+impl IntentProvider {
     pub fn new(url: Url, streaming_store: Arc<StreamingStore>) -> Self {
         Self { url, streaming_store }
     }
@@ -42,7 +42,7 @@ impl ChariottProvider {
 }
 
 #[async_trait]
-impl ProviderService for ChariottProvider {
+impl ProviderService for IntentProvider {
     async fn fulfill(
         &self,
         request: Request<FulfillRequest>,
@@ -60,7 +60,7 @@ impl ProviderService for ChariottProvider {
                 services: vec![Service {
                     url: self.url.to_string(),
                     schema_kind: "grpc+proto".to_owned(),
-                    schema_reference: "chariott.streaming.v1".to_owned(),
+                    schema_reference: "intent_brokering.streaming.v1".to_owned(),
                     metadata: HashMap::new(),
                 }],
             })),

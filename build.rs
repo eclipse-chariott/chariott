@@ -16,8 +16,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .file_descriptor_set_path(out_dir.join("descriptor.bin"))
         .compile(
             &[
-                "./proto/chariott/runtime/v1/runtime.proto",
-                "./proto/chariott/provider/v1/provider.proto",
+                "./proto/intent_brokering/runtime/v1/runtime.proto",
+                "./proto/intent_brokering/provider/v1/provider.proto",
             ],
             &["./proto/"],
         )?;

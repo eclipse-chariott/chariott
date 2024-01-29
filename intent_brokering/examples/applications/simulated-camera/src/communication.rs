@@ -5,22 +5,22 @@
 use std::sync::Arc;
 use std::{env::args, net::SocketAddr};
 
-use chariott_common::{
+use futures::future::join_all;
+use intent_brokering_common::{
     error::{Error, ResultExt as _},
     shutdown::{ctrl_c_cancellation, RouterExt as _},
 };
-use chariott_proto::{
+use intent_brokering_proto::{
     provider::provider_service_server::ProviderServiceServer,
     streaming::channel_service_server::ChannelServiceServer,
 };
-use futures::future::join_all;
 use tokio::spawn;
 use tonic::transport::Server;
 use url::Url;
 
 use crate::{
     camera::CameraLogic,
-    chariott_provider::{ChariottProvider, StreamingStore},
+    intent_provider::{IntentProvider, StreamingStore},
 };
 
 pub async fn serve(url: Url, address: SocketAddr) -> Result<(), Error> {
@@ -44,7 +44,7 @@ pub async fn serve(url: Url, address: SocketAddr) -> Result<(), Error> {
 
     let server_handle = spawn(
         Server::builder()
-            .add_service(ProviderServiceServer::new(ChariottProvider::new(
+            .add_service(ProviderServiceServer::new(IntentProvider::new(
                 url,
                 Arc::clone(&streaming_store),
             )))

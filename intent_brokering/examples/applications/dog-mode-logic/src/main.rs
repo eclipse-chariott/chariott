@@ -9,8 +9,8 @@ use std::{
 
 use anyhow::{anyhow, Error};
 use dog_mode_status::stream_dog_mode_status;
-use examples_common::chariott::{
-    api::{Chariott, ChariottExt as _, GrpcChariott},
+use examples_common::intent_brokering::{
+    api::{GrpcIntentBrokering, IntentBrokering, IntentBrokeringExt as _},
     value::Value,
 };
 use tokio::{select, time::sleep_until};
@@ -83,7 +83,7 @@ pub async fn main() -> Result<(), Error> {
         .finish()
         .init();
 
-    let mut chariott = GrpcChariott::connect().await?;
+    let mut intent_broker = GrpcIntentBrokering::connect().await?;
     let mut state = DogModeState::new();
 
     // Inspect vehicle hardware to assert that all requirements are met before
@@ -102,7 +102,7 @@ pub async fn main() -> Result<(), Error> {
             (ACTIVATE_AIR_CONDITIONING_ID, /*..*/ MEMBER_TYPE_COMMAND, "IAcmeAirconControl"),
         ] {
             inspect_dependency(
-                &mut chariott,
+                &mut intent_broker,
                 path,
                 &[(MEMBER_TYPE, member_type.into()), (TYPE, /*..*/ r#type.into())],
             )
@@ -114,7 +114,7 @@ pub async fn main() -> Result<(), Error> {
             (SET_UI_MESSAGE_ID, "ISetUiMessage", &mut state.set_ui_message_disabled),
         ] {
             if let Err(e) = inspect_dependency(
-                &mut chariott,
+                &mut intent_broker,
                 path,
                 &[(MEMBER_TYPE, MEMBER_TYPE_COMMAND.into()), (TYPE, /*..*/ r#type.into())],
             )
@@ -130,11 +130,11 @@ pub async fn main() -> Result<(), Error> {
         }
 
         async fn inspect_dependency(
-            chariott: &mut GrpcChariott,
+            intent_broker: &mut GrpcIntentBrokering,
             path: impl Into<Box<str>> + Send,
             expected_properties: &[(&str, Value)],
         ) -> Result<(), Error> {
-            let inspection_result = chariott.inspect(VDT_NAMESPACE, path).await?;
+            let inspection_result = intent_broker.inspect(VDT_NAMESPACE, path).await?;
             inspection_result.iter().map(|m| {
                 expected_properties.iter().map(|(expected_key, expected_value)| m.get(*expected_key)
                     .ok_or_else(|| anyhow!("Member does not specify {expected_key:?}."))
@@ -154,7 +154,7 @@ pub async fn main() -> Result<(), Error> {
 
     // Set up the VDT and dog mode status streaming.
 
-    let mut vdt_stream = chariott
+    let mut vdt_stream = intent_broker
         .listen(
             VDT_NAMESPACE,
             [
@@ -165,7 +165,8 @@ pub async fn main() -> Result<(), Error> {
         )
         .await?;
 
-    let mut dog_mode_status_stream = stream_dog_mode_status(chariott.clone(), &mut state).await?;
+    let mut dog_mode_status_stream =
+        stream_dog_mode_status(intent_broker.clone(), &mut state).await?;
 
     let mut next_timer_wakeup = Instant::now() + TIMEOUT_EVALUATION_INTERVAL;
 
@@ -176,7 +177,7 @@ pub async fn main() -> Result<(), Error> {
         let state_update = select! {
             _ = sleep_until(next_timer_wakeup.into()) => {
                 next_timer_wakeup = Instant::now() + TIMEOUT_EVALUATION_INTERVAL;
-                if let Some(new_state) = on_dog_mode_timer(&state, &mut chariott).await? {
+                if let Some(new_state) = on_dog_mode_timer(&state, &mut intent_broker).await? {
                     state = new_state;
                 }
 
@@ -214,7 +215,7 @@ pub async fn main() -> Result<(), Error> {
             state = new_state
         }
 
-        match run_dog_mode(&state, &previous_state, &mut chariott).await {
+        match run_dog_mode(&state, &previous_state, &mut intent_broker).await {
             Ok(Some(new_state)) => state = new_state,
             Err(e) => error!("{e:?}"),
             Ok(None) => {}
@@ -225,7 +226,7 @@ pub async fn main() -> Result<(), Error> {
 async fn run_dog_mode(
     state: &DogModeState,
     previous_state: &DogModeState,
-    chariott: &mut impl Chariott,
+    intent_broker: &mut impl IntentBrokering,
 ) -> Result<Option<DogModeState>, Error> {
     if state == previous_state {
         return Ok(None);
@@ -250,7 +251,7 @@ async fn run_dog_mode(
     log_change("Battery level", state, previous_state, |s| s.battery_level)?;
 
     if state.write_dog_mode_status && (state.dogmode_status != previous_state.dogmode_status) {
-        chariott
+        intent_broker
             .write(KEY_VALUE_STORE_NAMESPACE, DOG_MODE_STATUS_ID, state.dogmode_status.into())
             .await?;
     }
@@ -258,7 +259,7 @@ async fn run_dog_mode(
     // Immediately end, if dog mode is disabled
     if !state.dogmode_status {
         if previous_state.dogmode_status {
-            activate_air_conditioning(chariott, false).await?;
+            activate_air_conditioning(intent_broker, false).await?;
         }
 
         return Ok(None);
@@ -269,7 +270,7 @@ async fn run_dog_mode(
     // If the temperature falls below the set minimum, turn off air conditioning
     if MIN_TEMPERATURE >= state.temperature && state.air_conditioning_active {
         if let Some(last_air_conditioning_invocation_time) =
-            activate_air_conditioning_with_throttling(false, state, chariott).await?
+            activate_air_conditioning_with_throttling(false, state, intent_broker).await?
         {
             output_state = Some(DogModeState { last_air_conditioning_invocation_time, ..*state });
         }
@@ -278,7 +279,7 @@ async fn run_dog_mode(
     // If all criteria is fulfilled, activate air conditioning
     if state.temperature > MAX_TEMPERATURE && !state.air_conditioning_active {
         if let Some(last_air_conditioning_invocation_time) =
-            activate_air_conditioning_with_throttling(true, state, chariott).await?
+            activate_air_conditioning_with_throttling(true, state, intent_broker).await?
         {
             output_state = Some(DogModeState {
                 last_air_conditioning_invocation_time,
@@ -291,13 +292,13 @@ async fn run_dog_mode(
     async fn activate_air_conditioning_with_throttling(
         value: bool,
         state: &DogModeState,
-        chariott: &mut impl Chariott,
+        intent_broker: &mut impl IntentBrokering,
     ) -> Result<Option<Instant>, Error> {
         let now = Instant::now();
         if now
             > state.last_air_conditioning_invocation_time + FUNCTION_INVOCATION_THROTTLING_DURATION
         {
-            activate_air_conditioning(chariott, value).await?;
+            activate_air_conditioning(intent_broker, value).await?;
             return Ok(Some(now));
         }
 
@@ -306,32 +307,36 @@ async fn run_dog_mode(
 
     // Air conditioning state was changed by the provider.
     if state.air_conditioning_active && !previous_state.air_conditioning_active {
-        send_notification(chariott, "The car is now being cooled.", state).await?;
-        set_ui_message(chariott, "The car is cooled, no need to worry.", state).await?;
+        send_notification(intent_broker, "The car is now being cooled.", state).await?;
+        set_ui_message(intent_broker, "The car is cooled, no need to worry.", state).await?;
     }
 
     // If the battery level fell below a threshold value, send a warning to the car owner.
     if previous_state.battery_level > LOW_BATTERY_LEVEL && state.battery_level <= LOW_BATTERY_LEVEL
     {
-        send_notification(chariott, "The battery is low, please return to the car.", state).await?;
-        set_ui_message(chariott, "The battery is low, the animal is in danger.", state).await?;
+        send_notification(intent_broker, "The battery is low, please return to the car.", state)
+            .await?;
+        set_ui_message(intent_broker, "The battery is low, the animal is in danger.", state)
+            .await?;
     }
 
     async fn activate_air_conditioning(
-        chariott: &mut impl Chariott,
+        intent_broker: &mut impl IntentBrokering,
         value: bool,
     ) -> Result<(), Error> {
-        _ = chariott.invoke(VDT_NAMESPACE, ACTIVATE_AIR_CONDITIONING_ID, [value.into()]).await?;
+        _ = intent_broker
+            .invoke(VDT_NAMESPACE, ACTIVATE_AIR_CONDITIONING_ID, [value.into()])
+            .await?;
         Ok(())
     }
 
     async fn send_notification(
-        chariott: &mut impl Chariott,
+        intent_broker: &mut impl IntentBrokering,
         message: &str,
         state: &DogModeState,
     ) -> Result<(), Error> {
         if !state.send_notification_disabled {
-            _ = chariott.invoke(VDT_NAMESPACE, SEND_NOTIFICATION_ID, [message.into()]).await?;
+            _ = intent_broker.invoke(VDT_NAMESPACE, SEND_NOTIFICATION_ID, [message.into()]).await?;
             Ok(())
         } else {
             // as this is an optional method we don't care
@@ -340,12 +345,12 @@ async fn run_dog_mode(
     }
 
     async fn set_ui_message(
-        chariott: &mut impl Chariott,
+        intent_broker: &mut impl IntentBrokering,
         message: &str,
         state: &DogModeState,
     ) -> Result<(), Error> {
         if !state.set_ui_message_disabled {
-            _ = chariott.invoke(VDT_NAMESPACE, SET_UI_MESSAGE_ID, [message.into()]).await?;
+            _ = intent_broker.invoke(VDT_NAMESPACE, SET_UI_MESSAGE_ID, [message.into()]).await?;
             Ok(())
         } else {
             // as this is an optional method we don't care
@@ -358,7 +363,7 @@ async fn run_dog_mode(
 
 async fn on_dog_mode_timer(
     state: &DogModeState,
-    chariott: &mut impl Chariott,
+    intent_broker: &mut impl IntentBrokering,
 ) -> Result<Option<DogModeState>, Error> {
     if let Some(air_conditioning_activation_time) = state.air_conditioning_activation_time {
         if state.air_conditioning_active {
@@ -366,7 +371,7 @@ async fn on_dog_mode_timer(
         } else if Instant::now()
             > air_conditioning_activation_time + AIR_CONDITIONING_ACTIVATION_TIMEOUT
         {
-            _ = chariott
+            _ = intent_broker
                 .invoke(
                     VDT_NAMESPACE,
                     SEND_NOTIFICATION_ID,
@@ -384,8 +389,8 @@ async fn on_dog_mode_timer(
 #[cfg(test)]
 mod tests {
     use async_trait::async_trait;
-    use chariott_common::error::Error;
-    use examples_common::chariott::{api::Service, inspection::Entry};
+    use examples_common::intent_brokering::{api::Service, inspection::Entry};
+    use intent_brokering_common::error::Error;
 
     use super::*;
 
@@ -397,7 +402,7 @@ mod tests {
     }
 
     #[async_trait]
-    impl Chariott for CarControllerMock {
+    impl IntentBrokering for CarControllerMock {
         async fn invoke<I: IntoIterator<Item = Value> + Send>(
             &mut self,
             namespace: impl Into<Box<str>> + Send,

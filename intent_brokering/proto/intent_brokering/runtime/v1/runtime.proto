@@ -3,34 +3,34 @@
 // SPDX-License-Identifier: MIT
 
 /**
-* Chariott Runtime
+* Intent Brokering Runtime
 *
-* The prototype definitions for Chariott.
+* The prototype definitions for Intent Brokering.
 */
 
 syntax = "proto3";
 
-package chariott.runtime.v1;
+package intent_brokering.runtime.v1;
 
-import "chariott/common/v1/common.proto";
+import "intent_brokering/common/v1/common.proto";
 
 /**
-* The service entry point to Chariott. All functionality is provided through
+* The service entry point to Chariott Intent Brokering. All functionality is provided through
 * this service.
 *
-* **Announce** a service to Chariott.
+* **Announce** a service to the Intent Brokering service.
 *
-* The Announce method is used to announce a service to Chariott.
+* The Announce method is used to announce a service to the Intent Brokering service.
 * If an application calls this method with a not already registered service
 * it will get back that the service is in `ANNOUNCED` state. If the service
 * is already registered it will return `NOT_CHANGED`. Each service needs to
 * periodically call within 5 seconds this method in order to keep the service
-* active with Chariott.
+* active with the Intent Brokering service.
 * More details in the [ADR-0012](docs/adr/ctp-2/0012-intent-registration.md)
 *
-* **Register** a service to Chariott.
+* **Register** a service to the Intent Brokering service.
 *
-* The Register method is used to register a service to Chariott,
+* The Register method is used to register a service to the Intent Brokering service,
 * together with the locality where the service is supposed to run. It also
 * takes a list of intents that the service can handle. It prunes all old
 * registrations for the same service, where a service is identified by the
@@ -39,16 +39,16 @@ import "chariott/common/v1/common.proto";
 *
 * **Fulfill** an intent.
 *
-* The Fulfill method is used to fulfill an intent. Chariott will
+* The Fulfill method is used to fulfill an intent. The Intent Broker will
 * lookup the registered services that can handle the intent. This is
-* opaque to the caller. It will call the Fulfill method on the selected
-* service that is Chariott selected to be able to handle the intent.
+* opaque to the caller. It will call the Fulfill method on the service that is
+* selected to be able to handle the intent.
 * More details on intents can be found in the following ADRs:
 * [ADR-0014](docs/adr/ctp-2/0014-intent-discover.md)
 * [ADR-0015](docs/adr/ctp-2/0015-inspection.md)
 * [ADR-0017](docs/adr/ctp-2/0016-intent-invoke.md)
 */
-service ChariottService {
+service IntentBrokeringService {
     rpc Announce(AnnounceRequest) returns (AnnounceResponse);
     rpc Register(RegisterRequest) returns (RegisterResponse);
     rpc Fulfill(FulfillRequest) returns (FulfillResponse);
@@ -65,7 +65,7 @@ message IntentServiceRegistration {
 
     /**
     * A side note about the `ExecutionLocality`. When `CLOUD` is selected this doesn't
-    * mean that the service will be invoked directly in the cloud through Chariott,
+    * mean that the service will be invoked directly in the cloud through the Intent Broker,
     * but that the service will be invoked in the cloud through a local installed provider
     * that acts as a proxy to the cloud service. This allows abstraction of the cloud
     * service interface and protocol.
@@ -80,7 +80,7 @@ message IntentServiceRegistration {
 * This is used as input to the `Announce` method.
 *
 * Message to check if a service is already registered and also to announce a
-* service's health to Chariott.
+* service's health to the Intent Brokering service.
 */
 message AnnounceRequest {
     IntentServiceRegistration service = 1;
@@ -113,15 +113,15 @@ message IntentRegistration {
 }
 
 enum RegistrationState {
-    REGISTRATION_STATE_ANNOUNCED = 0; // service is not registered for Chariott, upon this result the service should call the `Register` method.
-    REGISTRATION_STATE_NOT_CHANGED = 1; // service is registered and successfully announced to Chariott.
+    REGISTRATION_STATE_ANNOUNCED = 0; // service is not registered, upon this result the service should call the `Register` method.
+    REGISTRATION_STATE_NOT_CHANGED = 1; // service is registered and successfully announced to the Intent Brokering service.
 }
 
 message FulfillRequest {
     string namespace = 1;
-    chariott.common.v1.Intent intent = 2;
+    intent_brokering.common.v1.Intent intent = 2;
 }
 
 message FulfillResponse {
-    chariott.common.v1.Fulfillment fulfillment = 1;
+    intent_brokering.common.v1.Fulfillment fulfillment = 1;
 }

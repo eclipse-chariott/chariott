@@ -7,17 +7,17 @@ use std::sync::Arc;
 use std::vec;
 
 use async_trait::async_trait;
-use chariott_proto::{
+use examples_common::intent_brokering;
+use examples_common::intent_brokering::inspection::{fulfill, Entry};
+use examples_common::intent_brokering::streaming::ProtoExt as _;
+use examples_common::intent_brokering::value::Value;
+use intent_brokering_proto::{
     common::{
         discover_fulfillment::Service, DiscoverFulfillment, FulfillmentEnum, FulfillmentMessage,
         IntentEnum, InvokeFulfillment, ValueMessage,
     },
     provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
 };
-use examples_common::chariott;
-use examples_common::chariott::inspection::{fulfill, Entry};
-use examples_common::chariott::streaming::ProtoExt as _;
-use examples_common::chariott::value::Value;
 use tonic::{Request, Response, Status};
 use url::Url;
 
@@ -30,18 +30,18 @@ pub const ACTIVATE_AIR_CONDITIONING_COMMAND: &str = "Vehicle.Cabin.HVAC.IsAirCon
 pub const SEND_NOTIFICATION_COMMAND: &str = "send_notification";
 pub const SET_UI_MESSAGE_COMMAND: &str = "set_ui_message";
 
-const SCHEMA_VERSION_STREAMING: &str = "chariott.streaming.v1";
+const SCHEMA_VERSION_STREAMING: &str = "intent_brokering.streaming.v1";
 const SCHEMA_REFERENCE: &str = "grpc+proto";
 
-pub type StreamingStore = chariott::streaming::StreamingStore<Value>;
+pub type StreamingStore = intent_brokering::streaming::StreamingStore<Value>;
 
-pub struct ChariottProvider {
+pub struct IntentProvider {
     url: Url,
     vehicle_simulation: VehicleSimulation,
     streaming_store: Arc<StreamingStore>,
 }
 
-impl ChariottProvider {
+impl IntentProvider {
     pub fn new(
         url: Url,
         simulation: VehicleSimulation,
@@ -80,7 +80,7 @@ fn command(path: &str, r#type: &str) -> Entry {
 }
 
 #[async_trait]
-impl ProviderService for ChariottProvider {
+impl ProviderService for IntentProvider {
     async fn fulfill(
         &self,
         request: Request<FulfillRequest>,

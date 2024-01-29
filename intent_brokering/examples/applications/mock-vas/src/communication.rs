@@ -2,8 +2,8 @@
 // Licensed under the MIT license.
 // SPDX-License-Identifier: MIT
 
-use chariott_common::shutdown::{ctrl_c_cancellation, RouterExt};
 use futures::future::join_all;
+use intent_brokering_common::shutdown::{ctrl_c_cancellation, RouterExt};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::spawn;
@@ -11,19 +11,19 @@ use url::Url;
 
 use tonic::transport::Server;
 
-use chariott_common::error::{Error, ResultExt as _};
-use chariott_proto::{
+use intent_brokering_common::error::{Error, ResultExt as _};
+use intent_brokering_proto::{
     provider::provider_service_server::ProviderServiceServer,
     streaming::channel_service_server::ChannelServiceServer,
 };
 
-use crate::chariott_provider::{ChariottProvider, StreamingStore};
+use crate::intent_provider::{IntentProvider, StreamingStore};
 use crate::simulation::VehicleSimulation;
 
 pub async fn serve(url: Url, address: SocketAddr) -> Result<(), Error> {
     let streaming_store = Arc::new(StreamingStore::new());
     let simulation = VehicleSimulation::new(Arc::clone(&streaming_store));
-    let provider = ChariottProvider::new(url, simulation.clone(), Arc::clone(&streaming_store));
+    let provider = IntentProvider::new(url, simulation.clone(), Arc::clone(&streaming_store));
 
     let cancellation_token = ctrl_c_cancellation();
     let server_token = cancellation_token.child_token();

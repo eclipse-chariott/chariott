@@ -12,7 +12,7 @@ set -e
 # set up error handler to clean up docker containers and network
 function cleanup {
     echo "Cleaning up containers and network"
-    docker rm -f chariott 2>/dev/null
+    docker rm -f intent_brokering 2>/dev/null
     docker rm -f kv-app 2>/dev/null
 }
 
@@ -35,13 +35,13 @@ if cleanup; then
     echo "Cleaned up existing containers and network"
 fi
 
-# build chariott docker container
-docker build --tag "chariott:$TAG" --file "$DOCKERFILE_CONTEXT/Dockerfile" "$DOCKERFILE_CONTEXT"
-docker run --init --rm --name chariott --detach --publish 4243:4243 "chariott:$TAG"
+# build intent_brokering docker container
+docker build --tag "intent_brokering:$TAG" --file "$DOCKERFILE_CONTEXT/Dockerfile" "$DOCKERFILE_CONTEXT"
+docker run --init --rm --name intent_brokering --detach --publish 4243:4243 "intent_brokering:$TAG"
 
 # build kv-app docker container
 docker build --tag "kv-app:$TAG" --file "$DOCKERFILE_CONTEXT/examples/applications/Dockerfile.kv-app.ci" --build-arg APP_NAME=kv-app "$DOCKERFILE_CONTEXT"
-docker run --init --rm --name kv-app --detach --publish 50064:50064 --env ANNOUNCE_URL=http://host.docker.internal:50064 --env CHARIOTT_URL=http://host.docker.internal:4243 "kv-app:$TAG" # DevSkim: ignore DS137138
+docker run --init --rm --name kv-app --detach --publish 50064:50064 --env ANNOUNCE_URL=http://host.docker.internal:50064 --env INTENT_BROKER_URL=http://host.docker.internal:4243 "kv-app:$TAG" # DevSkim: ignore DS137138
 
 # run the end to end tests
 cargo test --test "*e2e"

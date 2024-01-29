@@ -5,14 +5,14 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use async_trait::async_trait;
-use chariott_proto::{
+use examples_common::intent_brokering::value::Value;
+use intent_brokering_proto::{
     common::{FulfillmentEnum, FulfillmentMessage, IntentEnum, InvokeFulfillment, InvokeIntent},
     provider::{
         provider_service_server::{ProviderService, ProviderServiceServer},
         FulfillRequest, FulfillResponse,
     },
 };
-use examples_common::chariott::value::Value;
 use tokio::{net::TcpSocket, spawn};
 use tokio_stream::wrappers::TcpListenerStream;
 use tonic::{transport::Server, Request, Response, Status};

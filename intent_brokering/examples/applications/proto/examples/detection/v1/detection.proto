@@ -6,10 +6,10 @@ syntax = "proto3";
 
 package examples.detection.v1;
 
-import "chariott/common/v1/common.proto";
+import "intent_brokering/common/v1/common.proto";
 
 message DetectRequest {
-    chariott.common.v1.Blob blob = 1;
+    intent_brokering.common.v1.Blob blob = 1;
 }
 
 message DetectResponse {

@@ -5,7 +5,7 @@
 use std::{ops::Deref, sync::Arc, time::SystemTime};
 
 use async_trait::async_trait;
-use chariott_proto::{
+use intent_brokering_proto::{
     common::ValueMessage,
     common::{SubscribeFulfillment, SubscribeIntent, ValueEnum},
     streaming::{channel_service_server::ChannelService, Event, OpenRequest},
@@ -18,7 +18,7 @@ use uuid::Uuid;
 type EventSubSystem<T> = ess::EventSubSystem<Box<str>, Box<str>, T, Result<Event, Status>>;
 
 /// [`StreamingEss`](StreamingEss) integrates the reusable
-/// [`EventSubSystem`](ess::EventSubSystem) component with the Chariott gRPC
+/// [`EventSubSystem`](ess::EventSubSystem) component with the Intent Broker gRPC
 /// streaming contract. Cloning [`StreamingEss`](StreamingEss) is cheap, it will
 /// not create a new instance but refer to the same underlying instance instead.
 #[derive(Clone)]
@@ -99,7 +99,7 @@ impl<T> Deref for StreamingEss<T> {
 mod tests {
     use std::time::Duration;
 
-    use chariott_proto::{
+    use intent_brokering_proto::{
         common::{SubscribeIntent, ValueEnum, ValueMessage},
         streaming::{channel_service_server::ChannelService, OpenRequest},
     };

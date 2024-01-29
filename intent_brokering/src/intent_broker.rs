@@ -162,7 +162,7 @@ mod tests {
         sync::Arc,
     };
 
-    use chariott_common::streaming_ess::StreamingEss;
+    use intent_brokering_common::streaming_ess::StreamingEss;
     use url::Url;
 
     use crate::{

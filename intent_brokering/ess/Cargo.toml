@@ -11,7 +11,7 @@ tokio-util = { workspace = true }
 tracing = { workspace = true }
 
 [dev-dependencies]
-chariott-common = { path = "../common/" }
+intent_brokering_common = { path = "../common/" }
 criterion = { version = "0.5.1", features = ["async_tokio"] }
 futures = { workspace = true }
 tokio = { workspace = true, features = ["macros", "sync", "rt-multi-thread"] }

@@ -4,7 +4,7 @@
 
 use std::{error::Error, fmt::Display};
 
-use chariott_proto::common::{Blob, ValueEnum, ValueMessage};
+use intent_brokering_proto::common::{Blob, ValueEnum, ValueMessage};
 
 #[derive(Debug)]
 pub struct InvalidType;

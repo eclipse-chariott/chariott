@@ -1,6 +1,6 @@
 name: Containerize and Push to Container Registry
 
-# Containerizes and pushes a build of the Chariott to a container registry.
+# Containerizes and pushes a build of Chariott Intent Brokering to a container registry.
 #
 # To use this in your own clone of this repo, you need to configure three Github Action secrets:
 # 1. CONTAINER_REGISTRY_ENDPOINT: The DNS endpoint of your container registry (eg. sdv.azurecr.io)

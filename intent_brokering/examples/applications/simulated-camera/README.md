@@ -7,22 +7,22 @@ manual mode where you specify the frame rate event yourself.
 
 ## To run the application
 
-1. Start chariott runtime by executing `cargo run -p chariott` from the root directory
+1. Start the Intent Brokering runtime by executing `cargo run -p intent_brokering` from the root directory
 2. Navigate to `intent_brokering/examples/applications/simulated-camera` directory
-3. Create a `images` directory and place there all the `.jpg` files you want the
+3. Create an `images` directory and place there all the `.jpg` files you want the
    camera application to stream
 4. Start camera application by executing `cargo run` from the
    `intent_brokering/examples/applications/simulated-camera` directory.
 5. In another terminal, open a channel to the simulated-camera with `grpcurl -v \
    -plaintext -import-path proto -proto \
-   intent_brokering/proto/chariott/streaming/v1/streaming.proto localhost:50066 \
-   chariott.streaming.v1.ChannelService/Open` and take a note of the returned
+   intent_brokering/proto/intent_brokering/streaming/v1/streaming.proto localhost:50066 \
+   intent_brokering.streaming.v1.ChannelService/Open` and take a note of the returned
    channel id in the metadata _x-chariott-channel-id_.
 6. In yet another terminal, call the following, using the channel id from the
    previous step:
 
    ```shell
-   grpcurl -v -plaintext -d @ localhost:4243 chariott.runtime.v1.ChariottService/Fulfill <<EOM
+   grpcurl -v -plaintext -d @ localhost:4243 intent_brokering.runtime.v1.IntentBrokeringService/Fulfill <<EOM
    {
        "namespace": "sdv.camera.simulated",
        "intent": {
@@ -36,13 +36,13 @@ manual mode where you specify the frame rate event yourself.
    ```
 
    This makes a single request for a subscription intent for simulated camera
-   frames arriving at the desired frame per minute rate. Chariott then passes
+   frames arriving at the desired frame per minute rate. The Intent Broker then passes
    these intents to the simulated camera application that can fulfill it.
 
    Other allowed sources (i.e. event rate) can be found via `Inspect` intent:
 
    ```shell
-   grpcurl -v -plaintext -d @ localhost:4243 chariott.runtime.v1.ChariottService/Fulfill <<EOM
+   grpcurl -v -plaintext -d @ localhost:4243 intent_brokering.runtime.v1.IntentBrokeringService/Fulfill <<EOM
     {
         "namespace": "sdv.camera.simulated",
         "intent": {

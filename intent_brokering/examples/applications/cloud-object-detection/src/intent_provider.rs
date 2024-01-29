@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 use async_trait::async_trait;
-use chariott_proto::{
+use intent_brokering_proto::{
     common::{FulfillmentEnum, FulfillmentMessage, IntentEnum},
     provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
 };
@@ -13,15 +13,15 @@ use tracing::error;
 use crate::detection::DetectionLogic;
 
 use examples_common::{
-    chariott::inspection::{fulfill, Entry},
     examples::detection::DetectRequest,
+    intent_brokering::inspection::{fulfill, Entry},
 };
 
-pub struct ChariottProvider {
+pub struct IntentProvider {
     internal_logic: DetectionLogic,
 }
 
-impl ChariottProvider {
+impl IntentProvider {
     pub fn new() -> Self {
         let internal_logic = DetectionLogic::new();
         Self { internal_logic }
@@ -39,7 +39,7 @@ lazy_static::lazy_static! {
 }
 
 #[async_trait]
-impl ProviderService for ChariottProvider {
+impl ProviderService for IntentProvider {
     async fn fulfill(
         &self,
         request: Request<FulfillRequest>,
@@ -55,7 +55,7 @@ impl ProviderService for ChariottProvider {
                 let arg = DetectRequest::try_from(intent)
                     .map_err(|e| Status::invalid_argument(e.to_string()))?;
 
-                let result = self.internal_logic.detect_local(arg).map_err(|e| {
+                let result = self.internal_logic.detect_cloud(arg).await.map_err(|e| {
                     error!("Error when running detection: '{e:?}'.");
                     Status::unknown(format!("Error when invoking function: '{}'", e))
                 })?;

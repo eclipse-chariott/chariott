@@ -36,9 +36,9 @@ EOF
     fi
     local ID; ID="$(date -u +%s.%N)"
     echo "$REQ" > "$GRPC_LOG_DIR_PATH/req-$ID"
-    grpcurl -plaintext -import-path ../proto -proto ../proto/chariott/runtime/v1/runtime.proto \
-        -d @ "${CHARIOTT_ADDRESS:-0.0.0.0:4243}" \
-        chariott.runtime.v1.ChariottService/Fulfill <<< "$REQ" \
+    grpcurl -plaintext -import-path ../proto -proto ../proto/intent_brokering/runtime/v1/runtime.proto \
+        -d @ "${INTENT_BROKER_ADDRESS:-0.0.0.0:4243}" \
+        intent_brokering.runtime.v1.IntentBrokeringService/Fulfill <<< "$REQ" \
         | tee "$GRPC_LOG_DIR_PATH/rsp-$ID"
     if [[ "${PIPESTATUS[*]}" != '0 0' ]]; then return 1; fi
 }
@@ -193,7 +193,7 @@ cmd_listen() {
     fi
     local ADDRESS; ADDRESS="$(
         cmd_discover \
-            | jq -r '.[] | select(.schemaReference == "chariott.streaming.v1" and .schemaKind == "grpc+proto") | .url' \
+            | jq -r '.[] | select(.schemaReference == "intent_brokering.streaming.v1" and .schemaKind == "grpc+proto") | .url' \
             | tr -d / | sed -E "s/^http://"
     )"
     if [ -z "$ADDRESS" ]; then
@@ -211,8 +211,8 @@ cmd_listen() {
         mkfifo "$EVENT_STREAM_FIFO"
     fi
     grpcurl -v -plaintext -import-path ../proto -proto \
-        ../proto/chariott/streaming/v1/streaming.proto "$ADDRESS" \
-        chariott.streaming.v1.ChannelService/Open > "$EVENT_STREAM_FIFO" &
+        ../proto/intent_brokering/streaming/v1/streaming.proto "$ADDRESS" \
+        intent_brokering.streaming.v1.ChannelService/Open > "$EVENT_STREAM_FIFO" &
     echo>"$LISTENER_PID_FILE_PATH" $!
     touch "$EVENTS_FILE_PATH" "$MUX_EVENTS_FILE_PATH"
     local LINE
@@ -318,7 +318,7 @@ init_channel_context() {
     EVENTS_FILE_PATH="$CHAR_HOME/channel/$NAMESPACE/events"
 }
 
-chariott_cmd() {
+intent_brokering_cmd() {
     if [ -z "$2" ]; then
         echo>&2 'Missing namespace argument.'
         return 1
@@ -342,7 +342,7 @@ case "$1" in
     listen|\
     channel|\
     inspect)
-        chariott_cmd "$@"
+        intent_brokering_cmd "$@"
         ;;
     events)
         shift

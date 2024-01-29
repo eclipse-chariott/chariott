@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 // api.rs contains code that can be considered "boilerplate" when
-// interacting with the Chariott runtime. It will most likely need to be
-// repeated for all applications interacting with Chariott.
+// interacting with the Intent Brokering runtime. It will most likely need to be
+// repeated for all applications interacting with Intent Brokering.
 
 use std::{
     collections::HashMap,
@@ -15,23 +15,26 @@ use std::{
 use super::{inspection::Entry as InspectionEntry, value::Value};
 
 use async_trait::async_trait;
-use chariott_common::error::{Error, ResultExt as _};
-use chariott_proto::{
+use futures::{stream::BoxStream, StreamExt};
+use intent_brokering_common::error::{Error, ResultExt as _};
+use intent_brokering_proto::{
     common::{
         discover_fulfillment::Service as ServiceMessage, DiscoverFulfillment, DiscoverIntent,
         FulfillmentEnum, InspectFulfillment, InspectIntent, IntentEnum, IntentMessage,
         InvokeFulfillment, InvokeIntent, ReadFulfillment, ReadIntent, SubscribeFulfillment,
         SubscribeIntent, WriteFulfillment, WriteIntent,
     },
-    runtime::{chariott_service_client::ChariottServiceClient, FulfillRequest, FulfillResponse},
+    runtime::{
+        intent_brokering_service_client::IntentBrokeringServiceClient, FulfillRequest,
+        FulfillResponse,
+    },
     streaming::{channel_service_client::ChannelServiceClient, OpenRequest},
 };
-use futures::{stream::BoxStream, StreamExt};
 use tonic::{transport::Channel, Request, Response};
 use tracing::debug;
 
-const CHARIOTT_URL_KEY: &str = "CHARIOTT_URL";
-const DEFAULT_CHARIOTT_URL: &str = env!("DEFAULT_CHARIOTT_URL");
+const INTENT_BROKER_URL_KEY: &str = "INTENT_BROKER_URL";
+const DEFAULT_INTENT_BROKER_URL: &str = env!("DEFAULT_INTENT_BROKER_URL");
 
 struct Fulfillment(FulfillmentEnum);
 
@@ -79,24 +82,24 @@ impl_try_from_var!(Fulfillment, FulfillmentEnum::Subscribe, SubscribeFulfillment
 impl_try_from_var!(Fulfillment, FulfillmentEnum::Discover, DiscoverFulfillment);
 
 #[derive(Clone)]
-pub struct GrpcChariott {
-    client: ChariottServiceClient<Channel>,
+pub struct GrpcIntentBrokering {
+    client: IntentBrokeringServiceClient<Channel>,
 }
 
-impl GrpcChariott {
+impl GrpcIntentBrokering {
     pub async fn connect() -> Result<Self, Error> {
-        let chariott_url =
-            env::var(CHARIOTT_URL_KEY).unwrap_or_else(|_| DEFAULT_CHARIOTT_URL.to_string());
-        let client = ChariottServiceClient::connect(chariott_url)
+        let intent_brokering_url = env::var(INTENT_BROKER_URL_KEY)
+            .unwrap_or_else(|_| DEFAULT_INTENT_BROKER_URL.to_string());
+        let client = IntentBrokeringServiceClient::connect(intent_brokering_url)
             .await
-            .map_err_with("Connecting to Chariott failed.")?;
+            .map_err_with("Connecting to IntentBrokering failed.")?;
 
         Ok(Self { client })
     }
 }
 
 #[async_trait]
-impl ChariottCommunication for GrpcChariott {
+impl IntentBrokeringCommunication for GrpcIntentBrokering {
     async fn fulfill(
         &mut self,
         namespace: impl Into<Box<str>> + Send,
@@ -112,10 +115,10 @@ impl ChariottCommunication for GrpcChariott {
     }
 }
 
-/// Chariott abstracts the Communication layer, but is based on the Protobuf
-/// definitions of the Chariott API.
+/// IntentBrokering abstracts the Communication layer, but is based on the Protobuf
+/// definitions of the IntentBrokering API.
 #[async_trait]
-pub trait ChariottCommunication: Send {
+pub trait IntentBrokeringCommunication: Send {
     async fn fulfill(
         &mut self,
         namespace: impl Into<Box<str>> + Send,
@@ -123,9 +126,9 @@ pub trait ChariottCommunication: Send {
     ) -> Result<Response<FulfillResponse>, Error>;
 }
 
-/// Chariott abstracts the Protobuf definitions that define Chariott's API.
+/// IntentBrokering abstracts the Protobuf definitions that define IntentBrokering's API.
 #[async_trait]
-pub trait Chariott: Send {
+pub trait IntentBrokering: Send {
     async fn invoke<I: IntoIterator<Item = Value> + Send>(
         &mut self,
         namespace: impl Into<Box<str>> + Send,
@@ -166,7 +169,7 @@ pub trait Chariott: Send {
 }
 
 #[async_trait]
-impl<T: ChariottCommunication> Chariott for T {
+impl<T: IntentBrokeringCommunication> IntentBrokering for T {
     async fn invoke<I: IntoIterator<Item = Value> + Send>(
         &mut self,
         namespace: impl Into<Box<str>> + Send,
@@ -297,7 +300,7 @@ impl<T: ChariottCommunication> Chariott for T {
 }
 
 #[async_trait::async_trait]
-pub trait ChariottExt {
+pub trait IntentBrokeringExt {
     async fn listen<'b>(
         self,
         namespace: impl Into<Box<str>> + Send,
@@ -306,9 +309,9 @@ pub trait ChariottExt {
 }
 
 #[async_trait::async_trait]
-impl<T> ChariottExt for &mut T
+impl<T> IntentBrokeringExt for &mut T
 where
-    T: Chariott + Send,
+    T: IntentBrokering + Send,
 {
     async fn listen<'b>(
         self,
@@ -316,7 +319,7 @@ where
         subscription_sources: impl IntoIterator<Item = Box<str>> + Send,
     ) -> Result<BoxStream<'b, Result<Event, Error>>, Error> {
         const CHANNEL_ID_HEADER_NAME: &str = "x-chariott-channel-id";
-        const SDV_EVENT_STREAMING_SCHEMA_REFERENCE: &str = "chariott.streaming.v1";
+        const SDV_EVENT_STREAMING_SCHEMA_REFERENCE: &str = "intent_brokering.streaming.v1";
         const SDV_EVENT_STREAMING_SCHEMA_KIND: &str = "grpc+proto";
 
         let namespace = namespace.into();

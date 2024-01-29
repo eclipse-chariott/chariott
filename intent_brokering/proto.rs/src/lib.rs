@@ -7,10 +7,10 @@
 // why we use allow derive_partial_eq_without_eq
 #![allow(clippy::derive_partial_eq_without_eq)]
 
-mod chariott {
+pub mod intent_brokering {
     pub mod common {
         pub mod v1 {
-            tonic::include_proto!("chariott.common.v1");
+            tonic::include_proto!("intent_brokering.common.v1");
 
             // Re-exporting these types under a different name makes it more
             // ergonomic in scenarios where both the "outer" (*Message) and
@@ -26,22 +26,22 @@ mod chariott {
     }
     pub mod provider {
         pub mod v1 {
-            tonic::include_proto!("chariott.provider.v1");
+            tonic::include_proto!("intent_brokering.provider.v1");
         }
     }
     pub mod runtime {
         pub mod v1 {
-            tonic::include_proto!("chariott.runtime.v1");
+            tonic::include_proto!("intent_brokering.runtime.v1");
         }
     }
     pub mod streaming {
         pub mod v1 {
-            tonic::include_proto!("chariott.streaming.v1");
+            tonic::include_proto!("intent_brokering.streaming.v1");
         }
     }
 }
 
-pub use chariott::common::v1 as common;
-pub use chariott::provider::v1 as provider;
-pub use chariott::runtime::v1 as runtime;
-pub use chariott::streaming::v1 as streaming;
+pub use intent_brokering::common::v1 as common;
+pub use intent_brokering::provider::v1 as provider;
+pub use intent_brokering::runtime::v1 as runtime;
+pub use intent_brokering::streaming::v1 as streaming;

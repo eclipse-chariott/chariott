@@ -1,5 +1,5 @@
 [package]
-name = "chariott-proto"
+name = "intent_brokering_proto"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"

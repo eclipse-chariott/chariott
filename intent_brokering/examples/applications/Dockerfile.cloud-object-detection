@@ -1,7 +1,7 @@
 #####################################################################################################
 ## Final image
 ####################################################################################################
-FROM chariott:base as base
+FROM intent_brokering_examples:base as base
 FROM alpine:latest
 ARG APP_NAME
 ENV USER_NAME=sample

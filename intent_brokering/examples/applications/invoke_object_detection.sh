@@ -52,6 +52,6 @@ EOF
 
 grpcurl -plaintext --import-path ../../proto/ -import-path ./proto \
         -use-reflection -proto ./proto/examples/detection/v1/detection.proto \
-        -d @ "${CHARIOTT_ADDRESS:-0.0.0.0:4243}" \
-        chariott.runtime.v1.ChariottService/Fulfill < <(echo "$REQ") \
+        -d @ "${INTENT_BROKER_ADDRESS:-0.0.0.0:4243}" \
+        intent_brokering.runtime.v1.IntentBrokeringService/Fulfill < <(echo "$REQ") \
         | jq .fulfillment.invoke.return.any.entries

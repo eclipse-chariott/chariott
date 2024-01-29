@@ -9,7 +9,7 @@ use tonic::{Request, Response, Status};
 
 use url::Url;
 
-use chariott_proto::{
+use intent_brokering_proto::{
     common::{
         discover_fulfillment::Service, value::Value, DiscoverFulfillment, FulfillmentEnum,
         FulfillmentMessage, IntentEnum, InvokeFulfillment, InvokeIntent, ValueMessage,
@@ -17,11 +17,11 @@ use chariott_proto::{
     provider::{provider_service_server::ProviderService, FulfillRequest, FulfillResponse},
 };
 
-pub struct ChariottProvider {
+pub struct IntentProvider {
     url: Url,
 }
 
-impl ChariottProvider {
+impl IntentProvider {
     pub fn new(url: Url) -> Self {
         Self { url }
     }
@@ -61,7 +61,7 @@ impl ChariottProvider {
 }
 
 #[async_trait]
-impl ProviderService for ChariottProvider {
+impl ProviderService for IntentProvider {
     async fn fulfill(
         &self,
         request: Request<FulfillRequest>,

@@ -505,60 +505,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "chariott"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-recursion",
- "async-trait",
- "chariott-common",
- "chariott-proto",
- "examples-common",
- "futures",
- "prost",
- "prost-types",
- "test-case",
- "tokio",
- "tokio-stream",
- "tokio-util",
- "tonic",
- "tonic-build",
- "tonic-reflection",
- "tracing",
- "tracing-subscriber",
- "url",
- "uuid",
-]
-
-[[package]]
-name = "chariott-common"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chariott-proto",
- "ess",
- "regex",
- "serde",
- "tempfile",
- "tokio",
- "tokio-stream",
- "tokio-util",
- "tonic",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "chariott-proto"
-version = "0.1.0"
-dependencies = [
- "prost",
- "prost-types",
- "tonic",
- "tonic-build",
-]
-
-[[package]]
 name = "chrono"
 version = "0.4.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -639,10 +585,10 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "base64",
- "chariott-common",
- "chariott-proto",
  "examples-common",
  "futures",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "lazy_static",
  "reqwest",
  "serde",
@@ -875,10 +821,10 @@ dependencies = [
  "anyhow",
  "async-stream",
  "async-trait",
- "chariott-common",
- "chariott-proto",
  "examples-common",
  "futures",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "prost",
  "prost-types",
  "serde",
@@ -944,9 +890,9 @@ dependencies = [
 name = "ess"
 version = "0.1.0"
 dependencies = [
- "chariott-common",
  "criterion",
  "futures",
+ "intent_brokering_common",
  "tokio",
  "tokio-stream",
  "tokio-util",
@@ -986,10 +932,10 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "bytes",
- "chariott-common",
- "chariott-proto",
  "ess",
  "futures",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "keyvalue",
  "prost",
  "prost-types",
@@ -1561,14 +1507,68 @@ dependencies = [
 ]
 
 [[package]]
+name = "intent_brokering"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-recursion",
+ "async-trait",
+ "examples-common",
+ "futures",
+ "intent_brokering_common",
+ "intent_brokering_proto",
+ "prost",
+ "prost-types",
+ "test-case",
+ "tokio",
+ "tokio-stream",
+ "tokio-util",
+ "tonic",
+ "tonic-build",
+ "tonic-reflection",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "uuid",
+]
+
+[[package]]
+name = "intent_brokering_common"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "ess",
+ "intent_brokering_proto",
+ "regex",
+ "serde",
+ "tempfile",
+ "tokio",
+ "tokio-stream",
+ "tokio-util",
+ "tonic",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "intent_brokering_proto"
+version = "0.1.0"
+dependencies = [
+ "prost",
+ "prost-types",
+ "tonic",
+ "tonic-build",
+]
+
+[[package]]
 name = "invoke-command"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "chariott-common",
- "chariott-proto",
  "ess",
  "examples-common",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "keyvalue",
  "serde",
  "serde_json",
@@ -1669,10 +1669,10 @@ name = "kv-app"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "chariott-common",
- "chariott-proto",
  "ess",
  "examples-common",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "keyvalue",
  "tokio",
  "tokio-stream",
@@ -1745,10 +1745,10 @@ name = "local-object-detection-app"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "chariott-common",
- "chariott-proto",
  "examples-common",
  "image",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "lazy_static",
  "ndarray",
  "serde",
@@ -1787,10 +1787,10 @@ name = "lt-consumer-app"
 version = "0.1.0"
 dependencies = [
  "bollard",
- "chariott-common",
  "examples-common",
  "futures",
  "futures-util",
+ "intent_brokering_common",
  "metrics-util",
  "serde",
  "serde_json",
@@ -1803,9 +1803,9 @@ dependencies = [
 name = "lt-provider-app"
 version = "0.1.0"
 dependencies = [
- "chariott-common",
- "chariott-proto",
  "examples-common",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "rand",
  "rand_distr",
  "tokio",
@@ -1908,12 +1908,12 @@ dependencies = [
  "anyhow",
  "async-std",
  "async-trait",
- "chariott-common",
- "chariott-proto",
  "env_logger",
  "ess",
  "examples-common",
  "futures",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "keyvalue",
  "lazy_static",
  "regex",
@@ -2898,10 +2898,10 @@ name = "simple-provider"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "chariott-common",
- "chariott-proto",
  "ess",
  "examples-common",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "keyvalue",
  "serde",
  "serde_json",
@@ -2922,11 +2922,11 @@ dependencies = [
  "async-std",
  "async-stream",
  "async-trait",
- "chariott-common",
- "chariott-proto",
  "ess",
  "examples-common",
  "futures",
+ "intent_brokering_common",
+ "intent_brokering_proto",
  "keyvalue",
  "lazy_static",
  "regex",
