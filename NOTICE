@@ -4,7 +4,7 @@ This page lists the licenses of the projects used in cargo-about.
 
 ## Overview of licenses
 
-- MIT License (373)
+- MIT License (372)
 - Apache License 2.0 (16)
 - BSD 3-Clause "New" or "Revised" License (6)
 - Creative Commons Zero v1.0 Universal (1)
@@ -846,9 +846,9 @@ This page lists the licenses of the projects used in cargo-about.
 
 #### Used by
 
-- [ciborium]( https://github.com/enarx/ciborium ) 0.2.1
-- [ciborium-io]( https://github.com/enarx/ciborium ) 0.2.1
-- [ciborium-ll]( https://github.com/enarx/ciborium ) 0.2.1
+- [ciborium]( https://github.com/enarx/ciborium ) 0.2.2
+- [ciborium-io]( https://github.com/enarx/ciborium ) 0.2.2
+- [ciborium-ll]( https://github.com/enarx/ciborium ) 0.2.2
 
 #### License
 
@@ -1466,6 +1466,7 @@ limitations under the License.
 #### Used by
 
 - [bollard-stubs]( https://crates.io/crates/bollard-stubs ) 1.43.0-rc.2
+- [openssl]( https://github.com/sfackler/rust-openssl ) 0.10.63
 - [tensorflow-internal-macros]( https://github.com/tensorflow/rust ) 0.0.3
 - [tensorflow-sys]( https://github.com/tensorflow/rust ) 0.24.0
 
@@ -1539,33 +1540,6 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
 http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-```
-
-### Apache-2.0 (Apache License 2.0)
-
-#### Used by
-
-- [openssl]( https://github.com/sfackler/rust-openssl ) 0.10.62
-
-#### License
-
-```text
-Copyright 2011-2017 Google Inc.
-          2013 Jack Lloyd
-          2013-2014 Steven Fackler
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -2312,7 +2286,7 @@ DEALINGS IN THE SOFTWARE.
 - [flate2]( https://github.com/rust-lang/flate2-rs ) 1.0.28
 - [js-sys]( https://github.com/rustwasm/wasm-bindgen/tree/master/crates/js-sys ) 0.3.67
 - [openssl-probe]( https://github.com/alexcrichton/openssl-probe ) 0.1.5
-- [openssl-sys]( https://github.com/sfackler/rust-openssl ) 0.9.98
+- [openssl-sys]( https://github.com/sfackler/rust-openssl ) 0.9.99
 - [pkg-config]( https://github.com/rust-lang/pkg-config-rs ) 0.3.29
 - [rustc-demangle]( https://github.com/alexcrichton/rustc-demangle ) 0.1.23
 - [socket2]( https://github.com/rust-lang/socket2 ) 0.4.10
@@ -2613,8 +2587,8 @@ DEALINGS IN THE SOFTWARE.
 - [num-complex]( https://github.com/rust-num/num-complex ) 0.4.4
 - [num-integer]( https://github.com/rust-num/num-integer ) 0.1.45
 - [num-traits]( https://github.com/rust-num/num-traits ) 0.2.17
-- [regex]( https://github.com/rust-lang/regex ) 1.10.2
-- [regex-automata]( https://github.com/rust-lang/regex/tree/master/regex-automata ) 0.4.3
+- [regex]( https://github.com/rust-lang/regex ) 1.10.3
+- [regex-automata]( https://github.com/rust-lang/regex/tree/master/regex-automata ) 0.4.5
 - [regex-syntax]( https://github.com/rust-lang/regex ) 0.6.29
 - [regex-syntax]( https://github.com/rust-lang/regex/tree/master/regex-syntax ) 0.8.2
 
@@ -2653,7 +2627,7 @@ DEALINGS IN THE SOFTWARE.
 
 #### Used by
 
-- [uuid]( https://github.com/uuid-rs/uuid ) 1.6.1
+- [uuid]( https://github.com/uuid-rs/uuid ) 1.7.0
 
 #### License
 
@@ -2801,7 +2775,7 @@ THE SOFTWARE.
 - [itertools]( https://github.com/rust-itertools/itertools ) 0.11.0
 - [petgraph]( https://github.com/petgraph/petgraph ) 0.6.4
 - [rawpointer]( https://github.com/bluss/rawpointer/ ) 0.2.1
-- [serde_with]( https://github.com/jonasbb/serde_with/ ) 3.4.0
+- [serde_with]( https://github.com/jonasbb/serde_with/ ) 3.5.1
 
 #### License
 
@@ -4405,7 +4379,7 @@ DEALINGS IN THE SOFTWARE.
 
 #### Used by
 
-- [smallvec]( https://github.com/servo/rust-smallvec ) 1.13.0
+- [smallvec]( https://github.com/servo/rust-smallvec ) 1.13.1
 
 #### License
 
@@ -6241,7 +6215,6 @@ SOFTWARE.
 - [ess]( https://crates.io/crates/ess ) 0.1.0
 - [examples-common]( https://crates.io/crates/examples-common ) 0.1.0
 - [gloo-timers]( https://github.com/rustwasm/gloo/tree/master/crates/timers ) 0.2.6
-- [half]( https://github.com/starkat99/half-rs ) 1.8.2
 - [half]( https://github.com/starkat99/half-rs ) 2.3.1
 - [invoke-command]( https://crates.io/crates/invoke-command ) 0.1.0
 - [keyvalue]( https://crates.io/crates/keyvalue ) 0.1.0
@@ -6357,7 +6330,7 @@ DEALINGS IN THE SOFTWARE.
 
 #### Used by
 
-- [bytemuck]( https://github.com/Lokathor/bytemuck ) 1.14.0
+- [bytemuck]( https://github.com/Lokathor/bytemuck ) 1.14.1
 
 #### License
 
@@ -6422,7 +6395,6 @@ MIT OR Apache-2.0
 
 #### Used by
 
-- [half]( https://github.com/starkat99/half-rs ) 1.8.2
 - [half]( https://github.com/starkat99/half-rs ) 2.3.1
 
 #### License
@@ -6516,14 +6488,14 @@ DEALINGS IN THE SOFTWARE.
 - [linux-raw-sys]( https://github.com/sunfishcode/linux-raw-sys ) 0.4.13
 - [once_cell]( https://github.com/matklad/once_cell ) 1.19.0
 - [parking]( https://github.com/smol-rs/parking ) 2.2.0
-- [pin-project]( https://github.com/taiki-e/pin-project ) 1.1.3
-- [pin-project-internal]( https://github.com/taiki-e/pin-project ) 1.1.3
+- [pin-project]( https://github.com/taiki-e/pin-project ) 1.1.4
+- [pin-project-internal]( https://github.com/taiki-e/pin-project ) 1.1.4
 - [pin-project-lite]( https://github.com/taiki-e/pin-project-lite ) 0.2.13
 - [piper]( https://github.com/notgull/piper ) 0.2.1
 - [polling]( https://github.com/smol-rs/polling ) 3.3.2
 - [portable-atomic]( https://github.com/taiki-e/portable-atomic ) 1.6.0
 - [prettyplease]( https://github.com/dtolnay/prettyplease ) 0.2.16
-- [proc-macro2]( https://github.com/dtolnay/proc-macro2 ) 1.0.76
+- [proc-macro2]( https://github.com/dtolnay/proc-macro2 ) 1.0.78
 - [quote]( https://github.com/dtolnay/quote ) 1.0.35
 - [rustix]( https://github.com/bytecodealliance/rustix ) 0.37.27
 - [rustix]( https://github.com/bytecodealliance/rustix ) 0.38.30
@@ -7304,7 +7276,7 @@ DEALINGS IN THE SOFTWARE.
 
 #### Used by
 
-- [weezl]( https://github.com/image-rs/lzw.git ) 0.1.7
+- [weezl]( https://github.com/image-rs/lzw ) 0.1.8
 
 #### License
 
@@ -7461,6 +7433,7 @@ SOFTWARE.
 - [memchr]( https://github.com/BurntSushi/memchr ) 2.7.1
 - [regex-automata]( https://github.com/BurntSushi/regex-automata ) 0.1.10
 - [same-file]( https://github.com/BurntSushi/same-file ) 1.0.6
+- [termcolor]( https://github.com/BurntSushi/termcolor ) 1.4.1
 - [walkdir]( https://github.com/BurntSushi/walkdir ) 2.4.0
 - [winapi-util]( https://github.com/BurntSushi/winapi-util ) 0.1.6
 
