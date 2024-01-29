@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1706555490638,
+  "lastUpdate": 1706566828625,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -5459,6 +5459,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 128103848,
             "range": "± 574104",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0fb0bccb658c84f5e9016b82bc0a3a675b019a8a",
+          "message": "Replace the project name \"Chariott\" in code and package names, with the component name \"intent brokering\"  (#251)\n\n* First step of changing from chariott -> intent brokering in the code\r\n\r\n* Fix formatting and revert proto folder structure due to linting error\r\n\r\n* Fix proto path\r\n\r\n* Fix more references\r\n\r\n* Cargo fmt\r\n\r\n* Update to _ for consistency\r\n\r\n* Fix env variable\r\n\r\n* Fix links\r\n\r\n* fix link\r\n\r\n* Debugging workflow\r\n\r\n* fix container name\r\n\r\n* Docs updates\r\n\r\n* First iteration comments",
+          "timestamp": "2024-01-29T17:17:30-05:00",
+          "tree_id": "48b6b915255225d08dd6060c8a7f592e87b68bb7",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/0fb0bccb658c84f5e9016b82bc0a3a675b019a8a"
+        },
+        "date": 1706566828054,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 185709,
+            "range": "± 9108",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1311872,
+            "range": "± 32963",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 12764296,
+            "range": "± 850400",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1693387,
+            "range": "± 41164",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 13038178,
+            "range": "± 72678",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 128132628,
+            "range": "± 586147",
             "unit": "ns/iter"
           }
         ]
