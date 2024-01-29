@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1706555738692,
+  "lastUpdate": 1706567109514,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -6306,6 +6306,86 @@ window.BENCHMARK_DATA = {
             "value": 2712,
             "unit": "Bytes",
             "range": "p95=2998"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 2,
+            "unit": "Millisecond",
+            "range": "p95=7"
+          }
+        ]
+      }
+    ],
+    "Intent Brokering Benchmark": [
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0fb0bccb658c84f5e9016b82bc0a3a675b019a8a",
+          "message": "Replace the project name \"Chariott\" in code and package names, with the component name \"intent brokering\"  (#251)\n\n* First step of changing from chariott -> intent brokering in the code\r\n\r\n* Fix formatting and revert proto folder structure due to linting error\r\n\r\n* Fix proto path\r\n\r\n* Fix more references\r\n\r\n* Cargo fmt\r\n\r\n* Update to _ for consistency\r\n\r\n* Fix env variable\r\n\r\n* Fix links\r\n\r\n* fix link\r\n\r\n* Debugging workflow\r\n\r\n* fix container name\r\n\r\n* Docs updates\r\n\r\n* First iteration comments",
+          "timestamp": "2024-01-29T17:17:30-05:00",
+          "tree_id": "48b6b915255225d08dd6060c8a7f592e87b68bb7",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/0fb0bccb658c84f5e9016b82bc0a3a675b019a8a"
+        },
+        "date": 1706567109052,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2668",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "9",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 44,
+            "unit": "Percent",
+            "range": "p95=45"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 2892,
+            "unit": "Bytes",
+            "range": "p95=3343"
           },
           {
             "name": "Invoke Throughput",
