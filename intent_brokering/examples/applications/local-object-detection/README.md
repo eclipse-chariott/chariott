@@ -5,7 +5,7 @@ TensorFlow and ssd_mobilenet_v1_coco model.
 
 To run the application:
 
-1. Start intent brokering runtime by executing `cargo run -p intent_brokering`
+1. Start the Intent Brokering runtime by executing `cargo run -p intent_brokering`
 2. Start detection application by executing `cargo run` from the
    `intent_brokering/examples/applications/local-object-detection` directory.
 3. In the root directory create a `detect_image.json` file with the following

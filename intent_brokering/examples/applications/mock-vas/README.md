@@ -4,7 +4,7 @@ This code sample shows you how to use the mocked VAS for the dog mode scenario.
 The dog mode allows a car owner to keep their dog safe, while they are away from
 the car.
 
-## How-to consume a streaming service using Chariott intent brokering
+## How-to consume a streaming service using Chariott Intent Broker
 
 > As an application developer, I want to consume events from a streaming
 > service.
@@ -39,7 +39,7 @@ From the root directory:
    ```
 
    This makes a single request for 2 subscription intents for the
-   dog mode status and the temperature events to the intent broker. The intent broker then passes these
+   dog mode status and the temperature events to the Intent Broker. The Intent Broker then passes these
    intents to the mock-vas that can fulfill them.
 5. In terminal B, type `temp 20` in the standard input and notice the response
    coming through terminal C. However, if you type `battery 10` you see that

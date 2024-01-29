@@ -71,7 +71,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     tracing::info!("starting grpc services");
     let addr = format!("0.0.0.0:{PORT}").parse().unwrap();
-    tracing::info!("intent broker listening on {addr}");
+    tracing::info!("Intent Broker listening on {addr}");
 
     let server = Arc::new(IntentBrokeringServer::new(registry, broker));
     let router = Server::builder()

@@ -113,7 +113,7 @@ message InspectFulfillment {
 /**
 * Invoke Intent
 *
-* The invoke intent is used to invoke a method on the application through the intent brokering runtime.
+* The invoke intent is used to invoke a method on the application through the Intent Brokering runtime.
 */
 message InvokeIntent {
     string command = 1;

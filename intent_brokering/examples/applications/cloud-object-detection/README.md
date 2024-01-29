@@ -5,8 +5,8 @@ Cognitive Services.
 
 To run the application:
 
-1. Start chariott runtime by executing `cargo run -p intent_brokering`
-2. Start it by executing `cargo run` from the
+1. Start the Intent Brokering runtime by executing `cargo run -p intent_brokering`
+2. Start the cloud object detection by executing `cargo run` from the
    `intent_brokering/examples/applications/cloud-object-detection` directory while specifying
    `COGNITIVE_ENDPOINT` (i.e. `myendpoint.cognitiveservices.azure.com`) and
    `COGNITIVE_KEY` environment variables.

@@ -7,9 +7,9 @@ manual mode where you specify the frame rate event yourself.
 
 ## To run the application
 
-1. Start intent brokering runtime by executing `cargo run -p intent_brokering` from the root directory
+1. Start the Intent Brokering runtime by executing `cargo run -p intent_brokering` from the root directory
 2. Navigate to `intent_brokering/examples/applications/simulated-camera` directory
-3. Create a `images` directory and place there all the `.jpg` files you want the
+3. Create an `images` directory and place there all the `.jpg` files you want the
    camera application to stream
 4. Start camera application by executing `cargo run` from the
    `intent_brokering/examples/applications/simulated-camera` directory.
@@ -36,7 +36,7 @@ manual mode where you specify the frame rate event yourself.
    ```
 
    This makes a single request for a subscription intent for simulated camera
-   frames arriving at the desired frame per minute rate. The broker then passes
+   frames arriving at the desired frame per minute rate. The Intent Broker then passes
    these intents to the simulated camera application that can fulfill it.
 
    Other allowed sources (i.e. event rate) can be found via `Inspect` intent:

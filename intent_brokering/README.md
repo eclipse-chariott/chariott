@@ -32,7 +32,7 @@ an intent with the Intent Broker, other applications can use that intent to inte
 the provider. The intent is a gRPC method that is defined in the provider's
 protobuf definition. That definition is only used by the Intent Broker itself.
 
-The intent broker also provides a gRPC interface for applications to interact with
+The Intent Broker also provides a gRPC interface for applications to interact with
 providers and delegates the calls based on the intent to the provider transparently.
 Therefore, clients don't need to know the location and details of the provider as long as
 their intent is fulfilled.

@@ -5,7 +5,7 @@
 /**
 * Provider definition
 *
-* This proto file defines the contract between the intent broker and an intent provider.
+* This proto file defines the contract between the Intent Broker and an intent provider.
 */
 
 
@@ -18,7 +18,7 @@ import "intent_brokering/common/v1/common.proto";
 /**
 * The provider service definition.
 *
-* This service is used by intent_brokering to communicate with the provider. Each service application
+* This service the Intent Broker to communicate with the provider. Each service application
 * that wants to be a provider must implement this service.
 */
 service ProviderService  {

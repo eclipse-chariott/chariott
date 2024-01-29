@@ -7,9 +7,9 @@
 *
 * This contract is used to stream data from a service application registered as provider and
 * a service application that is a consumer. This interface will be discovered using the
-* `Discover` intent through the intent broker runtime. The communication is done after discovery
-* peer to peer without the intent broker being involved. Only the subscription of sources will be
-* handled by the intent broker again, but data flows peer to peer without the broker in between.
+* `Discover` intent through the Intent Broker runtime. The communication is done after discovery
+* peer to peer without the Intent Broker being involved. Only the subscription of sources will be
+* handled by the Intent Broker again, but data flows peer to peer without the broker in between.
 * More details found here:
 * [ADR-0016](docs/adr/ctp-2/0016-streaming-support.md)
 */

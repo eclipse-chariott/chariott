@@ -18,7 +18,7 @@ use uuid::Uuid;
 type EventSubSystem<T> = ess::EventSubSystem<Box<str>, Box<str>, T, Result<Event, Status>>;
 
 /// [`StreamingEss`](StreamingEss) integrates the reusable
-/// [`EventSubSystem`](ess::EventSubSystem) component with the intent broker gRPC
+/// [`EventSubSystem`](ess::EventSubSystem) component with the Intent Broker gRPC
 /// streaming contract. Cloning [`StreamingEss`](StreamingEss) is cheap, it will
 /// not create a new instance but refer to the same underlying instance instead.
 #[derive(Clone)]
