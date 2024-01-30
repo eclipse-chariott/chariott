@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1706566828625,
+  "lastUpdate": 1706629581045,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -5519,6 +5519,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 128132628,
             "range": "± 586147",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "021ec1d09da5d40ece3de911dcb0a86d4c5f9d55",
+          "message": "chore: Bump the dev-dependencies group with 2 updates (#254)\n\nBumps the dev-dependencies group with 2 updates: [serde](https://github.com/serde-rs/serde) and [serde_json](https://github.com/serde-rs/json).\r\n\r\n\r\nUpdates `serde` from 1.0.195 to 1.0.196\r\n- [Release notes](https://github.com/serde-rs/serde/releases)\r\n- [Commits](https://github.com/serde-rs/serde/compare/v1.0.195...v1.0.196)\r\n\r\nUpdates `serde_json` from 1.0.111 to 1.0.113\r\n- [Release notes](https://github.com/serde-rs/json/releases)\r\n- [Commits](https://github.com/serde-rs/json/compare/v1.0.111...v1.0.113)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: serde\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde_json\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2024-01-30T10:43:18-05:00",
+          "tree_id": "600ee80aaa9729cb0a2ab3276ad27591fd3a8cb5",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/021ec1d09da5d40ece3de911dcb0a86d4c5f9d55"
+        },
+        "date": 1706629579830,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 185897,
+            "range": "± 10262",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1325989,
+            "range": "± 30129",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 12880400,
+            "range": "± 726346",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1698531,
+            "range": "± 35388",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 13295235,
+            "range": "± 148287",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 130395158,
+            "range": "± 620770",
             "unit": "ns/iter"
           }
         ]
