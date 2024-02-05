@@ -6205,9 +6205,6 @@ SOFTWARE.
 #### Used by
 
 - [anes]( https://github.com/zrzka/anes-rs ) 0.1.6
-- [chariott]( https://crates.io/crates/chariott ) 0.1.0
-- [chariott-common]( https://crates.io/crates/chariott-common ) 0.1.0
-- [chariott-proto]( https://crates.io/crates/chariott-proto ) 0.1.0
 - [cloud-object-detection-app]( https://crates.io/crates/cloud-object-detection-app ) 0.1.0
 - [consumer]( https://crates.io/crates/consumer ) 0.1.0
 - [crunchy]( https://crates.io/crates/crunchy ) 0.2.2
@@ -6216,6 +6213,9 @@ SOFTWARE.
 - [examples-common]( https://crates.io/crates/examples-common ) 0.1.0
 - [gloo-timers]( https://github.com/rustwasm/gloo/tree/master/crates/timers ) 0.2.6
 - [half]( https://github.com/starkat99/half-rs ) 2.3.1
+- [intent_brokering]( https://crates.io/crates/intent_brokering ) 0.1.0
+- [intent_brokering_common]( https://crates.io/crates/intent_brokering_common ) 0.1.0
+- [intent_brokering_proto]( https://crates.io/crates/intent_brokering_proto ) 0.1.0
 - [invoke-command]( https://crates.io/crates/invoke-command ) 0.1.0
 - [keyvalue]( https://crates.io/crates/keyvalue ) 0.1.0
 - [kv-app]( https://crates.io/crates/kv-app ) 0.1.0
@@ -6501,9 +6501,9 @@ DEALINGS IN THE SOFTWARE.
 - [rustix]( https://github.com/bytecodealliance/rustix ) 0.38.30
 - [rustversion]( https://github.com/dtolnay/rustversion ) 1.0.14
 - [semver]( https://github.com/dtolnay/semver ) 1.0.21
-- [serde]( https://github.com/serde-rs/serde ) 1.0.195
-- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.195
-- [serde_json]( https://github.com/serde-rs/json ) 1.0.111
+- [serde]( https://github.com/serde-rs/serde ) 1.0.196
+- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.196
+- [serde_json]( https://github.com/serde-rs/json ) 1.0.113
 - [serde_repr]( https://github.com/dtolnay/serde-repr ) 0.1.18
 - [syn]( https://github.com/dtolnay/syn ) 1.0.109
 - [syn]( https://github.com/dtolnay/syn ) 2.0.48
