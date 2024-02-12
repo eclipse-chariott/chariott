@@ -210,7 +210,9 @@ This walkthrough is described in the [examples kv-app README](./examples/applica
 
 ## How to run the dog mode demo
 
-To run the dog mode demo, please refer to the [dog mode demo](./examples/applications/README.md).
+To run the dog mode demo, a bigger scenario example, please refer to the
+[dog mode demo](https://github.com/eclipse-chariott/chariott-example-applications/blob/main/intent_brokering/dogmode/README.md#dog-mode)
+in the chariott-example-applications repository.
 
 ## Trademarks
 
