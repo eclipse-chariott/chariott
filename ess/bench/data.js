@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1707759424554,
+  "lastUpdate": 1707861512558,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -5699,6 +5699,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 130024423,
             "range": "± 2684703",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "59834376cb67236a0f9b82cf52afc26032486d64",
+          "message": "chore: Bump the dev-dependencies group with 5 updates (#258)\n\n* chore: Bump the dev-dependencies group with 5 updates\r\n\r\nBumps the dev-dependencies group with 5 updates:\r\n\r\n| Package | From | To |\r\n| --- | --- | --- |\r\n| [tokio](https://github.com/tokio-rs/tokio) | `1.35.1` | `1.36.0` |\r\n| [tonic-reflection](https://github.com/hyperium/tonic) | `0.10.2` | `0.11.0` |\r\n| [tempfile](https://github.com/Stebalien/tempfile) | `3.9.0` | `3.10.0` |\r\n| [reqwest](https://github.com/seanmonstar/reqwest) | `0.11.23` | `0.11.24` |\r\n| [metrics-util](https://github.com/metrics-rs/metrics) | `0.16.0` | `0.16.2` |\r\n\r\n\r\nUpdates `tokio` from 1.35.1 to 1.36.0\r\n- [Release notes](https://github.com/tokio-rs/tokio/releases)\r\n- [Commits](https://github.com/tokio-rs/tokio/compare/tokio-1.35.1...tokio-1.36.0)\r\n\r\nUpdates `tonic-reflection` from 0.10.2 to 0.11.0\r\n- [Changelog](https://github.com/hyperium/tonic/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/hyperium/tonic/compare/v0.10.2...v0.11.0)\r\n\r\nUpdates `tempfile` from 3.9.0 to 3.10.0\r\n- [Changelog](https://github.com/Stebalien/tempfile/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/Stebalien/tempfile/compare/v3.9.0...v3.10.0)\r\n\r\nUpdates `reqwest` from 0.11.23 to 0.11.24\r\n- [Release notes](https://github.com/seanmonstar/reqwest/releases)\r\n- [Changelog](https://github.com/seanmonstar/reqwest/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/seanmonstar/reqwest/compare/v0.11.23...v0.11.24)\r\n\r\nUpdates `metrics-util` from 0.16.0 to 0.16.2\r\n- [Changelog](https://github.com/metrics-rs/metrics/blob/main/release.toml)\r\n- [Commits](https://github.com/metrics-rs/metrics/compare/metrics-util-v0.16.0...metrics-util-v0.16.2)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: tokio\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tonic-reflection\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tempfile\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: reqwest\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: metrics-util\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\n* Cargo update\r\n\r\n* Downgrade clap which requires an update of the rust toolchain version\r\n\r\n* Address security audit issue\r\n\r\n---------\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\r\nCo-authored-by: Lauren Datz <105828115+ladatz@users.noreply.github.com>",
+          "timestamp": "2024-02-13T16:55:38-05:00",
+          "tree_id": "a678dff7e3da05f559cf98ab50a727256e7cd10e",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/59834376cb67236a0f9b82cf52afc26032486d64"
+        },
+        "date": 1707861512054,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 142095,
+            "range": "± 18059",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1242946,
+            "range": "± 43215",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 12708479,
+            "range": "± 932714",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1235078,
+            "range": "± 157413",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 12158673,
+            "range": "± 192773",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 127172155,
+            "range": "± 3083881",
             "unit": "ns/iter"
           }
         ]
