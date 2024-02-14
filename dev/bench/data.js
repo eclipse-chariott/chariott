@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1707759684812,
+  "lastUpdate": 1707942636340,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -6632,6 +6632,84 @@ window.BENCHMARK_DATA = {
             "name": "Possibly Lost Blocks",
             "value": "8",
             "unit": "blocks"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b8528bcf356162f7f4e41624e7a2bd459d0be111",
+          "message": "Remove Dog Mode from Chariott repository now that it is in chariott-example-applications repository (#259)\n\n* Add readme changes\r\n\r\n* Remove dotnet workflow which is no longer needed\r\n\r\n* Remove unused references\r\n\r\n* Adjustments for clap version\r\n\r\n* Remove deleted files from dockerignore",
+          "timestamp": "2024-02-14T15:21:46-05:00",
+          "tree_id": "4cfbfe1ab8b9ebd504e32281e55582563e8d9d32",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/b8528bcf356162f7f4e41624e7a2bd459d0be111"
+        },
+        "date": 1707942635850,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2620",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 2,
+            "unit": "Millisecond",
+            "range": "p95=7"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 43,
+            "unit": "Percent",
+            "range": "p95=44"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 2753,
+            "unit": "Bytes",
+            "range": "p95=3015"
           }
         ]
       }
