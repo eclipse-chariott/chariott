@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1707861512558,
+  "lastUpdate": 1707942280611,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -5759,6 +5759,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 127172155,
             "range": "± 3083881",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b8528bcf356162f7f4e41624e7a2bd459d0be111",
+          "message": "Remove Dog Mode from Chariott repository now that it is in chariott-example-applications repository (#259)\n\n* Add readme changes\r\n\r\n* Remove dotnet workflow which is no longer needed\r\n\r\n* Remove unused references\r\n\r\n* Adjustments for clap version\r\n\r\n* Remove deleted files from dockerignore",
+          "timestamp": "2024-02-14T15:21:46-05:00",
+          "tree_id": "4cfbfe1ab8b9ebd504e32281e55582563e8d9d32",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/b8528bcf356162f7f4e41624e7a2bd459d0be111"
+        },
+        "date": 1707942279461,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 154256,
+            "range": "± 17250",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1213554,
+            "range": "± 39276",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 12088808,
+            "range": "± 476932",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1203343,
+            "range": "± 80133",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 11894493,
+            "range": "± 392738",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 120297009,
+            "range": "± 3027735",
             "unit": "ns/iter"
           }
         ]
