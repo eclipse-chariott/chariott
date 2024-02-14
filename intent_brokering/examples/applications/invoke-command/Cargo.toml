@@ -8,15 +8,10 @@ license = "MIT"
 async-trait = { workspace = true }
 intent_brokering_common = { workspace = true }
 intent_brokering_proto = { workspace = true }
-ess = { path = "../../../ess/" }
 examples-common = { path = "../../common/" }
-keyvalue = { path = "../../../keyvalue/" }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
-tokio-stream = { workspace = true }
 tonic = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 url = { workspace = true }
-uuid = { workspace = true }
-serde = "1.0.196"
 serde_json = "1.0.113"

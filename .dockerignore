@@ -13,8 +13,6 @@ docs/
 tools/
 
 Cargo.lock
-load_test.sh
 
-build-all-containers.sh
 **/Dockerfile
 **/Dockerfile.**
