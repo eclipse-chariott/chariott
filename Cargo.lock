@@ -67,9 +67,9 @@ checksum = "8901269c6307e8d93993578286ac0edf7f195079ffff5ebdeea6a59ffb7e36bc"
 
 [[package]]
 name = "anyhow"
-version = "1.0.79"
+version = "1.0.80"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "080e9890a082662b09c1ad45f567faeeb47f22b5fb23895fbe1e651e718e25ca"
+checksum = "5ad32ce52e4161730f7098c077cd2ed6229b5804ccf99e5366be1ab72a98b4e1"
 
 [[package]]
 name = "async-recursion"
@@ -344,7 +344,7 @@ dependencies = [
  "samples_proto",
  "service_discovery_proto",
  "tokio",
- "tonic 0.10.2",
+ "tonic",
  "tracing",
  "tracing-subscriber",
 ]
@@ -368,7 +368,7 @@ dependencies = [
  "criterion-plot",
  "futures",
  "is-terminal",
- "itertools 0.10.5",
+ "itertools",
  "num-traits",
  "once_cell",
  "oorandom",
@@ -390,7 +390,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b50826342786a51a89e2da3a28f1c32b06e387201bc2d19791f622c673706b1"
 dependencies = [
  "cast",
- "itertools 0.10.5",
+ "itertools",
 ]
 
 [[package]]
@@ -487,7 +487,7 @@ dependencies = [
  "prost",
  "prost-types",
  "tokio",
- "tonic 0.10.2",
+ "tonic",
  "tonic-build",
  "tracing",
  "url",
@@ -852,7 +852,7 @@ dependencies = [
  "tokio",
  "tokio-stream",
  "tokio-util",
- "tonic 0.10.2",
+ "tonic",
  "tonic-build",
  "tonic-reflection",
  "tracing",
@@ -874,7 +874,7 @@ dependencies = [
  "tokio",
  "tokio-stream",
  "tokio-util",
- "tonic 0.10.2",
+ "tonic",
  "tracing",
  "uuid",
 ]
@@ -885,7 +885,7 @@ version = "0.1.0"
 dependencies = [
  "prost",
  "prost-types",
- "tonic 0.10.2",
+ "tonic",
  "tonic-build",
 ]
 
@@ -899,7 +899,7 @@ dependencies = [
  "intent_brokering_proto",
  "serde_json",
  "tokio",
- "tonic 0.10.2",
+ "tonic",
  "tracing",
  "tracing-subscriber",
  "url",
@@ -921,15 +921,6 @@ name = "itertools"
 version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
-dependencies = [
- "either",
-]
-
-[[package]]
-name = "itertools"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
 dependencies = [
  "either",
 ]
@@ -962,7 +953,7 @@ dependencies = [
  "intent_brokering_common",
  "intent_brokering_proto",
  "tokio",
- "tonic 0.10.2",
+ "tonic",
  "tracing",
  "tracing-subscriber",
  "url",
@@ -1034,7 +1025,7 @@ dependencies = [
  "rand",
  "rand_distr",
  "tokio",
- "tonic 0.10.2",
+ "tonic",
  "tracing",
  "tracing-subscriber",
 ]
@@ -1380,7 +1371,7 @@ checksum = "c55e02e35260070b6f716a2423c2ff1c3bb1642ddca6f99e1f26d06268a0e2d2"
 dependencies = [
  "bytes",
  "heck",
- "itertools 0.11.0",
+ "itertools",
  "log",
  "multimap",
  "once_cell",
@@ -1401,7 +1392,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "efb6c9a1dd1def8e2124d17e83a20af56f1570d6c2d2bd9e266ccb768df3840e"
 dependencies = [
  "anyhow",
- "itertools 0.11.0",
+ "itertools",
  "proc-macro2",
  "quote",
  "syn 2.0.48",
@@ -1423,7 +1414,7 @@ dependencies = [
  "samples_proto",
  "service_discovery_proto",
  "tokio",
- "tonic 0.10.2",
+ "tonic",
  "tracing",
  "tracing-subscriber",
  "url",
@@ -1631,7 +1622,7 @@ version = "0.1.0"
 dependencies = [
  "prost",
  "tokio",
- "tonic 0.10.2",
+ "tonic",
  "tonic-build",
 ]
 
@@ -1720,7 +1711,7 @@ dependencies = [
  "prost",
  "service_discovery_proto",
  "tokio",
- "tonic 0.10.2",
+ "tonic",
  "tonic-build",
  "tracing",
  "tracing-subscriber",
@@ -1732,7 +1723,7 @@ version = "0.1.0"
 dependencies = [
  "prost",
  "tokio",
- "tonic 0.10.2",
+ "tonic",
  "tonic-build",
 ]
 
@@ -1763,7 +1754,7 @@ dependencies = [
  "intent_brokering_common",
  "intent_brokering_proto",
  "tokio",
- "tonic 0.10.2",
+ "tonic",
  "tracing",
  "tracing-subscriber",
  "url",
@@ -2014,9 +2005,9 @@ dependencies = [
 
 [[package]]
 name = "tonic"
-version = "0.10.2"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d560933a0de61cf715926b9cac824d4c883c2c43142f787595e48280c40a1d0e"
+checksum = "76c4eb7a4e9ef9d4763600161f12f5070b92a578e1b634db88a6887844c91a13"
 dependencies = [
  "async-stream",
  "async-trait",
@@ -2034,27 +2025,6 @@ dependencies = [
  "tokio",
  "tokio-stream",
  "tower",
- "tower-layer",
- "tower-service",
- "tracing",
-]
-
-[[package]]
-name = "tonic"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "76c4eb7a4e9ef9d4763600161f12f5070b92a578e1b634db88a6887844c91a13"
-dependencies = [
- "async-trait",
- "base64",
- "bytes",
- "http",
- "http-body",
- "percent-encoding",
- "pin-project",
- "prost",
- "tokio",
- "tokio-stream",
  "tower-layer",
  "tower-service",
  "tracing",
@@ -2083,7 +2053,7 @@ dependencies = [
  "prost-types",
  "tokio",
  "tokio-stream",
- "tonic 0.11.0",
+ "tonic",
 ]
 
 [[package]]
