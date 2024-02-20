@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1708027835707,
+  "lastUpdate": 1708451583580,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -5879,6 +5879,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 119021172,
             "range": "± 766121",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "91635f36a3c30fda3f6dc7b123997571b2209573",
+          "message": "chore: Bump the dev-dependencies group with 2 updates (#263)\n\nBumps the dev-dependencies group with 2 updates: [anyhow](https://github.com/dtolnay/anyhow) and [tonic](https://github.com/hyperium/tonic).\r\n\r\n\r\nUpdates `anyhow` from 1.0.79 to 1.0.80\r\n- [Release notes](https://github.com/dtolnay/anyhow/releases)\r\n- [Commits](https://github.com/dtolnay/anyhow/compare/1.0.79...1.0.80)\r\n\r\nUpdates `tonic` from 0.10.2 to 0.11.0\r\n- [Changelog](https://github.com/hyperium/tonic/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/hyperium/tonic/compare/v0.10.2...v0.11.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: anyhow\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tonic\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2024-02-20T12:50:06-05:00",
+          "tree_id": "78be0f7b321f51b83ee9d75d597f0f8fa529c259",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/91635f36a3c30fda3f6dc7b123997571b2209573"
+        },
+        "date": 1708451582505,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 140915,
+            "range": "± 16068",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1224458,
+            "range": "± 28533",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 12388225,
+            "range": "± 395067",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1217644,
+            "range": "± 153665",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 12117886,
+            "range": "± 781741",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 124567533,
+            "range": "± 465228",
             "unit": "ns/iter"
           }
         ]
