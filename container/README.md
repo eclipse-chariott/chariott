@@ -13,7 +13,7 @@ document has instructions for building and running the provided Dockerfiles in
 x86-64 architecture.
 - [Dockerfile.service_discovery.arm64](../Dockerfile.service_discovery.arm64) - Dockerfile used to build the `Service Discovery Service` for the
 aarch64 architecture.
-- [Dockerfile.service_discovery.multi](../Dockerfile.service_discovery.multi) - Dockerfile used to build the `Service Discovery Service` for multiple architectures based on the TARGETARCH argument. 
+- [Dockerfile.service_discovery.multi](../Dockerfile.service_discovery.multi) - Dockerfile used to build the `Service Discovery Service` for multiple architectures based on the TARGETARCH argument.
 
 #### Intent Brokering
 
@@ -50,7 +50,7 @@ Dockerfile:
     You must first create a new builder using the docker-container driver, which gives you access
     to more complex features like multi-platform build. See more information here:
     [multi-platform builds.](https://docs.docker.com/build/building/multi-platform/#cross-compilation)
-    
+
     ```shell
     docker buildx create --name multibuilder --driver docker-container --use
     docker buildx build --platform=linux/amd64,linux/arm64 -f Dockerfile.service_discovery.multi -t <container_registry>/service_discovery_multi --push .
