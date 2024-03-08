@@ -10,7 +10,7 @@ FROM --platform=$BUILDPLATFORM docker.io/library/rust:${RUST_VERSION} AS builder
 #
 # This Dockerfile utilizes a two step build process. It builds Chariott
 # Service Discovery with statically linked dependencies (using musl)
-# for a x86_64 architecture.
+# for a x86_64 and aarch64 architecture, based on the TARGETARCH.
 
 # Target architecture to cross-compile
 ARG TARGETARCH
@@ -20,6 +20,16 @@ ARG CHARIOTT_UID=10001
 
 RUN apt update && apt upgrade -y
 RUN apt install -y cmake protobuf-compiler
+
+WORKDIR /sdv
+
+COPY ./ .
+
+# Check that CHARIOTT_UID argument is valid.
+RUN /sdv/container/scripts/argument_sanitizer.sh \
+    --arg-value "${CHARIOTT_UID}" \
+    --regex "^[0-9]+$" || \
+    ( echo "Argument sanitizer failed for ARG 'CHARIOTT_UID'"; exit 1 )
 
 # unprivileged identity to run Chariott Service Discovery as
 RUN adduser \
@@ -31,9 +41,11 @@ RUN adduser \
     --uid "${CHARIOTT_UID}" \
     chariott
 
-WORKDIR /sdv
-
-COPY ./ .
+# Check that TARGETARCH argument is valid.
+RUN /sdv/container/scripts/argument_sanitizer.sh \
+    --arg-value "${TARGETARCH}" \
+    --regex "^[a-zA-Z_0-9-]+$" || \
+    ( echo "Argument sanitizer failed for ARG 'TARGETARCH'"; exit 1 )
 
 # Based on the target architecture, add the appropriate build target and build service.
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
