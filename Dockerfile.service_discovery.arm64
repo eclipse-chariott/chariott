@@ -10,7 +10,7 @@ FROM docker.io/library/rust:${RUST_VERSION} AS builder
 #
 # This Dockerfile utilizes a two step build process. It builds Chariott
 # Service Discovery with statically linked dependencies (using musl)
-# for a x86_64 architecture.
+# for an arm64 architecture.
 
 # Chariott user id
 ARG CHARIOTT_UID=10001
@@ -48,7 +48,7 @@ COPY --from=builder /etc/group /etc/group
 WORKDIR /sdv
 
 # Copy our build
-COPY --from=builder /sdv/release/aarch64-unknown-linux-musl/service_discovery /sdv/service_discovery
+COPY --from=builder /sdv/target/aarch64-unknown-linux-musl/release/service_discovery /sdv/service_discovery
 
 # Use the unprivileged chariott user during execution.
 USER chariott:chariott
