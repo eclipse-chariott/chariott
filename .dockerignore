@@ -11,8 +11,3 @@ target/
 devops/
 docs/
 tools/
-
-Cargo.lock
-
-**/Dockerfile
-**/Dockerfile.**

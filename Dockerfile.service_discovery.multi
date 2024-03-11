@@ -1,0 +1,81 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+# SPDX-License-Identifier: MIT
+
+ARG RUST_VERSION=1.70
+
+FROM --platform=$BUILDPLATFORM docker.io/library/rust:${RUST_VERSION} AS builder
+
+# Dockerfile for building Eclipse Chariott Service Discovery container
+#
+# This Dockerfile utilizes a two step build process. It builds Chariott
+# Service Discovery with statically linked dependencies (using musl)
+# for a x86_64 and aarch64 architecture, based on the TARGETARCH.
+
+# Target architecture to cross-compile
+ARG TARGETARCH
+
+# Chariott user id
+ARG CHARIOTT_UID=10001
+
+RUN apt update && apt upgrade -y
+RUN apt install -y cmake protobuf-compiler
+
+WORKDIR /sdv
+
+COPY ./ .
+
+# Check that CHARIOTT_UID argument is valid.
+RUN /sdv/container/scripts/argument_sanitizer.sh \
+    --arg-value "${CHARIOTT_UID}" \
+    --regex "^[0-9]+$" || \
+    ( echo "Argument sanitizer failed for ARG 'CHARIOTT_UID'"; exit 1 )
+
+# unprivileged identity to run Chariott Service Discovery as
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${CHARIOTT_UID}" \
+    chariott
+
+# Check that TARGETARCH argument is valid.
+RUN /sdv/container/scripts/argument_sanitizer.sh \
+    --arg-value "${TARGETARCH}" \
+    --regex "^[a-zA-Z_0-9-]+$" || \
+    ( echo "Argument sanitizer failed for ARG 'TARGETARCH'"; exit 1 )
+
+# Based on the target architecture, add the appropriate build target and build service.
+RUN if [ "$TARGETARCH" = "amd64" ]; then \
+        CARGOARCH="x86_64-unknown-linux-musl"; \
+    elif [ "$TARGETARCH" = "arm64" ]; then \
+        apt install -y gcc-aarch64-linux-gnu; \
+        CARGOARCH="aarch64-unknown-linux-musl"; \
+    else \
+        echo "Unsupported cross-compile architecture"; \
+        exit 1; \
+    fi; \
+        rustup target add ${CARGOARCH}; \
+        cargo build --release --target=${CARGOARCH} -p service_discovery; \
+        mkdir -p /sdv/release && cp /sdv/target/${CARGOARCH}/release/service_discovery /sdv/release/service_discovery
+
+####################################################################################################
+## Final image
+####################################################################################################
+FROM --platform=$TARGETPLATFORM alpine:latest
+
+# Import Chariott user and group from builder.
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
+
+WORKDIR /sdv
+
+# Copy our build
+COPY --from=builder /sdv/release/service_discovery /sdv/service_discovery
+
+# Use the unprivileged chariott user during execution.
+USER chariott:chariott
+
+CMD ["./service_discovery"]
