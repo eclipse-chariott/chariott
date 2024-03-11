@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1710162071774,
+  "lastUpdate": 1710193141525,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -6059,6 +6059,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 123832412,
             "range": "± 842894",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "39f570e0339a002daee1918e00920001078dd59c",
+          "message": "Workflow and UID fixes (#272)",
+          "timestamp": "2024-03-11T17:36:08-04:00",
+          "tree_id": "d3dca5efe162f4b2c9410a72322956f986068bb1",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/39f570e0339a002daee1918e00920001078dd59c"
+        },
+        "date": 1710193140972,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 155348,
+            "range": "± 17831",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1239960,
+            "range": "± 45632",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 12318905,
+            "range": "± 472303",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1277277,
+            "range": "± 145287",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 12250322,
+            "range": "± 210132",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 123779638,
+            "range": "± 1100275",
             "unit": "ns/iter"
           }
         ]
