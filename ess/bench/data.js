@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1709740157199,
+  "lastUpdate": 1710162071774,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -5999,6 +5999,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 126370371,
             "range": "± 9614369",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105753233+devkelley@users.noreply.github.com",
+            "name": "devkelley",
+            "username": "devkelley"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ad58e6c29bf065d9ef44c206fb9a57fba6c9e08d",
+          "message": "Add multi and arm dockerfiles (#265)\n\n* Add multi and arm dockerfiles\r\n\r\n* Update multi dockerfile to remove duplicate code\r\n\r\n* Changes for blueprint build\r\n\r\n* Addressing comments, documentation changes\r\n\r\n* Fix whitespace\r\n\r\n* Fix newlines\r\n\r\n---------\r\n\r\nCo-authored-by: Lauren Datz <105828115+ladatz@users.noreply.github.com>",
+          "timestamp": "2024-03-11T08:58:17-04:00",
+          "tree_id": "138efba41ebfb204b74ffab22265a17738ed2423",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/ad58e6c29bf065d9ef44c206fb9a57fba6c9e08d"
+        },
+        "date": 1710162071249,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 151255,
+            "range": "± 17848",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1253503,
+            "range": "± 41803",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 12274048,
+            "range": "± 471591",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1332141,
+            "range": "± 147803",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 12032271,
+            "range": "± 200289",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 123832412,
+            "range": "± 842894",
             "unit": "ns/iter"
           }
         ]
