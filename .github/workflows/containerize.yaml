@@ -17,7 +17,7 @@ on:
     paths:
       - "intent_brokering/src/**"
       - "intent_brokering/proto/**"
-      - "Dockerfile.intent_brokering"
+      - "Dockerfile.intent_brokering.amd64"
       - ".github/workflows/containerize.yaml"
       - "rust-toolchain.toml"
 

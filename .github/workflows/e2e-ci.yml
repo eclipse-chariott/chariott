@@ -50,7 +50,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./Dockerfile.intent_brokering
+          file: ./Dockerfile.intent_brokering.amd64
           load: true
           tags: intent_brokering:1
 

@@ -22,11 +22,11 @@ WORKDIR /sdv
 
 COPY ./ .
 
-# Check that UID argument is valid.
+# Check that CHARIOTT_UID argument is valid.
 RUN /sdv/container/scripts/argument_sanitizer.sh \
-    --arg-value "${UID}" \
+    --arg-value "${CHARIOTT_UID}" \
     --regex "^[0-9]+$" || \
-    ( echo "Argument sanitizer failed for ARG 'UID'"; exit 1 )
+    ( echo "Argument sanitizer failed for ARG 'CHARIOTT_UID'"; exit 1 )
 
 # unprivileged identity to run Chariott Service Discovery as
 RUN adduser \
