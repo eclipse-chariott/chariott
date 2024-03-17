@@ -5420,7 +5420,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #### Used by
 
-- [mio]( https://github.com/tokio-rs/mio ) 0.8.10
+- [mio]( https://github.com/tokio-rs/mio ) 0.8.11
 
 #### License
 
