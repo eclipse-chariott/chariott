@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1710959534020,
+  "lastUpdate": 1710960274332,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -7178,6 +7178,84 @@ window.BENCHMARK_DATA = {
             "value": 2867,
             "unit": "Bytes",
             "range": "p95=3117"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "93fe1ac6beb81d14b26f9e0e263d84cb1adb3079",
+          "message": "chore: Bump the dev-dependencies group with 9 updates (#274)\n\nBumps the dev-dependencies group with 9 updates:\r\n\r\n| Package | From | To |\r\n| --- | --- | --- |\r\n| [anyhow](https://github.com/dtolnay/anyhow) | `1.0.80` | `1.0.81` |\r\n| [async-trait](https://github.com/dtolnay/async-trait) | `0.1.77` | `0.1.78` |\r\n| [serde](https://github.com/serde-rs/serde) | `1.0.196` | `1.0.197` |\r\n| [serde_json](https://github.com/serde-rs/json) | `1.0.113` | `1.0.114` |\r\n| [tokio-stream](https://github.com/tokio-rs/tokio) | `0.1.14` | `0.1.15` |\r\n| [async-recursion](https://github.com/dcchut/async-recursion) | `1.0.5` | `1.1.0` |\r\n| [tempfile](https://github.com/Stebalien/tempfile) | `3.10.0` | `3.10.1` |\r\n| [bollard](https://github.com/fussybeaver/bollard) | `0.15.0` | `0.16.0` |\r\n| [metrics-util](https://github.com/metrics-rs/metrics) | `0.16.2` | `0.16.3` |\r\n\r\n\r\nUpdates `anyhow` from 1.0.80 to 1.0.81\r\n- [Release notes](https://github.com/dtolnay/anyhow/releases)\r\n- [Commits](https://github.com/dtolnay/anyhow/compare/1.0.80...1.0.81)\r\n\r\nUpdates `async-trait` from 0.1.77 to 0.1.78\r\n- [Release notes](https://github.com/dtolnay/async-trait/releases)\r\n- [Commits](https://github.com/dtolnay/async-trait/compare/0.1.77...0.1.78)\r\n\r\nUpdates `serde` from 1.0.196 to 1.0.197\r\n- [Release notes](https://github.com/serde-rs/serde/releases)\r\n- [Commits](https://github.com/serde-rs/serde/compare/v1.0.196...v1.0.197)\r\n\r\nUpdates `serde_json` from 1.0.113 to 1.0.114\r\n- [Release notes](https://github.com/serde-rs/json/releases)\r\n- [Commits](https://github.com/serde-rs/json/compare/v1.0.113...v1.0.114)\r\n\r\nUpdates `tokio-stream` from 0.1.14 to 0.1.15\r\n- [Release notes](https://github.com/tokio-rs/tokio/releases)\r\n- [Commits](https://github.com/tokio-rs/tokio/compare/tokio-stream-0.1.14...tokio-stream-0.1.15)\r\n\r\nUpdates `async-recursion` from 1.0.5 to 1.1.0\r\n- [Release notes](https://github.com/dcchut/async-recursion/releases)\r\n- [Commits](https://github.com/dcchut/async-recursion/compare/v1.0.5...v1.1.0)\r\n\r\nUpdates `tempfile` from 3.10.0 to 3.10.1\r\n- [Changelog](https://github.com/Stebalien/tempfile/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/Stebalien/tempfile/compare/v3.10.0...v3.10.1)\r\n\r\nUpdates `bollard` from 0.15.0 to 0.16.0\r\n- [Release notes](https://github.com/fussybeaver/bollard/releases)\r\n- [Commits](https://github.com/fussybeaver/bollard/compare/v0.15.0...v0.16.0)\r\n\r\nUpdates `metrics-util` from 0.16.2 to 0.16.3\r\n- [Changelog](https://github.com/metrics-rs/metrics/blob/main/release.toml)\r\n- [Commits](https://github.com/metrics-rs/metrics/compare/metrics-util-v0.16.2...metrics-util-v0.16.3)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: anyhow\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: async-trait\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde_json\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tokio-stream\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: async-recursion\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tempfile\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: bollard\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: metrics-util\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2024-03-20T14:36:07-04:00",
+          "tree_id": "bfa1665369d7899d4e884360b5a3215428a2d4ee",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/93fe1ac6beb81d14b26f9e0e263d84cb1adb3079"
+        },
+        "date": 1710960273289,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 2,
+            "unit": "Millisecond",
+            "range": "p95=8"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2620",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 44,
+            "unit": "Percent",
+            "range": "p95=45"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 2871,
+            "unit": "Bytes",
+            "range": "p95=3056"
           }
         ]
       }
