@@ -9,7 +9,7 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-async-recursion = "1.0"
+async-recursion = "1.1"
 async-trait = { workspace = true }
 intent_brokering_common = { workspace = true }
 intent_brokering_proto = { workspace = true }
