@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1710960274332,
+  "lastUpdate": 1711390435824,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -7256,6 +7256,84 @@ window.BENCHMARK_DATA = {
             "value": 2871,
             "unit": "Bytes",
             "range": "p95=3056"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "41898282+github-actions[bot]@users.noreply.github.com",
+            "name": "github-actions[bot]",
+            "username": "github-actions[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "533a24502c0289cabc65274e00d5d604821f8550",
+          "message": "New notice file (#275)\n\nCo-authored-by: Automated Notice Generation Pipeline <chariott-bot@eclipse.org>",
+          "timestamp": "2024-03-25T14:06:40-04:00",
+          "tree_id": "4e925e9f4afaaa283719b5cd57ab41ec2809dc5c",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/533a24502c0289cabc65274e00d5d604821f8550"
+        },
+        "date": 1711390435319,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 2,
+            "unit": "Millisecond",
+            "range": "p95=7"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2620",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 43,
+            "unit": "Percent",
+            "range": "p95=44"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 2830,
+            "unit": "Bytes",
+            "range": "p95=3089"
           }
         ]
       }
