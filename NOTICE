@@ -4,8 +4,8 @@ This page lists the licenses of the projects used in cargo-about.
 
 ## Overview of licenses
 
-- Apache License 2.0 (172)
-- MIT License (81)
+- Apache License 2.0 (174)
+- MIT License (85)
 - BSD 3-Clause "New" or "Revised" License (1)
 - Unicode License Agreement - Data Files and Software (2016) (1)
 
@@ -653,7 +653,8 @@ This page lists the licenses of the projects used in cargo-about.
 
 #### Used by
 
-- [bollard]( https://github.com/fussybeaver/bollard ) 0.15.0
+- [bollard]( https://github.com/fussybeaver/bollard ) 0.16.0
+- [hyper-named-pipe]( https://github.com/fussybeaver/hyper-named-pipe ) 0.1.0
 
 #### License
 
@@ -2154,8 +2155,8 @@ This page lists the licenses of the projects used in cargo-about.
 
 #### Used by
 
-- [anyhow]( https://github.com/dtolnay/anyhow ) 1.0.80
-- [async-trait]( https://github.com/dtolnay/async-trait ) 0.1.77
+- [anyhow]( https://github.com/dtolnay/anyhow ) 1.0.81
+- [async-trait]( https://github.com/dtolnay/async-trait ) 0.1.78
 - [itoa]( https://github.com/dtolnay/itoa ) 1.0.10
 - [libc]( https://github.com/rust-lang/libc ) 0.2.153
 - [prettyplease]( https://github.com/dtolnay/prettyplease ) 0.2.16
@@ -2163,9 +2164,9 @@ This page lists the licenses of the projects used in cargo-about.
 - [quote]( https://github.com/dtolnay/quote ) 1.0.35
 - [rustversion]( https://github.com/dtolnay/rustversion ) 1.0.14
 - [ryu]( https://github.com/dtolnay/ryu ) 1.0.16
-- [serde]( https://github.com/serde-rs/serde ) 1.0.196
-- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.196
-- [serde_json]( https://github.com/serde-rs/json ) 1.0.113
+- [serde]( https://github.com/serde-rs/serde ) 1.0.197
+- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.197
+- [serde_json]( https://github.com/serde-rs/json ) 1.0.114
 - [serde_repr]( https://github.com/dtolnay/serde-repr ) 0.1.18
 - [serde_urlencoded]( https://github.com/nox/serde_urlencoded ) 0.7.1
 - [syn]( https://github.com/dtolnay/syn ) 2.0.48
@@ -2583,6 +2584,7 @@ limitations under the License.
 #### Used by
 
 - [http]( https://github.com/hyperium/http ) 0.2.11
+- [http]( https://github.com/hyperium/http ) 1.1.0
 
 #### License
 
@@ -3501,7 +3503,7 @@ limitations under the License.
 - [smallvec]( https://github.com/servo/rust-smallvec ) 1.13.1
 - [socket2]( https://github.com/rust-lang/socket2 ) 0.5.5
 - [syn]( https://github.com/dtolnay/syn ) 1.0.109
-- [tempfile]( https://github.com/Stebalien/tempfile ) 3.10.0
+- [tempfile]( https://github.com/Stebalien/tempfile ) 3.10.1
 - [thread_local]( https://github.com/Amanieu/thread_local-rs ) 1.1.7
 - [tinytemplate]( https://github.com/bheisler/TinyTemplate ) 1.2.1
 - [unicode-bidi]( https://github.com/servo/unicode-bidi ) 0.3.15
@@ -4757,7 +4759,7 @@ limitations under the License.
 
 #### Used by
 
-- [async-recursion]( https://github.com/dcchut/async-recursion ) 1.0.5
+- [async-recursion]( https://github.com/dcchut/async-recursion ) 1.1.0
 
 #### License
 
@@ -5228,7 +5230,7 @@ limitations under the License.
 #### Used by
 
 - [anes]( https://github.com/zrzka/anes-rs ) 0.1.6
-- [bollard-stubs]( https://crates.io/crates/bollard-stubs ) 1.43.0-rc.2
+- [bollard-stubs]( https://crates.io/crates/bollard-stubs ) 1.44.0-rc.2
 - [half]( https://github.com/starkat99/half-rs ) 2.3.1
 - [winapi-i686-pc-windows-gnu]( https://github.com/retep998/winapi-rs ) 0.4.0
 - [winapi-x86_64-pc-windows-gnu]( https://github.com/retep998/winapi-rs ) 0.4.0
@@ -5452,6 +5454,7 @@ THE SOFTWARE.
 #### Used by
 
 - [hyper]( https://github.com/hyperium/hyper ) 0.14.28
+- [hyper]( https://github.com/hyperium/hyper ) 1.2.0
 
 #### License
 
@@ -5550,7 +5553,7 @@ THE SOFTWARE.
 
 #### Used by
 
-- [hyperlocal]( https://github.com/softprops/hyperlocal ) 0.8.0
+- [hyperlocal-next]( https://github.com/softprops/hyperlocal ) 0.9.0
 
 #### License
 
@@ -6105,7 +6108,7 @@ THE SOFTWARE.
 #### Used by
 
 - [metrics]( https://github.com/metrics-rs/metrics ) 0.22.1
-- [metrics-util]( https://github.com/metrics-rs/metrics ) 0.16.2
+- [metrics-util]( https://github.com/metrics-rs/metrics ) 0.16.3
 
 #### License
 
@@ -6136,8 +6139,39 @@ SOFTWARE.
 
 #### Used by
 
+- [hyper-util]( https://github.com/hyperium/hyper-util ) 0.1.3
+
+#### License
+
+```text
+Copyright (c) 2023 Sean McArthur
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+```
+
+### MIT (MIT License)
+
+#### Used by
+
 - [tokio]( https://github.com/tokio-rs/tokio ) 1.36.0
-- [tokio-stream]( https://github.com/tokio-rs/tokio ) 0.1.14
+- [tokio-stream]( https://github.com/tokio-rs/tokio ) 0.1.15
 - [tokio-util]( https://github.com/tokio-rs/tokio ) 0.7.10
 
 #### License
@@ -6323,6 +6357,8 @@ SOFTWARE.
 - [crunchy]( https://crates.io/crates/crunchy ) 0.2.2
 - [ess]( https://crates.io/crates/ess ) 0.1.0
 - [examples-common]( https://crates.io/crates/examples-common ) 0.1.0
+- [http-body]( https://github.com/hyperium/http-body ) 1.0.0
+- [http-body-util]( https://github.com/hyperium/http-body ) 0.1.1
 - [intent_brokering]( https://crates.io/crates/intent_brokering ) 0.1.0
 - [intent_brokering_common]( https://crates.io/crates/intent_brokering_common ) 0.1.0
 - [intent_brokering_proto]( https://crates.io/crates/intent_brokering_proto ) 0.1.0
