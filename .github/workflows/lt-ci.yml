@@ -26,6 +26,7 @@ concurrency:
 permissions:
   contents: write
   deployments: write
+  pull-requests: write
 
 env:
   # Push the results to gh-pages only on merge to main.
