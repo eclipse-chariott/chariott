@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1712690251530,
+  "lastUpdate": 1712691528396,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -6419,6 +6419,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 124207808,
             "range": "± 4336213",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2b318f1470b02d7b2b69ff95aea0a31efc13cd52",
+          "message": "chore: Bump the dev-dependencies group with 8 updates (#279)\n\nBumps the dev-dependencies group with 8 updates:\r\n\r\n| Package | From | To |\r\n| --- | --- | --- |\r\n| [async-trait](https://github.com/dtolnay/async-trait) | `0.1.78` | `0.1.79` |\r\n| [prost](https://github.com/tokio-rs/prost) | `0.12.3` | `0.12.4` |\r\n| [prost-types](https://github.com/tokio-rs/prost) | `0.12.3` | `0.12.4` |\r\n| [regex](https://github.com/rust-lang/regex) | `1.10.3` | `1.10.4` |\r\n| [serde_json](https://github.com/serde-rs/json) | `1.0.114` | `1.0.115` |\r\n| [tokio](https://github.com/tokio-rs/tokio) | `1.36.0` | `1.37.0` |\r\n| [uuid](https://github.com/uuid-rs/uuid) | `1.7.0` | `1.8.0` |\r\n| [bollard](https://github.com/fussybeaver/bollard) | `0.16.0` | `0.16.1` |\r\n\r\n\r\nUpdates `async-trait` from 0.1.78 to 0.1.79\r\n- [Release notes](https://github.com/dtolnay/async-trait/releases)\r\n- [Commits](https://github.com/dtolnay/async-trait/compare/0.1.78...0.1.79)\r\n\r\nUpdates `prost` from 0.12.3 to 0.12.4\r\n- [Release notes](https://github.com/tokio-rs/prost/releases)\r\n- [Commits](https://github.com/tokio-rs/prost/compare/v0.12.3...v0.12.4)\r\n\r\nUpdates `prost-types` from 0.12.3 to 0.12.4\r\n- [Release notes](https://github.com/tokio-rs/prost/releases)\r\n- [Commits](https://github.com/tokio-rs/prost/compare/v0.12.3...v0.12.4)\r\n\r\nUpdates `regex` from 1.10.3 to 1.10.4\r\n- [Release notes](https://github.com/rust-lang/regex/releases)\r\n- [Changelog](https://github.com/rust-lang/regex/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/rust-lang/regex/compare/1.10.3...1.10.4)\r\n\r\nUpdates `serde_json` from 1.0.114 to 1.0.115\r\n- [Release notes](https://github.com/serde-rs/json/releases)\r\n- [Commits](https://github.com/serde-rs/json/compare/v1.0.114...v1.0.115)\r\n\r\nUpdates `tokio` from 1.36.0 to 1.37.0\r\n- [Release notes](https://github.com/tokio-rs/tokio/releases)\r\n- [Commits](https://github.com/tokio-rs/tokio/compare/tokio-1.36.0...tokio-1.37.0)\r\n\r\nUpdates `uuid` from 1.7.0 to 1.8.0\r\n- [Release notes](https://github.com/uuid-rs/uuid/releases)\r\n- [Commits](https://github.com/uuid-rs/uuid/compare/1.7.0...1.8.0)\r\n\r\nUpdates `bollard` from 0.16.0 to 0.16.1\r\n- [Release notes](https://github.com/fussybeaver/bollard/releases)\r\n- [Commits](https://github.com/fussybeaver/bollard/compare/v0.16.0...v0.16.1)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: async-trait\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: prost\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: prost-types\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: regex\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde_json\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tokio\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: uuid\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: bollard\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\r\nCo-authored-by: Lauren Datz <105828115+ladatz@users.noreply.github.com>",
+          "timestamp": "2024-04-09T15:35:02-04:00",
+          "tree_id": "4959250a6e92baf1bade2c555d1b82b2a5e4e5fe",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/2b318f1470b02d7b2b69ff95aea0a31efc13cd52"
+        },
+        "date": 1712691527938,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 149448,
+            "range": "± 16213",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1217012,
+            "range": "± 42476",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 12098796,
+            "range": "± 452047",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1336566,
+            "range": "± 155277",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 11894411,
+            "range": "± 191469",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 121101972,
+            "range": "± 930548",
             "unit": "ns/iter"
           }
         ]
