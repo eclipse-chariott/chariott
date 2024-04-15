@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: MIT
 
 [workspace]
+# The default resolver for workspaces is different than for regular packages, so use v2 to avoid warnings
+resolver = "2"
 members = [
     "intent_brokering",
     "intent_brokering/common",
