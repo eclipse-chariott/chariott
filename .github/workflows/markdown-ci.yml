@@ -29,5 +29,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: |
+        # markdown-link-check had a regression introduced in version 3.12.0. Keep it at 3.11.2 until that is resolved
+        # Issue: https://github.com/tcort/markdown-link-check/issues/304
         npm install markdown-link-check@3.11.2
         find . -type d \( -name node_modules -o -name .github \) -prune -o -type f -name '*.md' -print0 | xargs -0 -n1 node_modules/.bin/markdown-link-check --config .markdownlinkcheck.jsonc --quiet
