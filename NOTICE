@@ -4,7 +4,7 @@ This page lists the licenses of the projects used in cargo-about.
 
 ## Overview of licenses
 
-- Apache License 2.0 (174)
+- Apache License 2.0 (175)
 - MIT License (85)
 - BSD 3-Clause "New" or "Revised" License (1)
 - Unicode License Agreement - Data Files and Software (2016) (1)
@@ -653,7 +653,7 @@ This page lists the licenses of the projects used in cargo-about.
 
 #### Used by
 
-- [bollard]( https://github.com/fussybeaver/bollard ) 0.16.0
+- [bollard]( https://github.com/fussybeaver/bollard ) 0.16.1
 - [hyper-named-pipe]( https://github.com/fussybeaver/hyper-named-pipe ) 0.1.0
 
 #### License
@@ -2156,7 +2156,7 @@ This page lists the licenses of the projects used in cargo-about.
 #### Used by
 
 - [anyhow]( https://github.com/dtolnay/anyhow ) 1.0.81
-- [async-trait]( https://github.com/dtolnay/async-trait ) 0.1.78
+- [async-trait]( https://github.com/dtolnay/async-trait ) 0.1.79
 - [itoa]( https://github.com/dtolnay/itoa ) 1.0.10
 - [libc]( https://github.com/rust-lang/libc ) 0.2.153
 - [prettyplease]( https://github.com/dtolnay/prettyplease ) 0.2.16
@@ -2166,7 +2166,7 @@ This page lists the licenses of the projects used in cargo-about.
 - [ryu]( https://github.com/dtolnay/ryu ) 1.0.16
 - [serde]( https://github.com/serde-rs/serde ) 1.0.197
 - [serde_derive]( https://github.com/serde-rs/serde ) 1.0.197
-- [serde_json]( https://github.com/serde-rs/json ) 1.0.114
+- [serde_json]( https://github.com/serde-rs/json ) 1.0.115
 - [serde_repr]( https://github.com/dtolnay/serde-repr ) 0.1.18
 - [serde_urlencoded]( https://github.com/nox/serde_urlencoded ) 0.7.1
 - [syn]( https://github.com/dtolnay/syn ) 2.0.48
@@ -3441,6 +3441,7 @@ limitations under the License.
 - [autocfg]( https://github.com/cuviper/autocfg ) 1.1.0
 - [backtrace]( https://github.com/rust-lang/backtrace-rs ) 0.3.69
 - [base64]( https://github.com/marshallpierce/rust-base64 ) 0.21.7
+- [base64]( https://github.com/marshallpierce/rust-base64 ) 0.22.0
 - [bitflags]( https://github.com/bitflags/bitflags ) 1.3.2
 - [bitflags]( https://github.com/bitflags/bitflags ) 2.4.2
 - [bumpalo]( https://github.com/fitzgen/bumpalo ) 3.14.0
@@ -3485,13 +3486,13 @@ limitations under the License.
 - [parking_lot_core]( https://github.com/Amanieu/parking_lot ) 0.9.9
 - [percent-encoding]( https://github.com/servo/rust-url/ ) 2.3.1
 - [petgraph]( https://github.com/petgraph/petgraph ) 0.6.4
-- [prost]( https://github.com/tokio-rs/prost ) 0.12.3
+- [prost]( https://github.com/tokio-rs/prost ) 0.12.4
 - [prost-build]( https://github.com/tokio-rs/prost ) 0.12.3
-- [prost-derive]( https://github.com/tokio-rs/prost ) 0.12.3
-- [prost-types]( https://github.com/tokio-rs/prost ) 0.12.3
+- [prost-derive]( https://github.com/tokio-rs/prost ) 0.12.4
+- [prost-types]( https://github.com/tokio-rs/prost ) 0.12.4
 - [rayon]( https://github.com/rayon-rs/rayon ) 1.8.1
 - [rayon-core]( https://github.com/rayon-rs/rayon ) 1.12.1
-- [regex]( https://github.com/rust-lang/regex ) 1.10.3
+- [regex]( https://github.com/rust-lang/regex ) 1.10.4
 - [regex-automata]( https://github.com/rust-lang/regex/tree/master/regex-automata ) 0.4.5
 - [regex-syntax]( https://github.com/rust-lang/regex ) 0.6.29
 - [regex-syntax]( https://github.com/rust-lang/regex/tree/master/regex-syntax ) 0.8.2
@@ -3509,7 +3510,7 @@ limitations under the License.
 - [unicode-bidi]( https://github.com/servo/unicode-bidi ) 0.3.15
 - [unicode-normalization]( https://github.com/unicode-rs/unicode-normalization ) 0.1.22
 - [url]( https://github.com/servo/rust-url ) 2.5.0
-- [uuid]( https://github.com/uuid-rs/uuid ) 1.7.0
+- [uuid]( https://github.com/uuid-rs/uuid ) 1.8.0
 - [version_check]( https://github.com/SergioBenitez/version_check ) 0.9.4
 - [wasi]( https://github.com/bytecodealliance/wasi ) 0.11.0+wasi-snapshot-preview1
 - [wasm-bindgen]( https://github.com/rustwasm/wasm-bindgen ) 0.2.91
@@ -5618,7 +5619,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #### Used by
 
-- [h2]( https://github.com/hyperium/h2 ) 0.3.24
+- [h2]( https://github.com/hyperium/h2 ) 0.3.26
 
 #### License
 
@@ -6170,7 +6171,7 @@ THE SOFTWARE.
 
 #### Used by
 
-- [tokio]( https://github.com/tokio-rs/tokio ) 1.36.0
+- [tokio]( https://github.com/tokio-rs/tokio ) 1.37.0
 - [tokio-stream]( https://github.com/tokio-rs/tokio ) 0.1.15
 - [tokio-util]( https://github.com/tokio-rs/tokio ) 0.7.10
 
