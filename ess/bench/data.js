@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1713192239437,
+  "lastUpdate": 1713300130860,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -6539,6 +6539,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 124093538,
             "range": "± 3915761",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7bd707c075763fef963e7e19c3d4c7a414690cfd",
+          "message": "SECURITY.md updated to Eclipse's policy, rust toolchain update (#283)\n\n* SECURITY.md updated to Eclipse's policy, rust toolchain update\r\n\r\n* Fix bare URLs and use speciifc version of markdown link check due to regeression in tooling\r\n\r\n* Add comment for version for markdown-link-check",
+          "timestamp": "2024-04-16T16:38:55-04:00",
+          "tree_id": "a8bbfb1ee5cabce3496ef32b6b6c61041f6deaa6",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/7bd707c075763fef963e7e19c3d4c7a414690cfd"
+        },
+        "date": 1713300129813,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 166843,
+            "range": "± 7555",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1247312,
+            "range": "± 30270",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 11989178,
+            "range": "± 432117",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1470143,
+            "range": "± 80647",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 12040501,
+            "range": "± 90348",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 118370070,
+            "range": "± 1685357",
             "unit": "ns/iter"
           }
         ]
