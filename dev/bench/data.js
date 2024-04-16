@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1713192487566,
+  "lastUpdate": 1713300414801,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -7538,6 +7538,84 @@ window.BENCHMARK_DATA = {
             "value": 2,
             "unit": "Millisecond",
             "range": "p95=7"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2620",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "105828115+ladatz@users.noreply.github.com",
+            "name": "ladatz",
+            "username": "ladatz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7bd707c075763fef963e7e19c3d4c7a414690cfd",
+          "message": "SECURITY.md updated to Eclipse's policy, rust toolchain update (#283)\n\n* SECURITY.md updated to Eclipse's policy, rust toolchain update\r\n\r\n* Fix bare URLs and use speciifc version of markdown link check due to regeression in tooling\r\n\r\n* Add comment for version for markdown-link-check",
+          "timestamp": "2024-04-16T16:38:55-04:00",
+          "tree_id": "a8bbfb1ee5cabce3496ef32b6b6c61041f6deaa6",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/7bd707c075763fef963e7e19c3d4c7a414690cfd"
+        },
+        "date": 1713300414142,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 79,
+            "unit": "Percent",
+            "range": "p95=82"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 1954,
+            "unit": "Bytes",
+            "range": "p95=2806"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 5,
+            "unit": "Millisecond",
+            "range": "p95=13"
           },
           {
             "name": "Definitely Lost Bytes",
