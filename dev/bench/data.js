@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1713300414801,
+  "lastUpdate": 1713899873207,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -7646,6 +7646,84 @@ window.BENCHMARK_DATA = {
             "name": "Possibly Lost Blocks",
             "value": "8",
             "unit": "blocks"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9e98037592a32de9170286c83d1fcc44d95c6f55",
+          "message": "chore: Bump the dev-dependencies group with 4 updates (#285)\n\nBumps the dev-dependencies group with 4 updates: [anyhow](https://github.com/dtolnay/anyhow), [async-trait](https://github.com/dtolnay/async-trait), [serde](https://github.com/serde-rs/serde) and [serde_json](https://github.com/serde-rs/json).\r\n\r\n\r\nUpdates `anyhow` from 1.0.81 to 1.0.82\r\n- [Release notes](https://github.com/dtolnay/anyhow/releases)\r\n- [Commits](https://github.com/dtolnay/anyhow/compare/1.0.81...1.0.82)\r\n\r\nUpdates `async-trait` from 0.1.79 to 0.1.80\r\n- [Release notes](https://github.com/dtolnay/async-trait/releases)\r\n- [Commits](https://github.com/dtolnay/async-trait/compare/0.1.79...0.1.80)\r\n\r\nUpdates `serde` from 1.0.197 to 1.0.198\r\n- [Release notes](https://github.com/serde-rs/serde/releases)\r\n- [Commits](https://github.com/serde-rs/serde/compare/v1.0.197...v1.0.198)\r\n\r\nUpdates `serde_json` from 1.0.115 to 1.0.116\r\n- [Release notes](https://github.com/serde-rs/json/releases)\r\n- [Commits](https://github.com/serde-rs/json/compare/v1.0.115...v1.0.116)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: anyhow\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: async-trait\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde_json\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2024-04-23T15:10:00-04:00",
+          "tree_id": "a0ed4c515c3c545a814bd8e6e3b8b8fb3c89659b",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/9e98037592a32de9170286c83d1fcc44d95c6f55"
+        },
+        "date": 1713899872691,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 76,
+            "unit": "Percent",
+            "range": "p95=78"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 1999,
+            "unit": "Bytes",
+            "range": "p95=2740"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2620",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 4,
+            "unit": "Millisecond",
+            "range": "p95=12"
           }
         ]
       }
