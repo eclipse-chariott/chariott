@@ -2155,8 +2155,8 @@ This page lists the licenses of the projects used in cargo-about.
 
 #### Used by
 
-- [anyhow]( https://github.com/dtolnay/anyhow ) 1.0.81
-- [async-trait]( https://github.com/dtolnay/async-trait ) 0.1.79
+- [anyhow]( https://github.com/dtolnay/anyhow ) 1.0.82
+- [async-trait]( https://github.com/dtolnay/async-trait ) 0.1.80
 - [itoa]( https://github.com/dtolnay/itoa ) 1.0.10
 - [libc]( https://github.com/rust-lang/libc ) 0.2.153
 - [prettyplease]( https://github.com/dtolnay/prettyplease ) 0.2.16
@@ -2164,9 +2164,9 @@ This page lists the licenses of the projects used in cargo-about.
 - [quote]( https://github.com/dtolnay/quote ) 1.0.35
 - [rustversion]( https://github.com/dtolnay/rustversion ) 1.0.14
 - [ryu]( https://github.com/dtolnay/ryu ) 1.0.16
-- [serde]( https://github.com/serde-rs/serde ) 1.0.197
-- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.197
-- [serde_json]( https://github.com/serde-rs/json ) 1.0.115
+- [serde]( https://github.com/serde-rs/serde ) 1.0.198
+- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.198
+- [serde_json]( https://github.com/serde-rs/json ) 1.0.116
 - [serde_repr]( https://github.com/dtolnay/serde-repr ) 0.1.18
 - [serde_urlencoded]( https://github.com/nox/serde_urlencoded ) 0.7.1
 - [syn]( https://github.com/dtolnay/syn ) 2.0.48
