@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1714409463133,
+  "lastUpdate": 1714761538226,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -6719,6 +6719,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 124530292,
             "range": "± 2102995",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2029d39952c201efee86c81581922a60ac22fb66",
+          "message": "chore: Bump the dev-dependencies group with 3 updates (#287)\n\nBumps the dev-dependencies group with 3 updates: [parking_lot](https://github.com/Amanieu/parking_lot), [serde](https://github.com/serde-rs/serde) and [async-recursion](https://github.com/dcchut/async-recursion).\r\n\r\n\r\nUpdates `parking_lot` from 0.12.1 to 0.12.2\r\n- [Changelog](https://github.com/Amanieu/parking_lot/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/Amanieu/parking_lot/compare/0.12.1...0.12.2)\r\n\r\nUpdates `serde` from 1.0.198 to 1.0.199\r\n- [Release notes](https://github.com/serde-rs/serde/releases)\r\n- [Commits](https://github.com/serde-rs/serde/compare/v1.0.198...v1.0.199)\r\n\r\nUpdates `async-recursion` from 1.1.0 to 1.1.1\r\n- [Release notes](https://github.com/dcchut/async-recursion/releases)\r\n- [Commits](https://github.com/dcchut/async-recursion/compare/v1.1.0...v1.1.1)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: parking_lot\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: async-recursion\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2024-05-03T14:36:08-04:00",
+          "tree_id": "8eb8e059556cd0bed46810440ca040ddd4422f38",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/2029d39952c201efee86c81581922a60ac22fb66"
+        },
+        "date": 1714761537703,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 163685,
+            "range": "± 6870",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1215176,
+            "range": "± 27006",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 11834098,
+            "range": "± 589952",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1440816,
+            "range": "± 77390",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 11840570,
+            "range": "± 95875",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 118124289,
+            "range": "± 936557",
             "unit": "ns/iter"
           }
         ]
