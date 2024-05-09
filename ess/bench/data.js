@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1715026921571,
+  "lastUpdate": 1715264929362,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -6839,6 +6839,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 116919044,
             "range": "± 607296",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ee7f4660d5fd5315cbbd8aee3003d65511028be8",
+          "message": "chore: Bump the dev-dependencies group with 3 updates (#289)\n\nBumps the dev-dependencies group with 3 updates: [anyhow](https://github.com/dtolnay/anyhow), [serde](https://github.com/serde-rs/serde) and [tokio-util](https://github.com/tokio-rs/tokio).\r\n\r\n\r\nUpdates `anyhow` from 1.0.82 to 1.0.83\r\n- [Release notes](https://github.com/dtolnay/anyhow/releases)\r\n- [Commits](https://github.com/dtolnay/anyhow/compare/1.0.82...1.0.83)\r\n\r\nUpdates `serde` from 1.0.199 to 1.0.200\r\n- [Release notes](https://github.com/serde-rs/serde/releases)\r\n- [Commits](https://github.com/serde-rs/serde/compare/v1.0.199...v1.0.200)\r\n\r\nUpdates `tokio-util` from 0.7.10 to 0.7.11\r\n- [Release notes](https://github.com/tokio-rs/tokio/releases)\r\n- [Commits](https://github.com/tokio-rs/tokio/compare/tokio-util-0.7.10...tokio-util-0.7.11)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: anyhow\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tokio-util\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2024-05-09T10:25:54-04:00",
+          "tree_id": "4fa43d76f6bd20e42153255b42ab143152fdc3d6",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/ee7f4660d5fd5315cbbd8aee3003d65511028be8"
+        },
+        "date": 1715264928234,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 167925,
+            "range": "± 5647",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1254486,
+            "range": "± 37330",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 12171548,
+            "range": "± 424993",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1575588,
+            "range": "± 88149",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 12252773,
+            "range": "± 51695",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 122308385,
+            "range": "± 600002",
             "unit": "ns/iter"
           }
         ]
