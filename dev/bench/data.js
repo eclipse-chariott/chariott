@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1715265219018,
+  "lastUpdate": 1715634335956,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -8036,6 +8036,84 @@ window.BENCHMARK_DATA = {
             "value": 4,
             "unit": "Millisecond",
             "range": "p95=13"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "615e0bb836eec166ea5783415fc623163494c0e4",
+          "message": "chore: Bump the dev-dependencies group with 2 updates (#291)\n\nBumps the dev-dependencies group with 2 updates: [serde](https://github.com/serde-rs/serde) and [serde_json](https://github.com/serde-rs/json).\r\n\r\n\r\nUpdates `serde` from 1.0.200 to 1.0.201\r\n- [Release notes](https://github.com/serde-rs/serde/releases)\r\n- [Commits](https://github.com/serde-rs/serde/compare/v1.0.200...v1.0.201)\r\n\r\nUpdates `serde_json` from 1.0.116 to 1.0.117\r\n- [Release notes](https://github.com/serde-rs/json/releases)\r\n- [Commits](https://github.com/serde-rs/json/compare/v1.0.116...v1.0.117)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: serde\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde_json\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2024-05-13T16:57:40-04:00",
+          "tree_id": "6298219d1dc9e82743b7b6490dd61a1c95cac390",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/615e0bb836eec166ea5783415fc623163494c0e4"
+        },
+        "date": 1715634335253,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 77,
+            "unit": "Percent",
+            "range": "p95=79"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 1868,
+            "unit": "Bytes",
+            "range": "p95=2962"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2620",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 4,
+            "unit": "Millisecond",
+            "range": "p95=12"
           }
         ]
       }
