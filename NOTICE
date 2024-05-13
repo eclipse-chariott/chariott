@@ -2155,7 +2155,7 @@ This page lists the licenses of the projects used in cargo-about.
 
 #### Used by
 
-- [anyhow]( https://github.com/dtolnay/anyhow ) 1.0.82
+- [anyhow]( https://github.com/dtolnay/anyhow ) 1.0.83
 - [async-trait]( https://github.com/dtolnay/async-trait ) 0.1.80
 - [itoa]( https://github.com/dtolnay/itoa ) 1.0.10
 - [libc]( https://github.com/rust-lang/libc ) 0.2.153
@@ -2164,8 +2164,8 @@ This page lists the licenses of the projects used in cargo-about.
 - [quote]( https://github.com/dtolnay/quote ) 1.0.35
 - [rustversion]( https://github.com/dtolnay/rustversion ) 1.0.14
 - [ryu]( https://github.com/dtolnay/ryu ) 1.0.16
-- [serde]( https://github.com/serde-rs/serde ) 1.0.199
-- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.199
+- [serde]( https://github.com/serde-rs/serde ) 1.0.200
+- [serde_derive]( https://github.com/serde-rs/serde ) 1.0.200
 - [serde_json]( https://github.com/serde-rs/json ) 1.0.116
 - [serde_repr]( https://github.com/dtolnay/serde-repr ) 0.1.18
 - [serde_urlencoded]( https://github.com/nox/serde_urlencoded ) 0.7.1
@@ -6173,7 +6173,7 @@ THE SOFTWARE.
 
 - [tokio]( https://github.com/tokio-rs/tokio ) 1.37.0
 - [tokio-stream]( https://github.com/tokio-rs/tokio ) 0.1.15
-- [tokio-util]( https://github.com/tokio-rs/tokio ) 0.7.10
+- [tokio-util]( https://github.com/tokio-rs/tokio ) 0.7.11
 
 #### License
 
