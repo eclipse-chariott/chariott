@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1715634335956,
+  "lastUpdate": 1715634790530,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -8072,6 +8072,84 @@ window.BENCHMARK_DATA = {
             "value": 1868,
             "unit": "Bytes",
             "range": "p95=2962"
+          },
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2620",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 4,
+            "unit": "Millisecond",
+            "range": "p95=12"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "41898282+github-actions[bot]@users.noreply.github.com",
+            "name": "github-actions[bot]",
+            "username": "github-actions[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9dd1a7fe55761dc6f2740e3b2b9b44d86eef033d",
+          "message": "New notice file (#290)\n\nCo-authored-by: Automated Notice Generation Pipeline <chariott-bot@eclipse.org>",
+          "timestamp": "2024-05-13T16:58:07-04:00",
+          "tree_id": "883d1fe4652e1a2b9bfe6d0d1a3bdfd84b172e1c",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/9dd1a7fe55761dc6f2740e3b2b9b44d86eef033d"
+        },
+        "date": 1715634790016,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 77,
+            "unit": "Percent",
+            "range": "p95=79"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 1888,
+            "unit": "Bytes",
+            "range": "p95=2736"
           },
           {
             "name": "Definitely Lost Bytes",
