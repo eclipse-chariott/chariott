@@ -29,11 +29,11 @@ intent_brokering_common = { path = "./intent_brokering/common/" }
 intent_brokering_proto = { path = "./intent_brokering/proto.rs/" }
 futures = { version = "0.3" }
 lazy_static = "1.4.0"
-parking_lot = "0.12.2"
+parking_lot = "0.12.3"
 prost = "0.12"
 prost-types = "0.12"
 regex = "1.10"
-serde = "1.0.202"
+serde = "1.0.203"
 serde_json = "1.0.117"
 tokio = { version = "1.37", features = ["macros"] }
 tokio-util = "0.7"
