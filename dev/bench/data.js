@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1716574902317,
+  "lastUpdate": 1718742106476,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "Chariott Benchmark": [
@@ -8348,6 +8348,84 @@ window.BENCHMARK_DATA = {
             "value": 1860,
             "unit": "Bytes",
             "range": "p95=2736"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "41898282+github-actions[bot]@users.noreply.github.com",
+            "name": "github-actions[bot]",
+            "username": "github-actions[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a8c7ca48a82b560e32a3c3d311df65f421091683",
+          "message": "New notice file (#300)\n\nCo-authored-by: Automated Notice Generation Pipeline <chariott-bot@eclipse.org>",
+          "timestamp": "2024-06-18T16:13:34-04:00",
+          "tree_id": "435c1f12aaf5c8d16b338555ef0f6cf518535eb8",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/a8c7ca48a82b560e32a3c3d311df65f421091683"
+        },
+        "date": 1718742105793,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Definitely Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Definitely Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Indirectly Lost Bytes",
+            "value": "0",
+            "unit": "bytes"
+          },
+          {
+            "name": "Indirectly Lost Blocks",
+            "value": "0",
+            "unit": "blocks"
+          },
+          {
+            "name": "Possibly Lost Bytes",
+            "value": "2620",
+            "unit": "bytes"
+          },
+          {
+            "name": "Possibly Lost Blocks",
+            "value": "8",
+            "unit": "blocks"
+          },
+          {
+            "name": "Invoke Throughput",
+            "value": 3030,
+            "unit": "1/Second",
+            "range": null
+          },
+          {
+            "name": "Latency",
+            "value": 4,
+            "unit": "Millisecond",
+            "range": "p95=13"
+          },
+          {
+            "name": "CPU Usage",
+            "value": 81,
+            "unit": "Percent",
+            "range": "p95=83"
+          },
+          {
+            "name": "Memory Usage",
+            "value": 1917,
+            "unit": "Bytes",
+            "range": "p95=2843"
           }
         ]
       }
