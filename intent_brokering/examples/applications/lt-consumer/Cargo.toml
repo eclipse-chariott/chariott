@@ -9,7 +9,7 @@ bollard = "0.16"
 intent_brokering_common = { workspace = true }
 examples-common = { path = "../../common/" }
 futures-util = "0.3"
-metrics-util = "0.16"
+metrics-util = "0.17"
 serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true }
