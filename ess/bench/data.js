@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1721064269404,
+  "lastUpdate": 1721064441149,
   "repoUrl": "https://github.com/eclipse-chariott/chariott",
   "entries": {
     "ESS Benchmark": [
@@ -7259,6 +7259,66 @@ window.BENCHMARK_DATA = {
             "name": "ess/100-subscribers/10000-events",
             "value": 122964371,
             "range": "± 842968",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "579b99f80dac9472c3d28915dcfde0ef7e0f2871",
+          "message": "Bump the dev-dependencies group across 1 directory with 11 updates (#303)\n\nBumps the dev-dependencies group with 11 updates in the / directory:\r\n\r\n| Package | From | To |\r\n| --- | --- | --- |\r\n| [async-trait](https://github.com/dtolnay/async-trait) | `0.1.80` | `0.1.81` |\r\n| [lazy_static](https://github.com/rust-lang-nursery/lazy-static.rs) | `1.4.0` | `1.5.0` |\r\n| [parking_lot](https://github.com/Amanieu/parking_lot) | `0.12.2` | `0.12.3` |\r\n| [regex](https://github.com/rust-lang/regex) | `1.10.4` | `1.10.5` |\r\n| [serde](https://github.com/serde-rs/serde) | `1.0.202` | `1.0.204` |\r\n| [serde_json](https://github.com/serde-rs/json) | `1.0.117` | `1.0.120` |\r\n| [tokio](https://github.com/tokio-rs/tokio) | `1.37.0` | `1.38.0` |\r\n| [uuid](https://github.com/uuid-rs/uuid) | `1.8.0` | `1.9.1` |\r\n| [url](https://github.com/servo/rust-url) | `2.5.0` | `2.5.2` |\r\n| [tonic-reflection](https://github.com/hyperium/tonic) | `0.11.0` | `0.12.0` |\r\n| [metrics-util](https://github.com/metrics-rs/metrics) | `0.16.3` | `0.17.0` |\r\n\r\n\r\n\r\nUpdates `async-trait` from 0.1.80 to 0.1.81\r\n- [Release notes](https://github.com/dtolnay/async-trait/releases)\r\n- [Commits](https://github.com/dtolnay/async-trait/compare/0.1.80...0.1.81)\r\n\r\nUpdates `lazy_static` from 1.4.0 to 1.5.0\r\n- [Release notes](https://github.com/rust-lang-nursery/lazy-static.rs/releases)\r\n- [Commits](https://github.com/rust-lang-nursery/lazy-static.rs/compare/1.4.0...1.5.0)\r\n\r\nUpdates `parking_lot` from 0.12.2 to 0.12.3\r\n- [Changelog](https://github.com/Amanieu/parking_lot/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/Amanieu/parking_lot/compare/0.12.2...0.12.3)\r\n\r\nUpdates `regex` from 1.10.4 to 1.10.5\r\n- [Release notes](https://github.com/rust-lang/regex/releases)\r\n- [Changelog](https://github.com/rust-lang/regex/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/rust-lang/regex/compare/1.10.4...1.10.5)\r\n\r\nUpdates `serde` from 1.0.202 to 1.0.204\r\n- [Release notes](https://github.com/serde-rs/serde/releases)\r\n- [Commits](https://github.com/serde-rs/serde/compare/v1.0.202...v1.0.204)\r\n\r\nUpdates `serde_json` from 1.0.117 to 1.0.120\r\n- [Release notes](https://github.com/serde-rs/json/releases)\r\n- [Commits](https://github.com/serde-rs/json/compare/v1.0.117...v1.0.120)\r\n\r\nUpdates `tokio` from 1.37.0 to 1.38.0\r\n- [Release notes](https://github.com/tokio-rs/tokio/releases)\r\n- [Commits](https://github.com/tokio-rs/tokio/compare/tokio-1.37.0...tokio-1.38.0)\r\n\r\nUpdates `uuid` from 1.8.0 to 1.9.1\r\n- [Release notes](https://github.com/uuid-rs/uuid/releases)\r\n- [Commits](https://github.com/uuid-rs/uuid/compare/1.8.0...1.9.1)\r\n\r\nUpdates `url` from 2.5.0 to 2.5.2\r\n- [Release notes](https://github.com/servo/rust-url/releases)\r\n- [Commits](https://github.com/servo/rust-url/compare/v2.5.0...v2.5.2)\r\n\r\nUpdates `tonic-reflection` from 0.11.0 to 0.12.0\r\n- [Release notes](https://github.com/hyperium/tonic/releases)\r\n- [Changelog](https://github.com/hyperium/tonic/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/hyperium/tonic/compare/v0.11.0...v0.12.0)\r\n\r\nUpdates `metrics-util` from 0.16.3 to 0.17.0\r\n- [Changelog](https://github.com/metrics-rs/metrics/blob/main/release.toml)\r\n- [Commits](https://github.com/metrics-rs/metrics/compare/metrics-util-v0.16.3...metrics-util-v0.17.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: async-trait\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: lazy_static\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: parking_lot\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: regex\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: serde_json\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tokio\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: uuid\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: url\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n  dependency-group: dev-dependencies\r\n- dependency-name: tonic-reflection\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n- dependency-name: metrics-util\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n  dependency-group: dev-dependencies\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2024-07-15T13:22:36-04:00",
+          "tree_id": "88c84a70c99e1cb79af0faa59080f93b6aac4ccc",
+          "url": "https://github.com/eclipse-chariott/chariott/commit/579b99f80dac9472c3d28915dcfde0ef7e0f2871"
+        },
+        "date": 1721064440804,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "ess/1-subscribers/1000-events",
+            "value": 166392,
+            "range": "± 7896",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/1000-events",
+            "value": 1261964,
+            "range": "± 30284",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/1000-events",
+            "value": 12257723,
+            "range": "± 579267",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/1-subscribers/10000-events",
+            "value": 1442342,
+            "range": "± 92774",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/10-subscribers/10000-events",
+            "value": 12365364,
+            "range": "± 74602",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "ess/100-subscribers/10000-events",
+            "value": 123776258,
+            "range": "± 773853",
             "unit": "ns/iter"
           }
         ]
