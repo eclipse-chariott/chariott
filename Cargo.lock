@@ -494,8 +494,8 @@ dependencies = [
  "intent_brokering_common",
  "intent_brokering_proto",
  "keyvalue",
- "prost 0.12.6",
- "prost-types 0.12.6",
+ "prost 0.13.0",
+ "prost-types 0.13.0",
  "tokio",
  "tonic 0.11.0",
  "tonic-build",
@@ -946,8 +946,8 @@ dependencies = [
  "futures",
  "intent_brokering_common",
  "intent_brokering_proto",
- "prost 0.12.6",
- "prost-types 0.12.6",
+ "prost 0.13.0",
+ "prost-types 0.13.0",
  "test-case",
  "tokio",
  "tokio-stream",
@@ -983,8 +983,8 @@ dependencies = [
 name = "intent_brokering_proto"
 version = "0.1.0"
 dependencies = [
- "prost 0.12.6",
- "prost-types 0.12.6",
+ "prost 0.13.0",
+ "prost-types 0.13.0",
  "tonic 0.11.0",
  "tonic-build",
 ]
@@ -1752,7 +1752,7 @@ dependencies = [
 name = "samples_proto"
 version = "0.1.0"
 dependencies = [
- "prost 0.12.6",
+ "prost 0.13.0",
  "tokio",
  "tonic 0.11.0",
  "tonic-build",
@@ -1840,7 +1840,7 @@ name = "service_discovery"
 version = "0.1.0"
 dependencies = [
  "parking_lot",
- "prost 0.12.6",
+ "prost 0.13.0",
  "service_discovery_proto",
  "tokio",
  "tonic 0.11.0",
@@ -1853,7 +1853,7 @@ dependencies = [
 name = "service_discovery_proto"
 version = "0.1.0"
 dependencies = [
- "prost 0.12.6",
+ "prost 0.13.0",
  "tokio",
  "tonic 0.11.0",
  "tonic-build",
@@ -2342,9 +2342,9 @@ dependencies = [
 
 [[package]]
 name = "uuid"
-version = "1.9.1"
+version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5de17fd2f7da591098415cff336e12965a28061ddace43b59cb3c430179c9439"
+checksum = "81dfa00651efa65069b0b6b651f4aaa31ba9e3c3ce0137aaad053604ee7e0314"
 dependencies = [
  "getrandom",
 ]
